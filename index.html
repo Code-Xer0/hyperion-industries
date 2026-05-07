@@ -211,22 +211,23 @@ h2.h2 em { font-style:normal; color:var(--gold); }
 .ops-intro { max-width:600px; margin-bottom:56px; }
 .ops-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
 /* ── OPERATOR TRADING CARDS ── */
-.ops-grid { display:flex; gap:40px; justify-content:center; flex-wrap:wrap; margin-top:56px; }
+.ops-grid { display:flex; gap:36px; justify-content:center; flex-wrap:wrap; margin-top:56px; }
 
+/* Standard trading card: 63×88mm → ~1:1.4 ratio */
 .op-card {
   position:relative;
-  width:340px;
-  border-radius:18px;
+  width:300px;
+  border-radius:14px;
   padding:3px;
   background:linear-gradient(135deg,#ffc72c 0%,#a0630a 20%,#ffc72c 40%,#fff0a0 50%,#ffc72c 60%,#a0630a 80%,#ffc72c 100%);
   background-size:300% 300%;
   animation:cardFoil 6s ease infinite;
-  box-shadow:0 0 40px rgba(255,199,44,0.25),0 30px 80px rgba(0,0,0,0.8);
+  box-shadow:0 0 32px rgba(255,199,44,0.22),0 24px 64px rgba(0,0,0,0.8);
   flex-shrink:0;
 }
 .op-card.kesh-card {
   background:linear-gradient(135deg,#8ab4f8 0%,#2563a8 20%,#a78bfa 40%,#c4d4ff 50%,#8ab4f8 60%,#2563a8 80%,#8ab4f8 100%);
-  box-shadow:0 0 40px rgba(138,180,248,0.2),0 30px 80px rgba(0,0,0,0.8);
+  box-shadow:0 0 32px rgba(138,180,248,0.18),0 24px 64px rgba(0,0,0,0.8);
 }
 @keyframes cardFoil {
   0%,100% { background-position:0% 50%; }
@@ -235,11 +236,10 @@ h2.h2 em { font-style:normal; color:var(--gold); }
 
 .card-inner {
   background:linear-gradient(170deg,#111318 0%,#0c0e14 50%,#111318 100%);
-  border-radius:15px;
+  border-radius:11px;
   overflow:hidden;
   position:relative;
 }
-/* subtle circuit-grid texture */
 .card-inner::before {
   content:'';
   position:absolute;
@@ -247,51 +247,49 @@ h2.h2 em { font-style:normal; color:var(--gold); }
   background-image:
     linear-gradient(rgba(255,199,44,0.03) 1px,transparent 1px),
     linear-gradient(90deg,rgba(255,199,44,0.03) 1px,transparent 1px);
-  background-size:20px 20px;
+  background-size:18px 18px;
   pointer-events:none;
   z-index:0;
 }
 .card-inner > * { position:relative; z-index:1; }
 
-/* top bar */
 .card-topbar {
   display:flex;
   justify-content:space-between;
   align-items:center;
-  padding:10px 14px 6px;
+  padding:7px 12px 5px;
   border-bottom:1px solid rgba(255,199,44,0.15);
 }
 .kesh-card .card-topbar { border-bottom-color:rgba(138,180,248,0.15); }
-.card-stars { color:#ffc72c; font-size:13px; letter-spacing:2px; line-height:1; text-shadow:0 0 8px rgba(255,199,44,0.6); }
+.card-stars { color:#ffc72c; font-size:11px; letter-spacing:3px; line-height:1; text-shadow:0 0 8px rgba(255,199,44,0.6); }
 .kesh-card .card-stars { color:#8ab4f8; text-shadow:0 0 8px rgba(138,180,248,0.6); }
 .card-attr {
-  width:24px; height:24px;
+  width:20px; height:20px;
   border-radius:50%;
   border:1px solid rgba(255,199,44,0.4);
   display:flex; align-items:center; justify-content:center;
-  font-size:10px; color:#ffc72c; font-weight:700;
+  font-size:9px; color:#ffc72c; font-weight:700;
   background:rgba(255,199,44,0.08);
 }
 .kesh-card .card-attr { border-color:rgba(138,180,248,0.4); color:#8ab4f8; background:rgba(138,180,248,0.08); }
 
-/* card name */
 .card-name {
   font-family:var(--font-display);
-  font-size:22px;
-  font-weight:800;
-  letter-spacing:0.08em;
+  font-size:19px;
+  font-weight:700;
+  letter-spacing:0.1em;
   color:#fff;
-  padding:10px 16px 8px;
-  text-shadow:0 0 20px rgba(255,199,44,0.4);
+  padding:7px 13px 6px;
+  text-shadow:0 0 16px rgba(255,199,44,0.4);
   line-height:1;
 }
-.kesh-card .card-name { text-shadow:0 0 20px rgba(138,180,248,0.4); }
+.kesh-card .card-name { text-shadow:0 0 16px rgba(138,180,248,0.4); }
 
-/* art box */
+/* Art box: 4:3 ratio keeps card close to standard 63×88 total */
 .card-art {
   position:relative;
   width:100%;
-  aspect-ratio:1/1;
+  aspect-ratio:4/3;
   overflow:hidden;
 }
 .card-art img {
@@ -303,9 +301,8 @@ h2.h2 em { font-style:normal; color:var(--gold); }
 .card-art-overlay {
   position:absolute;
   inset:0;
-  background:linear-gradient(to bottom,transparent 55%,rgba(11,13,20,0.9) 100%);
+  background:linear-gradient(to bottom,transparent 50%,rgba(11,13,20,0.85) 100%);
 }
-/* foil shimmer on hover */
 .card-art::before {
   content:'';
   position:absolute;
@@ -317,95 +314,88 @@ h2.h2 em { font-style:normal; color:var(--gold); }
 }
 .op-card:hover .card-art::before { transform:translateX(100%); }
 
-/* type line */
 .card-typeline {
   display:flex;
   align-items:center;
-  gap:8px;
-  padding:6px 16px;
-  background:rgba(255,199,44,0.06);
-  border-top:1px solid rgba(255,199,44,0.15);
-  border-bottom:1px solid rgba(255,199,44,0.1);
+  gap:6px;
+  padding:5px 13px;
+  background:rgba(255,199,44,0.05);
+  border-top:1px solid rgba(255,199,44,0.14);
+  border-bottom:1px solid rgba(255,199,44,0.08);
 }
-.kesh-card .card-typeline {
-  background:rgba(138,180,248,0.06);
-  border-color:rgba(138,180,248,0.15);
-}
-.card-type-ornament { color:#ffc72c; font-size:10px; opacity:0.7; }
+.kesh-card .card-typeline { background:rgba(138,180,248,0.05); border-color:rgba(138,180,248,0.14); }
+.card-type-ornament { color:#ffc72c; font-size:9px; opacity:0.7; flex-shrink:0; }
 .kesh-card .card-type-ornament { color:#8ab4f8; }
 .card-typeline span:not(.card-type-ornament) {
   font-family:var(--font-display);
-  font-size:9px;
-  letter-spacing:0.22em;
-  color:rgba(255,255,255,0.6);
+  font-size:8px;
+  letter-spacing:0.2em;
+  color:rgba(255,255,255,0.55);
   text-transform:uppercase;
   font-weight:600;
 }
 
-/* text box */
 .card-textbox {
-  padding:14px 16px 10px;
+  padding:10px 13px 8px;
   display:flex;
   flex-direction:column;
-  gap:10px;
+  gap:7px;
 }
 .card-effect {
-  font-size:11.5px;
-  color:rgba(255,255,255,0.7);
-  line-height:1.75;
+  font-size:10.5px;
+  color:rgba(255,255,255,0.68);
+  line-height:1.65;
   margin:0;
 }
 .card-focuses {
   display:flex;
   flex-direction:column;
-  gap:4px;
+  gap:2px;
 }
 .card-focus {
-  font-size:10.5px;
-  color:rgba(255,255,255,0.5);
+  font-size:9.5px;
+  color:rgba(255,255,255,0.45);
   display:flex;
   align-items:baseline;
-  gap:6px;
+  gap:5px;
   line-height:1.5;
 }
-.focus-diamond { color:#ffc72c; font-size:8px; flex-shrink:0; }
+.focus-diamond { color:#ffc72c; font-size:7px; flex-shrink:0; }
 .kesh-card .focus-diamond { color:#8ab4f8; }
 .card-flavor {
-  font-size:10px;
+  font-size:9px;
   font-style:italic;
-  color:rgba(255,255,255,0.35);
-  line-height:1.7;
-  border-top:1px solid rgba(255,255,255,0.08);
-  padding-top:8px;
-  margin-top:2px;
+  color:rgba(255,255,255,0.3);
+  line-height:1.6;
+  border-top:1px solid rgba(255,255,255,0.07);
+  padding-top:6px;
 }
 
-/* stats */
 .card-stats {
   display:flex;
   align-items:center;
   justify-content:flex-end;
-  gap:0;
-  padding:8px 14px 12px;
+  padding:6px 12px 7px;
   border-top:1px solid rgba(255,199,44,0.1);
+  gap:0;
 }
 .kesh-card .card-stats { border-top-color:rgba(138,180,248,0.1); }
 .card-stat {
   font-family:var(--font-display);
-  font-size:10px;
-  letter-spacing:0.1em;
-  color:rgba(255,255,255,0.45);
-  padding:0 10px;
+  font-size:9px;
+  letter-spacing:0.08em;
+  color:rgba(255,255,255,0.4);
+  padding:0 8px;
   border-right:1px solid rgba(255,255,255,0.1);
 }
 .card-stat:last-child { border-right:none; }
-.card-stat span { color:#ffc72c; font-weight:700; font-size:11px; margin-left:4px; }
+.card-stat span { color:#ffc72c; font-weight:700; font-size:10px; margin-left:3px; }
 .kesh-card .card-stat span { color:#8ab4f8; }
 .card-serial {
-  font-size:8px;
-  color:rgba(255,255,255,0.15);
-  letter-spacing:0.15em;
-  padding:0 0 6px 14px;
+  font-size:7px;
+  color:rgba(255,255,255,0.12);
+  letter-spacing:0.14em;
+  padding:0 12px 7px;
   font-family:var(--font-display);
 }
 
