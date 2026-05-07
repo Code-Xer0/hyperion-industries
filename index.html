@@ -3,482 +3,303 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hyperion Industries — Human-Centered Intelligence Systems</title>
-<meta name="description" content="Hyperion Industries builds local-first software for people who need to organize, preserve, and navigate what matters — without giving up control of their data.">
+<title>Hyperion Industries — Local-First Intelligence Infrastructure</title>
+<meta name="description" content="Hyperion Industries builds local-first intelligence tools for people who need custody, continuity, and control of their data.">
 <meta property="og:title" content="Hyperion Industries">
-<meta property="og:description" content="Human-centered intelligence systems. Local-first software built for continuity, ownership, and long-term understanding.">
+<meta property="og:description" content="Local-first intelligence infrastructure for people who need custody, continuity, and control.">
 <meta property="og:url" content="https://hyperion-industries.dev">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
 :root {
-  --bg:           #050506;
-  --bg-soft:      #0D0D0D;
-  --surface:      #111214;
-  --surface-up:   #181A1D;
-  --surface-top:  #1E2024;
-  --border:       #2A2D31;
-  --border-soft:  rgba(255,255,255,0.05);
-  --border-gold:  rgba(255,199,44,0.22);
-  --text:         #F5F5F2;
-  --text-soft:    #C9C9C3;
-  --text-muted:   #8B8E91;
-  --text-dim:     #52555A;
-  --gold:         #FFC72C;
-  --gold-soft:    #C99518;
-  --gold-glow:    rgba(255,199,44,0.08);
-  --gold-glow2:   rgba(255,199,44,0.14);
-  --cyan:         #21D6E8;
-  --cyan-glow:    rgba(33,214,232,0.08);
-  --red:          #E05252;
-  --red-glow:     rgba(224,82,82,0.08);
-  --purple:       #A78BFA;
-  --purple-glow:  rgba(167,139,250,0.08);
-  --font-display: 'Orbitron', sans-serif;
-  --font-body:    'Montserrat', sans-serif;
-  --r-sm: 6px;
-  --r-md: 10px;
-  --r-lg: 16px;
-  --r-xl: 24px;
+  --bg:          #050506;
+  --bg-soft:     #0D0D0D;
+  --surface:     #111214;
+  --surface-up:  #181A1D;
+  --surface-top: #1E2024;
+  --border:      #2A2D31;
+  --border-soft: rgba(255,255,255,0.05);
+  --border-gold: rgba(255,199,44,0.22);
+  --text:        #F5F5F2;
+  --text-soft:   #C9C9C3;
+  --text-muted:  #8B8E91;
+  --text-dim:    #52555A;
+  --gold:        #FFC72C;
+  --gold-soft:   #C99518;
+  --gold-glow:   rgba(255,199,44,0.08);
+  --cyan:        #21D6E8;
+  --cyan-glow:   rgba(33,214,232,0.08);
+  --red:         #E05252;
+  --red-glow:    rgba(224,82,82,0.08);
+  --purple:      #A78BFA;
+  --purple-glow: rgba(167,139,250,0.08);
+  --font-display:'Orbitron', sans-serif;
+  --font-body:   'Montserrat', sans-serif;
+  --r-sm:4px; --r-md:10px; --r-lg:16px; --r-xl:24px;
 }
-
 html { scroll-behavior: smooth; }
-body { background: var(--bg); color: var(--text); font-family: var(--font-body); line-height: 1.6; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+body { background:var(--bg); color:var(--text); font-family:var(--font-body); line-height:1.6; overflow-x:hidden; -webkit-font-smoothing:antialiased; }
+::-webkit-scrollbar { width:4px; }
+::-webkit-scrollbar-track { background:var(--bg); }
+::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+::-webkit-scrollbar-thumb:hover { background:rgba(255,199,44,0.3); }
 
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: var(--bg); }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(255,199,44,0.3); }
-
-.inner { max-width: 1200px; margin: 0 auto; padding: 0 52px; }
-.section { padding: 100px 0; }
-.divider { border: none; border-top: 1px solid var(--border); }
-
+.inner { max-width:1200px; margin:0 auto; padding:0 52px; }
+.section { padding:100px 0; }
+.divider { border:none; border-top:1px solid var(--border); }
 .label {
-  font-family: var(--font-display);
-  font-size: 9px; font-weight: 600; letter-spacing: 0.24em;
-  color: var(--gold); text-transform: uppercase;
-  display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
+  font-family:var(--font-display); font-size:9px; font-weight:600;
+  letter-spacing:0.24em; color:var(--gold); text-transform:uppercase;
+  display:flex; align-items:center; gap:10px; margin-bottom:14px;
 }
-.label::before { content: ''; display: block; width: 18px; height: 1.5px; background: var(--gold); }
+.label::before { content:''; display:block; width:18px; height:1.5px; background:var(--gold); }
+h2.h2 { font-family:var(--font-body); font-size:clamp(26px,3vw,42px); font-weight:800; letter-spacing:-0.025em; line-height:1.1; color:var(--text); margin-bottom:14px; }
+h2.h2 em { font-style:normal; color:var(--gold); }
+.body-lead { font-size:15px; color:var(--text-muted); font-weight:400; max-width:560px; line-height:1.8; }
+.btn { display:inline-flex; align-items:center; gap:8px; padding:10px 22px; border-radius:var(--r-sm); font-family:var(--font-body); font-size:12px; font-weight:700; cursor:pointer; text-decoration:none; transition:all 0.16s; border:none; white-space:nowrap; letter-spacing:0.03em; }
+.btn-gold { background:var(--gold); color:#0a0900; }
+.btn-gold:hover { background:#ffd454; }
+.btn-ghost { background:transparent; color:var(--text-soft); border:1px solid var(--border); }
+.btn-ghost:hover { border-color:var(--text-muted); color:var(--text); }
 
-h2.h2 { font-family: var(--font-body); font-size: clamp(26px,3vw,42px); font-weight: 800; letter-spacing: -0.025em; line-height: 1.1; color: var(--text); margin-bottom: 14px; }
-h2.h2 em { font-style: normal; color: var(--gold); }
-.body-lead { font-size: 15px; color: var(--text-muted); font-weight: 400; max-width: 560px; line-height: 1.8; margin-bottom: 48px; }
-
-.btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 22px; border-radius: var(--r-sm); font-family: var(--font-body); font-size: 12px; font-weight: 700; cursor: pointer; text-decoration: none; transition: all 0.16s ease; border: none; white-space: nowrap; letter-spacing: 0.03em; }
-.btn-gold { background: var(--gold); color: #0a0900; }
-.btn-gold:hover { background: #ffd454; }
-.btn-ghost { background: transparent; color: var(--text-soft); border: 1px solid var(--border); }
-.btn-ghost:hover { border-color: var(--text-muted); color: var(--text); }
-.btn-cyan { background: rgba(33,214,232,0.1); color: var(--cyan); border: 1px solid rgba(33,214,232,0.25); }
-.btn-cyan:hover { background: rgba(33,214,232,0.18); border-color: var(--cyan); }
-
-/* ══ NAV ══ */
+/* NAV */
 #nav {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 200;
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 0 52px; height: 62px;
-  background: rgba(5,5,6,0.9);
-  backdrop-filter: blur(24px);
-  border-bottom: 1px solid var(--border-soft);
+  position:fixed; top:0; left:0; right:0; z-index:200;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 52px; height:62px;
+  background:rgba(5,5,6,0.92); backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--border-soft);
 }
-.nav-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
-.nav-mark { width: 34px; height: 34px; object-fit: contain; }
-.nav-wordmark { font-family: var(--font-display); font-size: 10px; font-weight: 700; letter-spacing: 0.2em; color: var(--text); line-height: 1; text-transform: uppercase; }
-.nav-wordmark span { display: block; font-size: 7px; letter-spacing: 0.3em; color: var(--text-dim); font-weight: 500; margin-top: 3px; }
-.nav-links { display: flex; align-items: center; gap: 28px; list-style: none; }
-.nav-links a { font-family: var(--font-body); font-size: 12px; font-weight: 500; color: var(--text-muted); text-decoration: none; transition: color 0.16s; letter-spacing: 0.02em; }
-.nav-links a:hover { color: var(--text); }
-.nav-cta { display: flex; gap: 8px; }
+.nav-logo { display:flex; align-items:center; gap:12px; text-decoration:none; }
+.nav-mark { width:34px; height:34px; object-fit:contain; }
+.nav-wordmark { font-family:var(--font-display); font-size:10px; font-weight:700; letter-spacing:0.2em; color:var(--text); line-height:1; text-transform:uppercase; }
+.nav-wordmark span { display:block; font-size:7px; letter-spacing:0.3em; color:var(--text-dim); font-weight:500; margin-top:3px; }
+.nav-links { display:flex; align-items:center; gap:28px; list-style:none; }
+.nav-links a { font-size:12px; font-weight:500; color:var(--text-muted); text-decoration:none; transition:color 0.16s; letter-spacing:0.02em; }
+.nav-links a:hover { color:var(--text); }
+.nav-cta { display:flex; gap:8px; }
 
-/* ══ HERO ══ */
+/* HERO */
 #hero {
-  position: relative; min-height: 100vh;
-  display: flex; align-items: center;
-  padding: 100px 52px 80px; overflow: hidden;
+  position:relative; min-height:100vh;
+  display:flex; align-items:center;
+  padding:100px 52px 80px; overflow:hidden;
 }
-#hero-canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
-.hero-orb { position: absolute; border-radius: 50%; pointer-events: none; }
-.hero-orb-1 { width: 700px; height: 700px; right: -100px; top: 50%; transform: translateY(-50%); background: radial-gradient(circle, rgba(255,199,44,0.035) 0%, transparent 65%); }
-.hero-orb-2 { width: 400px; height: 400px; left: -80px; bottom: 10%; background: radial-gradient(circle, rgba(33,214,232,0.02) 0%, transparent 70%); }
-
-.hero-inner {
-  max-width: 1200px; margin: 0 auto; width: 100%;
-  display: grid; grid-template-columns: 1fr 1fr; gap: 80px;
-  align-items: center; position: relative; z-index: 2;
-}
-
+#hero-canvas { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
+.hero-orb { position:absolute; border-radius:50%; pointer-events:none; }
+.hero-orb-1 { width:700px; height:700px; right:-100px; top:50%; transform:translateY(-50%); background:radial-gradient(circle, rgba(255,199,44,0.035) 0%, transparent 65%); }
+.hero-orb-2 { width:400px; height:400px; left:-80px; bottom:0%; background:radial-gradient(circle, rgba(33,214,232,0.02) 0%, transparent 70%); }
+.hero-inner { max-width:1200px; margin:0 auto; width:100%; display:grid; grid-template-columns:1fr 1fr; gap:80px; align-items:center; position:relative; z-index:2; }
 .hero-eyebrow {
-  display: inline-flex; align-items: center; gap: 8px;
-  font-family: var(--font-display); font-size: 8px; font-weight: 600;
-  letter-spacing: 0.26em; color: var(--gold); text-transform: uppercase;
-  margin-bottom: 32px;
-  padding: 5px 14px;
-  background: var(--gold-glow);
-  border: 1px solid var(--border-gold);
-  border-radius: 100px;
+  display:inline-flex; align-items:center; gap:8px; margin-bottom:32px;
+  padding:5px 14px; background:var(--gold-glow); border:1px solid var(--border-gold); border-radius:100px;
+  font-family:var(--font-display); font-size:8px; font-weight:600; letter-spacing:0.26em; color:var(--gold); text-transform:uppercase;
 }
-.hero-eyebrow::before {
-  content: ''; width: 5px; height: 5px; border-radius: 50%;
-  background: var(--gold); display: inline-block;
-  animation: pulse 2.4s ease-in-out infinite;
-}
+.hero-eyebrow::before { content:''; width:5px; height:5px; border-radius:50%; background:var(--gold); display:inline-block; animation:pulse 2.4s ease-in-out infinite; }
 @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.2} }
+.hero-h1 { margin-bottom:24px; }
+.hero-h1 .l1 { display:block; font-size:clamp(16px,1.6vw,22px); font-weight:300; color:var(--text-muted); letter-spacing:0.01em; line-height:1.2; margin-bottom:6px; font-style:italic; }
+.hero-h1 .l2 { display:block; font-size:clamp(50px,5.8vw,78px); font-weight:900; color:var(--text); letter-spacing:-0.045em; line-height:0.95; }
+.hero-h1 .l3 { display:block; font-size:clamp(50px,5.8vw,78px); font-weight:900; color:var(--gold); letter-spacing:-0.045em; line-height:0.95; }
+.hero-sub { font-size:16px; color:var(--text-muted); line-height:1.8; max-width:460px; margin-bottom:40px; font-weight:400; }
+.hero-ctas { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:52px; }
+.hero-ctas .btn { padding:13px 28px; font-size:13px; }
+.hero-chips { display:flex; gap:0; border-top:1px solid var(--border); padding-top:22px; flex-wrap:wrap; }
+.chip { padding:0 22px 0 0; display:flex; flex-direction:column; gap:3px; }
+.chip:first-child { padding-left:0; }
+.chip + .chip { border-left:1px solid var(--border); padding-left:22px; }
+.chip-name { font-family:var(--font-display); font-size:10px; font-weight:700; letter-spacing:0.1em; }
+.chip-name.c { color:var(--cyan); }
+.chip-name.r { color:var(--red); }
+.chip-name.p { color:var(--purple); }
+.chip-name.g { color:var(--gold); }
+.chip-status { font-size:10px; color:var(--text-dim); font-weight:500; }
+.hero-visual { display:flex; align-items:center; justify-content:center; }
+.hero-lockup { width:clamp(240px,26vw,400px); height:auto; animation:float 7s ease-in-out infinite; filter:drop-shadow(0 0 60px rgba(255,199,44,0.1)); }
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-14px)} }
 
-.hero-h1 { margin-bottom: 24px; }
-.hero-h1 .line-muted { display: block; font-size: clamp(22px,2.4vw,34px); font-weight: 300; color: var(--text-muted); letter-spacing: -0.01em; line-height: 1.2; margin-bottom: 4px; font-style: italic; }
-.hero-h1 .line-main { display: block; font-size: clamp(48px,5.6vw,76px); font-weight: 900; color: var(--text); letter-spacing: -0.045em; line-height: 0.95; }
-.hero-h1 .line-gold { display: block; font-size: clamp(48px,5.6vw,76px); font-weight: 900; color: var(--gold); letter-spacing: -0.045em; line-height: 0.95; }
+/* WHAT WE BUILD */
+.wtb-grid { display:grid; grid-template-columns:1fr 1fr; gap:80px; align-items:start; margin-top:48px; }
+.wtb-copy p { font-size:14px; color:var(--text-muted); line-height:1.85; margin-bottom:14px; }
+.wtb-pillars { display:flex; flex-direction:column; gap:12px; }
+.pillar { display:flex; gap:16px; padding:16px 20px; background:var(--surface); border:1px solid var(--border); border-radius:var(--r-md); transition:border-color 0.16s; }
+.pillar:hover { border-color:var(--border-gold); }
+.pillar-icon { font-family:var(--font-display); font-size:10px; font-weight:700; color:var(--gold); flex-shrink:0; width:20px; padding-top:1px; }
+.pillar-content strong { font-size:13px; font-weight:700; color:var(--text-soft); display:block; margin-bottom:3px; }
+.pillar-content span { font-size:12px; color:var(--text-dim); line-height:1.55; }
 
-.hero-sub {
-  font-size: 16px; color: var(--text-muted); line-height: 1.8;
-  max-width: 460px; margin-bottom: 40px; font-weight: 400;
-}
+/* SYSTEMS */
+.systems-intro { max-width:600px; margin-bottom:48px; }
+.systems-stack { display:flex; flex-direction:column; gap:2px; background:var(--border); border-radius:var(--r-lg); overflow:hidden; }
 
-.hero-ctas { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 56px; }
-.hero-ctas .btn { padding: 13px 28px; font-size: 13px; }
+.sys-row {
+  background:var(--surface); padding:32px 36px;
+  display:grid; grid-template-columns:280px 1fr auto;
+  gap:40px; align-items:center;
+  border-left:3px solid transparent; transition:background 0.16s;
+  position:relative;
+}
+.sys-row:hover { background:var(--surface-up); }
+.sys-row.c { border-left-color:var(--cyan); }
+.sys-row.r { border-left-color:var(--red); }
+.sys-row.hw { border-left-color:var(--gold); }
 
-.hero-products {
-  display: flex; gap: 0;
-  border-top: 1px solid var(--border); padding-top: 24px;
-}
-.hp {
-  padding: 0 24px 0 0; display: flex; flex-direction: column; gap: 4px;
-}
-.hp:first-child { padding-left: 0; }
-.hp + .hp { border-left: 1px solid var(--border); padding-left: 24px; }
-.hp-name {
-  font-family: var(--font-display); font-size: 11px; font-weight: 700;
-  letter-spacing: 0.1em; color: var(--text-soft);
-}
-.hp-name.c { color: var(--cyan); }
-.hp-name.r { color: var(--red); }
-.hp-name.p { color: var(--purple); }
-.hp-name.g { color: var(--gold); }
-.hp-status {
-  font-size: 10px; color: var(--text-dim); font-weight: 500; letter-spacing: 0.04em;
-}
+.sys-left { display:flex; flex-direction:column; gap:6px; }
+.sys-num { font-family:var(--font-display); font-size:8px; letter-spacing:0.2em; color:var(--text-dim); font-weight:600; }
+.sys-name { font-family:var(--font-display); font-size:18px; font-weight:700; letter-spacing:0.06em; }
+.sys-row.c .sys-name { color:var(--cyan); }
+.sys-row.r .sys-name { color:var(--red); }
+.sys-row.hw .sys-name { color:var(--gold); }
+.sys-tagline { font-size:12px; font-weight:600; color:var(--text-muted); }
 
-.hero-visual {
-  display: flex; align-items: center; justify-content: center;
-}
-.hero-lockup {
-  width: clamp(240px,26vw,400px); height: auto;
-  animation: floatMark 7s ease-in-out infinite;
-  filter: drop-shadow(0 0 60px rgba(255,199,44,0.1));
-}
-@keyframes floatMark { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-14px)} }
+.sys-desc { font-size:13px; color:var(--text-dim); line-height:1.7; }
 
-/* ══ ECOSYSTEM ══ */
-#ecosystem { background: var(--bg-soft); }
-.eco-intro { max-width: 600px; margin-bottom: 56px; }
-.eco-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; background: var(--border); border-radius: var(--r-lg); overflow: hidden; }
+.sys-right { display:flex; flex-direction:column; align-items:flex-end; gap:12px; }
+.badge {
+  font-family:var(--font-display); font-size:8px; letter-spacing:0.1em;
+  padding:3px 10px; border-radius:100px; font-weight:600; text-transform:uppercase;
+  display:inline-flex; align-items:center; gap:5px; white-space:nowrap;
+}
+.b-live { background:rgba(34,197,94,0.1); color:#4ade80; border:1px solid rgba(34,197,94,0.2); }
+.b-building { background:var(--gold-glow); color:var(--gold); border:1px solid var(--border-gold); }
+.b-concept { background:rgba(255,255,255,0.04); color:var(--text-dim); border:1px solid var(--border-soft); }
+.sys-link { font-family:var(--font-display); font-size:8.5px; letter-spacing:0.12em; text-transform:uppercase; text-decoration:none; font-weight:600; transition:opacity 0.16s; }
+.sys-row.c .sys-link { color:var(--cyan); }
+.sys-row.r .sys-link { color:var(--red); }
+.sys-row.hw .sys-link { color:var(--gold); }
+.sys-link:hover { opacity:0.7; }
+.sys-link.disabled { opacity:0.3; cursor:default; pointer-events:none; }
 
-.eco-card {
-  background: var(--surface); padding: 36px 32px;
-  display: flex; flex-direction: column; gap: 0;
-  position: relative; transition: background 0.18s;
-  border-left: 3px solid transparent;
-}
-.eco-card:hover { background: var(--surface-up); }
-.eco-card.c { border-left-color: var(--cyan); }
-.eco-card.r { border-left-color: var(--red); }
-.eco-card.p { border-left-color: var(--purple); }
-.eco-card.g { border-left-color: var(--gold); }
+/* SHOWCASE */
+.showcase-frame { background:var(--surface); border:1px solid var(--border); border-radius:var(--r-lg); overflow:hidden; }
+.sf-bar { background:var(--surface-up); padding:10px 18px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:12px; }
+.sf-dots { display:flex; gap:5px; }
+.sf-dot { width:9px; height:9px; border-radius:50%; background:var(--border); }
+.sf-title { font-family:var(--font-display); font-size:8px; letter-spacing:0.16em; color:var(--text-dim); text-transform:uppercase; flex:1; text-align:center; }
+.sf-ver { font-family:var(--font-display); font-size:8px; padding:2px 8px; border-radius:100px; background:rgba(34,197,94,0.1); color:#4ade80; border:1px solid rgba(34,197,94,0.2); letter-spacing:0.08em; }
+.art-row { padding:14px 20px; border-bottom:1px solid var(--border-soft); display:flex; flex-direction:column; gap:6px; transition:background 0.14s; cursor:default; }
+.art-row:last-child { border-bottom:none; }
+.art-row:hover { background:var(--surface-up); }
+.art-name { font-size:12px; font-weight:600; color:var(--text-soft); font-family:monospace; letter-spacing:0.01em; }
+.art-tags { display:flex; gap:5px; flex-wrap:wrap; }
+.tag { padding:2px 8px; border-radius:3px; font-size:10px; font-weight:500; }
+.t-dom { background:rgba(33,214,232,0.07); color:var(--cyan); border:1px solid rgba(33,214,232,0.18); }
+.t-sig { background:var(--gold-glow); color:var(--gold-soft); border:1px solid var(--border-gold); }
+.t-def { background:rgba(255,255,255,0.04); color:var(--text-dim); border:1px solid var(--border-soft); }
+.art-note { font-size:10px; color:var(--text-dim); font-style:italic; }
+.showcase-footer { margin-top:24px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px; }
+.showcase-note { font-family:var(--font-display); font-size:9px; letter-spacing:0.14em; color:var(--text-dim); text-transform:uppercase; }
 
-.eco-tag {
-  font-family: var(--font-display); font-size: 8px; font-weight: 600;
-  letter-spacing: 0.2em; text-transform: uppercase;
-  margin-bottom: 18px; opacity: 0.7;
-}
-.eco-card.c .eco-tag { color: var(--cyan); }
-.eco-card.r .eco-tag { color: var(--red); }
-.eco-card.p .eco-tag { color: var(--purple); }
-.eco-card.g .eco-tag { color: var(--gold); }
+/* DOCTRINE */
+.doctrine-wrap { display:grid; grid-template-columns:1fr 1fr; gap:80px; align-items:start; }
+.doctrine-copy p { font-size:14px; color:var(--text-muted); line-height:1.85; margin-bottom:14px; }
+.doctrine-quote { margin-top:28px; padding:22px 26px; background:var(--gold-glow); border-left:2px solid var(--gold); border-radius:0 var(--r-sm) var(--r-sm) 0; }
+.doctrine-quote blockquote { font-size:15px; font-weight:600; color:var(--text-soft); line-height:1.5; margin-bottom:10px; font-style:italic; letter-spacing:-0.01em; }
+.doctrine-quote cite { font-family:var(--font-display); font-size:8px; letter-spacing:0.16em; color:var(--gold-soft); text-transform:uppercase; font-style:normal; font-weight:600; }
+.doctrine-tenets { border:1px solid var(--border); border-radius:var(--r-md); overflow:hidden; }
+.dt { padding:14px 20px; border-bottom:1px solid var(--border-soft); display:flex; gap:12px; align-items:flex-start; transition:background 0.16s; }
+.dt:last-child { border-bottom:none; }
+.dt:hover { background:var(--surface-up); }
+.dt-arrow { color:var(--gold); font-weight:700; flex-shrink:0; font-size:12px; padding-top:1px; }
+.dt-text { font-size:12.5px; color:var(--text-muted); line-height:1.55; }
+.dt-text strong { color:var(--text-soft); font-weight:600; }
 
-.eco-name {
-  font-family: var(--font-display); font-size: 20px; font-weight: 700;
-  letter-spacing: 0.06em; margin-bottom: 4px;
+/* OPERATORS */
+#operators { background:var(--bg-soft); }
+.ops-intro { max-width:600px; margin-bottom:56px; }
+.ops-grid { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+.op-card {
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--r-lg); padding:36px 32px;
+  display:flex; flex-direction:column; gap:24px;
+  transition:border-color 0.16s;
 }
-.eco-card.c .eco-name { color: var(--cyan); }
-.eco-card.r .eco-name { color: var(--red); }
-.eco-card.p .eco-name { color: var(--purple); }
-.eco-card.g .eco-name { color: var(--gold); }
-
-.eco-tagline {
-  font-size: 13px; font-weight: 700; color: var(--text-soft);
-  margin-bottom: 14px; line-height: 1.3;
+.op-card:hover { border-color:var(--border-gold); }
+.op-header { display:flex; align-items:flex-start; gap:18px; }
+.op-avatar {
+  width:52px; height:52px; border-radius:var(--r-sm); flex-shrink:0;
+  background:var(--surface-up); border:1px solid var(--border-gold);
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--font-display); font-size:14px; font-weight:700;
+  color:var(--gold); letter-spacing:0.05em;
 }
-.eco-desc {
-  font-size: 13px; color: var(--text-dim); line-height: 1.7; flex: 1;
-  margin-bottom: 24px;
+.op-id { display:flex; flex-direction:column; gap:4px; }
+.op-handle { font-family:var(--font-display); font-size:16px; font-weight:700; color:var(--text); letter-spacing:0.06em; }
+.op-role { font-family:var(--font-display); font-size:8px; letter-spacing:0.2em; color:var(--gold-soft); text-transform:uppercase; font-weight:600; opacity:0.8; }
+.op-bio { font-size:13px; color:var(--text-muted); line-height:1.8; }
+.op-bio + .op-bio { margin-top:-10px; }
+.op-focuses { display:flex; flex-direction:column; gap:6px; }
+.op-focuses-label { font-family:var(--font-display); font-size:8px; letter-spacing:0.2em; color:var(--text-dim); text-transform:uppercase; font-weight:600; margin-bottom:2px; }
+.op-focus-tags { display:flex; flex-wrap:wrap; gap:5px; }
+.op-focus-tag {
+  font-size:11px; color:var(--text-dim); padding:3px 9px;
+  background:var(--surface-up); border:1px solid var(--border);
+  border-radius:var(--r-sm); font-weight:500;
 }
-.eco-link {
-  font-family: var(--font-display); font-size: 8.5px; letter-spacing: 0.14em;
-  text-transform: uppercase; text-decoration: none; font-weight: 600;
-  display: inline-flex; align-items: center; gap: 6px;
-  transition: gap 0.16s;
-}
-.eco-card.c .eco-link { color: var(--cyan); }
-.eco-card.r .eco-link { color: var(--red); }
-.eco-card.p .eco-link { color: var(--purple); }
-.eco-card.g .eco-link { color: var(--gold); }
-.eco-link:hover { gap: 10px; }
-
-.eco-badge {
-  font-family: var(--font-display); font-size: 8px; letter-spacing: 0.1em;
-  padding: 3px 9px; border-radius: 100px; font-weight: 600;
-  text-transform: uppercase; display: inline-flex; align-items: center; gap: 5px;
-  margin-bottom: 20px; align-self: flex-start;
-}
-.badge-live { background: rgba(34,197,94,0.1); color: #4ade80; border: 1px solid rgba(34,197,94,0.2); }
-.badge-building { background: rgba(255,199,44,0.08); color: var(--gold); border: 1px solid var(--border-gold); }
-.badge-research { background: rgba(255,255,255,0.04); color: var(--text-dim); border: 1px solid var(--border-soft); }
-
-/* ══ WHY WE BUILD ══ */
-.why-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; }
-.why-statement {
-  font-size: clamp(18px,2vw,24px); font-weight: 700; line-height: 1.4;
-  color: var(--text); margin-bottom: 20px; letter-spacing: -0.02em;
-}
-.why-body p { font-size: 14px; color: var(--text-muted); line-height: 1.85; margin-bottom: 14px; }
-.why-pillars { display: flex; flex-direction: column; gap: 0; border: 1px solid var(--border); border-radius: var(--r-md); overflow: hidden; }
-.pillar {
-  padding: 18px 22px; border-bottom: 1px solid var(--border-soft);
-  display: grid; grid-template-columns: 80px 1fr; gap: 16px;
-  align-items: start; transition: background 0.16s;
-}
-.pillar:last-child { border-bottom: none; }
-.pillar:hover { background: var(--surface-up); }
-.pillar-key {
-  font-family: var(--font-display); font-size: 8px; font-weight: 600;
-  letter-spacing: 0.14em; color: var(--gold); text-transform: uppercase;
-  padding-top: 2px;
-}
-.pillar-val { font-size: 13px; color: var(--text-muted); line-height: 1.6; }
-.pillar-val strong { color: var(--text-soft); font-weight: 700; display: block; margin-bottom: 2px; font-size: 13px; }
-
-/* ══ SHOWCASE ══ */
-#showcase { background: var(--bg-soft); }
-.showcase-intro { max-width: 560px; margin-bottom: 48px; }
-.showcase-frame {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--r-lg); overflow: hidden;
-}
-.sf-bar {
-  background: var(--surface-up); padding: 10px 16px;
-  border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; gap: 12px;
-}
-.sf-dots { display: flex; gap: 5px; }
-.sf-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--border); }
-.sf-title {
-  font-family: var(--font-display); font-size: 8px; letter-spacing: 0.16em;
-  color: var(--text-dim); text-transform: uppercase; flex: 1; text-align: center;
-}
-.sf-ver {
-  font-family: var(--font-display); font-size: 8px;
-  padding: 2px 8px; border-radius: 100px;
-  background: rgba(34,197,94,0.1); color: #4ade80;
-  border: 1px solid rgba(34,197,94,0.2); letter-spacing: 0.08em;
-}
-.sf-body { padding: 0; }
-
-.art-row {
-  padding: 14px 20px; border-bottom: 1px solid var(--border-soft);
-  display: flex; flex-direction: column; gap: 6px;
-  transition: background 0.14s; cursor: default;
-}
-.art-row:last-child { border-bottom: none; }
-.art-row:hover { background: var(--surface-up); }
-.art-name { font-size: 12px; font-weight: 600; color: var(--text-soft); font-family: monospace; letter-spacing: 0.01em; }
-.art-tags { display: flex; gap: 5px; flex-wrap: wrap; }
-.tag { padding: 2px 8px; border-radius: 3px; font-size: 10px; font-weight: 500; }
-.t-dom { background: rgba(33,214,232,0.07); color: var(--cyan); border: 1px solid rgba(33,214,232,0.18); }
-.t-sig { background: var(--gold-glow); color: var(--gold-soft); border: 1px solid var(--border-gold); }
-.t-def { background: rgba(255,255,255,0.04); color: var(--text-dim); border: 1px solid var(--border-soft); }
-.art-note { font-size: 10px; color: var(--text-dim); font-style: italic; }
-
-.showcase-bottom {
-  margin-top: 28px; display: flex; align-items: center;
-  justify-content: space-between; flex-wrap: wrap; gap: 16px;
-}
-.showcase-note {
-  font-family: var(--font-display); font-size: 9px; letter-spacing: 0.14em;
-  color: var(--text-dim); text-transform: uppercase;
+.op-belief {
+  padding:16px 18px; background:var(--gold-glow);
+  border-left:2px solid var(--gold); border-radius:0 var(--r-sm) var(--r-sm) 0;
+  font-size:12px; font-style:italic; color:var(--text-muted); line-height:1.65;
 }
 
-/* ══ STATUS ══ */
-.status-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 1px; background: var(--border); border-radius: var(--r-lg); overflow: hidden; margin-top: 40px; }
-.status-col { background: var(--surface); padding: 28px 24px; }
-.status-head {
-  display: flex; align-items: center; gap: 8px;
-  font-family: var(--font-display); font-size: 9px; font-weight: 700;
-  letter-spacing: 0.2em; text-transform: uppercase;
-  margin-bottom: 24px; padding-bottom: 16px;
-  border-bottom: 1px solid var(--border);
-}
-.sh-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-.sh-live { color: #4ade80; }
-.sh-live .sh-dot { background: #4ade80; box-shadow: 0 0 6px rgba(74,222,128,0.6); }
-.sh-building { color: var(--gold); }
-.sh-building .sh-dot { background: var(--gold); }
-.sh-research { color: var(--text-dim); }
-.sh-research .sh-dot { background: var(--text-dim); }
+/* CONTACT */
+.contact-grid { display:grid; grid-template-columns:1fr 1fr; gap:72px; align-items:start; }
+.contact-copy p { font-size:14px; color:var(--text-muted); line-height:1.85; margin-bottom:14px; }
+.contact-modes { display:flex; flex-direction:column; gap:8px; margin-top:24px; }
+.cm { padding:14px 18px; border:1px solid var(--border); border-radius:var(--r-sm); background:var(--surface); display:flex; gap:14px; align-items:flex-start; transition:border-color 0.16s; }
+.cm:hover { border-color:var(--border-gold); }
+.cm-dot { width:5px; height:5px; border-radius:50%; background:var(--gold); flex-shrink:0; margin-top:5px; }
+.cm-title { font-size:12.5px; font-weight:700; color:var(--text-soft); margin-bottom:2px; }
+.cm-body { font-size:11.5px; color:var(--text-dim); line-height:1.5; }
+.form { display:flex; flex-direction:column; gap:12px; }
+.form-group { display:flex; flex-direction:column; gap:5px; }
+.form-lbl { font-family:var(--font-display); font-size:8px; letter-spacing:0.18em; color:var(--text-dim); text-transform:uppercase; font-weight:600; }
+.form-input { padding:10px 13px; background:var(--surface-up); border:1px solid var(--border); border-radius:var(--r-sm); color:var(--text-soft); font-family:var(--font-body); font-size:12.5px; outline:none; transition:border-color 0.16s; width:100%; }
+.form-input:focus { border-color:var(--border-gold); }
+.form-input::placeholder { color:var(--text-dim); }
+textarea.form-input { resize:vertical; min-height:88px; }
+select.form-input { appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2352555A' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; padding-right:32px; cursor:pointer; }
+select.form-input option { background:var(--surface-up); }
 
-.status-items { display: flex; flex-direction: column; gap: 14px; }
-.si { display: flex; flex-direction: column; gap: 4px; }
-.si-name {
-  font-size: 13px; font-weight: 700; color: var(--text-soft);
-}
-.si-subs { display: flex; flex-direction: column; gap: 3px; margin-top: 4px; }
-.si-sub {
-  font-size: 11.5px; color: var(--text-dim); padding-left: 12px;
-  position: relative; line-height: 1.5;
-}
-.si-sub::before {
-  content: '·'; position: absolute; left: 0; color: var(--text-dim);
-}
+/* FOOTER */
+footer { background:var(--bg-soft); border-top:1px solid var(--border); padding:52px 52px 32px; }
+.footer-top { display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:48px; margin-bottom:40px; }
+.footer-brand { display:flex; flex-direction:column; gap:14px; }
+.footer-logo-row { display:flex; align-items:center; gap:10px; }
+.footer-mark { width:26px; height:26px; object-fit:contain; }
+.footer-wm { font-family:var(--font-display); font-size:10px; font-weight:700; letter-spacing:0.22em; color:var(--text); text-transform:uppercase; }
+.footer-desc { font-size:12px; color:var(--text-dim); line-height:1.7; max-width:260px; }
+.footer-url { font-family:var(--font-display); font-size:8.5px; letter-spacing:0.14em; color:var(--gold-soft); opacity:0.6; font-weight:600; text-decoration:none; transition:opacity 0.16s; }
+.footer-url:hover { opacity:1; }
+.fcol-title { font-family:var(--font-display); font-size:8px; letter-spacing:0.2em; color:var(--text-dim); text-transform:uppercase; margin-bottom:14px; font-weight:600; }
+.fcol-links { display:flex; flex-direction:column; gap:9px; list-style:none; }
+.fcol-links a { font-size:12.5px; color:var(--text-dim); text-decoration:none; transition:color 0.16s; }
+.fcol-links a:hover { color:var(--text-soft); }
+.footer-bottom { border-top:1px solid var(--border-soft); padding-top:22px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; }
+.footer-copy { font-size:11px; color:var(--text-dim); }
+.footer-copy span { color:var(--gold); opacity:0.55; }
+.footer-legal { display:flex; gap:18px; }
+.footer-legal a { font-size:11px; color:var(--text-dim); text-decoration:none; transition:color 0.16s; }
+.footer-legal a:hover { color:var(--text-muted); }
 
-/* ══ SYSTEMS ══ */
-#systems-hw { background: var(--bg-soft); }
-.hw-grid { display: grid; grid-template-columns: 1fr 2fr; gap: 80px; align-items: start; margin-top: 0; }
-.hw-copy p { font-size: 14px; color: var(--text-muted); line-height: 1.85; margin-bottom: 14px; }
-.hw-builds { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.hw-card {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--r-md); padding: 20px 18px;
-  transition: border-color 0.16s;
+/* RESPONSIVE */
+@media (max-width:1024px) {
+  .hero-inner, .wtb-grid, .doctrine-wrap, .contact-grid { grid-template-columns:1fr; gap:48px; }
+  .ops-grid { grid-template-columns:1fr; }
+  .sys-row { grid-template-columns:1fr; gap:16px; }
+  .sys-right { align-items:flex-start; flex-direction:row; flex-wrap:wrap; }
+  .hero-visual { display:none; }
+  .inner, #nav, footer { padding-left:24px; padding-right:24px; }
+  .footer-top { grid-template-columns:1fr 1fr; }
+  #hero { padding:100px 24px 60px; }
 }
-.hw-card:hover { border-color: var(--border-gold); }
-.hw-num {
-  font-family: var(--font-display); font-size: 8px;
-  letter-spacing: 0.18em; color: var(--gold-soft);
-  margin-bottom: 8px; font-weight: 600; opacity: 0.6;
-}
-.hw-name {
-  font-size: 13px; font-weight: 700; color: var(--text-soft);
-  margin-bottom: 6px; line-height: 1.2;
-}
-.hw-desc { font-size: 11.5px; color: var(--text-dim); line-height: 1.6; }
-
-/* ══ LAB NOTES ══ */
-.lab-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
-.lab-card {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: var(--r-md); padding: 22px;
-  display: flex; flex-direction: column; gap: 9px;
-  transition: border-color 0.16s;
-}
-.lab-card:hover { border-color: var(--border-gold); }
-.lab-top { display: flex; justify-content: space-between; align-items: center; }
-.lab-date { font-size: 10.5px; color: var(--text-dim); font-weight: 500; }
-.lab-tag {
-  font-family: var(--font-display); font-size: 8px; letter-spacing: 0.1em;
-  padding: 2px 7px; border-radius: 100px; font-weight: 600; text-transform: uppercase;
-}
-.lt-dev { background: rgba(33,214,232,0.07); color: var(--cyan); border: 1px solid rgba(33,214,232,0.18); }
-.lt-res { background: var(--gold-glow); color: var(--gold); border: 1px solid var(--border-gold); }
-.lt-inf { background: rgba(255,255,255,0.04); color: var(--text-dim); border: 1px solid var(--border-soft); }
-.lab-title { font-size: 14px; font-weight: 700; color: var(--text-soft); line-height: 1.3; }
-.lab-body { font-size: 12px; color: var(--text-dim); line-height: 1.65; }
-
-/* ══ CONTACT ══ */
-.contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 72px; align-items: start; }
-.contact-copy p { font-size: 14px; color: var(--text-muted); line-height: 1.85; margin-bottom: 14px; }
-.cm-grid { display: flex; flex-direction: column; gap: 8px; }
-.cm {
-  padding: 14px 18px; border: 1px solid var(--border); border-radius: var(--r-sm);
-  background: var(--surface); display: flex; gap: 14px; align-items: flex-start;
-  transition: border-color 0.16s;
-}
-.cm:hover { border-color: var(--border-gold); }
-.cm-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--gold); flex-shrink: 0; margin-top: 5px; }
-.cm-title { font-size: 12.5px; font-weight: 700; color: var(--text-soft); margin-bottom: 2px; }
-.cm-body { font-size: 11.5px; color: var(--text-dim); line-height: 1.5; }
-.form { display: flex; flex-direction: column; gap: 12px; }
-.form-group { display: flex; flex-direction: column; gap: 5px; }
-.form-lbl {
-  font-family: var(--font-display); font-size: 8px; letter-spacing: 0.18em;
-  color: var(--text-dim); text-transform: uppercase; font-weight: 600;
-}
-.form-input {
-  padding: 10px 13px; background: var(--surface-up); border: 1px solid var(--border);
-  border-radius: var(--r-sm); color: var(--text-soft); font-family: var(--font-body);
-  font-size: 12.5px; outline: none; transition: border-color 0.16s; width: 100%;
-}
-.form-input:focus { border-color: var(--border-gold); }
-.form-input::placeholder { color: var(--text-dim); }
-textarea.form-input { resize: vertical; min-height: 88px; }
-select.form-input {
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2352555A' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-  background-repeat: no-repeat; background-position: right 12px center;
-  padding-right: 32px; cursor: pointer;
-}
-select.form-input option { background: var(--surface-up); }
-
-/* ══ FOOTER ══ */
-footer {
-  background: var(--bg-soft); border-top: 1px solid var(--border);
-  padding: 52px 52px 32px;
-}
-.footer-top {
-  display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
-  gap: 48px; margin-bottom: 40px;
-}
-.footer-brand { display: flex; flex-direction: column; gap: 14px; }
-.footer-logo-row { display: flex; align-items: center; gap: 10px; }
-.footer-mark { width: 26px; height: 26px; object-fit: contain; }
-.footer-wm {
-  font-family: var(--font-display); font-size: 10px; font-weight: 700;
-  letter-spacing: 0.22em; color: var(--text); text-transform: uppercase;
-}
-.footer-desc { font-size: 12px; color: var(--text-dim); line-height: 1.7; max-width: 260px; }
-.footer-url {
-  font-family: var(--font-display); font-size: 8.5px; letter-spacing: 0.14em;
-  color: var(--gold-soft); opacity: 0.6; font-weight: 600;
-  text-decoration: none; transition: opacity 0.16s;
-}
-.footer-url:hover { opacity: 1; }
-.fcol-title {
-  font-family: var(--font-display); font-size: 8px; letter-spacing: 0.2em;
-  color: var(--text-dim); text-transform: uppercase; margin-bottom: 14px; font-weight: 600;
-}
-.fcol-links { display: flex; flex-direction: column; gap: 9px; list-style: none; }
-.fcol-links a { font-size: 12.5px; color: var(--text-dim); text-decoration: none; transition: color 0.16s; }
-.fcol-links a:hover { color: var(--text-soft); }
-.footer-bottom {
-  border-top: 1px solid var(--border-soft); padding-top: 22px;
-  display: flex; align-items: center; justify-content: space-between;
-  flex-wrap: wrap; gap: 10px;
-}
-.footer-copy { font-size: 11px; color: var(--text-dim); }
-.footer-copy span { color: var(--gold); opacity: 0.55; }
-.footer-legal { display: flex; gap: 18px; }
-.footer-legal a { font-size: 11px; color: var(--text-dim); text-decoration: none; transition: color 0.16s; }
-.footer-legal a:hover { color: var(--text-muted); }
-
-/* ══ RESPONSIVE ══ */
-@media (max-width: 1024px) {
-  .hero-inner, .why-grid, .hw-grid, .contact-grid { grid-template-columns: 1fr; gap: 48px; }
-  .eco-grid, .status-grid { grid-template-columns: 1fr; }
-  .hw-builds { grid-template-columns: 1fr 1fr; }
-  .lab-grid { grid-template-columns: 1fr 1fr; }
-  .hero-visual { display: none; }
-  .inner, #nav, footer { padding-left: 24px; padding-right: 24px; }
-  .footer-top { grid-template-columns: 1fr 1fr; }
-  #hero { padding: 100px 24px 60px; }
-}
-@media (max-width: 640px) {
-  .hw-builds, .lab-grid { grid-template-columns: 1fr; }
-  .nav-links, .nav-cta .btn-ghost { display: none; }
-  .hero-products { flex-wrap: wrap; gap: 16px; }
-  .hp + .hp { border-left: none; padding-left: 0; border-top: 1px solid var(--border); padding-top: 12px; }
+@media (max-width:640px) {
+  .hero-chips { flex-wrap:wrap; gap:14px; }
+  .chip + .chip { border-left:none; padding-left:0; }
+  .nav-links, .nav-cta .btn-ghost { display:none; }
+  .footer-top { grid-template-columns:1fr; }
 }
 </style>
 </head>
@@ -491,10 +312,10 @@ footer {
     <div class="nav-wordmark">Hyperion<span>Industries</span></div>
   </a>
   <ul class="nav-links">
-    <li><a href="#ecosystem">Systems</a></li>
+    <li><a href="#systems">Systems</a></li>
     <li><a href="#showcase">Showcase</a></li>
-    <li><a href="#roadmap">Roadmap</a></li>
-    <li><a href="#lab">Lab Notes</a></li>
+    <li><a href="#doctrine">Doctrine</a></li>
+    <li><a href="#operators">Team</a></li>
     <li><a href="#contact">Contact</a></li>
   </ul>
   <div class="nav-cta">
@@ -512,32 +333,20 @@ footer {
     <div>
       <div class="hero-eyebrow">Hyperion Industries · Est. 2026</div>
       <div class="hero-h1">
-        <span class="line-muted">Human-centered</span>
-        <span class="line-main">intelligence</span>
-        <span class="line-gold">systems.</span>
+        <span class="l1">Local-first</span>
+        <span class="l2">intelligence</span>
+        <span class="l3">infrastructure.</span>
       </div>
-      <p class="hero-sub">Software that helps people organize, preserve, and navigate what matters — without giving up control of their data.</p>
+      <p class="hero-sub">For people who need custody, continuity, and control of their data. No cloud dependency. No lock-in. No compromise.</p>
       <div class="hero-ctas">
         <a href="https://chr0nos.app" class="btn btn-gold">Explore CHRON.OS →</a>
-        <a href="#ecosystem" class="btn btn-ghost">View the ecosystem</a>
+        <a href="#systems" class="btn btn-ghost">View all systems</a>
       </div>
-      <div class="hero-products">
-        <div class="hp">
-          <span class="hp-name c">CHRON.OS</span>
-          <span class="hp-status">Stable beta</span>
-        </div>
-        <div class="hp">
-          <span class="hp-name r">MNEM.OS</span>
-          <span class="hp-status">In development</span>
-        </div>
-        <div class="hp">
-          <span class="hp-name p">LOG.OS</span>
-          <span class="hp-status">Concept</span>
-        </div>
-        <div class="hp">
-          <span class="hp-name g">MYTH.OS</span>
-          <span class="hp-status">Research</span>
-        </div>
+      <div class="hero-chips">
+        <div class="chip"><span class="chip-name c">CHRON.OS</span><span class="chip-status">Stable beta</span></div>
+        <div class="chip"><span class="chip-name r">MNEM.OS</span><span class="chip-status">In development</span></div>
+        <div class="chip"><span class="chip-name p">LOG.OS</span><span class="chip-status">Concept</span></div>
+        <div class="chip"><span class="chip-name g">MYTH.OS</span><span class="chip-status">Research</span></div>
       </div>
     </div>
     <div class="hero-visual">
@@ -546,46 +355,36 @@ footer {
   </div>
 </section>
 
-<!-- ECOSYSTEM -->
-<section id="ecosystem" class="section" style="background:var(--bg-soft);">
+<!-- WHAT HYPERION BUILDS -->
+<section id="about" class="section" style="background:var(--bg-soft);">
 <div class="inner">
-  <div class="label">The Ecosystem</div>
-  <div class="eco-intro">
-    <h2 class="h2">Four systems.<br>One architecture.</h2>
-    <p class="body-lead" style="margin-bottom:0;">Each product is a layer of sovereign intelligence infrastructure. Built to work alone, designed to work together.</p>
-  </div>
-  <div class="eco-grid">
-    <div class="eco-card c">
-      <div class="eco-tag">Archive Intelligence · SYS-01</div>
-      <div class="eco-name">CHRON.OS</div>
-      <div class="eco-tagline">Your archive. Your provenance.</div>
-      <span class="eco-badge badge-live"><span style="width:4px;height:4px;border-radius:50%;background:#4ade80;display:inline-block;"></span>Stable Beta</span>
-      <p class="eco-desc">Local-first file archiving with full provenance tracking. Documents, media, research, decisions — every artifact knows where it came from, why it mattered, and what it connects to. No cloud required.</p>
-      <a href="https://chr0nos.app" class="eco-link">Visit chr0nos.app →</a>
+  <div class="label">What Hyperion Builds</div>
+  <div class="wtb-grid">
+    <div>
+      <h2 class="h2">A forge for <em>intelligence infrastructure.</em></h2>
+      <div class="wtb-copy">
+        <p>Hyperion Industries builds local-first software and systems for people who need to own their knowledge — researchers, operators, organizations, and individuals with serious data.</p>
+        <p>We're not a SaaS company. We don't aggregate your data. Every tool we build runs on your machine, answers to you, and keeps the chain of custody intact from intake to retrieval.</p>
+        <p>The Hyperion ecosystem is four interoperable systems — currently one is live, more are building. Each is designed to work alone and together.</p>
+      </div>
     </div>
-    <div class="eco-card r">
-      <div class="eco-tag">Continuity Intelligence · SYS-02</div>
-      <div class="eco-name">MNEM.OS</div>
-      <div class="eco-tagline">Memory that follows you.</div>
-      <span class="eco-badge badge-building">In Development</span>
-      <p class="eco-desc">Long-horizon memory substrate for agentic work. Persistent context, reasoning continuity, and session handoffs — so the work you started yesterday is fully accessible today. No drift. No loss.</p>
-      <span class="eco-link" style="opacity:0.4;cursor:default;">Coming soon</span>
-    </div>
-    <div class="eco-card p">
-      <div class="eco-tag">Reasoning Intelligence · SYS-03</div>
-      <div class="eco-name">LOG.OS</div>
-      <div class="eco-tagline">Every decision, traced.</div>
-      <span class="eco-badge badge-research">Concept</span>
-      <p class="eco-desc">Decision-logic and evidence layer. Tracks who decided what, from which evidence, with what weight. The audit trail for human-AI reasoning — transparent, immutable, inspectable.</p>
-      <span class="eco-link" style="opacity:0.4;cursor:default;">Early research</span>
-    </div>
-    <div class="eco-card g">
-      <div class="eco-tag">Governance Intelligence · SYS-04</div>
-      <div class="eco-name">MYTH.OS</div>
-      <div class="eco-tagline">Systems that stay aligned.</div>
-      <span class="eco-badge badge-research">Research</span>
-      <p class="eco-desc">Governance and meaning architecture for aligning AI systems around doctrine, purpose, and human oversight. The layer that keeps everything else honest.</p>
-      <span class="eco-link" style="opacity:0.4;cursor:default;">Research phase</span>
+    <div class="wtb-pillars">
+      <div class="pillar">
+        <span class="pillar-icon">01</span>
+        <div class="pillar-content"><strong>Local-first, always</strong><span>Your data never leaves your machine unless you choose. No accounts required. No passive collection. No egress.</span></div>
+      </div>
+      <div class="pillar">
+        <span class="pillar-icon">02</span>
+        <div class="pillar-content"><strong>Full user custody</strong><span>You hold the originals, the index, and the provenance chain — on hardware you own and control.</span></div>
+      </div>
+      <div class="pillar">
+        <span class="pillar-icon">03</span>
+        <div class="pillar-content"><strong>Human-governed AI</strong><span>AI that surfaces and suggests. Never acts without your approval. Governance is built in, not bolted on.</span></div>
+      </div>
+      <div class="pillar">
+        <span class="pillar-icon">04</span>
+        <div class="pillar-content"><strong>Private source, public previews</strong><span>Core systems are private-source. Interfaces, docs, and previews are publicly accessible. You can always inspect what matters.</span></div>
+      </div>
     </div>
   </div>
 </div>
@@ -593,38 +392,49 @@ footer {
 
 <hr class="divider">
 
-<!-- WHY WE BUILD -->
-<section id="why" class="section">
+<!-- CURRENT SYSTEMS -->
+<section id="systems" class="section">
 <div class="inner">
-  <div class="label">Why We Build This</div>
-  <div class="why-grid">
-    <div>
-      <p class="why-statement">Modern software is optimized for convenience and scale. Hyperion is focused on continuity, ownership, and long-term understanding.</p>
-      <div class="why-body">
-        <p>Most tools are built for the average workflow. They abstract away provenance, centralize your data, and optimize for retention — not for your ability to understand and control what you've built over time.</p>
-        <p>We build the opposite. Software designed for people and organizations that cannot afford to lose the thread of their own knowledge.</p>
+  <div class="label">Current Systems</div>
+  <div class="systems-intro">
+    <h2 class="h2">The Hyperion stack.</h2>
+    <p class="body-lead">Four systems. One architecture. Each a layer of the intelligence infrastructure stack — built to interoperate, designed to last.</p>
+  </div>
+  <div class="systems-stack">
+    <div class="sys-row c">
+      <div class="sys-left">
+        <span class="sys-num">SYS — 01</span>
+        <span class="sys-name">CHRON.OS</span>
+        <span class="sys-tagline">Archive intelligence</span>
+      </div>
+      <div class="sys-desc">Local-first archiving with full provenance tracking. Intake documents, media, and research — every artifact indexed with its origin, significance, and relationships. Navigate your archive as a living knowledge graph. Runs entirely on your machine.</div>
+      <div class="sys-right">
+        <span class="badge b-live"><span style="width:4px;height:4px;border-radius:50%;background:#4ade80;display:inline-block;"></span>Stable Beta</span>
+        <a href="https://chr0nos.app" class="sys-link">Visit chr0nos.app →</a>
       </div>
     </div>
-    <div class="why-pillars">
-      <div class="pillar">
-        <span class="pillar-key">Local-first</span>
-        <div class="pillar-val"><strong>Your data never leaves unless you choose</strong>All Hyperion tools run on your machine. No accounts required. No passive data collection.</div>
+    <div class="sys-row r">
+      <div class="sys-left">
+        <span class="sys-num">SYS — 02</span>
+        <span class="sys-name">MNEM.OS</span>
+        <span class="sys-tagline">Continuity intelligence</span>
       </div>
-      <div class="pillar">
-        <span class="pillar-key">Provenance</span>
-        <div class="pillar-val"><strong>Every artifact knows its origin</strong>Where it came from, when it arrived, what touched it — preserved immutably from intake.</div>
+      <div class="sys-desc">Long-horizon memory substrate for agentic work. Persistent context across sessions, reasoning continuity, and session handoffs — so the work you started yesterday is fully accessible today. No drift. No lost thread.</div>
+      <div class="sys-right">
+        <span class="badge b-building">In Development</span>
+        <span class="sys-link disabled">Coming soon</span>
       </div>
-      <div class="pillar">
-        <span class="pillar-key">Oversight</span>
-        <div class="pillar-val"><strong>AI that proposes, never acts alone</strong>Intelligence that surfaces, suggests, and waits for your approval. Governance before capability.</div>
+    </div>
+    <div class="sys-row hw">
+      <div class="sys-left">
+        <span class="sys-num">SYS — HW</span>
+        <span class="sys-name">Custom Builds</span>
+        <span class="sys-tagline">Local AI infrastructure</span>
       </div>
-      <div class="pillar">
-        <span class="pillar-key">Transparency</span>
-        <div class="pillar-val"><strong>Open formats, inspectable indexes</strong>Plain JSON sidecars. No proprietary lock-in. You can read every file we generate with a text editor.</div>
-      </div>
-      <div class="pillar">
-        <span class="pillar-key">Continuity</span>
-        <div class="pillar-val"><strong>Built to last, not to retain</strong>Systems designed to remain useful as your knowledge grows — across years, projects, and tools.</div>
+      <div class="sys-desc">Purpose-built hardware for archival storage, local AI inference, NAS nodes, and simulation environments. Local-first intelligence requires local-first hardware — machines that run your stack on your terms, without cloud dependency.</div>
+      <div class="sys-right">
+        <span class="badge b-concept">By inquiry</span>
+        <a href="#contact" class="sys-link">Inquire →</a>
       </div>
     </div>
   </div>
@@ -636,175 +446,55 @@ footer {
 <!-- SHOWCASE -->
 <section id="showcase" class="section" style="background:var(--bg-soft);">
 <div class="inner">
-  <div class="label">CHRON.OS · In Action</div>
-  <div class="showcase-intro">
-    <h2 class="h2">See what it actually <em>feels like.</em></h2>
-    <p class="body-lead" style="margin-bottom:0;">Real archive. Real provenance. Every artifact indexed, tagged, and navigable — entirely on your machine.</p>
-  </div>
+  <div class="label">CHRON.OS · Showcase</div>
+  <h2 class="h2" style="margin-bottom:12px;">See it in action.</h2>
+  <p class="body-lead" style="margin-bottom:36px;">Real archive. Real provenance. Every artifact indexed, tagged, and navigable — entirely on your machine.</p>
   <div class="showcase-frame">
     <div class="sf-bar">
-      <div class="sf-dots">
-        <div class="sf-dot"></div>
-        <div class="sf-dot"></div>
-        <div class="sf-dot"></div>
-      </div>
+      <div class="sf-dots"><div class="sf-dot"></div><div class="sf-dot"></div><div class="sf-dot"></div></div>
       <span class="sf-title">CHRON.OS — Artifact Ontology View</span>
       <span class="sf-ver">v1.0.0</span>
     </div>
-    <div class="sf-body">
-      <div class="art-row">
-        <div class="art-name">Affidavit_2026-04-13.pdf</div>
-        <div class="art-tags"><span class="tag t-dom">Legal · District Court</span><span class="tag t-sig">significance: high</span><span class="tag t-def">document</span></div>
-        <div class="art-note">"Active case file — do not archive without review"</div>
-      </div>
-      <div class="art-row">
-        <div class="art-name">cognitive_architecture_notes_v3.md</div>
-        <div class="art-tags"><span class="tag t-dom">AI Research</span><span class="tag t-def">technical</span><span class="tag t-def">reference</span></div>
-        <div class="art-note">"Working notes for ontology design session"</div>
-      </div>
-      <div class="art-row">
-        <div class="art-name">hyperion_doctrine_v2.md</div>
-        <div class="art-tags"><span class="tag t-dom">Governance</span><span class="tag t-sig">significance: critical</span></div>
-        <div class="art-note">"Source doctrine — board review required to modify"</div>
-      </div>
-      <div class="art-row">
-        <div class="art-name">archivist_system_design.md</div>
-        <div class="art-tags"><span class="tag t-dom">Coding · Library</span><span class="tag t-sig">significance: high</span></div>
-        <div class="art-note">"Core spec — affects archivist behavior"</div>
-      </div>
-      <div class="art-row">
-        <div class="art-name">Service_Invoice_HI2026-01.pdf</div>
-        <div class="art-tags"><span class="tag t-dom">Finance · Invoice</span><span class="tag t-def">moderate</span></div>
-        <div class="art-note">"Filed 2026-01-22"</div>
-      </div>
+    <div>
+      <div class="art-row"><div class="art-name">Affidavit_2026-04-13.pdf</div><div class="art-tags"><span class="tag t-dom">Legal · District Court</span><span class="tag t-sig">significance: high</span><span class="tag t-def">document</span></div><div class="art-note">"Active case file — do not archive without review"</div></div>
+      <div class="art-row"><div class="art-name">cognitive_architecture_notes_v3.md</div><div class="art-tags"><span class="tag t-dom">AI Research</span><span class="tag t-def">technical</span><span class="tag t-def">reference</span></div><div class="art-note">"Working notes for ontology design session"</div></div>
+      <div class="art-row"><div class="art-name">hyperion_doctrine_v2.md</div><div class="art-tags"><span class="tag t-dom">Governance</span><span class="tag t-sig">significance: critical</span></div><div class="art-note">"Source doctrine — board review required to modify"</div></div>
+      <div class="art-row"><div class="art-name">archivist_system_design.md</div><div class="art-tags"><span class="tag t-dom">Coding · Library</span><span class="tag t-sig">significance: high</span></div><div class="art-note">"Core spec — affects archivist behavior"</div></div>
+      <div class="art-row"><div class="art-name">Service_Invoice_HI2026-01.pdf</div><div class="art-tags"><span class="tag t-dom">Finance · Invoice</span><span class="tag t-def">moderate</span></div><div class="art-note">"Filed 2026-01-22"</div></div>
     </div>
   </div>
-  <div class="showcase-bottom">
+  <div class="showcase-footer">
     <span class="showcase-note">Walkthrough videos · coming soon</span>
-    <a href="https://chr0nos.app" class="btn btn-cyan" style="font-size:11px;padding:9px 20px;">Try CHRON.OS →</a>
+    <a href="https://chr0nos.app" class="btn btn-gold" style="font-size:11px;padding:9px 20px;">Download CHRON.OS →</a>
   </div>
 </div>
 </section>
 
 <hr class="divider">
 
-<!-- ROADMAP / STATUS -->
-<section id="roadmap" class="section">
+<!-- DOCTRINE -->
+<section id="doctrine" class="section">
 <div class="inner">
-  <div class="label">Current Status</div>
-  <h2 class="h2">What's live. What's building.<br>What's next.</h2>
-  <p class="body-lead">Full transparency on where every system stands — right now.</p>
-  <div class="status-grid">
-    <div class="status-col">
-      <div class="status-head sh-live">
-        <span class="sh-dot"></span>Live Now
-      </div>
-      <div class="status-items">
-        <div class="si">
-          <div class="si-name">CHRON.OS — Stable Beta</div>
-          <div class="si-subs">
-            <span class="si-sub">Local archive indexing</span>
-            <span class="si-sub">Ontology & provenance tracking</span>
-            <span class="si-sub">Atlas constellation view</span>
-            <span class="si-sub">Archivist AI (local, bounded)</span>
-            <span class="si-sub">Windows — .exe &amp; .msi installer</span>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="status-col">
-      <div class="status-head sh-building">
-        <span class="sh-dot"></span>In Development
-      </div>
-      <div class="status-items">
-        <div class="si">
-          <div class="si-name">MNEM.OS — Continuity Layer</div>
-          <div class="si-subs">
-            <span class="si-sub">Persistent session memory</span>
-            <span class="si-sub">Reasoning context handoffs</span>
-          </div>
-        </div>
-        <div class="si">
-          <div class="si-name">CHRON.OS — Next</div>
-          <div class="si-subs">
-            <span class="si-sub">MCP bridge (developer preview)</span>
-            <span class="si-sub">Media inference &amp; tagging</span>
-            <span class="si-sub">Local agent routing</span>
-            <span class="si-sub">WebGL atlas renderer (v1.1)</span>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="status-col">
-      <div class="status-head sh-research">
-        <span class="sh-dot"></span>Research
-      </div>
-      <div class="status-items">
-        <div class="si">
-          <div class="si-name">LOG.OS</div>
-          <div class="si-subs">
-            <span class="si-sub">Decision-logic layer architecture</span>
-            <span class="si-sub">Evidence weighting model</span>
-          </div>
-        </div>
-        <div class="si">
-          <div class="si-name">MYTH.OS</div>
-          <div class="si-subs">
-            <span class="si-sub">Governance constraint systems</span>
-            <span class="si-sub">Doctrine-as-machine-constraint</span>
-          </div>
-        </div>
-        <div class="si">
-          <div class="si-name">Hyperion Systems</div>
-          <div class="si-subs">
-            <span class="si-sub">Purpose-built inference hardware</span>
-            <span class="si-sub">Archival workstation builds</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-</section>
-
-<hr class="divider">
-
-<!-- HYPERION SYSTEMS (HARDWARE) -->
-<section id="systems-hw" class="section" style="background:var(--bg-soft);">
-<div class="inner">
-  <div class="label">Hyperion Systems · Hardware</div>
-  <div class="hw-grid">
+  <div class="label">Research &amp; Doctrine</div>
+  <div class="doctrine-wrap">
     <div>
-      <h2 class="h2">Built for the<br><em>work that matters.</em></h2>
-      <div class="hw-copy">
-        <p>Local-first intelligence requires local-first hardware. Hyperion Systems is the infrastructure layer — purpose-built machines for archival storage, local AI inference, and continuity workloads.</p>
-        <p>No shared cloud. No external dependencies. Your system, on your terms.</p>
+      <h2 class="h2">Built on doctrine.<br>Not convention.</h2>
+      <div class="doctrine-copy">
+        <p>Modern software is optimized for convenience and scale. Hyperion is focused on continuity, ownership, and long-term understanding.</p>
+        <p>The most meaningful knowledge — legal records, research lineage, personal decisions, institutional memory — should never leave the custody of those who created it. The doctrine isn't a marketing position. It's a design constraint every system we build is bound by.</p>
       </div>
-      <div style="margin-top:24px;">
-        <a href="#contact" class="btn btn-ghost" style="font-size:11px;">Inquire about a build →</a>
+      <div class="doctrine-quote">
+        <blockquote>"Imported content informs the system. Imported content never commands the system."</blockquote>
+        <cite>Hyperion Doctrine · Section II — Agency Governance</cite>
       </div>
     </div>
-    <div class="hw-builds">
-      <div class="hw-card">
-        <div class="hw-num">SYS · HW-01</div>
-        <div class="hw-name">Archival Workstation</div>
-        <div class="hw-desc">High-capacity storage systems optimized for long-term archival, local indexing, and fast retrieval.</div>
-      </div>
-      <div class="hw-card">
-        <div class="hw-num">SYS · HW-02</div>
-        <div class="hw-name">Edge Inference Rig</div>
-        <div class="hw-desc">Local AI inference hardware — for running models on-device without cloud dependency or egress.</div>
-      </div>
-      <div class="hw-card">
-        <div class="hw-num">SYS · HW-03</div>
-        <div class="hw-name">NAS / Storage Node</div>
-        <div class="hw-desc">Network-attached storage built for continuity infrastructure, RAID redundancy, and long-horizon retention.</div>
-      </div>
-      <div class="hw-card">
-        <div class="hw-num">SYS · HW-04</div>
-        <div class="hw-name">Research &amp; Simulation</div>
-        <div class="hw-desc">High-performance builds for AI research, simulation workloads, and multi-model local environments.</div>
-      </div>
+    <div class="doctrine-tenets">
+      <div class="dt"><span class="dt-arrow">→</span><span class="dt-text"><strong>Provenance before prediction.</strong> The chain of custody matters more than algorithmic convenience.</span></div>
+      <div class="dt"><span class="dt-arrow">→</span><span class="dt-text"><strong>Memory with custody.</strong> Intelligence that preserves where things came from and why they mattered.</span></div>
+      <div class="dt"><span class="dt-arrow">→</span><span class="dt-text"><strong>Tools that preserve source truth.</strong> No system should alter what you gave it.</span></div>
+      <div class="dt"><span class="dt-arrow">→</span><span class="dt-text"><strong>Human-directed agents.</strong> AI that surfaces, suggests, and awaits approval — never acts alone.</span></div>
+      <div class="dt"><span class="dt-arrow">→</span><span class="dt-text"><strong>The ontology belongs to you.</strong> Your meaning, your index, your terms. The system reflects — not decides.</span></div>
+      <div class="dt"><span class="dt-arrow">→</span><span class="dt-text"><strong>Small, truthful packets.</strong> When context leaves the local environment, it goes as minimal, scoped, honest extracts.</span></div>
     </div>
   </div>
 </div>
@@ -812,23 +502,69 @@ footer {
 
 <hr class="divider">
 
-<!-- LAB NOTES -->
-<section id="lab" class="section">
+<!-- FOUNDING OPERATORS -->
+<section id="operators" class="section" style="background:var(--bg-soft);">
 <div class="inner">
-  <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:36px;flex-wrap:wrap;gap:16px;">
-    <div>
-      <div class="label">Lab Notes</div>
-      <h2 class="h2" style="margin-bottom:6px;">Dispatches from the forge.</h2>
-      <p style="font-size:14px;color:var(--text-muted);max-width:480px;margin-bottom:0;">Build milestones, research threads, and infrastructure decisions — in public.</p>
-    </div>
+  <div class="label">Founding Operators</div>
+  <div class="ops-intro">
+    <h2 class="h2">The people running<br>the <em>forge.</em></h2>
+    <p class="body-lead">A small, focused team building long-horizon infrastructure. Identifiable operators, clear roles, real work.</p>
   </div>
-  <div class="lab-grid">
-    <div class="lab-card"><div class="lab-top"><span class="lab-date">2026 · Apr 28</span><span class="lab-tag lt-dev">Dev</span></div><div class="lab-title">CHRON.OS v1.0.1 — sidecar schema finalized</div><div class="lab-body">Schema locked for v1.0.1. All metadata fields documented and stable. Existing sidecars migrate automatically on next open.</div></div>
-    <div class="lab-card"><div class="lab-top"><span class="lab-date">2026 · Apr 21</span><span class="lab-tag lt-res">Research</span></div><div class="lab-title">Mnem.OS — memory substrate design notes v0.1</div><div class="lab-body">Initial architecture for the long-horizon memory layer. Key question: how do you persist reasoning context without drift?</div></div>
-    <div class="lab-card"><div class="lab-top"><span class="lab-date">2026 · Apr 14</span><span class="lab-tag lt-inf">Infra</span></div><div class="lab-title">MCP bridge — developer preview scoped</div><div class="lab-body">MCP bridge for CHRON.OS being scoped. Structured tool invocations only — no raw archive access via MCP in v1.</div></div>
-    <div class="lab-card"><div class="lab-top"><span class="lab-date">2026 · Apr 07</span><span class="lab-tag lt-res">Research</span></div><div class="lab-title">Myth.OS framework — governance architecture sketch</div><div class="lab-body">How doctrine becomes a machine-readable constraint that Hyperion systems can verify against in real time.</div></div>
-    <div class="lab-card"><div class="lab-top"><span class="lab-date">2026 · Mar 29</span><span class="lab-tag lt-dev">Dev</span></div><div class="lab-title">Atlas constellation view — performance at scale</div><div class="lab-body">Indexes above 10,000 artifacts hitting rendering limits. Investigating WebGL renderer for v1.1.</div></div>
-    <div class="lab-card"><div class="lab-top"><span class="lab-date">2026 · Mar 18</span><span class="lab-tag lt-inf">Infra</span></div><div class="lab-title">Log.OS concept — decision-logic layer scoped</div><div class="lab-body">Log.OS will track reasoning chains: evidence used, weight carried, alternatives considered. The audit trail for intelligence.</div></div>
+  <div class="ops-grid">
+
+    <div class="op-card">
+      <div class="op-header">
+        <div class="op-avatar">Δχ</div>
+        <div class="op-id">
+          <span class="op-handle">Δeus χ</span>
+          <span class="op-role">Founder · Systems Architecture</span>
+        </div>
+      </div>
+      <div>
+        <p class="op-bio">Systems architect focused on local-first intelligence infrastructure, continuity systems, archival tooling, and high-context operational environments.</p>
+        <p class="op-bio" style="margin-top:10px;">Creator of CHRON.OS and MNEM.OS — interoperable systems designed around provenance, continuity, memory governance, and human-directed AI workflows.</p>
+        <p class="op-bio" style="margin-top:10px;">Background in IT systems engineering, infrastructure triage, workflow architecture, hardware optimization, and adaptive deployment strategy across constrained environments.</p>
+      </div>
+      <div class="op-focuses">
+        <div class="op-focuses-label">Focus areas</div>
+        <div class="op-focus-tags">
+          <span class="op-focus-tag">Local-first AI infrastructure</span>
+          <span class="op-focus-tag">Archival intelligence</span>
+          <span class="op-focus-tag">Continuity governance</span>
+          <span class="op-focus-tag">Human-AI tooling</span>
+          <span class="op-focus-tag">Modular deployment</span>
+          <span class="op-focus-tag">Ontology &amp; provenance</span>
+        </div>
+      </div>
+      <div class="op-belief">"Technology should augment human continuity and agency — not replace custody, understanding, or control."</div>
+    </div>
+
+    <div class="op-card">
+      <div class="op-header">
+        <div class="op-avatar" style="font-size:18px;">K</div>
+        <div class="op-id">
+          <span class="op-handle">Kesh</span>
+          <span class="op-role">Operations · Deployment</span>
+        </div>
+      </div>
+      <div>
+        <p class="op-bio">Operations lead focused on deployment strategy, system integration, and experience infrastructure. Responsible for the connective tissue between Hyperion's technical builds and the people who use them.</p>
+        <p class="op-bio" style="margin-top:10px;">Background in customer experience, business development, and translating complex systems into operational realities that work for real users in real environments.</p>
+      </div>
+      <div class="op-focuses">
+        <div class="op-focuses-label">Focus areas</div>
+        <div class="op-focus-tags">
+          <span class="op-focus-tag">Deployment strategy</span>
+          <span class="op-focus-tag">Business development</span>
+          <span class="op-focus-tag">Experience infrastructure</span>
+          <span class="op-focus-tag">Partner coordination</span>
+          <span class="op-focus-tag">System integration</span>
+          <span class="op-focus-tag">Operational logistics</span>
+        </div>
+      </div>
+      <div class="op-belief">"Good infrastructure disappears. The best systems are the ones people trust without thinking twice."</div>
+    </div>
+
   </div>
 </div>
 </section>
@@ -843,13 +579,13 @@ footer {
     <div>
       <h2 class="h2">Work with <em>Hyperion.</em></h2>
       <div class="contact-copy">
-        <p>We build in public and work selectively. If your work intersects local-first AI, archival intelligence, provenance systems, or purpose-built hardware — we want to hear from you.</p>
+        <p>We build in public and work selectively. If your work intersects local-first AI, archival intelligence, provenance systems, or purpose-built infrastructure — reach out.</p>
         <p>Not taking VC funding. Not pivoting to SaaS. Building infrastructure that lasts.</p>
       </div>
-      <div class="cm-grid">
+      <div class="contact-modes">
         <div class="cm"><span class="cm-dot"></span><div><div class="cm-title">Technical Collaboration</div><div class="cm-body">Researchers and engineers working on local-first AI, provenance, or archival intelligence.</div></div></div>
         <div class="cm"><span class="cm-dot"></span><div><div class="cm-title">Organizational Deployment</div><div class="cm-body">Organizations needing CHRON.OS deployment, customization, or enterprise support.</div></div></div>
-        <div class="cm"><span class="cm-dot"></span><div><div class="cm-title">Hardware Inquiry</div><div class="cm-body">Custom builds for archival, inference, NAS, or research workloads.</div></div></div>
+        <div class="cm"><span class="cm-dot"></span><div><div class="cm-title">Hardware &amp; Custom Builds</div><div class="cm-body">Purpose-built machines for local AI inference, archival storage, NAS, and research workloads.</div></div></div>
         <div class="cm"><span class="cm-dot"></span><div><div class="cm-title">Support the Work</div><div class="cm-body">CHRON.OS is free for individuals. Contributions sustain independent development.</div></div></div>
       </div>
     </div>
@@ -863,13 +599,13 @@ footer {
             <option value="">Select a category</option>
             <option>Technical collaboration</option>
             <option>Organizational deployment</option>
-            <option>Hardware inquiry</option>
+            <option>Hardware &amp; custom builds</option>
             <option>Research partnership</option>
             <option>Support the work</option>
             <option>Other</option>
           </select>
         </div>
-        <div class="form-group"><label class="form-lbl">Message</label><textarea name="body" class="form-input" placeholder="Describe what you&#39;re working on and how it intersects with Hyperion&#39;s work."></textarea></div>
+        <div class="form-group"><label class="form-lbl">Message</label><textarea name="body" class="form-input" placeholder="What are you working on and how does it intersect with Hyperion?"></textarea></div>
         <button type="submit" class="btn btn-gold" style="align-self:flex-start;padding:12px 26px;">Send Message →</button>
       </form>
     </div>
@@ -885,25 +621,25 @@ footer {
         <img src="data:image/png;base64,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" alt="" class="footer-mark">
         <span class="footer-wm">Hyperion Industries</span>
       </div>
-      <p class="footer-desc">Research forge and intelligence infrastructure. Building local-first, human-centered systems for the agentic era.</p>
+      <p class="footer-desc">Local-first intelligence infrastructure for people who need custody, continuity, and control.</p>
       <a href="https://hyperion-industries.dev" class="footer-url">hyperion-industries.dev</a>
     </div>
     <div>
-      <div class="fcol-title">Products</div>
+      <div class="fcol-title">Systems</div>
       <ul class="fcol-links">
         <li><a href="https://chr0nos.app">CHRON.OS</a></li>
-        <li><a href="#ecosystem">MNEM.OS</a></li>
-        <li><a href="#ecosystem">LOG.OS</a></li>
-        <li><a href="#ecosystem">MYTH.OS</a></li>
+        <li><a href="#systems">MNEM.OS</a></li>
+        <li><a href="#systems">LOG.OS</a></li>
+        <li><a href="#systems">MYTH.OS</a></li>
       </ul>
     </div>
     <div>
-      <div class="fcol-title">Company</div>
+      <div class="fcol-title">Hyperion</div>
       <ul class="fcol-links">
-        <li><a href="#why">Why We Build</a></li>
-        <li><a href="#roadmap">Roadmap</a></li>
-        <li><a href="#lab">Lab Notes</a></li>
-        <li><a href="#systems-hw">Hardware</a></li>
+        <li><a href="#about">What We Build</a></li>
+        <li><a href="#showcase">Showcase</a></li>
+        <li><a href="#doctrine">Doctrine</a></li>
+        <li><a href="#operators">Team</a></li>
       </ul>
     </div>
     <div>
@@ -921,7 +657,7 @@ footer {
     <div class="footer-legal">
       <a href="https://chr0nos.app/privacy.html">Privacy</a>
       <a href="https://chr0nos.app/terms.html">Terms</a>
-      <a href="#why">Doctrine</a>
+      <a href="#doctrine">Doctrine</a>
     </div>
   </div>
 </footer>
@@ -931,51 +667,25 @@ footer {
   const canvas = document.getElementById('hero-canvas');
   const ctx = canvas.getContext('2d');
   let W, H, stars = [];
-
   function resize(){ W = canvas.width = canvas.offsetWidth; H = canvas.height = canvas.offsetHeight; }
-
   function init(){
     stars = [];
     const n = Math.floor(W * H / 4200);
-    for(let i = 0; i < n; i++){
-      stars.push({
-        x: Math.random()*W, y: Math.random()*H,
-        r: Math.random()*1.1+0.15,
-        o: Math.random()*0.35+0.04,
-        p: Math.random()*Math.PI*2,
-        sp: (Math.random()-0.5)*0.006
-      });
-    }
+    for(let i = 0; i < n; i++) stars.push({ x:Math.random()*W, y:Math.random()*H, r:Math.random()*1.1+0.15, o:Math.random()*0.35+0.04, p:Math.random()*Math.PI*2, sp:(Math.random()-0.5)*0.006 });
   }
-
   function draw(){
     ctx.clearRect(0,0,W,H);
-    ctx.strokeStyle = 'rgba(42,45,49,0.5)';
-    ctx.lineWidth = 0.5;
-    const gs = 80;
-    for(let x=0;x<W;x+=gs){ ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke(); }
-    for(let y=0;y<H;y+=gs){ ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke(); }
+    ctx.strokeStyle='rgba(42,45,49,0.5)'; ctx.lineWidth=0.5;
+    for(let x=0;x<W;x+=80){ ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke(); }
+    for(let y=0;y<H;y+=80){ ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke(); }
     for(const s of stars){
-      s.p += s.sp;
-      const a = s.o + Math.sin(s.p)*0.05;
-      ctx.beginPath();
-      ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
-      ctx.fillStyle = `rgba(245,245,242,${a})`;
-      ctx.fill();
+      s.p+=s.sp;
+      ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(245,245,242,${s.o+Math.sin(s.p)*0.05})`; ctx.fill();
     }
-    for(let i=0;i<stars.length;i++){
-      for(let j=i+1;j<stars.length;j++){
-        const dx=stars[i].x-stars[j].x, dy=stars[i].y-stars[j].y;
-        const d=Math.sqrt(dx*dx+dy*dy);
-        if(d<80){
-          ctx.beginPath();
-          ctx.strokeStyle=`rgba(42,45,49,${(1-d/80)*0.6})`;
-          ctx.lineWidth=0.4;
-          ctx.moveTo(stars[i].x,stars[i].y);
-          ctx.lineTo(stars[j].x,stars[j].y);
-          ctx.stroke();
-        }
-      }
+    for(let i=0;i<stars.length;i++) for(let j=i+1;j<stars.length;j++){
+      const dx=stars[i].x-stars[j].x, dy=stars[i].y-stars[j].y, d=Math.sqrt(dx*dx+dy*dy);
+      if(d<80){ ctx.beginPath(); ctx.strokeStyle=`rgba(42,45,49,${(1-d/80)*0.6})`; ctx.lineWidth=0.4; ctx.moveTo(stars[i].x,stars[i].y); ctx.lineTo(stars[j].x,stars[j].y); ctx.stroke(); }
     }
     requestAnimationFrame(draw);
   }
@@ -986,20 +696,18 @@ footer {
 (function(){
   const links = document.querySelectorAll('.nav-links a');
   const sects = [...document.querySelectorAll('section[id]')];
-  window.addEventListener('scroll', ()=>{
-    const y = window.scrollY + 80;
-    let active = '';
-    for(const s of sects){ if(s.offsetTop <= y) active = s.id; }
-    links.forEach(l => {
-      const href = l.getAttribute('href');
-      if(!href || !href.startsWith('#')) return;
-      const on = href === '#'+active;
-      l.style.color = on ? 'var(--text)' : '';
-      l.style.fontWeight = on ? '700' : '';
+  window.addEventListener('scroll',()=>{
+    const y = window.scrollY+80; let active='';
+    for(const s of sects){ if(s.offsetTop<=y) active=s.id; }
+    links.forEach(l=>{
+      const h=l.getAttribute('href');
+      if(!h||!h.startsWith('#')) return;
+      const on=h==='#'+active;
+      l.style.color=on?'var(--text)':'';
+      l.style.fontWeight=on?'700':'';
     });
   });
 })();
 </script>
-
 </body>
 </html>
