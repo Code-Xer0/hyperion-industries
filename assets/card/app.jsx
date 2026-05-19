@@ -130,4 +130,11 @@ function App() {
   );
 }
 
-ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+// Expose for the editor entry to reuse without re-defining.
+Object.assign(window, { App, FALLBACK_CONFIG, applyAccent, buildData });
+
+// edit.html sets this flag BEFORE Babel compiles app.jsx, so the editor
+// can mount its own wrapped App with the TweaksPanel attached.
+if (!window.__cardSuppressAutoMount) {
+  ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+}

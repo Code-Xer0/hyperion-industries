@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Operator Card · Editor</title>
+<meta name="robots" content="noindex,nofollow" />
+<meta name="referrer" content="no-referrer" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23ff2a36'/%3E%3Ctext x='32' y='44' font-family='monospace' font-size='40' font-weight='700' fill='%23070608' text-anchor='middle'%3E%CE%94%3C/text%3E%3C/svg%3E" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="assets/card/card.css" />
+<style>
+  .site-back {
+    position: fixed;
+    top: 16px;
+    left: 20px;
+    z-index: 50;
+    font: 500 9px/1 "JetBrains Mono", ui-monospace, monospace;
+    letter-spacing: 0.26em;
+    color: rgba(243, 239, 230, 0.38);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    transition: color 160ms;
+    text-transform: uppercase;
+  }
+  .site-back::before { content: "←"; font-size: 11px; line-height: 1; }
+  .site-back:hover   { color: rgba(243, 239, 230, 0.80); }
+  @media (max-width: 480px) { .site-back { display: none; } }
+</style>
+</head>
+<body>
+  <a class="site-back" href="card.html">Public card</a>
+  <div id="root"></div>
+
+  <!-- IMPORTANT: must run BEFORE the Babel scripts so app.jsx skips its
+       own ReactDOM.createRoot() at module bottom. The editor mounts
+       <EditorApp /> instead. -->
+  <script>window.__cardSuppressAutoMount = true;</script>
+
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js"
+          integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L"
+          crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js"
+          integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm"
+          crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js"
+          integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y"
+          crossorigin="anonymous"></script>
+  <script src="assets/card/image-slot.js"></script>
+  <script type="text/babel" src="assets/card/icons.jsx"></script>
+  <script type="text/babel" src="assets/card/signal-field.jsx"></script>
+  <script type="text/babel" src="assets/card/mesh-bg.jsx"></script>
+  <script type="text/babel" src="assets/card/card.jsx"></script>
+  <script type="text/babel" src="assets/card/tweaks-panel.jsx"></script>
+  <script type="text/babel" src="assets/card/app.jsx"></script>
+  <script type="text/babel" src="assets/card/edit.jsx"></script>
+</body>
+</html>
