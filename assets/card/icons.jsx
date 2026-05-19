@@ -114,10 +114,18 @@ const IconHelix = (p) => (
     <path d="M18 4c0 4-12 4-12 8s12 4 12 8" />
   </Icon>
 );
+const IconInstagram = (p) => (
+  <Icon {...p}>
+    <rect x="3" y="3" width="18" height="18" rx="5" />
+    <circle cx="12" cy="12" r="4" />
+    <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
+  </Icon>
+);
 
 Object.assign(window, {
   Icon,
   IconGlobe, IconMail, IconGithub, IconLink, IconPhone,
   IconLocation, IconDownload, IconHeart, IconCoffee,
   IconNFC, IconFlip, IconArrow, IconClock, IconBrain, IconHelix,
+  IconInstagram,
 });

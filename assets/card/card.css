@@ -1113,6 +1113,17 @@ html, body {
   opacity: 0.85;
   border-radius: 1px;
 }
+/* Real branded QR — replaces the placeholder grid on the back face. */
+.scan-qr-img {
+  width: 64px;
+  height: 64px;
+  border: 1px solid rgba(255,42,54,0.35);
+  background: #fff;
+  border-radius: 2px;
+  display: block;
+  object-fit: contain;
+  padding: 3px;
+}
 .scan-meta {
   font: 500 9.5px/1.55 var(--font-mono);
   letter-spacing: 0.16em;

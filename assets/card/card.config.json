@@ -1,0 +1,33 @@
+{
+  "accent": "#ff2a36",
+  "motion": "on",
+  "serial": "HYP-Δ-0001",
+  "name": "VICTOR AMANI",
+  "alias": "Δeus χ",
+  "role": "FOUNDER · SYSTEMS ARCHITECT",
+  "brand": "HYPERION INDUSTRIES",
+  "capability": "INFRASTRUCTURE · CONTINUITY · AI SYSTEMS",
+  "tagline": "Building systems that remember, adapt, and survive contact with reality.",
+  "footTag": "SYSTEMS BUILT TO SURVIVE FAILURE",
+  "doctrine": {
+    "label": "HYPERION DOCTRINE",
+    "vol": "VOL · 01",
+    "titlePre": "Build systems that",
+    "titleHighlight": "survive",
+    "titlePost": "contact with reality.",
+    "body": "Hyperion develops resilient infrastructure, continuity systems, and adaptive operational tooling — designed to remain functional under pressure, change, and uncertainty.",
+    "website": "hyperion-industries.dev",
+    "email": "va@hyperion-industries.dev"
+  },
+  "email": "va@hyperion-industries.dev",
+  "phone": "+1 (612) 314-9992",
+  "website": "hyperion-industries.dev",
+  "links": {
+    "hyperion":  "https://hyperion-industries.dev",
+    "chronos":   "https://chr0nos.app",
+    "forge":     "mailto:forge@hyperion-industries.dev?subject=Forge%20Inquiry",
+    "github":    "https://github.com/Code-Xer0",
+    "instagram": "https://www.instagram.com/code_xer0/",
+    "kofi":      "https://ko-fi.com/hyperionindustries"
+  }
+}

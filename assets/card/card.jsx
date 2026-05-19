@@ -303,7 +303,11 @@ function BackFace({ data }) {
       </div>
 
       <div className="scan-box">
-        <QRCells seed="hyp-deusx-01" />
+        <img
+          className="scan-qr-img"
+          src="assets/card/qr.png"
+          alt="Scan to open operator card"
+        />
         <div className="scan-meta">
           <strong>OPEN A CHANNEL</strong>
           <span>{d.website}</span><br />
