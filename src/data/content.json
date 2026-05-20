@@ -105,5 +105,18 @@
     "badge": "Signal Pending",
     "title": "Newsletter",
     "desc": "Release notes, build drops, and product updates when the signal goes live. The broadcast system is being staged — not rushed."
+  },
+  "systems": {
+    "hero": {
+      "eyebrow": "Systems wing",
+      "title": "Software that keeps custody close.",
+      "lead": "Hyperion builds local-first tools for people who need custody, continuity, and control. Public demos now. Source protected while the systems mature."
+    },
+    "active": {
+      "title": "Active Systems"
+    },
+    "lanes": {
+      "title": "Research & Hardware Lanes"
+    }
   }
 }

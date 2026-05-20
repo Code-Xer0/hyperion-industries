@@ -3,6 +3,7 @@ import PageShell from '../components/layout/PageShell';
 import SectionHero from '../components/ui/SectionHero';
 import SystemCard from '../components/cards/SystemCard';
 import systems from '../data/systems.json';
+import content from '../data/content.json';
 import './SubPage.css';
 import HoverEditor from '../components/ui/HoverEditor';
 import { useState, useEffect, useCallback } from 'react';
@@ -224,15 +225,21 @@ export default function SystemsPage() {
 
   return (
     <PageShell>
-      <SectionHero
-        eyebrow="Systems wing"
-        title="Software that keeps custody close."
-        lead="Hyperion builds local-first tools for people who need custody, continuity, and control. Public demos now. Source protected while the systems mature."
-      />
+      <HoverEditor model="content">
+        <SectionHero
+          eyebrow={content.systems.hero.eyebrow}
+          title={content.systems.hero.title}
+          lead={content.systems.hero.lead}
+        />
+      </HoverEditor>
 
       <section className="section section-alt">
+        <HoverEditor model="content">
+          <div className="shell">
+            <div className="sp-label">{content.systems.active.title}</div>
+          </div>
+        </HoverEditor>
         <div className="shell">
-          <div className="sp-label">Active Systems</div>
           <div className="sp-grid-2">
             {primary.map((sys) => {
               return (
@@ -266,8 +273,12 @@ export default function SystemsPage() {
       </section>
 
       <section className="section">
+        <HoverEditor model="content">
+          <div className="shell">
+            <div className="sp-label">{content.systems.lanes.title}</div>
+          </div>
+        </HoverEditor>
         <div className="shell">
-          <div className="sp-label">Research & Hardware Lanes</div>
           <div className="sp-grid-3">
             {secondary.map((sys) => {
               return (
