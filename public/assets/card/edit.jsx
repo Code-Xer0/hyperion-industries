@@ -164,6 +164,10 @@ window.omelette = window.omelette || {};
 window.omelette.writeFile = (path, content) => {
   if (path.endsWith(".image-slots.state.json")) {
     window.__cardEditor.queueSlots(content);
+    // Nudge the SaveBar's dirty state immediately (image-slot writes
+    // don't go through setTweak, so without this the change is only
+    // noticed by the 400ms poll).
+    window.dispatchEvent(new CustomEvent("tweakchange", { detail: {} }));
     return Promise.resolve();
   }
   console.warn("omelette.writeFile: unsupported path", path);
@@ -354,6 +358,10 @@ function SaveBar({ user, onSignOut }) {
       <div className="hyp-save">
         <span className="who">{user?.login ? `@${user.login}` : ""}</span>
         <span className={statusClass}>{statusText}</span>
+        <button className="signout"
+                onClick={() => window.postMessage({ type: "__activate_edit_mode" }, "*")}>
+          Panel
+        </button>
         <button onClick={save} disabled={busy || !dirty}>
           {busy ? "Saving…" : "Save"}
         </button>
@@ -414,6 +422,18 @@ function TweaksDriver() {
 
   return (
     <TweaksPanel title="Operator Card · Edit" noDeckControls>
+      <TweakSection label="Portrait">
+        <div style={{
+          font: "11px/1.5 ui-sans-serif, system-ui, sans-serif",
+          color: "rgba(41,38,27,.62)", padding: "2px 0 4px",
+        }}>
+          <strong>Double-click</strong> the portrait to reframe — drag to
+          pan, corner-drag to zoom, scroll to scale. <strong>Hover</strong> it
+          for Replace / Remove. Hit <strong>Save</strong> when it looks right.
+          Use <strong>Panel</strong> (top-right) to hide this while you frame.
+        </div>
+      </TweakSection>
+
       <TweakSection label="Identity">
         <TweakText label="Name"       value={t.name}       onChange={(v) => setTweak("name", v)} />
         <TweakText label="Alias"      value={t.alias}      onChange={(v) => setTweak("alias", v)} />
