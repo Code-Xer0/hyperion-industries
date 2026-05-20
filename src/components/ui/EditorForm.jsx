@@ -57,7 +57,7 @@ export default function EditorForm({ data, onUpdate }) {
             />
             <label style={{ 
               fontSize: '12px', 
-              color: 'rgba(255,255,255,0.7)', 
+              color: 'var(--text-soft)', 
               fontFamily: 'var(--font-display, monospace)',
               fontWeight: 600,
               cursor: 'pointer'
@@ -76,7 +76,7 @@ export default function EditorForm({ data, onUpdate }) {
             <label style={{ 
               display: 'block', 
               fontSize: '10px', 
-              color: 'rgba(255,255,255,0.4)', 
+              color: 'var(--text-muted)', 
               textTransform: 'uppercase', 
               letterSpacing: '0.15em', 
               marginBottom: '8px',
@@ -92,10 +92,10 @@ export default function EditorForm({ data, onUpdate }) {
                 className="ed-input"
                 style={{
                   width: '100%',
-                  background: 'rgba(255,255,255,0.03)',
-                  border: '1px solid rgba(255,255,255,0.08)',
+                  background: 'var(--chip-bg)',
+                  border: '1px solid var(--border-soft)',
                   borderRadius: '6px',
-                  color: '#fff',
+                  color: 'var(--text)',
                   padding: '12px',
                   fontSize: '14px',
                   lineHeight: '1.6',
@@ -113,10 +113,10 @@ export default function EditorForm({ data, onUpdate }) {
                     className="ed-input"
                     style={{
                       flex: 1,
-                      background: 'rgba(255,255,255,0.03)',
-                      border: '1px solid rgba(255,255,255,0.08)',
+                      background: 'var(--chip-bg)',
+                      border: '1px solid var(--border-soft)',
                       borderRadius: '6px',
-                      color: '#fff',
+                      color: 'var(--text)',
                       padding: '10px 12px',
                       fontSize: '14px',
                       outline: 'none',
@@ -147,9 +147,9 @@ export default function EditorForm({ data, onUpdate }) {
                   <div style={{ 
                     marginTop: '4px',
                     padding: '8px',
-                    background: 'rgba(0,0,0,0.3)',
+                    background: 'var(--surface-top)',
                     borderRadius: '8px',
-                    border: '1px solid rgba(255,255,255,0.04)',
+                    border: '1px solid var(--border)',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '12px'
@@ -159,9 +159,9 @@ export default function EditorForm({ data, onUpdate }) {
                       height: '64px', 
                       objectFit: 'cover', 
                       borderRadius: '4px',
-                      border: '1px solid rgba(255,255,255,0.1)'
+                      border: '1px solid var(--border)'
                     }} />
-                    <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.3)', fontFamily: 'var(--font-display, monospace)' }}>
+                    <div style={{ fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--font-display, monospace)' }}>
                       Source: {val.split('/').pop()}
                     </div>
                   </div>
@@ -178,7 +178,7 @@ export default function EditorForm({ data, onUpdate }) {
             <label style={{ 
               display: 'block', 
               fontSize: '10px', 
-              color: 'rgba(255,255,255,0.4)', 
+              color: 'var(--text-muted)', 
               textTransform: 'uppercase', 
               letterSpacing: '0.15em', 
               marginBottom: '8px',
@@ -194,10 +194,10 @@ export default function EditorForm({ data, onUpdate }) {
               }}
               style={{
                 width: '100%',
-                background: 'rgba(255,255,255,0.03)',
-                border: '1px solid rgba(255,255,255,0.08)',
+                background: 'var(--chip-bg)',
+                border: '1px solid var(--border-soft)',
                 borderRadius: '6px',
-                color: '#fff',
+                color: 'var(--text)',
                 padding: '10px 12px',
                 fontSize: '14px',
                 outline: 'none'
@@ -213,14 +213,14 @@ export default function EditorForm({ data, onUpdate }) {
             marginTop: '24px',
             marginBottom: '32px',
             padding: '24px',
-            background: 'rgba(255,255,255,0.015)',
-            border: '1px solid rgba(255,255,255,0.05)',
+            background: 'var(--surface-top)',
+            border: '1px solid var(--border-soft)',
             borderRadius: '12px'
           }}>
             <div style={{ 
               fontSize: '13px', 
               fontWeight: 800, 
-              color: '#fff', 
+              color: 'var(--text)', 
               marginBottom: '20px', 
               fontFamily: 'var(--font-display)',
               textTransform: 'uppercase',
@@ -229,9 +229,9 @@ export default function EditorForm({ data, onUpdate }) {
               alignItems: 'center',
               gap: '12px'
             }}>
-              <span style={{ color: '#ffc72c' }}>▶</span> {key}
+              <span style={{ color: 'var(--gold)' }}>▶</span> {key}
             </div>
-            <div className="ed-nested-content" style={{ paddingLeft: '12px', borderLeft: '1px solid rgba(255,255,255,0.04)' }}>
+            <div className="ed-nested-content" style={{ paddingLeft: '12px', borderLeft: '1px solid var(--border-soft)' }}>
               {renderFormFields(val, currentPath)}
             </div>
           </div>

@@ -27,6 +27,12 @@ function BuildManager() {
 
   useEffect(() => { reload(); }, [reload]);
 
+  useEffect(() => {
+    if (selected !== null && items && items[selected]) {
+      setSpecsStr(items[selected].specs.join(', '));
+    }
+  }, [selected, items]);
+
   if (!items) return <div style={{ color: 'rgba(255,255,255,0.3)', padding: '60px', textAlign: 'center' }}>Loading build data…</div>;
 
   const flash = (text, ms = 3500) => { setMsg(text); setTimeout(() => setMsg(''), ms); };
@@ -131,12 +137,6 @@ function BuildManager() {
     };
     reader.readAsDataURL(file);
   };
-
-  useEffect(() => {
-    if (selected !== null && items && items[selected]) {
-      setSpecsStr(items[selected].specs.join(', '));
-    }
-  }, [selected, items]);
 
   const current = selected !== null ? items[selected] : null;
 
