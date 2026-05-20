@@ -12,13 +12,13 @@ const { useState: useStateE, useEffect: useEffectE, useRef: useRefE } = React;
 
 // ── Constants ─────────────────────────────────────────────────────────────
 const REPO_OWNER     = "Code-Xer0";
-const REPO_NAME      = "hyperion-industries-publish";
+const REPO_NAME      = "hyperion-industries";
 const CONFIG_PATH    = "assets/card/card.config.json";
 const SLOTS_PATH     = "assets/card/.image-slots.state.json";
 const PORTRAIT_PATH  = "assets/card/portrait.webp";
 const PAT_KEY        = "hypEditPAT";
 const BRANCH_KEY     = "hypEditBranch";
-const DEFAULT_BRANCH = "codex/ecosystem-navigation-staging";
+const DEFAULT_BRANCH = "main";
 
 // ── GitHub API helpers ────────────────────────────────────────────────────
 const gh = {
@@ -276,7 +276,7 @@ function PatGate({ onUnlock }) {
             type="text"
             value={branch}
             onChange={(e) => setBranch(e.target.value)}
-            placeholder="codex/ecosystem-navigation-staging"
+            placeholder="main"
           />
           <div className="row">
             <button type="submit" disabled={busy}>
