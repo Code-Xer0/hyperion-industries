@@ -13,8 +13,8 @@
   },
   {
     "src": "/assets/uploads/20240801_103026.jpg",
-    "label": "Reference sheet",
-    "desc": "Design source, not a default public hero image.",
+    "label": "",
+    "desc": "",
     "type": "References",
     "reference": true
   }
