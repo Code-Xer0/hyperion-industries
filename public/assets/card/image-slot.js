@@ -75,7 +75,11 @@
 
   function load() {
     if (loadP) return loadP;
-    loadP = fetch(STATE_FILE)
+    // Cache-bust: GitHub Pages' CDN caches this JSON (and may have
+    // negative-cached the 404 from before the sidecar existed), so a
+    // freshly-committed crop wouldn't show until the cache expired. A
+    // unique query string forces the edge to treat each load as new.
+    loadP = fetch(STATE_FILE + "?t=" + Date.now(), { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : null))
       .then((j) => {
         // Merge: sidecar loses to any in-memory change that raced ahead of
