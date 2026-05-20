@@ -82,11 +82,11 @@
   "devdiary": {
     "hero": {
       "eyebrow": "Lab notes",
-      "title": "What is being built, tested, and refined.",
-      "lead": "A public development trail for Hyperion systems, forge work, roadmap notes, and behind-the-scenes updates. The lane is active; long-form entries are being staged."
+      "title": "What's currently in the oven.",
+      "lead": "The development trail for Hyperion systems, forge work, roadmap notes, and behind-the-scenes updates. More to come soon!"
     },
     "roadmap": {
-      "title": "Roadmap notes without the fog machine.",
+      "title": "Light the path.",
       "desc": "Future entries will cover release notes, CHR0N.OS changes, Mnem.OS progress, Forge build logs, public-good infrastructure decisions, and visual system updates."
     }
   },
