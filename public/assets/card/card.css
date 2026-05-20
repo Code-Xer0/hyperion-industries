@@ -919,6 +919,26 @@ html, body {
   letter-spacing: 0.36em;
   color: var(--ink-mute);
 }
+/* Save-contact (vCard) — sits under the activate CTA on the lock screen
+   so a visitor can grab the details without (or before) activating. */
+.lock-vcard {
+  margin-top: 22px;
+  background: transparent;
+  border: 1px solid rgba(255, 42, 54, 0.40);
+  color: var(--ink);
+  font: 500 9.5px/1 var(--font-mono);
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  padding: 9px 16px;
+  cursor: pointer;
+  transition: background 160ms, border-color 160ms, transform 200ms;
+  clip-path: polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px);
+}
+.lock-vcard:hover {
+  background: rgba(255, 42, 54, 0.12);
+  border-color: var(--accent);
+}
+.lock-vcard:active { transform: scale(0.97); }
 
 /* scan sweep when activating */
 .scan-sweep {

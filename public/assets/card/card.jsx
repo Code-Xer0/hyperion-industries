@@ -4,6 +4,40 @@
 
 const { useState, useEffect, useRef, useMemo } = React;
 
+// ---- vCard (.vcf) download ----
+// Lets a visitor save the operator's contact details even if they later
+// lose the link. Built from the live config so it always matches the card.
+function downloadVCard(data) {
+  const email = data.comms?.find((c) => /DIRECT/i.test(c.eyebrow))?.value || data.doctrine?.email || "";
+  const phoneRaw = data.comms?.find((c) => /VOICE/i.test(c.eyebrow))?.value || "";
+  const phone = phoneRaw.replace(/[^+\d]/g, "");
+  const parts = (data.name || "").trim().split(/\s+/);
+  const last = parts.length > 1 ? parts.pop() : "";
+  const first = parts.join(" ");
+  const lines = [
+    "BEGIN:VCARD",
+    "VERSION:3.0",
+    `N:${last};${first};;;`,
+    `FN:${data.name || ""}`,
+    `ORG:${data.brand || ""}`,
+    `TITLE:${data.role || ""}`,
+    email ? `EMAIL;TYPE=INTERNET:${email}` : "",
+    phone ? `TEL;TYPE=CELL:${phone}` : "",
+    `URL:https://hyperion-industries.dev/dxcard`,
+    `NOTE:${data.alias || ""} — ${data.tagline || ""}`,
+    "END:VCARD",
+  ].filter(Boolean);
+  const blob = new Blob([lines.join("\r\n")], { type: "text/vcard;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = (data.name || "contact").toLowerCase().replace(/\s+/g, "-") + ".vcf";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
 // ---- deterministic-looking QR grid (fake; placeholder) ----
 function QRCells({ seed = "deusx" }) {
   const cells = useMemo(() => {
@@ -386,6 +420,14 @@ function OperatorCard({ data, motion = "on" }) {
                   TAP TO ACTIVATE
                   <span className="hint">NFC · HOLD TO SYNC</span>
                 </div>
+                <button
+                  type="button"
+                  className="lock-vcard"
+                  onClick={(e) => { e.stopPropagation(); downloadVCard(data); }}
+                  onKeyDown={(e) => e.stopPropagation()}
+                >
+                  ↓ SAVE CONTACT
+                </button>
               </div>
             </div>
           )}
