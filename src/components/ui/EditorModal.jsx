@@ -6,6 +6,7 @@ export default function EditorModal() {
   const { activeEditConfig, setActiveEditConfig } = useEditor();
   const [data, setData] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
 
   useEffect(() => {
     if (!activeEditConfig) {
@@ -23,7 +24,7 @@ export default function EditorModal() {
 
   if (!activeEditConfig) return null;
 
-  const [errorMsg, setErrorMsg] = useState('');
+
 
   const handleSave = async () => {
     setSaving(true);
