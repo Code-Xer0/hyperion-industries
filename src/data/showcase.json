@@ -35,7 +35,7 @@
     "description": ""
   },
   {
-    "codename": "Vault Nine",
+    "codename": "Command Deck",
     "generation": "Gen 2023",
     "hardwareClass": "Artifact",
     "status": "Cataloged",
@@ -44,11 +44,12 @@
     "focalY": "43%",
     "fit": "cover",
     "specs": [
-      "Mid Tower",
+      "Full Tower",
       "Service Path",
-      "Cable Discipline"
+      "Cable Discipline",
+      "Custom Deployment"
     ],
-    "description": "A balanced mid-tower artifact with enough negative space to read the enclosure geometry."
+    "description": "Fully specced hand picked setup for gaming and creative work."
   },
   {
     "codename": "Ion Deck",
