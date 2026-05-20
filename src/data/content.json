@@ -19,11 +19,11 @@
       "desc": "Custom PCs, sim rigs, local AI boxes, and deployment-ready workstations. Hand-built machines tuned around your workload, room, budget, and taste."
     },
     "doctrine": {
-      "titlePart1": "Built for custody.",
+      "titlePart1": "Built for Longevity",
       "titlePart2": "Not lock-in.",
       "p1": "Hyperion is built around a simple belief: useful intelligence should stay close to the people who own the work.",
       "p2": "That means local-first tools, clear provenance, protected source while systems mature, and AI that helps without quietly taking control.",
-      "quote": "\"Imported content informs the system. Imported content never commands the system.\"",
+      "quote": "\"Uploaded content informs the system. Uploaded content never commands the system.\"",
       "cite": "Hyperion Doctrine · Section II — Agency Governance"
     }
   },

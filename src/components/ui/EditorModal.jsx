@@ -23,16 +23,33 @@ export default function EditorModal() {
 
   if (!activeEditConfig) return null;
 
+  const [errorMsg, setErrorMsg] = useState('');
+
   const handleSave = async () => {
     setSaving(true);
-    await fetch(`/api/data/${activeEditConfig.model}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data, null, 2),
-    });
-    setSaving(false);
-    // Hard refresh to show new data on page
-    window.location.reload();
+    setErrorMsg('');
+    try {
+      const saveRes = await fetch(`/api/data/${activeEditConfig.model}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data, null, 2),
+      });
+      if (!saveRes.ok) {
+        throw new Error('Failed to save locally.');
+      }
+
+      const commitRes = await fetch('/api/commit', { method: 'POST' });
+      const commitResult = await commitRes.json();
+      if (!commitResult.success) {
+        throw new Error(commitResult.error || 'Failed to commit/push changes.');
+      }
+
+      window.location.reload();
+    } catch (err) {
+      console.error(err);
+      setErrorMsg(err.message || 'An error occurred during synchronization.');
+      setSaving(false);
+    }
   };
 
   // Extract the specific chunk to edit if an index is provided
@@ -128,50 +145,58 @@ export default function EditorModal() {
           padding: '24px 32px',
           borderTop: '1px solid rgba(255,255,255,0.06)',
           display: 'flex',
-          justifyContent: 'flex-end',
+          justifyContent: 'space-between',
+          alignItems: 'center',
           gap: '16px',
           background: 'rgba(0,0,0,0.2)'
         }}>
-          <button 
-            onClick={() => setActiveEditConfig(null)}
-            style={{ 
-              padding: '10px 24px', 
-              background: 'transparent', 
-              border: '1px solid rgba(255,255,255,0.15)', 
-              color: 'rgba(255,255,255,0.7)', 
-              borderRadius: '8px', 
-              cursor: 'pointer',
-              fontSize: '13px',
-              fontWeight: 600,
-              transition: 'all 0.2s'
-            }}
-            onMouseOver={(e) => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.4)'}
-            onMouseOut={(e) => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'}
-          >
-            Discard Changes
-          </button>
-          <button 
-            onClick={handleSave}
-            disabled={saving || !chunkToEdit}
-            style={{ 
-              padding: '10px 32px', 
-              background: '#ffc72c', 
-              border: 'none', 
-              color: '#000', 
-              borderRadius: '8px', 
-              cursor: 'pointer', 
-              fontWeight: 800,
-              fontSize: '13px',
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-              transition: 'all 0.2s',
-              boxShadow: '0 8px 24px rgba(255, 199, 44, 0.2)'
-            }}
-            onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-1px)'}
-            onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-          >
-            {saving ? 'Syncing...' : 'Push to local →'}
-          </button>
+          {errorMsg ? (
+            <div style={{ color: '#ff5555', fontSize: '11px', fontFamily: 'monospace', maxWidth: '50%' }}>
+              ⚠️ {errorMsg}
+            </div>
+          ) : <div />}
+          <div style={{ display: 'flex', gap: '16px' }}>
+            <button 
+              onClick={() => setActiveEditConfig(null)}
+              style={{ 
+                padding: '10px 24px', 
+                background: 'transparent', 
+                border: '1px solid rgba(255,255,255,0.15)', 
+                color: 'rgba(255,255,255,0.7)', 
+                borderRadius: '8px', 
+                cursor: 'pointer',
+                fontSize: '13px',
+                fontWeight: 600,
+                transition: 'all 0.2s'
+              }}
+              onMouseOver={(e) => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.4)'}
+              onMouseOut={(e) => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'}
+            >
+              Discard Changes
+            </button>
+            <button 
+              onClick={handleSave}
+              disabled={saving || !chunkToEdit}
+              style={{ 
+                padding: '10px 32px', 
+                background: '#ffc72c', 
+                border: 'none', 
+                color: '#000', 
+                borderRadius: '8px', 
+                cursor: 'pointer', 
+                fontWeight: 800,
+                fontSize: '13px',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+                transition: 'all 0.2s',
+                boxShadow: '0 8px 24px rgba(255, 199, 44, 0.2)'
+              }}
+              onMouseOver={(e) => e.currentTarget.style.transform = 'translateY(-1px)'}
+              onMouseOut={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+            >
+              {saving ? 'Deploying...' : 'Save & Publish →'}
+            </button>
+          </div>
         </div>
       </div>
     </div>
