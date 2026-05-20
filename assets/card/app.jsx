@@ -88,7 +88,7 @@ function buildData(c) {
 // without forking this file. Default impl just returns the fetched value.
 window.__cardConfig = window.__cardConfig || {
   load: () =>
-    fetch("assets/card/card.config.json", { cache: "no-store" })
+    fetch("/assets/card/card.config.json", { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error("no config"))))
       .catch(() => FALLBACK_CONFIG),
 };

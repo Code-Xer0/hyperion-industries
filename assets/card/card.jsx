@@ -116,7 +116,7 @@ function Portrait() {
             id="operator-portrait"
             shape="circle"
             placeholder="ΔEUS χ"
-            src="assets/operators/deus-x-portrait-complete.png"
+            src="/assets/operators/deus-x-portrait-complete.png"
           ></image-slot>
         </div>
       </div>
@@ -305,7 +305,7 @@ function BackFace({ data }) {
       <div className="scan-box">
         <img
           className="scan-qr-img"
-          src="assets/card/qr.png"
+          src="/assets/card/qr.png"
           alt="Scan to open operator card"
         />
         <div className="scan-meta">

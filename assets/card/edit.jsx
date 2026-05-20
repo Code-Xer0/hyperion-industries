@@ -14,7 +14,7 @@ const { useState: useStateE, useEffect: useEffectE, useRef: useRefE } = React;
 const REPO_OWNER     = "Code-Xer0";
 const REPO_NAME      = "hyperion-industries-publish";
 const CONFIG_PATH    = "assets/card/card.config.json";
-const SLOTS_PATH     = ".image-slots.state.json";
+const SLOTS_PATH     = "assets/card/.image-slots.state.json";
 const PORTRAIT_PATH  = "assets/card/portrait.webp";
 const PAT_KEY        = "hypEditPAT";
 const BRANCH_KEY     = "hypEditBranch";
@@ -158,8 +158,11 @@ window.__cardEditor = {
 // image-slot writes via window.omelette.writeFile(path, content). We shim
 // it to route slot state into the editor's pending buffer; Save flushes it.
 window.omelette = window.omelette || {};
+// image-slot writes its sidecar via its absolute STATE_FILE constant
+// (/assets/card/.image-slots.state.json). Accept any path that ends with
+// .image-slots.state.json so a future relocation doesn't break the bridge.
 window.omelette.writeFile = (path, content) => {
-  if (path === SLOTS_PATH) {
+  if (path.endsWith(".image-slots.state.json")) {
     window.__cardEditor.queueSlots(content);
     return Promise.resolve();
   }

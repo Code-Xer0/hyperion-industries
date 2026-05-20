@@ -47,7 +47,9 @@
  */
 
 (() => {
-  const STATE_FILE = '.image-slots.state.json';
+  // Absolute path so the sidecar lives in one place regardless of which
+  // HTML loads this component (public /dxcard/ vs editor /edit.html).
+  const STATE_FILE = '/assets/card/.image-slots.state.json';
   // 2× a ~600px slot in a 1920-wide deck — retina-sharp without making the
   // sidecar enormous. A 1200px WebP at q=0.85 is ~150-300KB.
   const MAX_DIM = 1200;
