@@ -84,13 +84,24 @@ function localCmsPlugin() {
         }
 
         if (req.url === '/api/commit' && req.method === 'POST') {
-          exec('git add src/data/ public/assets/ && git commit -m "Content and assets updated via Editor" && git push', (error, stdout, stderr) => {
-            res.setHeader('Content-Type', 'application/json');
-            if (error) {
-              res.end(JSON.stringify({ success: false, error: error.message, stderr }));
-            } else {
-              res.end(JSON.stringify({ success: true, stdout }));
+          exec('git status --porcelain src/data/ public/assets/', (statusErr, statusStdout) => {
+            if (statusErr) {
+              res.setHeader('Content-Type', 'application/json');
+              return res.end(JSON.stringify({ success: false, error: statusErr.message }));
             }
+            if (!statusStdout.trim()) {
+              // Nothing to commit
+              res.setHeader('Content-Type', 'application/json');
+              return res.end(JSON.stringify({ success: true, stdout: 'No changes to commit. Already up to date.' }));
+            }
+            exec('git add src/data/ public/assets/ && git commit -m "Content and assets updated via Editor" && git push', (error, stdout, stderr) => {
+              res.setHeader('Content-Type', 'application/json');
+              if (error) {
+                res.end(JSON.stringify({ success: false, error: error.message, stderr }));
+              } else {
+                res.end(JSON.stringify({ success: true, stdout }));
+              }
+            });
           });
           return;
         }
