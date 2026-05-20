@@ -52,10 +52,10 @@
     "description": "Fully specced hand picked setup for gaming and creative work."
   },
   {
-    "codename": "Ion Deck",
+    "codename": "Kuda R3 (2022)",
     "generation": "Gen 2022",
-    "hardwareClass": "Setup",
-    "status": "Extended",
+    "hardwareClass": "Artifact",
+    "status": "Succeeded",
     "image": "/assets/builds/20220602_223426.jpg",
     "focalX": "50%",
     "focalY": "50%",
@@ -65,7 +65,7 @@
       "Ambient Rail",
       "Control Surface"
     ],
-    "description": "A screenshot-like desk and display specimen using conservative framing to retain the telemetry field."
+    "description": "Sensor Panel Custom deployment."
   },
   {
     "codename": "Red Vault",
