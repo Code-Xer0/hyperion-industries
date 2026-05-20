@@ -84,7 +84,7 @@ function localCmsPlugin() {
         }
 
         if (req.url === '/api/commit' && req.method === 'POST') {
-          exec('git add src/data/*.json && git commit -m "Content updated via Editor" && git push', (error, stdout, stderr) => {
+          exec('git add src/data/ public/assets/ && git commit -m "Content and assets updated via Editor" && git push', (error, stdout, stderr) => {
             res.setHeader('Content-Type', 'application/json');
             if (error) {
               res.end(JSON.stringify({ success: false, error: error.message, stderr }));
