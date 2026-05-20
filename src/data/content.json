@@ -30,17 +30,17 @@
   "forge": {
     "hero": {
       "eyebrow": "The Forge",
-      "title": "Physical systems for local-first work.",
+      "title": "Systems Shaped to your Needs",
       "lead": "Custom PCs, sim rigs, local AI boxes, and deployment-ready workstations. The Forge is where Hyperion systems become physical: quiet, powerful, serviceable machines built around the work they need to carry."
     },
     "lanes": {
-      "titlePart1": "Not shelf machines.",
-      "titlePart2": "Work machines."
+      "titlePart1": "Not Pre Builts.",
+      "titlePart2": "Fine-tuned Infrastructure."
     },
     "future": {
-      "title": "Scaffolded, not rushed.",
-      "lead": "The configurator is intentionally not live yet. For now, build inquiries stay human so the system matches the budget, workload, taste, and room it will live in.",
-      "planned": "Planned: build quiz, intake form, budget/use-case selector, benchmark vault, showcase videos, and repair/mod service lanes."
+      "title": "Perfected, not rushed.",
+      "lead": "The configurator is intentionally not live yet. For now, build inquiries stay human so the system matches the budget, workload, taste, and room it will thrive in.",
+      "planned": "Planned: build quiz, intake form, budget/use-case selector, benchmark vault, showcase videos, and repair/mod service lane."
     },
     "mediaStrip": {
       "image1": "/assets/uploads/20240801_103026.jpg",
@@ -49,7 +49,7 @@
   },
   "gallery": {
     "hero": {
-      "eyebrow": "Gallery wing",
+      "eyebrow": "Gallery",
       "title": "Signals, cards, renders, and field pieces.",
       "lead": "Hyperion gallery: build cards, product cards, visuals, showcase pieces, and cinematic previews."
     },
@@ -59,8 +59,8 @@
       "desc": "Completed Loadouts and Deployments."
     },
     "mediaStrip": {
-      "image1": "/assets/operators/deus-x-wide-brand.png",
-      "image2": "/assets/operators/deus-x-avatar-orb.png"
+      "image1": "/assets/uploads/chatgpt-1749167849728.jpg",
+      "image2": "/assets/uploads/20231003_191131.jpg"
     }
   },
   "contact": {
