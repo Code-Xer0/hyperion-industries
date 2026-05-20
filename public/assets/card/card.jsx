@@ -81,7 +81,23 @@ function useUTC() {
 }
 
 // ---- top operator bar ----
-function OpBar({ serial, onFlip, side = "front" }) {
+function OpBar({ serial, onFlip, onOperator, layer = 2, side = "front" }) {
+  // Layer 1 (calm identity): a quiet live dot + a discreet operator-mode entry.
+  if(layer === 1) {
+    return (
+      <div className="opbar opbar-quiet">
+        <div className="opbar-left">
+          <span className="pill"><span className="dot" /> ONLINE</span>
+        </div>
+        <div className="opbar-right">
+          <button className="op-flip" onClick={onOperator} aria-label="Operator mode">
+            <IconFlip size={14} />
+          </button>
+        </div>
+      </div>
+    );
+  }
+  // Layer 2 (operator dashboard): full chrome.
   return (
     <div className="opbar">
       <div className="opbar-left">
@@ -90,13 +106,9 @@ function OpBar({ serial, onFlip, side = "front" }) {
       </div>
       <div className="opbar-right">
         <span className="opbar-meta tick">CAL · NOMINAL</span>
-        {onFlip ? (
-          <button className="op-flip" onClick={onFlip} aria-label={side === "front" ? "Flip to back" : "Flip to front"}>
-            <IconFlip size={14} />
-          </button>
-        ) : (
-          <span className="nfc"><IconNFC size={20} /></span>
-        )}
+        <button className="op-flip" onClick={onFlip} aria-label="Back to identity">
+          <IconFlip size={14} />
+        </button>
       </div>
     </div>
   );
@@ -160,12 +172,14 @@ function Portrait() {
 }
 
 // ---- identity ----
-function Identity({ name, alias, role, brand, capability }) {
+function Identity({ name, alias, role, brand, capability, layer = 1 }) {
   return (
     <div className="identity">
       <h1>
         <span>{name}</span>
-        <span className="alias">ALIAS · <span>{alias}</span></span>
+        {layer !== 1 && alias && (
+          <span className="alias">ALIAS · <span>{alias}</span></span>
+        )}
       </h1>
       <div className="role">{role}</div>
       <div className="brand">{brand}</div>
@@ -354,28 +368,25 @@ function BackFace({ data }) {
 
 // ---- the whole card ----
 function OperatorCard({ data, motion = "on" }) {
-  const [locked, setLocked] = useState(true);
-  const [activating, setActivating] = useState(false);
+  // Progressive disclosure: Layer 1 (front) shows immediately — a calm,
+  // professional identity. Layer 2 (back) is the opt-in operator ecosystem,
+  // reached via the scan-sweep + flip ("operator mode").
   const [flipped, setFlipped] = useState(false);
+  const [activating, setActivating] = useState(false);
 
-  const activate = () => {
-    if (!locked || activating) return;
+  const enterOperator = () => {
+    if (flipped || activating) return;
+    if (motion === "off") { setFlipped(true); return; }
     setActivating(true);
-    const dur = motion === "off" ? 0 : 1100;
-    setTimeout(() => { setLocked(false); setActivating(false); }, dur);
+    setTimeout(() => { setActivating(false); setFlipped(true); }, 900);
   };
-
-  useEffect(() => {
-    if (motion === "off" && locked) {
-      setLocked(false);
-    }
-  }, [motion]); // eslint-disable-line
+  const backToIdentity = () => setFlipped(false);
 
   return (
     <div className="card-wrap">
       <div className={"card " + (flipped ? "flipped" : "")}>
-        {/* FRONT */}
-        <div className={"face front " + (!locked ? "live" : "")}>
+        {/* FRONT — Layer 1: clean identity, shown immediately */}
+        <div className="face front live">
           <MeshBG density={26} />
           <div className="frame">
             <div className="bracket tl" />
@@ -385,58 +396,39 @@ function OperatorCard({ data, motion = "on" }) {
           </div>
           <div className="frame-inner" />
 
-          <OpBar serial={data.serial} onFlip={() => setFlipped(true)} side="front" />
+          <OpBar layer={1} onOperator={enterOperator} />
           <Portrait />
           <Identity
+            layer={1}
             name={data.name}
-            alias={data.alias}
             role={data.role}
             brand={data.brand}
             capability={data.capability}
           />
           <Tagline text={data.tagline} />
-          <Modules items={data.systems} />
           <CommsConsole channels={data.comms} rail={data.rail} />
-          <div className="cardfoot">
-            <TelemetryStrip />
-            <Signature text={data.footTag} />
+          <div className="cardfoot l1-foot">
+            <button
+              type="button"
+              className="cta-save"
+              onClick={() => downloadVCard(data)}
+            >
+              ↓ SAVE CONTACT
+            </button>
+            <button
+              type="button"
+              className="op-mode"
+              onClick={enterOperator}
+            >
+              OPERATOR MODE ▸
+            </button>
           </div>
 
-          {/* lock overlay */}
-          {locked && (
-            <div
-              className={"lock-overlay " + (activating ? "fading" : "")}
-              onClick={activate}
-              onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && activate()}
-              role="button"
-              tabIndex={0}
-              aria-label="Activate card"
-            >
-              <div className="lock-inner">
-                <div className="lock-ring">
-                  <IconNFC size={36} />
-                </div>
-                <div className="lock-cta">
-                  TAP TO ACTIVATE
-                  <span className="hint">NFC · HOLD TO SYNC</span>
-                </div>
-                <button
-                  type="button"
-                  className="lock-vcard"
-                  onClick={(e) => { e.stopPropagation(); downloadVCard(data); }}
-                  onKeyDown={(e) => e.stopPropagation()}
-                >
-                  ↓ SAVE CONTACT
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* scan sweep */}
+          {/* operator-mode reveal sweep */}
           {activating && <div className="scan-sweep" aria-hidden="true" />}
         </div>
 
-        {/* BACK */}
+        {/* BACK — Layer 2: operator ecosystem (scrollable deck) */}
         <div className="face back">
           <MeshBG density={26} />
           <div className="frame">
@@ -446,8 +438,16 @@ function OperatorCard({ data, motion = "on" }) {
             <div className="bracket br" />
           </div>
           <div className="frame-inner" />
-          <OpBar serial={data.serial} onFlip={() => setFlipped(false)} side="back" />
-          <BackFace data={data} />
+          <OpBar layer={2} serial={data.serial} onFlip={backToIdentity} side="back" />
+          <div className="op-deck">
+            <div className="op-alias">ALIAS · {data.alias}</div>
+            <Modules items={data.systems} />
+            <BackFace data={data} />
+            <div className="cardfoot">
+              <TelemetryStrip />
+              <Signature text={data.footTag} />
+            </div>
+          </div>
         </div>
       </div>
     </div>
