@@ -68,20 +68,20 @@
     "description": "Sensor Panel Custom deployment."
   },
   {
-    "codename": "Red Vault",
+    "codename": "Licht Matter",
     "generation": "Gen 2022",
     "hardwareClass": "Compact",
     "status": "Sealed",
-    "image": "/assets/builds/20220308_165818.jpg",
+    "image": "/assets/uploads/20230210_102609.jpg",
     "focalX": "46%",
     "focalY": "46%",
     "fit": "cover",
     "specs": [
       "Compact Case",
-      "Thermal Path",
-      "RGB Accent"
+      "aRGB Fine Accents",
+      "Gaming Powerhouse"
     ],
-    "description": "An early compact chassis record with hardware focus preserved through upper-safe-zone cropping."
+    "description": "Whisper quiet screaming performace all day long."
   },
   {
     "codename": "Obsidian Run",
