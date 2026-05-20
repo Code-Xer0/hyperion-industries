@@ -32,22 +32,6 @@
     "description": "A luminous hard-lane tower profile balanced around case silhouette and internal light continuity."
   },
   {
-    "codename": "Aegis Core",
-    "generation": "Gen 2022",
-    "hardwareClass": "Performance",
-    "status": "Validated",
-    "image": "/assets/builds/20221224_211944.jpg",
-    "focalX": "52%",
-    "focalY": "48%",
-    "fit": "cover",
-    "specs": [
-      "GPU Focus",
-      "Thermal Route",
-      "Redline"
-    ],
-    "description": "A dense performance configuration logged for component fitment and GPU-zone presentation."
-  },
-  {
     "codename": "Vault Nine",
     "generation": "Gen 2023",
     "hardwareClass": "Artifact",
@@ -110,38 +94,6 @@
       "Airflow"
     ],
     "description": "A gaming-class build with controlled glow and a clean frontal hardware read."
-  },
-  {
-    "codename": "Telemetry Ghost",
-    "generation": "Gen 2026",
-    "hardwareClass": "Evidence",
-    "status": "Proof Set",
-    "image": "/assets/builds/Screenshot_20260318_080336_Gallery.jpg",
-    "focalX": "50%",
-    "focalY": "50%",
-    "fit": "contain",
-    "specs": [
-      "Screenshot",
-      "No Crop",
-      "Reference"
-    ],
-    "description": "A screenshot-derived archive entry rendered in contain mode so interface evidence remains uncropped."
-  },
-  {
-    "codename": "Arc Furnace",
-    "generation": "Gen 2023",
-    "hardwareClass": "Workshop",
-    "status": "Logged",
-    "image": "/assets/builds/20230818_170046.jpg",
-    "focalX": "52%",
-    "focalY": "46%",
-    "fit": "cover",
-    "specs": [
-      "Workbench",
-      "Inspection",
-      "Case Lines"
-    ],
-    "description": "A workshop-stage build record that keeps the enclosure silhouette and inspection context intact."
   },
   {
     "codename": "Cyan Relay",
