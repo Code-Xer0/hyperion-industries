@@ -1,0 +1,205 @@
+/* ── OPERATOR TRADING CARDS ── */
+.ops-grid {
+  display: flex;
+  gap: 36px;
+  justify-content: center;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  margin-top: 56px;
+}
+
+/* Standard trading card: 63×88mm → ~1:1.4 ratio */
+.op-card {
+  position: relative;
+  width: 300px;
+  border-radius: 14px;
+  padding: 3px;
+  background: linear-gradient(135deg, #ffc72c 0%, #a0630a 20%, #ffc72c 40%, #fff0a0 50%, #ffc72c 60%, #a0630a 80%, #ffc72c 100%);
+  background-size: 300% 300%;
+  animation: cardFoil 6s ease infinite;
+  box-shadow: 0 0 32px rgba(255,199,44,0.22), 0 24px 64px rgba(0,0,0,0.8);
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.op-card.kesh-card {
+  background: linear-gradient(135deg, #8ab4f8 0%, #2563a8 20%, #a78bfa 40%, #c4d4ff 50%, #8ab4f8 60%, #2563a8 80%, #8ab4f8 100%);
+  box-shadow: 0 0 32px rgba(138,180,248,0.18), 0 24px 64px rgba(0,0,0,0.8);
+}
+
+@keyframes cardFoil {
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
+}
+
+.card-inner {
+  background: linear-gradient(170deg, #111318 0%, #0c0e14 50%, #111318 100%);
+  border-radius: 11px;
+  overflow: hidden;
+  position: relative;
+  height: 100%;
+}
+
+.card-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+.card-stars {
+  font-size: 12px;
+  color: var(--gold);
+  letter-spacing: 0.12em;
+}
+
+.card-attr {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #1c1f26;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+  border: 1px solid #000;
+}
+
+.card-name {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  color: #fff;
+  padding: 12px 16px;
+  margin: 0;
+  text-shadow: 0 0 16px rgba(255,199,44,0.2);
+}
+
+.card-art {
+  height: 180px;
+  background: #07080a;
+  position: relative;
+  overflow: hidden;
+  border-top: 1px solid #000;
+  border-bottom: 1px solid #000;
+}
+
+.card-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  mix-blend-mode: luminosity;
+  opacity: 0.85;
+}
+
+.card-art-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 40%);
+  pointer-events: none;
+}
+
+.card-typeline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: #1c1f26;
+  border-bottom: 1px solid #000;
+  font-family: var(--font-display);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.card-type-ornament {
+  color: var(--gold);
+  font-size: 8px;
+}
+
+.card-textbox {
+  padding: 16px;
+  min-height: 140px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.card-effect {
+  font-size: 11px;
+  color: var(--text-dim);
+  line-height: 1.6;
+}
+
+.card-flavor {
+  font-style: italic;
+  font-size: 10px;
+  color: var(--text-muted);
+  line-height: 1.5;
+  border-left: 2px solid var(--gold-dim);
+  padding-left: 10px;
+  margin-top: auto;
+}
+
+.card-focuses {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.card-focus {
+  font-size: 10px;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.focus-diamond {
+  color: var(--gold);
+  font-size: 8px;
+}
+
+.card-stats {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  background: #0c0e14;
+}
+
+.card-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.card-stat span {
+  font-size: 8px;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  font-weight: 400;
+  text-transform: uppercase;
+}
+
+.card-serial {
+  padding: 8px 16px 14px;
+  font-family: var(--font-display);
+  font-size: 8px;
+  letter-spacing: 0.18em;
+  color: var(--text-muted);
+  text-align: center;
+  opacity: 0.6;
+}

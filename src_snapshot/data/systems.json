@@ -1,0 +1,69 @@
+[
+  {
+    "id": "chronos",
+    "code": "SYS — 01",
+    "name": "CHR0N.OS",
+    "tagline": "Archive intelligence",
+    "description": "Turn messy folders into a searchable local archive that remembers where things came from and why they matter. Useful for legal files, research folders, creative projects, client records, family archives, case timelines, and media libraries.",
+    "status": "live",
+    "statusLabel": "Stable Beta",
+    "link": "https://chr0nos.app",
+    "linkLabel": "Visit chr0nos.app →",
+    "icon": "/assets/branding/chronos/chronos-icon-updated.png",
+    "color": "cyan",
+    "chips": ["Legal files", "Research folders", "Creative projects", "Client records", "Family archives", "Case timelines", "Media libraries"]
+  },
+  {
+    "id": "mnemos",
+    "code": "SYS — 02",
+    "name": "MNEM.OS",
+    "tagline": "Continuity intelligence",
+    "description": "A continuity layer for projects, agents, and long-running work — designed to track what changed, what matters, and what should carry forward. Built for session handoffs, project memory, and decisions over time.",
+    "status": "building",
+    "statusLabel": "In Development",
+    "link": null,
+    "linkLabel": "Coming soon",
+    "icon": "/assets/branding/mnemos/mnemlogoonly.png",
+    "color": "red",
+    "chips": ["Session handoffs", "Project memory", "Decisions over time", "What changed?", "What carries forward?"]
+  },
+  {
+    "id": "logos",
+    "code": "SYS — 03",
+    "name": "LOG.OS",
+    "tagline": "Operational logs",
+    "description": "Operational logs, incident notes, release trails, and field records structured for people who need to know what happened.",
+    "status": "concept",
+    "statusLabel": "Concept Lane",
+    "link": null,
+    "linkLabel": null,
+    "icon": "/assets/branding/Logos/logoonly.png",
+    "color": "purple"
+  },
+  {
+    "id": "mythos",
+    "code": "SYS — 04",
+    "name": "MYTH.OS",
+    "tagline": "Identity & narrative",
+    "description": "Identity, narrative, and presentation systems for the public face of tools, operators, and long-running work.",
+    "status": "concept",
+    "statusLabel": "Research Lane",
+    "link": null,
+    "linkLabel": null,
+    "icon": "/assets/branding/hyperion/Hyblklogoonly.png",
+    "color": "gold"
+  },
+  {
+    "id": "forge",
+    "code": "SYS — HW",
+    "name": "Forge Builds",
+    "tagline": "Local AI infrastructure",
+    "description": "Custom PCs, sim rigs, local AI boxes, and deployment-ready workstations. The Forge is where Hyperion systems become physical.",
+    "status": "building",
+    "statusLabel": "By Inquiry",
+    "link": "/forge",
+    "linkLabel": "Enter the Forge →",
+    "icon": "/assets/branding/hyperion/Hyblklogoonly.png",
+    "color": "gold"
+  }
+]

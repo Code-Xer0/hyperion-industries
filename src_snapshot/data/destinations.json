@@ -1,0 +1,74 @@
+[
+  {
+    "id": "systems",
+    "color": "cyan",
+    "status": "Live / In Development",
+    "title": "Systems",
+    "purpose": "Explore the software stack: CHR0N.OS, Mnem.OS, and the engines in development.",
+    "cta": "View Systems",
+    "path": "/systems"
+  },
+  {
+    "id": "forge",
+    "color": "gold",
+    "status": "By Inquiry",
+    "title": "The Forge",
+    "purpose": "Custom machines, local AI boxes, sim rigs, and deployment-ready builds.",
+    "cta": "Enter the Forge",
+    "path": "/forge"
+  },
+  {
+    "id": "archive",
+    "color": "red",
+    "status": "Gallery",
+    "title": "Build Archive",
+    "purpose": "Browse completed builds as artifact cards, galleries, and showcase entries.",
+    "cta": "Open Archive",
+    "path": "/build-archive"
+  },
+  {
+    "id": "gallery",
+    "color": "purple",
+    "status": "Growing",
+    "title": "Gallery",
+    "purpose": "Visuals, operator cards, renders, wallpapers, and brand artifacts.",
+    "cta": "View Gallery",
+    "path": "/gallery"
+  },
+  {
+    "id": "devdiary",
+    "color": "red",
+    "status": "Active",
+    "title": "Dev Diary",
+    "purpose": "Follow what is being built, shipped, tested, and refined.",
+    "cta": "Read Updates",
+    "path": "/dev-diary"
+  },
+  {
+    "id": "newsletter",
+    "color": "cyan",
+    "status": "Coming Soon",
+    "title": "Newsletter",
+    "purpose": "Get release notes, build drops, and product updates when the signal goes live.",
+    "cta": "Join Waitlist",
+    "path": "/newsletter"
+  },
+  {
+    "id": "contact",
+    "color": "gold",
+    "status": "Open",
+    "title": "Contact",
+    "purpose": "Reach out for deployments, builds, collaborations, or technical partnerships.",
+    "cta": "Get in Touch",
+    "path": "/contact"
+  },
+  {
+    "id": "store",
+    "color": "purple",
+    "status": "Planned",
+    "title": "Store",
+    "purpose": "Future merch, prints, build deposits, and hardware/service products.",
+    "cta": "Coming Soon",
+    "path": "/store"
+  }
+]

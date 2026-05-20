@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Custom Builds - Hyperion Industries</title>
+<meta name="description" content="Premium custom PC builds by Hyperion Industries, presented as an artifact archive of hardware dossiers and showcase cards.">
+<meta property="og:title" content="Custom Builds - Hyperion Industries">
+<meta property="og:description" content="A classified hardware archive of premium Hyperion Industries PC builds.">
+<meta property="og:url" content="https://hyperion-industries.dev/builds.html">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23040506'/%3E%3Cpath d='M14 50V14h8v15h20V14h8v36h-8V36H22v14z' fill='%23ffc72c'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jura:wght@300;400;500;600;700&family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; }
+:root {
+  --bg: #040405;
+  --bg-2: #08090a;
+  --panel: rgba(14, 15, 18, 0.82);
+  --panel-strong: #101216;
+  --rail: rgba(255,255,255,0.07);
+  --rail-strong: rgba(255,255,255,0.16);
+  --text: #f5f6f2;
+  --soft: #b9bdbd;
+  --muted: #747b7f;
+  --dim: #43494e;
+  --red: #ff3b3b;
+  --red-soft: rgba(255,59,59,0.2);
+  --cyan: #21d6e8;
+  --cyan-soft: rgba(33,214,232,0.18);
+  --gold: #ffc72c;
+  --gold-soft: rgba(255,199,44,0.16);
+  --shadow: rgba(0,0,0,0.64);
+  --font-display: "Jura", sans-serif;
+  --font-body: "Montserrat", sans-serif;
+}
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  color: var(--text);
+  background:
+    radial-gradient(circle at 74% 18%, rgba(33,214,232,0.08), transparent 24rem),
+    radial-gradient(circle at 12% 78%, rgba(255,59,59,0.065), transparent 22rem),
+    linear-gradient(180deg, #050506 0%, #020203 100%);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -3;
+  pointer-events: none;
+  opacity: 0.24;
+  background:
+    linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.022) 1px, transparent 1px);
+  background-size: 58px 58px;
+  mask-image: radial-gradient(circle at 50% 20%, #000 0%, transparent 72%);
+}
+main { overflow-x: clip; }
+a { color: inherit; }
+button { font: inherit; }
+#gravity-particles {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0.72;
+}
+.shell {
+  position: relative;
+  z-index: 1;
+  width: min(1220px, calc(100% - 40px));
+  margin: 0 auto;
+}
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 30;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 max(22px, calc((100vw - 1220px) / 2));
+  background: rgba(4, 4, 5, 0.88);
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  backdrop-filter: blur(20px);
+}
+.nav-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+}
+.nav-logo img {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
+}
+.nav-word {
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  line-height: 1;
+}
+.nav-word span {
+  display: block;
+  margin-top: 4px;
+  color: var(--dim);
+  font-size: 8px;
+  letter-spacing: 0.32em;
+}
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.nav-links a {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+  transition: color 160ms ease;
+}
+.nav-links a:hover,
+.nav-links a:focus-visible { color: var(--text); }
+.hero {
+  min-height: 94vh;
+  padding: 130px 0 48px;
+  display: grid;
+  grid-template-columns: minmax(320px, 0.85fr) minmax(520px, 1.15fr);
+  gap: 38px;
+  align-items: center;
+}
+.hero-copy {
+  position: relative;
+  max-width: 560px;
+}
+.section-code,
+.card-kicker,
+.meta-label,
+.control-label {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+}
+.section-code {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--cyan);
+  font-size: 10px;
+  font-weight: 700;
+  margin-bottom: 24px;
+}
+.section-code::before {
+  content: "";
+  width: 30px;
+  height: 1px;
+  background: linear-gradient(90deg, var(--red), var(--cyan));
+}
+h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(48px, 7vw, 92px);
+  font-weight: 800;
+  line-height: 0.92;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+h1 span {
+  display: block;
+  color: var(--red);
+  text-shadow: 0 0 28px rgba(255,59,59,0.2);
+}
+.hero-copy p {
+  margin: 28px 0 0;
+  max-width: 510px;
+  color: var(--soft);
+  font-size: 15px;
+  line-height: 1.85;
+}
+.hero-status {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  margin-top: 34px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.status-cell {
+  min-height: 72px;
+  padding: 14px 16px;
+  background: rgba(9,10,12,0.86);
+}
+.status-cell strong {
+  display: block;
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+}
+.status-cell span {
+  display: block;
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.showcase {
+  position: relative;
+  min-height: 720px;
+  display: grid;
+  align-items: center;
+}
+.carousel-shell {
+  position: relative;
+  height: min(76vw, 720px);
+  min-height: 620px;
+  perspective: 1400px;
+  isolation: isolate;
+}
+.carousel-track {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  touch-action: pan-y;
+  user-select: none;
+  cursor: grab;
+}
+.carousel-track.dragging { cursor: grabbing; }
+.artifact-card {
+  --offset: 0;
+  --abs: 0;
+  position: absolute;
+  width: min(430px, 58vw);
+  aspect-ratio: 5 / 7;
+  border: 1px solid rgba(255,255,255,0.2);
+  background:
+    linear-gradient(145deg, rgba(255,255,255,0.12), transparent 22%),
+    linear-gradient(180deg, rgba(11,12,15,0.92), rgba(5,5,6,0.98));
+  box-shadow:
+    0 32px 80px rgba(0,0,0,0.72),
+    0 0 0 1px rgba(33,214,232,0.08) inset,
+    0 0 60px rgba(255,59,59,0.04);
+  overflow: hidden;
+  opacity: calc(1 - (var(--abs) * 0.2));
+  transform:
+    translateX(calc(var(--offset) * 235px))
+    translateY(calc(var(--abs) * 18px))
+    translateZ(calc(var(--abs) * -120px))
+    rotateY(calc(var(--offset) * -16deg))
+    rotateZ(calc(var(--offset) * -2.2deg))
+    scale(calc(1 - (var(--abs) * 0.092)));
+  transition:
+    transform 680ms cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 420ms ease,
+    filter 420ms ease;
+  z-index: calc(20 - var(--abs));
+  filter: brightness(calc(1 - (var(--abs) * 0.16))) saturate(calc(1 - (var(--abs) * 0.1)));
+}
+.artifact-card.is-active {
+  opacity: 1;
+  filter: brightness(1.05) saturate(1.02);
+}
+.artifact-card.is-hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+.artifact-card::before,
+.artifact-card::after {
+  content: "";
+  position: absolute;
+  inset: 11px;
+  pointer-events: none;
+  z-index: 4;
+}
+.artifact-card::before {
+  border: 1px solid rgba(255,255,255,0.16);
+  clip-path: polygon(0 0, 32% 0, 32% 8px, 68% 8px, 68% 0, 100% 0, 100% 100%, 70% 100%, 70% calc(100% - 8px), 30% calc(100% - 8px), 30% 100%, 0 100%);
+}
+.artifact-card::after {
+  background:
+    linear-gradient(110deg, transparent 0%, rgba(255,255,255,0.14) 26%, transparent 42%),
+    repeating-linear-gradient(180deg, rgba(255,255,255,0.035) 0 1px, transparent 1px 5px);
+  mix-blend-mode: screen;
+  opacity: 0.2;
+  transform: translateX(-70%);
+  transition: transform 900ms cubic-bezier(0.16, 1, 0.3, 1), opacity 400ms ease;
+}
+.artifact-card.is-active::after {
+  opacity: 0.34;
+  transform: translateX(30%);
+}
+.card-inner {
+  position: absolute;
+  inset: 14px;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  border: 1px solid rgba(33,214,232,0.18);
+  background:
+    radial-gradient(circle at 24% 12%, rgba(33,214,232,0.12), transparent 19rem),
+    radial-gradient(circle at 82% 80%, rgba(255,59,59,0.14), transparent 17rem),
+    rgba(5,6,8,0.7);
+}
+.card-top {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  padding: 18px 18px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.card-kicker {
+  color: var(--cyan);
+  font-size: 9px;
+  font-weight: 700;
+}
+.card-title {
+  margin-top: 7px;
+  font-family: var(--font-display);
+  font-size: clamp(25px, 3.2vw, 40px);
+  line-height: 0.95;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+.card-class {
+  align-self: start;
+  padding: 5px 9px;
+  color: var(--gold);
+  border: 1px solid rgba(255,199,44,0.34);
+  background: rgba(255,199,44,0.08);
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.image-bay {
+  position: relative;
+  margin: 14px 18px 0;
+  min-height: 0;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.16);
+  background:
+    linear-gradient(135deg, rgba(255,255,255,0.06), transparent),
+    #07080a;
+}
+.image-bay::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(4,4,5,0.02), rgba(4,4,5,0.18)),
+    linear-gradient(90deg, rgba(255,59,59,0.18), transparent 10%, transparent 90%, rgba(33,214,232,0.16));
+}
+.image-bay::after {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  z-index: 3;
+  pointer-events: none;
+  border: 1px solid rgba(255,255,255,0.12);
+  clip-path: polygon(0 0, 44px 0, 44px 6px, calc(100% - 44px) 6px, calc(100% - 44px) 0, 100% 0, 100% 100%, calc(100% - 44px) 100%, calc(100% - 44px) calc(100% - 6px), 44px calc(100% - 6px), 44px 100%, 0 100%);
+}
+.image-bay img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: var(--fit, cover);
+  object-position: var(--focal-x, 50%) var(--focal-y, 50%);
+  transform: scale(1.012);
+  transition: transform 700ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.artifact-card.is-active .image-bay img { transform: scale(1.04); }
+.card-body {
+  padding: 14px 18px 18px;
+  display: grid;
+  gap: 13px;
+}
+.spec-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.spec-tags span {
+  padding: 4px 7px;
+  color: var(--soft);
+  background: rgba(255,255,255,0.055);
+  border: 1px solid rgba(255,255,255,0.08);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+}
+.card-description {
+  margin: 0;
+  color: var(--soft);
+  font-size: 12px;
+  line-height: 1.62;
+}
+.card-footer {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: end;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+}
+.meta-label {
+  display: block;
+  color: var(--dim);
+  font-size: 8px;
+  font-weight: 700;
+}
+.meta-value {
+  display: block;
+  margin-top: 4px;
+  color: var(--cyan);
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.expand-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  color: var(--text);
+  border: 1px solid rgba(255,255,255,0.16);
+  background: rgba(255,255,255,0.045);
+  cursor: pointer;
+  transition: border-color 160ms ease, color 160ms ease, background 160ms ease;
+}
+.expand-btn:hover,
+.expand-btn:focus-visible {
+  color: var(--cyan);
+  border-color: rgba(33,214,232,0.55);
+  background: rgba(33,214,232,0.08);
+}
+.expand-btn svg,
+.carousel-button svg,
+.lightbox-close svg { width: 18px; height: 18px; }
+.corner {
+  position: absolute;
+  z-index: 6;
+  width: 32px;
+  height: 32px;
+  pointer-events: none;
+}
+.corner.tl { top: 0; left: 0; border-top: 2px solid var(--red); border-left: 2px solid var(--red); }
+.corner.tr { top: 0; right: 0; border-top: 2px solid var(--cyan); border-right: 2px solid var(--cyan); }
+.corner.bl { bottom: 0; left: 0; border-bottom: 2px solid var(--cyan); border-left: 2px solid var(--cyan); }
+.corner.br { bottom: 0; right: 0; border-bottom: 2px solid var(--red); border-right: 2px solid var(--red); }
+.carousel-controls {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 4px;
+  z-index: 25;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+.carousel-button {
+  width: 46px;
+  height: 46px;
+  display: inline-grid;
+  place-items: center;
+  color: var(--text);
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(11,12,15,0.86);
+  cursor: pointer;
+  transition: transform 160ms ease, border-color 160ms ease, color 160ms ease;
+}
+.carousel-button:hover,
+.carousel-button:focus-visible {
+  transform: translateY(-1px);
+  color: var(--red);
+  border-color: rgba(255,59,59,0.48);
+}
+.counter {
+  min-width: 120px;
+  color: var(--muted);
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-align: center;
+}
+.archive-panel {
+  margin: 32px auto 0;
+  max-width: 920px;
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 1px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.archive-panel > div {
+  min-height: 130px;
+  padding: 24px;
+  background: rgba(9,10,12,0.78);
+}
+.archive-panel h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(24px, 3vw, 42px);
+  line-height: 1.05;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+.archive-panel p {
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.75;
+}
+.control-label {
+  color: var(--gold);
+  font-size: 9px;
+  font-weight: 700;
+}
+.control-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 13px;
+  color: var(--soft);
+  font-size: 12px;
+}
+.process {
+  padding: 92px 0 110px;
+}
+.process-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  margin-top: 28px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.process-step {
+  min-height: 185px;
+  padding: 22px;
+  background: rgba(10,11,13,0.82);
+}
+.process-step strong {
+  display: block;
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: 16px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.process-step span {
+  display: block;
+  margin-bottom: 18px;
+  color: var(--red);
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+}
+.process-step p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.72;
+}
+.contact {
+  padding: 80px 0 96px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  text-align: center;
+}
+.contact h2 {
+  margin: 0 auto;
+  max-width: 760px;
+  font-family: var(--font-display);
+  font-size: clamp(34px, 5vw, 64px);
+  line-height: 0.98;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+.contact p {
+  max-width: 620px;
+  margin: 22px auto 28px;
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.8;
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 46px;
+  padding: 0 20px;
+  color: #080808;
+  background: var(--gold);
+  border: 1px solid rgba(255,199,44,0.56);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: transform 160ms ease, background 160ms ease;
+}
+.btn:hover,
+.btn:focus-visible {
+  transform: translateY(-1px);
+  background: #ffda69;
+}
+footer {
+  padding: 32px 0 42px;
+  color: var(--dim);
+  border-top: 1px solid rgba(255,255,255,0.06);
+  font-size: 11px;
+  text-align: center;
+}
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  display: none;
+  place-items: center;
+  padding: 34px;
+  background: rgba(0,0,0,0.9);
+  backdrop-filter: blur(12px);
+}
+.lightbox.is-open { display: grid; }
+.lightbox-frame {
+  width: min(1120px, 100%);
+  max-height: calc(100vh - 68px);
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  border: 1px solid rgba(255,255,255,0.16);
+  background: #050506;
+}
+.lightbox-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.lightbox-title {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.lightbox-close {
+  display: inline-grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  color: var(--text);
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.04);
+  cursor: pointer;
+}
+.lightbox-media {
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+}
+.lightbox-media img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: calc(100vh - 190px);
+  object-fit: contain;
+}
+.lightbox-caption {
+  padding: 0 16px 16px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+@media (max-width: 980px) {
+  .nav { padding: 0 20px; }
+  .nav-links { gap: 15px; }
+  .hero {
+    min-height: auto;
+    padding-top: 112px;
+    grid-template-columns: 1fr;
+  }
+  .hero-copy { max-width: 760px; }
+  .showcase { min-height: 680px; }
+  .carousel-shell { min-height: 610px; height: 660px; }
+  .artifact-card {
+    width: min(390px, 72vw);
+    transform:
+      translateX(calc(var(--offset) * 150px))
+      translateY(calc(var(--abs) * 15px))
+      translateZ(calc(var(--abs) * -90px))
+      rotateY(calc(var(--offset) * -12deg))
+      rotateZ(calc(var(--offset) * -1.8deg))
+      scale(calc(1 - (var(--abs) * 0.086)));
+  }
+  .archive-panel,
+  .process-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 640px) {
+  .shell { width: min(100% - 28px, 1220px); }
+  .nav { height: 58px; }
+  .nav-word { font-size: 9px; }
+  .nav-logo img { width: 30px; height: 30px; }
+  .nav-links li:not(:nth-child(3)) { display: none; }
+  .hero { padding-top: 96px; gap: 22px; }
+  .hero-status { grid-template-columns: 1fr; }
+  .showcase { min-height: 600px; }
+  .carousel-shell { min-height: 560px; height: 570px; }
+  .artifact-card {
+    width: min(345px, 88vw);
+    transform:
+      translateX(calc(var(--offset) * 72px))
+      translateY(calc(var(--abs) * 13px))
+      translateZ(calc(var(--abs) * -80px))
+      rotateY(calc(var(--offset) * -8deg))
+      scale(calc(1 - (var(--abs) * 0.1)));
+  }
+  .card-inner { inset: 10px; }
+  .card-top { padding: 14px 14px 10px; }
+  .image-bay { margin: 10px 14px 0; }
+  .card-body { padding: 12px 14px 14px; gap: 10px; }
+  .card-title { font-size: 26px; }
+  .card-description { font-size: 11px; }
+  .spec-tags span { font-size: 9px; }
+  .archive-panel,
+  .process-grid { grid-template-columns: 1fr; }
+  .archive-panel > div,
+  .process-step { min-height: auto; }
+  .lightbox { padding: 12px; }
+  .lightbox-media { padding: 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.001ms !important;
+  }
+  #gravity-particles { display: none; }
+  .artifact-card::after { display: none; }
+}
+</style>
+</head>
+<body>
+<canvas id="gravity-particles" aria-hidden="true"></canvas>
+
+<nav class="nav" aria-label="Primary">
+  <a href="index.html" class="nav-logo" aria-label="Hyperion Industries home">
+    <img src="assets/branding/hyperion/Hyblklogoonly.png" alt="">
+    <span class="nav-word">Hyperion<span>Industries</span></span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="systems.html">Systems</a></li>
+    <li><a href="forge.html">Forge</a></li>
+    <li><a href="build-archive.html">Archive</a></li>
+    <li><a href="gallery.html">Gallery</a></li>
+    <li><a href="contact.html">Contact</a></li>
+  </ul>
+</nav>
+
+<main>
+  <section class="shell hero" aria-labelledby="page-title">
+    <div class="hero-copy">
+      <div class="section-code">Archive Node HW-03</div>
+      <h1 id="page-title">Custom PC <span>Artifacts</span></h1>
+      <p>Precision-built machines cataloged like classified hardware relics: thermal intent, cable discipline, RGB lane continuity, and workstation-grade usability wrapped in collector-card presentation.</p>
+      <div class="hero-status" aria-label="Archive stats">
+        <div class="status-cell"><strong>11</strong><span>Dossiers</span></div>
+        <div class="status-cell"><strong>2022-26</strong><span>Field Era</span></div>
+        <div class="status-cell"><strong>LIVE</strong><span>Card Archive</span></div>
+      </div>
+    </div>
+
+    <div class="showcase" aria-label="PC showcase carousel">
+      <div class="carousel-shell">
+        <div class="carousel-track" id="carouselTrack" tabindex="0" aria-roledescription="carousel" aria-label="Premium PC build trading cards"></div>
+        <div class="carousel-controls" aria-label="Carousel controls">
+          <button class="carousel-button" type="button" id="prevCard" aria-label="Previous build">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><path d="M15 5 8 12l7 7"/></svg>
+          </button>
+          <div class="counter" id="cardCounter" aria-live="polite">01 / 11</div>
+          <button class="carousel-button" type="button" id="nextCard" aria-label="Next build">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="shell archive-panel" aria-label="Showcase notes">
+    <div>
+      <div class="section-code">Dossier Format</div>
+      <h2>Booster-pack hardware cards, not a flat gallery.</h2>
+      <p>Each build carries focal metadata for image framing, keeping cases, GPU zones, telemetry screens, and silhouette lines intact inside fixed-ratio artifact cards.</p>
+    </div>
+    <div>
+      <div class="control-label">Input Protocol</div>
+      <div class="control-list">
+        <span>Drag or swipe across the card stack</span>
+        <span>Use arrow keys while the carousel is focused</span>
+        <span>Open any active card for the full uncropped image</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="shell process" aria-labelledby="process-title">
+    <div class="section-code">Build Doctrine</div>
+    <h2 id="process-title" class="sr-only">Build doctrine</h2>
+    <div class="process-grid">
+      <article class="process-step">
+        <span>01</span>
+        <strong>Thermal Map</strong>
+        <p>Airflow, component clearance, and acoustic targets are planned before visual styling gets to make demands.</p>
+      </article>
+      <article class="process-step">
+        <span>02</span>
+        <strong>Signal Lanes</strong>
+        <p>Cable routing, RGB continuity, and visible linework are treated like readable circuitry, not decoration.</p>
+      </article>
+      <article class="process-step">
+        <span>03</span>
+        <strong>Fitment Pass</strong>
+        <p>GPU zones, radiator stackups, storage access, and service paths are verified against the chosen enclosure.</p>
+      </article>
+      <article class="process-step">
+        <span>04</span>
+        <strong>Archive Proof</strong>
+        <p>Finished machines are photographed and logged as permanent reference dossiers for future builds.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="contact" id="contact">
+    <div class="shell">
+      <h2>Commission a machine with evidence in the metal.</h2>
+      <p>Bring the workload, aesthetic target, and constraints. Hyperion turns the parts list into a system that feels deliberate before it ever powers on.</p>
+      <a class="btn" href="mailto:forge@hyperion-industries.dev?subject=Hyperion%20Forge%20Build%20Inquiry">Start Build Inquiry</a>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="shell">Hyperion Industries - Local-first intelligence and custom hardware systems.</div>
+</footer>
+
+<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-labelledby="lightboxTitle">
+  <div class="lightbox-frame">
+    <div class="lightbox-top">
+      <div class="lightbox-title" id="lightboxTitle">Build Dossier</div>
+      <button class="lightbox-close" type="button" id="lightboxClose" aria-label="Close full image view">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="square" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+    </div>
+    <div class="lightbox-media">
+      <img id="lightboxImage" alt="">
+    </div>
+    <div class="lightbox-caption" id="lightboxCaption"></div>
+  </div>
+</div>
+
+<template id="cardTemplate">
+  <article class="artifact-card" aria-roledescription="slide">
+    <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
+    <div class="card-inner">
+      <header class="card-top">
+        <div>
+          <div class="card-kicker"></div>
+          <div class="card-title"></div>
+        </div>
+        <div class="card-class"></div>
+      </header>
+      <div class="image-bay">
+        <img alt="">
+      </div>
+      <div class="card-body">
+        <div class="spec-tags"></div>
+        <p class="card-description"></p>
+        <footer class="card-footer">
+          <div>
+            <span class="meta-label">Archive Marker</span>
+            <span class="meta-value"></span>
+          </div>
+          <button class="expand-btn" type="button" aria-label="Open full image">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true"><path d="M8 3H3v5M16 3h5v5M21 16v5h-5M3 16v5h5"/><path d="M3 3l7 7M21 3l-7 7M21 21l-7-7M3 21l7-7"/></svg>
+          </button>
+        </footer>
+      </div>
+    </div>
+  </article>
+</template>
+
+<script>
+const showcaseItems = [
+  {
+    codename: "Miles",
+    generation: "Gen 2023",
+    hardwareClass: "Creator Rig",
+    status: "Archive Prime",
+    image: "assets/builds/20230803_133211.jpg",
+    focalX: "50%",
+    focalY: "44%",
+    fit: "cover",
+    specs: ["Ryzen Class", "RTX Lane", "Desk Telemetry"],
+    description: "Extended workstation build with visible command-center posture, photographed as the primary archive specimen."
+  },
+  {
+    codename: "Helios Lane",
+    generation: "Gen 2024",
+    hardwareClass: "Showcase",
+    status: "Field Ready",
+    image: "assets/builds/20240801_103114.jpg",
+    focalX: "48%",
+    focalY: "42%",
+    fit: "cover",
+    specs: ["Glass Chassis", "RGB Bus", "Clean Airflow"],
+    description: "A luminous hard-lane tower profile balanced around case silhouette and internal light continuity."
+  },
+  {
+    codename: "Aegis Core",
+    generation: "Gen 2022",
+    hardwareClass: "Performance",
+    status: "Validated",
+    image: "assets/builds/20221224_211944.jpg",
+    focalX: "52%",
+    focalY: "48%",
+    fit: "cover",
+    specs: ["GPU Focus", "Thermal Route", "Redline"],
+    description: "A dense performance configuration logged for component fitment and GPU-zone presentation."
+  },
+  {
+    codename: "Vault Nine",
+    generation: "Gen 2023",
+    hardwareClass: "Artifact",
+    status: "Cataloged",
+    image: "assets/builds/20230415_153654.jpg",
+    focalX: "50%",
+    focalY: "43%",
+    fit: "cover",
+    specs: ["Mid Tower", "Service Path", "Cable Discipline"],
+    description: "A balanced mid-tower artifact with enough negative space to read the enclosure geometry."
+  },
+  {
+    codename: "Ion Deck",
+    generation: "Gen 2022",
+    hardwareClass: "Setup",
+    status: "Extended",
+    image: "assets/builds/20220602_223426.jpg",
+    focalX: "50%",
+    focalY: "50%",
+    fit: "cover",
+    specs: ["Display Array", "Ambient Rail", "Control Surface"],
+    description: "A screenshot-like desk and display specimen using conservative framing to retain the telemetry field."
+  },
+  {
+    codename: "Red Vault",
+    generation: "Gen 2022",
+    hardwareClass: "Compact",
+    status: "Sealed",
+    image: "assets/builds/20220308_165818.jpg",
+    focalX: "46%",
+    focalY: "46%",
+    fit: "cover",
+    specs: ["Compact Case", "Thermal Path", "RGB Accent"],
+    description: "An early compact chassis record with hardware focus preserved through upper-safe-zone cropping."
+  },
+  {
+    codename: "Obsidian Run",
+    generation: "Gen 2022",
+    hardwareClass: "Gaming",
+    status: "Burn-in",
+    image: "assets/builds/20221225_210223.jpg",
+    focalX: "50%",
+    focalY: "48%",
+    fit: "cover",
+    specs: ["GPU Class", "Panel Glow", "Airflow"],
+    description: "A gaming-class build with controlled glow and a clean frontal hardware read."
+  },
+  {
+    codename: "Telemetry Ghost",
+    generation: "Gen 2026",
+    hardwareClass: "Evidence",
+    status: "Proof Set",
+    image: "assets/builds/Screenshot_20260318_080336_Gallery.jpg",
+    focalX: "50%",
+    focalY: "50%",
+    fit: "contain",
+    specs: ["Screenshot", "No Crop", "Reference"],
+    description: "A screenshot-derived archive entry rendered in contain mode so interface evidence remains uncropped."
+  },
+  {
+    codename: "Arc Furnace",
+    generation: "Gen 2023",
+    hardwareClass: "Workshop",
+    status: "Logged",
+    image: "assets/builds/20230818_170046.jpg",
+    focalX: "52%",
+    focalY: "46%",
+    fit: "cover",
+    specs: ["Workbench", "Inspection", "Case Lines"],
+    description: "A workshop-stage build record that keeps the enclosure silhouette and inspection context intact."
+  },
+  {
+    codename: "Cyan Relay",
+    generation: "Gen 2023",
+    hardwareClass: "Display",
+    status: "Signal",
+    image: "assets/builds/20230122_141511.jpg",
+    focalX: "50%",
+    focalY: "45%",
+    fit: "cover",
+    specs: ["RGB Lane", "Side Panel", "Clean Crop"],
+    description: "A side-panel showcase pass tuned around the primary glow rail and internal component stack."
+  },
+  {
+    codename: "Archive Stack",
+    generation: "Gen 2024",
+    hardwareClass: "Dossier",
+    status: "Recovered",
+    image: "assets/builds/20240801_103140.jpg",
+    focalX: "54%",
+    focalY: "42%",
+    fit: "cover",
+    specs: ["Portrait Safe", "Vault Frame", "Hardware ID"],
+    description: "A portrait-leaning capture with card-safe focal metadata to protect the tower's top silhouette."
+  }
+];
+
+const track = document.getElementById("carouselTrack");
+const template = document.getElementById("cardTemplate");
+const counter = document.getElementById("cardCounter");
+const prev = document.getElementById("prevCard");
+const next = document.getElementById("nextCard");
+const lightbox = document.getElementById("lightbox");
+const lightboxImage = document.getElementById("lightboxImage");
+const lightboxTitle = document.getElementById("lightboxTitle");
+const lightboxCaption = document.getElementById("lightboxCaption");
+const lightboxClose = document.getElementById("lightboxClose");
+const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+let activeIndex = 0;
+let dragStart = null;
+let dragDelta = 0;
+
+function wrapIndex(index) {
+  return (index + showcaseItems.length) % showcaseItems.length;
+}
+
+function signedOffset(index) {
+  const total = showcaseItems.length;
+  let offset = index - activeIndex;
+  if (offset > total / 2) offset -= total;
+  if (offset < -total / 2) offset += total;
+  return offset;
+}
+
+function renderCards() {
+  track.innerHTML = "";
+  showcaseItems.forEach((item, index) => {
+    const card = template.content.firstElementChild.cloneNode(true);
+    const img = card.querySelector("img");
+    card.querySelector(".card-kicker").textContent = item.generation;
+    card.querySelector(".card-title").textContent = item.codename;
+    card.querySelector(".card-class").textContent = item.hardwareClass;
+    card.querySelector(".card-description").textContent = item.description;
+    card.querySelector(".meta-value").textContent = item.status;
+    img.src = item.image;
+    img.alt = item.codename + " custom PC build";
+    card.style.setProperty("--focal-x", item.focalX);
+    card.style.setProperty("--focal-y", item.focalY);
+    card.style.setProperty("--fit", item.fit);
+    card.setAttribute("aria-label", item.codename + ", " + item.generation);
+
+    const specTags = card.querySelector(".spec-tags");
+    item.specs.forEach((tag) => {
+      const span = document.createElement("span");
+      span.textContent = tag;
+      specTags.appendChild(span);
+    });
+
+    card.querySelector(".expand-btn").addEventListener("click", (event) => {
+      event.stopPropagation();
+      openLightbox(index);
+    });
+    card.addEventListener("dblclick", () => openLightbox(index));
+    track.appendChild(card);
+  });
+  updateCarousel();
+}
+
+function updateCarousel() {
+  Array.from(track.children).forEach((card, index) => {
+    const offset = signedOffset(index);
+    const abs = Math.min(Math.abs(offset), 4);
+    card.style.setProperty("--offset", Math.max(-3, Math.min(3, offset)));
+    card.style.setProperty("--abs", abs);
+    card.classList.toggle("is-active", index === activeIndex);
+    card.classList.toggle("is-hidden", Math.abs(offset) > 3);
+    card.setAttribute("aria-hidden", Math.abs(offset) > 2 ? "true" : "false");
+    card.style.pointerEvents = index === activeIndex ? "auto" : "none";
+  });
+  counter.textContent = String(activeIndex + 1).padStart(2, "0") + " / " + String(showcaseItems.length).padStart(2, "0");
+}
+
+function goTo(index) {
+  activeIndex = wrapIndex(index);
+  updateCarousel();
+}
+
+function openLightbox(index) {
+  const item = showcaseItems[index];
+  lightboxImage.src = item.image;
+  lightboxImage.alt = item.codename + " full uncropped custom PC build";
+  lightboxTitle.textContent = item.codename + " / " + item.generation;
+  lightboxCaption.textContent = item.description + " Status: " + item.status + ".";
+  lightbox.classList.add("is-open");
+  document.body.style.overflow = "hidden";
+  lightboxClose.focus();
+}
+
+function closeLightbox() {
+  lightbox.classList.remove("is-open");
+  document.body.style.overflow = "";
+  lightboxImage.removeAttribute("src");
+  track.focus();
+}
+
+prev.addEventListener("click", () => goTo(activeIndex - 1));
+next.addEventListener("click", () => goTo(activeIndex + 1));
+track.addEventListener("keydown", (event) => {
+  if (event.key === "ArrowLeft") {
+    event.preventDefault();
+    goTo(activeIndex - 1);
+  }
+  if (event.key === "ArrowRight") {
+    event.preventDefault();
+    goTo(activeIndex + 1);
+  }
+  if (event.key === "Enter") openLightbox(activeIndex);
+});
+track.addEventListener("pointerdown", (event) => {
+  dragStart = event.clientX;
+  dragDelta = 0;
+  track.classList.add("dragging");
+  track.setPointerCapture(event.pointerId);
+});
+track.addEventListener("pointermove", (event) => {
+  if (dragStart === null) return;
+  dragDelta = event.clientX - dragStart;
+});
+track.addEventListener("pointerup", (event) => {
+  if (dragStart === null) return;
+  track.classList.remove("dragging");
+  track.releasePointerCapture(event.pointerId);
+  if (Math.abs(dragDelta) > 54) goTo(activeIndex + (dragDelta < 0 ? 1 : -1));
+  dragStart = null;
+  dragDelta = 0;
+});
+track.addEventListener("pointercancel", () => {
+  track.classList.remove("dragging");
+  dragStart = null;
+  dragDelta = 0;
+});
+lightboxClose.addEventListener("click", closeLightbox);
+lightbox.addEventListener("click", (event) => {
+  if (event.target === lightbox) closeLightbox();
+});
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape" && lightbox.classList.contains("is-open")) closeLightbox();
+});
+
+renderCards();
+
+(function initGravityParticles() {
+  const canvas = document.getElementById("gravity-particles");
+  if (!canvas || prefersReducedMotion) return;
+  const ctx = canvas.getContext("2d", { alpha: true });
+  const pointer = { x: -9999, y: -9999, active: false };
+  const particles = [];
+  const isCoarse = window.matchMedia("(pointer: coarse)").matches;
+  let width = 0;
+  let height = 0;
+  let raf = 0;
+  let hidden = document.hidden;
+
+  function resize() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    width = window.innerWidth;
+    height = window.innerHeight;
+    canvas.width = Math.floor(width * dpr);
+    canvas.height = Math.floor(height * dpr);
+    canvas.style.width = width + "px";
+    canvas.style.height = height + "px";
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const targetCount = isCoarse ? Math.min(32, Math.floor(width * height / 36000)) : Math.min(86, Math.max(44, Math.floor(width * height / 21000)));
+    particles.length = 0;
+    for (let i = 0; i < targetCount; i += 1) {
+      const x = Math.random() * width;
+      const y = Math.random() * height;
+      particles.push({
+        x,
+        y,
+        ox: x,
+        oy: y,
+        vx: (Math.random() - 0.5) * 0.18,
+        vy: (Math.random() - 0.5) * 0.18,
+        r: Math.random() * 1.2 + 0.35,
+        tone: Math.random()
+      });
+    }
+  }
+
+  function tick() {
+    if (hidden) {
+      raf = requestAnimationFrame(tick);
+      return;
+    }
+    ctx.clearRect(0, 0, width, height);
+    for (const p of particles) {
+      const dx = pointer.x - p.x;
+      const dy = pointer.y - p.y;
+      const distSq = dx * dx + dy * dy;
+      const radius = isCoarse ? 0 : 190;
+      if (pointer.active && distSq < radius * radius) {
+        const dist = Math.sqrt(distSq) || 1;
+        const force = (1 - dist / radius) * 0.018;
+        p.vx += (dx / dist) * force;
+        p.vy += (dy / dist) * force;
+      }
+      p.vx += (p.ox - p.x) * 0.0009;
+      p.vy += (p.oy - p.y) * 0.0009;
+      p.vx *= 0.965;
+      p.vy *= 0.965;
+      p.x += p.vx + Math.sin((performance.now() * 0.00018) + p.oy) * 0.018;
+      p.y += p.vy + Math.cos((performance.now() * 0.00016) + p.ox) * 0.018;
+      const alpha = p.tone > 0.68 ? 0.24 : 0.15;
+      ctx.beginPath();
+      ctx.fillStyle = p.tone > 0.68 ? "rgba(33,214,232," + alpha + ")" : "rgba(255,255,255," + alpha + ")";
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    raf = requestAnimationFrame(tick);
+  }
+
+  window.addEventListener("resize", resize, { passive: true });
+  window.addEventListener("pointermove", (event) => {
+    pointer.x = event.clientX;
+    pointer.y = event.clientY;
+    pointer.active = !isCoarse;
+  }, { passive: true });
+  window.addEventListener("pointerleave", () => { pointer.active = false; }, { passive: true });
+  document.addEventListener("visibilitychange", () => { hidden = document.hidden; });
+  resize();
+  raf = requestAnimationFrame(tick);
+  window.addEventListener("beforeunload", () => cancelAnimationFrame(raf), { once: true });
+})();
+</script>
+</body>
+</html>

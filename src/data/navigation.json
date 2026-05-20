@@ -1,0 +1,32 @@
+{
+  "main": [
+    { "label": "Systems", "path": "/systems" },
+    { "label": "Forge", "path": "/forge" },
+    { "label": "Archive", "path": "/build-archive" },
+    { "label": "Gallery", "path": "/gallery" },
+    { "label": "Dev Diary", "path": "/dev-diary" },
+    { "label": "Contact", "path": "/contact" }
+  ],
+  "cta": [
+    { "label": "CHR0N.OS ↗", "href": "https://chr0nos.app", "variant": "ghost", "external": true },
+    { "label": "Get in Touch →", "path": "/contact", "variant": "gold" }
+  ],
+  "footer": {
+    "systems": [
+      { "label": "CHR0N.OS", "href": "https://chr0nos.app", "external": true },
+      { "label": "Mnem.OS", "path": "/systems", "note": "In development" },
+      { "label": "Forge Builds", "path": "/forge" }
+    ],
+    "explore": [
+      { "label": "Systems", "path": "/systems" },
+      { "label": "Build Archive", "path": "/build-archive" },
+      { "label": "Gallery", "path": "/gallery" },
+      { "label": "Dev Diary", "path": "/dev-diary" }
+    ],
+    "connect": [
+      { "label": "Contact", "path": "/contact" },
+      { "label": "Newsletter", "path": "/newsletter" },
+      { "label": "Store", "path": "/store", "note": "Coming soon" }
+    ]
+  }
+}

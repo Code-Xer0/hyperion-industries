@@ -1,0 +1,105 @@
+{
+  "home": {
+    "hero": {
+      "eyebrow": "Hyperion Industries · Est. 2026",
+      "l1": "Local-first",
+      "l2": "Intelligent",
+      "l3": "Infrastructure.",
+      "sub": "For people who need privacy, continuity, and control of their data. No cloud dependency. No lock-in. No compromise."
+    },
+    "wtb": {
+      "titlePart1": "A forge for",
+      "titlePart2": "Intelligent Infrastructure.",
+      "p1": "Hyperion Industries builds local-first tools and custom systems for people who need privacy, continuity, and control.",
+      "p2": "We are not a generic SaaS company. We build software and hardware that can run close to the work: on your machine, around your files, under your control."
+    },
+    "forgePreview": {
+      "titlePart1": "Enter",
+      "titlePart2": "the Forge.",
+      "desc": "Custom PCs, sim rigs, local AI boxes, and deployment-ready workstations. Hand-built machines tuned around your workload, room, budget, and taste."
+    },
+    "doctrine": {
+      "titlePart1": "Built for custody.",
+      "titlePart2": "Not lock-in.",
+      "p1": "Hyperion is built around a simple belief: useful intelligence should stay close to the people who own the work.",
+      "p2": "That means local-first tools, clear provenance, protected source while systems mature, and AI that helps without quietly taking control.",
+      "quote": "\"Imported content informs the system. Imported content never commands the system.\"",
+      "cite": "Hyperion Doctrine · Section II — Agency Governance"
+    }
+  },
+  "forge": {
+    "hero": {
+      "eyebrow": "The Forge",
+      "title": "Physical systems for local-first work.",
+      "lead": "Custom PCs, sim rigs, local AI boxes, and deployment-ready workstations. The Forge is where Hyperion systems become physical: quiet, powerful, serviceable machines built around the work they need to carry."
+    },
+    "lanes": {
+      "titlePart1": "Not shelf machines.",
+      "titlePart2": "Work machines."
+    },
+    "future": {
+      "title": "Scaffolded, not rushed.",
+      "lead": "The configurator is intentionally not live yet. For now, build inquiries stay human so the system matches the budget, workload, taste, and room it will live in.",
+      "planned": "Planned: build quiz, intake form, budget/use-case selector, benchmark vault, showcase videos, and repair/mod service lanes."
+    }
+  },
+  "gallery": {
+    "hero": {
+      "eyebrow": "Gallery wing",
+      "title": "Signals, cards, renders, and field pieces.",
+      "lead": "Hyperion gallery: build cards, product cards, visuals, showcase pieces, and cinematic previews."
+    },
+    "operatorHero": {
+      "image": "/assets/operators/deus-x-terminal-frame.png",
+      "title": "From The Forge",
+      "desc": "Completed Loadouts and Deployments."
+    },
+    "mediaStrip": {
+      "image1": "/assets/operators/deus-x-wide-brand.png",
+      "image2": "/assets/operators/deus-x-avatar-orb.png"
+    }
+  },
+  "contact": {
+    "hero": {
+      "eyebrow": "Contact layer",
+      "title": "Bring the right signal.",
+      "lead": "Reach out for CHR0N.OS pilots, custom builds, deployments, partnerships, support, and aligned collaborations. Hyperion is currently prioritizing builds, pilots, and strategic partnerships."
+    },
+    "instructions": {
+      "title": "What to include.",
+      "desc": "For build inquiries, send your budget range, primary use case, timeline, aesthetic direction, and any must-have hardware. For systems or pilot conversations, send the problem, data type, operating constraints, and what success looks like."
+    }
+  },
+  "store": {
+    "badge": "Module Planned",
+    "title": "Store",
+    "desc": "Future merch, prints, build deposits, and hardware/service products. This lane is being designed with the same care as the machines — not bolted on early."
+  },
+  "devdiary": {
+    "hero": {
+      "eyebrow": "Lab notes",
+      "title": "What is being built, tested, and refined.",
+      "lead": "A public development trail for Hyperion systems, forge work, roadmap notes, and behind-the-scenes updates. The lane is active; long-form entries are being staged."
+    },
+    "roadmap": {
+      "title": "Roadmap notes without the fog machine.",
+      "desc": "Future entries will cover release notes, CHR0N.OS changes, Mnem.OS progress, Forge build logs, public-good infrastructure decisions, and visual system updates."
+    }
+  },
+  "buildarchive": {
+    "hero": {
+      "eyebrow": "Artifact Archive",
+      "title": "Classified hardware.",
+      "lead": "A curated archive of premium custom builds by Hyperion Industries. Every machine hand-built, tuned, and documented."
+    },
+    "footer": {
+      "title": "More builds incoming.",
+      "desc": "For now, reach out directly for the complete portfolio and past build documentation."
+    }
+  },
+  "newsletter": {
+    "badge": "Signal Pending",
+    "title": "Newsletter",
+    "desc": "Release notes, build drops, and product updates when the signal goes live. The broadcast system is being staged — not rushed."
+  }
+}

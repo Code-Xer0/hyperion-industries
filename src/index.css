@@ -1,0 +1,186 @@
+/* ═══════════════════════════════════════════════════════════════
+   HYPERION INDUSTRIES — Design System
+   Unified tokens from index.html + site-public.css
+   ═══════════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Jura:wght@300;400;500;600;700&family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300&display=swap');
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* ── Backgrounds ── */
+  --bg:          #050506;
+  --bg-soft:     #0D0D0D;
+  --surface:     #111214;
+  --surface-up:  #181A1D;
+  --surface-top: #1E2024;
+
+  /* ── Borders ── */
+  --border:      #2A2D31;
+  --border-soft: rgba(255,255,255,0.05);
+  --border-gold: rgba(255,199,44,0.22);
+
+  /* ── Text ── */
+  --text:        #F5F5F2;
+  --text-soft:   #C9C9C3;
+  --text-muted:  #8B8E91;
+  --text-dim:    #52555A;
+
+  /* ── Accents ── */
+  --gold:        #FFC72C;
+  --gold-soft:   #C99518;
+  --gold-glow:   rgba(255,199,44,0.08);
+  --cyan:        #21D6E8;
+  --cyan-glow:   rgba(33,214,232,0.08);
+  --red:         #E05252;
+  --red-glow:    rgba(224,82,82,0.08);
+  --purple:      #A78BFA;
+  --purple-glow: rgba(167,139,250,0.08);
+
+  /* ── Typography ── */
+  --font-display:'Jura', sans-serif;
+  --font-body:   'Montserrat', sans-serif;
+
+  /* ── Radii ── */
+  --r-sm: 4px;
+  --r-md: 10px;
+  --r-lg: 16px;
+  --r-xl: 24px;
+
+  /* ── Transitions ── */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+body.theme-light {
+  /* ── Backgrounds ── */
+  --bg:          #F9F9F9;
+  --bg-soft:     #F0F0F0;
+  --surface:     #FFFFFF;
+  --surface-up:  #FAFAFA;
+  --surface-top: #F5F5F5;
+
+  /* ── Borders ── */
+  --border:      #E0E0E0;
+  --border-soft: rgba(0,0,0,0.08);
+  --border-gold: rgba(200,150,20,0.4);
+
+  /* ── Text ── */
+  --text:        #1A1A1A;
+  --text-soft:   #4A4A4A;
+  --text-muted:  #757575;
+  --text-dim:    #A0A0A0;
+}
+
+/* Light mode specific background tweaks */
+body.theme-light::before {
+  background:
+    linear-gradient(90deg, rgba(255,199,44,0.1) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(0,0,0,0.03) 1px, transparent 1px),
+    radial-gradient(circle at 50% 12%, rgba(0,0,0,0.02), transparent 36%);
+  mask-image: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent 72%);
+}
+
+body.theme-light::after {
+  background:
+    radial-gradient(900px circle at 18% 8%, rgba(255,199,44,0.05), transparent 38%),
+    radial-gradient(760px circle at 82% 16%, rgba(0,220,255,0.03), transparent 42%),
+    radial-gradient(680px circle at 58% 66%, rgba(255,42,42,0.02), transparent 44%);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,199,44,0.3); }
+
+a { color: inherit; text-decoration: none; }
+ul, ol { list-style: none; }
+img { max-width: 100%; display: block; }
+
+/* ── Layout ── */
+.inner { max-width: 1200px; margin: 0 auto; padding: 0 52px; }
+.shell { width: min(1200px, calc(100% - 40px)); margin: 0 auto; }
+
+/* ── Background Atmosphere ── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    linear-gradient(90deg, rgba(255,199,44,0.035) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(255,255,255,0.018) 1px, transparent 1px),
+    radial-gradient(circle at 50% 12%, rgba(255,255,255,0.04), transparent 36%);
+  background-size: 82px 82px, 82px 82px, 100% 100%;
+  mask-image: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent 72%);
+  opacity: 0.58;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background:
+    radial-gradient(900px circle at 18% 8%, rgba(255,199,44,0.075), transparent 38%),
+    radial-gradient(760px circle at 82% 16%, rgba(0,220,255,0.052), transparent 42%),
+    radial-gradient(680px circle at 58% 66%, rgba(255,42,42,0.04), transparent 44%);
+}
+
+#root {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Typography ── */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  margin: 0;
+  letter-spacing: 0;
+}
+
+/* ── Route transition ── */
+.page-enter {
+  opacity: 0;
+  transform: translateY(18px);
+}
+.page-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 0.5s var(--ease-out), transform 0.5s var(--ease-out);
+}
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  .page-enter, .page-active {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+/* ── Responsive ── */
+@media (max-width: 1024px) {
+  .inner, .shell { padding-left: 24px; padding-right: 24px; }
+}
+@media (max-width: 640px) {
+  .inner, .shell { padding-left: 16px; padding-right: 16px; }
+}
