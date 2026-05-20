@@ -100,7 +100,7 @@
     "description": "R3 before the latest gen fan run."
   },
   {
-    "codename": "Cyan Relay",
+    "codename": "Kuda R3 (2023)",
     "generation": "Gen 2023",
     "hardwareClass": "Display",
     "status": "Signal",
@@ -113,7 +113,7 @@
       "Side Panel",
       "Clean Crop"
     ],
-    "description": "A side-panel showcase pass tuned around the primary glow rail and internal component stack."
+    "description": ""
   },
   {
     "codename": "Archive Stack",
