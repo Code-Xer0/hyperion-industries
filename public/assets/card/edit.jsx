@@ -13,9 +13,12 @@ const { useState: useStateE, useEffect: useEffectE, useRef: useRefE } = React;
 // ── Constants ─────────────────────────────────────────────────────────────
 const REPO_OWNER     = "Code-Xer0";
 const REPO_NAME      = "hyperion-industries";
-const CONFIG_PATH    = "assets/card/card.config.json";
-const SLOTS_PATH     = "assets/card/.image-slots.state.json";
-const PORTRAIT_PATH  = "assets/card/portrait.webp";
+// NOTE: after the Vite migration the served files live under public/.
+// Vite copies public/ verbatim to dist/, so the browser still fetches
+// them at /assets/card/... but the GitHub repo path is public/assets/...
+const CONFIG_PATH    = "public/assets/card/card.config.json";
+const SLOTS_PATH     = "public/assets/card/.image-slots.state.json";
+const PORTRAIT_PATH  = "public/assets/card/portrait.webp";
 const PAT_KEY        = "hypEditPAT";
 const BRANCH_KEY     = "hypEditBranch";
 const DEFAULT_BRANCH = "main";
