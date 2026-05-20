@@ -116,19 +116,21 @@
     "description": ""
   },
   {
-    "codename": "Archive Stack",
+    "codename": "Kuda R3 (Current)",
     "generation": "Gen 2024",
-    "hardwareClass": "Dossier",
-    "status": "Recovered",
+    "hardwareClass": "Flagship",
+    "status": "Live",
     "image": "/assets/builds/20240801_103140.jpg",
     "focalX": "54%",
     "focalY": "42%",
     "fit": "cover",
     "specs": [
-      "Portrait Safe",
-      "Vault Frame",
-      "Hardware ID"
+      "X570",
+      "5800X3D",
+      "Sapphire Toxic 6900XT",
+      "Lian Li",
+      "Nzxt"
     ],
-    "description": "A portrait-leaning capture with card-safe focal metadata to protect the tower's top silhouette."
+    "description": "Flagship Gaming rig."
   }
 ]
