@@ -4,7 +4,7 @@
    ═══════════════════════════════════════════════ */
 
 .section { padding: 88px 0; border-top: 1px solid rgba(255,255,255,0.06); position: relative; }
-.section-alt { background: linear-gradient(180deg, rgba(13,13,13,0.42), rgba(4,4,5,0.92)); }
+.section-alt { background: var(--section-alt-bg); }
 
 /* ── Labels ── */
 .sp-label {
@@ -21,8 +21,8 @@
 /* ── System Cards ── */
 .sp-system-card, .sp-lane-card {
   border: 1px solid var(--border);
-  background: linear-gradient(145deg, rgba(255,255,255,0.045), rgba(255,255,255,0.015));
-  box-shadow: 0 24px 90px rgba(0,0,0,0.28);
+  background: var(--card-bg);
+  box-shadow: var(--shadow-card);
   border-radius: var(--r-md); padding: 26px;
   transition: border-color 0.2s, transform 0.2s;
 }
@@ -40,7 +40,7 @@
 .sp-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
 .sp-chip {
   color: var(--text-soft); border: 1px solid var(--border);
-  background: rgba(255,255,255,0.025); border-radius: 4px;
+  background: var(--chip-bg); border-radius: 4px;
   padding: 7px 10px; font-size: 12px;
 }
 .sp-actions { margin-top: 20px; display: flex; gap: 10px; }
@@ -52,7 +52,7 @@
 .sp-panel {
   border: 1px solid var(--border); border-radius: var(--r-md);
   padding: 28px;
-  background: linear-gradient(145deg, rgba(255,255,255,0.045), rgba(255,255,255,0.015));
+  background: var(--card-bg);
 }
 .sp-panel h2 { font-size: clamp(28px,4vw,48px); font-weight: 800; line-height: 1; margin-bottom: 16px; }
 .sp-panel h2 em { color: var(--gold); font-style: normal; }
@@ -73,7 +73,7 @@
 .sp-contact-link {
   color: var(--text); text-decoration: none;
   border: 1px solid var(--border); border-radius: 6px;
-  padding: 16px 20px; background: rgba(255,255,255,0.025);
+  padding: 16px 20px; background: var(--chip-bg);
   display: block; transition: border-color 0.2s, transform 0.2s;
 }
 .sp-contact-link:hover { border-color: var(--border-gold); transform: translateY(-2px); }
