@@ -51,14 +51,16 @@ export default function ForgePage() {
 
       <section className="section">
         <div className="shell">
-          <div className="sp-media-strip">
-            <img src="/assets/builds/20230803_133211.jpg" alt="Hyperion custom PC desk setup" />
-            <img src="/assets/builds/20221224_211435.jpg" alt="White custom PC build" />
-          </div>
-          <div className="sp-actions" style={{ justifyContent: 'center', marginTop: '28px' }}>
-            <Link to="/build-archive" className="btn btn-gold">Open Artifact Archive</Link>
-            <a href="mailto:forge@hyperion-industries.dev?subject=Hyperion%20Forge%20Build%20Inquiry" className="btn btn-ghost">Talk Through a Build</a>
-          </div>
+          <HoverEditor model="content">
+            <div className="sp-media-strip">
+              <img src={content.forge.mediaStrip.image1} alt="Hyperion custom PC desk setup" />
+              <img src={content.forge.mediaStrip.image2} alt="White custom PC build" />
+            </div>
+            <div className="sp-actions" style={{ justifyContent: 'center', marginTop: '28px' }}>
+              <Link to="/build-archive" className="btn btn-gold">Open Artifact Archive</Link>
+              <a href="mailto:forge@hyperion-industries.dev?subject=Hyperion%20Forge%20Build%20Inquiry" className="btn btn-ghost">Talk Through a Build</a>
+            </div>
+          </HoverEditor>
         </div>
       </section>
 
