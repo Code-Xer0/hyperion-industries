@@ -84,7 +84,7 @@
     "description": "Whisper quiet screaming performace all day long."
   },
   {
-    "codename": "Obsidian Run",
+    "codename": "Obsidian Run)",
     "generation": "Gen 2022",
     "hardwareClass": "Gaming",
     "status": "Burn-in",
@@ -93,11 +93,11 @@
     "focalY": "48%",
     "fit": "cover",
     "specs": [
-      "GPU Class",
-      "Panel Glow",
+      "Godlike",
+      "X570",
       "Airflow"
     ],
-    "description": "A gaming-class build with controlled glow and a clean frontal hardware read."
+    "description": "R3 before the latest gen fan run."
   },
   {
     "codename": "Cyan Relay",
