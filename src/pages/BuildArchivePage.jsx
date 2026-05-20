@@ -16,6 +16,7 @@ function BuildManager() {
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState('');
   const [uploadingField, setUploadingField] = useState(null);
+  const [specsStr, setSpecsStr] = useState('');
 
   const reload = useCallback(() => {
     fetch('/api/data/showcase')
@@ -131,11 +132,17 @@ function BuildManager() {
     reader.readAsDataURL(file);
   };
 
+  useEffect(() => {
+    if (selected !== null && items && items[selected]) {
+      setSpecsStr(items[selected].specs.join(', '));
+    }
+  }, [selected, items]);
+
   const current = selected !== null ? items[selected] : null;
 
   /* ── field styling tokens ── */
-  const labelSt = { display: 'block', fontSize: '9px', color: 'rgba(255,255,255,0.35)', textTransform: 'uppercase', letterSpacing: '0.18em', marginBottom: '6px', fontWeight: 700 };
-  const inputSt = { width: '100%', background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '6px', color: '#fff', padding: '9px 12px', fontSize: '13px', outline: 'none', boxSizing: 'border-box' };
+  const labelSt = { display: 'block', fontSize: '9px', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.18em', marginBottom: '6px', fontWeight: 700 };
+  const inputSt = { width: '100%', background: 'var(--chip-bg)', border: '1px solid var(--border-soft)', borderRadius: '6px', color: 'var(--text)', padding: '9px 12px', fontSize: '13px', outline: 'none', boxSizing: 'border-box' };
   const textareaSt = { ...inputSt, lineHeight: '1.5', resize: 'vertical' };
 
   return (
@@ -143,17 +150,17 @@ function BuildManager() {
       display: 'grid',
       gridTemplateColumns: '280px 1fr',
       gap: 0,
-      background: '#0a0c10',
-      border: '1px solid rgba(255,199,44,0.12)',
+      background: 'var(--surface-up)',
+      border: '1px solid var(--border-gold)',
       borderRadius: '14px',
       overflow: 'hidden',
       maxHeight: '72vh',
-      boxShadow: '0 32px 80px rgba(0,0,0,0.6)',
+      boxShadow: 'var(--shadow-card)',
     }}>
       {/* — sidebar list — */}
-      <div style={{ borderRight: '1px solid rgba(255,255,255,0.06)', display: 'flex', flexDirection: 'column' }}>
-        <div style={{ padding: '18px 16px', borderBottom: '1px solid rgba(255,255,255,0.06)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <span style={{ fontSize: '11px', fontWeight: 800, color: '#ffc72c', textTransform: 'uppercase', letterSpacing: '0.15em' }}>Builds ({items.length})</span>
+      <div style={{ borderRight: '1px solid var(--border-soft)', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+        <div style={{ padding: '18px 16px', borderBottom: '1px solid var(--border-soft)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <span style={{ fontSize: '11px', fontWeight: 800, color: 'var(--gold)', textTransform: 'uppercase', letterSpacing: '0.15em' }}>Builds ({items.length})</span>
           <button onClick={addItem} style={{ background: 'rgba(33,214,232,0.12)', color: '#21d6e8', border: '1px solid rgba(33,214,232,0.25)', borderRadius: '4px', padding: '4px 10px', fontSize: '10px', fontWeight: 700, cursor: 'pointer', textTransform: 'uppercase', letterSpacing: '0.05em' }}>+ Add</button>
         </div>
         <div style={{ flex: 1, overflowY: 'auto', scrollbarWidth: 'thin' }}>
@@ -171,17 +178,17 @@ function BuildManager() {
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                {item.image && <img src={item.image} alt="" style={{ width: '36px', height: '36px', objectFit: 'cover', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.08)' }} />}
+                {item.image && <img src={item.image} alt="" style={{ width: '36px', height: '36px', objectFit: 'cover', borderRadius: '4px', border: '1px solid var(--border-soft)' }} />}
                 <div style={{ flex: 1, overflow: 'hidden' }}>
-                  <div style={{ fontSize: '12px', fontWeight: 700, color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.codename}</div>
-                  <div style={{ fontSize: '9px', color: 'rgba(255,255,255,0.3)', marginTop: '2px' }}>{item.generation} · {item.hardwareClass}</div>
+                  <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.codename}</div>
+                  <div style={{ fontSize: '9px', color: 'var(--text-muted)', marginTop: '2px' }}>{item.generation} · {item.hardwareClass}</div>
                 </div>
               </div>
             </div>
           ))}
         </div>
         {/* footer actions */}
-        <div style={{ padding: '14px 16px', borderTop: '1px solid rgba(255,255,255,0.06)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        <div style={{ padding: '14px 16px', borderTop: '1px solid var(--border-soft)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
           <button
             onClick={() => saveAndPublish(items)}
             disabled={saving}
@@ -198,12 +205,13 @@ function BuildManager() {
         {current ? (
           <div>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-              <h3 style={{ margin: 0, fontFamily: 'var(--font-display)', fontSize: '18px', fontWeight: 800, color: '#fff', letterSpacing: '0.04em' }}>
-                <span style={{ color: '#ffc72c' }}>#{selected + 1}</span> {current.codename}
+              <h3 style={{ margin: 0, fontFamily: 'var(--font-display)', fontSize: '18px', fontWeight: 800, color: 'var(--text)', letterSpacing: '0.04em' }}>
+                <span style={{ color: 'var(--gold)' }}>#{selected + 1}</span> {current.codename}
               </h3>
               <div style={{ display: 'flex', gap: '6px' }}>
-                <button onClick={() => moveItem(selected, -1)} disabled={selected === 0} title="Move up" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', borderRadius: '4px', width: '28px', height: '28px', cursor: 'pointer', fontSize: '12px' }}>↑</button>
-                <button onClick={() => moveItem(selected, 1)} disabled={selected === items.length - 1} title="Move down" style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', borderRadius: '4px', width: '28px', height: '28px', cursor: 'pointer', fontSize: '12px' }}>↓</button>
+                <button onClick={() => saveAndPublish(items)} disabled={saving} title="Save & Publish" style={{ background: 'var(--gold)', border: 'none', color: '#000', borderRadius: '4px', padding: '0 12px', cursor: 'pointer', fontSize: '10px', fontWeight: 800, textTransform: 'uppercase' }}>{saving ? '...' : 'Save'}</button>
+                <button onClick={() => moveItem(selected, -1)} disabled={selected === 0} title="Move up" style={{ background: 'var(--chip-bg)', border: '1px solid var(--border-soft)', color: 'var(--text)', borderRadius: '4px', width: '28px', height: '28px', cursor: 'pointer', fontSize: '12px' }}>↑</button>
+                <button onClick={() => moveItem(selected, 1)} disabled={selected === items.length - 1} title="Move down" style={{ background: 'var(--chip-bg)', border: '1px solid var(--border-soft)', color: 'var(--text)', borderRadius: '4px', width: '28px', height: '28px', cursor: 'pointer', fontSize: '12px' }}>↓</button>
                 <button onClick={() => deleteItem(selected)} title="Delete" style={{ background: 'rgba(255,59,59,0.1)', border: '1px solid rgba(255,59,59,0.25)', color: '#ff5555', borderRadius: '4px', width: '28px', height: '28px', cursor: 'pointer', fontSize: '14px' }}>×</button>
               </div>
             </div>
@@ -251,7 +259,7 @@ function BuildManager() {
 
             <div style={{ marginBottom: '20px' }}>
               <label style={labelSt}>Spec Tags (comma separated)</label>
-              <input type="text" value={current.specs.join(', ')} onChange={(e) => updateField(selected, 'specs', e.target.value.split(',').map(s => s.trim()))} style={inputSt} />
+              <input type="text" value={specsStr} onChange={(e) => setSpecsStr(e.target.value)} onBlur={() => updateField(selected, 'specs', specsStr.split(',').map(s => s.trim()).filter(Boolean))} style={inputSt} />
             </div>
 
             <div style={{ marginBottom: '20px' }}>
@@ -260,7 +268,7 @@ function BuildManager() {
             </div>
           </div>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'rgba(255,255,255,0.2)' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', color: 'var(--text-muted)' }}>
             <div style={{ fontSize: '40px', marginBottom: '16px', opacity: 0.4 }}>⚙</div>
             <div style={{ fontSize: '13px', fontWeight: 600 }}>Select a build to edit</div>
             <div style={{ fontSize: '11px', marginTop: '6px', opacity: 0.5 }}>or click "+ Add" to create a new entry</div>
@@ -297,8 +305,8 @@ export default function BuildArchivePage() {
         <section className="section" style={{ paddingTop: 0 }}>
           <div className="shell">
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
-              <span style={{ fontSize: '11px', fontWeight: 800, color: '#ffc72c', textTransform: 'uppercase', letterSpacing: '0.15em', fontFamily: 'var(--font-display)' }}>Build Manager</span>
-              <div style={{ flex: 1, height: '1px', background: 'rgba(255,199,44,0.15)' }} />
+              <span style={{ fontSize: '11px', fontWeight: 800, color: 'var(--gold)', textTransform: 'uppercase', letterSpacing: '0.15em', fontFamily: 'var(--font-display)' }}>Build Manager</span>
+              <div style={{ flex: 1, height: '1px', background: 'var(--border-gold)' }} />
             </div>
             <BuildManager />
           </div>

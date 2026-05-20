@@ -71,7 +71,7 @@ export default function EditorModal() {
     <div style={{
       position: 'fixed',
       inset: 0,
-      background: 'rgba(5, 6, 8, 0.9)',
+      background: 'var(--nav-bg-scrolled)',
       backdropFilter: 'blur(20px)',
       zIndex: 99999,
       display: 'flex',
@@ -81,8 +81,8 @@ export default function EditorModal() {
       animation: 'ed-fade-in 0.3s ease-out'
     }}>
       <div style={{
-        background: '#0d0f14',
-        border: '1px solid rgba(255,199,44,0.15)',
+        background: 'var(--surface-up)',
+        border: '1px solid var(--border-gold)',
         borderRadius: '16px',
         width: '100%',
         maxWidth: '900px',
@@ -103,17 +103,17 @@ export default function EditorModal() {
         }}>
           <div>
             <div style={{ fontSize: '10px', color: '#ffc72c', fontFamily: 'var(--font-display)', letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: '4px' }}>Visual Editor</div>
-            <h3 style={{ margin: 0, color: '#fff', fontFamily: 'var(--font-display)', fontSize: '20px', fontWeight: 800, letterSpacing: '0.05em' }}>
-              Editing: <span style={{ color: '#ffc72c' }}>{activeEditConfig.model}</span>
-              {activeEditConfig.index !== null && <span style={{ color: 'rgba(255,255,255,0.3)', marginLeft: '12px' }}>[#{activeEditConfig.index}]</span>}
+            <h3 style={{ margin: 0, color: 'var(--text)', fontFamily: 'var(--font-display)', fontSize: '20px', fontWeight: 800, letterSpacing: '0.05em' }}>
+              Editing: <span style={{ color: 'var(--gold)' }}>{activeEditConfig.model}</span>
+              {activeEditConfig.index !== null && <span style={{ color: 'var(--text-muted)', marginLeft: '12px' }}>[#{activeEditConfig.index}]</span>}
             </h3>
           </div>
           <button 
             onClick={() => setActiveEditConfig(null)}
             style={{ 
-              background: 'rgba(255,255,255,0.05)', 
-              border: '1px solid rgba(255,255,255,0.1)', 
-              color: '#fff', 
+              background: 'var(--chip-bg)', 
+              border: '1px solid var(--border-soft)', 
+              color: 'var(--text)', 
               cursor: 'pointer', 
               width: '36px', 
               height: '36px', 
@@ -125,7 +125,7 @@ export default function EditorModal() {
               transition: 'all 0.2s'
             }}
             onMouseOver={(e) => e.currentTarget.style.background = 'rgba(255,59,59,0.2)'}
-            onMouseOut={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
+            onMouseOut={(e) => e.currentTarget.style.background = 'var(--chip-bg)'}
           >
             ×
           </button>
@@ -135,7 +135,7 @@ export default function EditorModal() {
           {chunkToEdit ? (
             <EditorForm data={chunkToEdit} onUpdate={handleUpdate} />
           ) : (
-            <div style={{ color: 'rgba(255,255,255,0.4)', textAlign: 'center', padding: '40px' }}>
+            <div style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '40px' }}>
               <div style={{ marginBottom: '16px', fontSize: '24px' }}>⏳</div>
               Initializing synchronization...
             </div>
@@ -144,12 +144,12 @@ export default function EditorModal() {
 
         <div style={{
           padding: '24px 32px',
-          borderTop: '1px solid rgba(255,255,255,0.06)',
+          borderTop: '1px solid var(--border-soft)',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
           gap: '16px',
-          background: 'rgba(0,0,0,0.2)'
+          background: 'var(--chip-bg)'
         }}>
           {errorMsg ? (
             <div style={{ color: '#ff5555', fontSize: '11px', fontFamily: 'monospace', maxWidth: '50%' }}>
@@ -162,16 +162,16 @@ export default function EditorModal() {
               style={{ 
                 padding: '10px 24px', 
                 background: 'transparent', 
-                border: '1px solid rgba(255,255,255,0.15)', 
-                color: 'rgba(255,255,255,0.7)', 
+                border: '1px solid var(--border)', 
+                color: 'var(--text-soft)', 
                 borderRadius: '8px', 
                 cursor: 'pointer',
                 fontSize: '13px',
                 fontWeight: 600,
                 transition: 'all 0.2s'
               }}
-              onMouseOver={(e) => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.4)'}
-              onMouseOut={(e) => e.currentTarget.style.borderColor = 'rgba(255,255,255,0.15)'}
+              onMouseOver={(e) => { e.currentTarget.style.borderColor = 'var(--text)'; e.currentTarget.style.color = 'var(--text)'; }}
+              onMouseOut={(e) => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--text-soft)'; }}
             >
               Discard Changes
             </button>
@@ -180,7 +180,7 @@ export default function EditorModal() {
               disabled={saving || !chunkToEdit}
               style={{ 
                 padding: '10px 32px', 
-                background: '#ffc72c', 
+                background: 'var(--gold)', 
                 border: 'none', 
                 color: '#000', 
                 borderRadius: '8px', 

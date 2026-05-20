@@ -2,15 +2,15 @@
   display: flex;
   height: 100vh;
   width: 100vw;
-  background: #050608;
-  color: #c4c6cc;
+  background: var(--bg);
+  color: var(--text-soft);
   font-family: Inter, system-ui, sans-serif;
 }
 
 .ed-sidebar {
   width: 260px;
-  background: #0b0d11;
-  border-right: 1px solid rgba(255,255,255,0.06);
+  background: var(--surface-top);
+  border-right: 1px solid var(--border-soft);
   display: flex;
   flex-direction: column;
 }
@@ -21,8 +21,8 @@
   font-size: 16px;
   font-weight: 800;
   letter-spacing: 0.1em;
-  color: #fff;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
+  color: var(--text);
+  border-bottom: 1px solid var(--border-soft);
 }
 
 .ed-nav {
@@ -37,7 +37,7 @@
   font-size: 10px;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: rgba(255,255,255,0.3);
+  color: var(--text-muted);
   margin-bottom: 12px;
   padding-left: 8px;
   font-weight: 700;
@@ -46,7 +46,7 @@
 .ed-nav-btn {
   background: transparent;
   border: none;
-  color: #8b8d96;
+  color: var(--text-soft);
   text-align: left;
   padding: 10px 14px;
   border-radius: 6px;
@@ -57,8 +57,8 @@
 }
 
 .ed-nav-btn:hover {
-  background: rgba(255,255,255,0.04);
-  color: #fff;
+  background: var(--chip-bg);
+  color: var(--text);
 }
 
 .ed-nav-btn.active {
@@ -70,7 +70,7 @@
 
 .ed-sidebar-footer {
   padding: 24px 16px;
-  border-top: 1px solid rgba(255,255,255,0.06);
+  border-top: 1px solid var(--border-soft);
 }
 
 .ed-btn {
@@ -87,7 +87,7 @@
 .ed-btn:hover:not(:disabled) { opacity: 0.8; }
 
 .ed-btn-commit {
-  background: #101216;
+  background: var(--surface-up);
   border: 1px solid rgba(34,197,94,0.3);
   color: #4ade80;
 }
@@ -108,7 +108,7 @@
 
 .ed-header {
   height: 72px;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
+  border-bottom: 1px solid var(--border-soft);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -118,12 +118,12 @@
 .ed-header h2 {
   font-size: 18px;
   font-weight: 600;
-  color: #fff;
+  color: var(--text);
 }
 
 .ed-btn-primary {
   width: auto;
-  background: #ffc72c;
+  background: var(--gold);
   color: #000;
   padding: 8px 24px;
 }
@@ -136,7 +136,7 @@
 
 .ed-loading {
   padding: 48px;
-  color: rgba(255,255,255,0.4);
+  color: var(--text-muted);
 }
 
 .ed-editor-container {
@@ -152,15 +152,15 @@
 
 .ed-list {
   width: 320px;
-  border-right: 1px solid rgba(255,255,255,0.06);
+  border-right: 1px solid var(--border-soft);
   overflow-y: auto;
   padding: 24px;
 }
 
 .ed-list-item {
   padding: 14px 18px;
-  background: #0f1116;
-  border: 1px solid rgba(255,255,255,0.04);
+  background: var(--surface-up);
+  border: 1px solid var(--border-soft);
   margin-bottom: 8px;
   border-radius: 6px;
   cursor: pointer;
@@ -170,8 +170,8 @@
 }
 
 .ed-list-item:hover {
-  background: #14171d;
-  border-color: rgba(255,255,255,0.1);
+  background: var(--chip-bg);
+  border-color: var(--border);
 }
 
 .ed-list-item.active {
@@ -199,7 +199,7 @@
   align-items: center;
   justify-content: center;
   height: 100%;
-  color: rgba(255,255,255,0.3);
+  color: var(--text-muted);
   font-size: 14px;
 }
 
@@ -213,15 +213,15 @@
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: rgba(255,255,255,0.4);
+  color: var(--text-muted);
   font-weight: 600;
 }
 
 .ed-field input, .ed-field textarea {
-  background: #0f1116;
-  border: 1px solid rgba(255,255,255,0.1);
+  background: var(--surface-up);
+  border: 1px solid var(--border-soft);
   border-radius: 6px;
-  color: #fff;
+  color: var(--text);
   padding: 12px 14px;
   font-family: inherit;
   font-size: 14px;
@@ -242,12 +242,12 @@
   margin-top: 12px;
   max-width: 240px;
   border-radius: 6px;
-  border: 1px solid rgba(255,255,255,0.1);
+  border: 1px solid var(--border-soft);
 }
 
 .ed-nested {
-  background: #0b0d11;
-  border: 1px solid rgba(255,255,255,0.06);
+  background: var(--surface-top);
+  border: 1px solid var(--border-soft);
   border-radius: 8px;
   padding: 24px;
 }
@@ -255,9 +255,9 @@
 .ed-nested-label {
   font-size: 14px;
   font-weight: 600;
-  color: #fff;
+  color: var(--text);
   margin-bottom: 20px;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
+  border-bottom: 1px solid var(--border-soft);
   padding-bottom: 12px;
 }
 
