@@ -1,5 +1,21 @@
 [
-  { "src": "/assets/operators/deus-x-portrait-complete.png", "label": "Avatar base", "desc": "Primary portrait for crops, dossiers, and operator panels.", "type": "Portraits" },
-  { "src": "/assets/operators/deus-x-tarot-card.png", "label": "Tarot complete", "desc": "Use when the card artifact itself is the content.", "type": "Cards" },
-  { "src": "/assets/operators/deus-x-card-reference-sheet.png", "label": "Reference sheet", "desc": "Design source, not a default public hero image.", "type": "References", "reference": true }
+  {
+    "src": "/assets/operators/deus-x-portrait-complete.png",
+    "label": "Avatar base",
+    "desc": "Primary portrait for crops, dossiers, and operator panels.",
+    "type": "Portraits"
+  },
+  {
+    "src": "/assets/operators/deus-x-tarot-card.png",
+    "label": "Tarot complete",
+    "desc": "Use when the card artifact itself is the content.",
+    "type": "Cards"
+  },
+  {
+    "src": "/assets/uploads/20240801_103026.jpg",
+    "label": "Reference sheet",
+    "desc": "Design source, not a default public hero image.",
+    "type": "References",
+    "reference": true
+  }
 ]
