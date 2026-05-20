@@ -1,15 +1,19 @@
 [
   {
-    "codename": "Miles",
+    "codename": "Miles 1.0",
     "generation": "Gen 2023",
-    "hardwareClass": "Creator Rig",
-    "status": "Archive Prime",
+    "hardwareClass": "Production Rig",
+    "status": "Succeeded",
     "image": "/assets/builds/20230803_133211.jpg",
     "focalX": "50%",
     "focalY": "44%",
     "fit": "cover",
-    "specs": ["Ryzen Class", "RTX Lane", "Desk Telemetry"],
-    "description": "Extended workstation build with visible command-center posture, photographed as the primary archive specimen."
+    "specs": [
+      "Ryzen Class",
+      "RTX Lane",
+      "Desk Telemetry"
+    ],
+    "description": ""
   },
   {
     "codename": "Helios Lane",
@@ -20,7 +24,11 @@
     "focalX": "48%",
     "focalY": "42%",
     "fit": "cover",
-    "specs": ["Glass Chassis", "RGB Bus", "Clean Airflow"],
+    "specs": [
+      "Glass Chassis",
+      "RGB Bus",
+      "Clean Airflow"
+    ],
     "description": "A luminous hard-lane tower profile balanced around case silhouette and internal light continuity."
   },
   {
@@ -32,7 +40,11 @@
     "focalX": "52%",
     "focalY": "48%",
     "fit": "cover",
-    "specs": ["GPU Focus", "Thermal Route", "Redline"],
+    "specs": [
+      "GPU Focus",
+      "Thermal Route",
+      "Redline"
+    ],
     "description": "A dense performance configuration logged for component fitment and GPU-zone presentation."
   },
   {
@@ -44,7 +56,11 @@
     "focalX": "50%",
     "focalY": "43%",
     "fit": "cover",
-    "specs": ["Mid Tower", "Service Path", "Cable Discipline"],
+    "specs": [
+      "Mid Tower",
+      "Service Path",
+      "Cable Discipline"
+    ],
     "description": "A balanced mid-tower artifact with enough negative space to read the enclosure geometry."
   },
   {
@@ -56,7 +72,11 @@
     "focalX": "50%",
     "focalY": "50%",
     "fit": "cover",
-    "specs": ["Display Array", "Ambient Rail", "Control Surface"],
+    "specs": [
+      "Display Array",
+      "Ambient Rail",
+      "Control Surface"
+    ],
     "description": "A screenshot-like desk and display specimen using conservative framing to retain the telemetry field."
   },
   {
@@ -68,7 +88,11 @@
     "focalX": "46%",
     "focalY": "46%",
     "fit": "cover",
-    "specs": ["Compact Case", "Thermal Path", "RGB Accent"],
+    "specs": [
+      "Compact Case",
+      "Thermal Path",
+      "RGB Accent"
+    ],
     "description": "An early compact chassis record with hardware focus preserved through upper-safe-zone cropping."
   },
   {
@@ -80,7 +104,11 @@
     "focalX": "50%",
     "focalY": "48%",
     "fit": "cover",
-    "specs": ["GPU Class", "Panel Glow", "Airflow"],
+    "specs": [
+      "GPU Class",
+      "Panel Glow",
+      "Airflow"
+    ],
     "description": "A gaming-class build with controlled glow and a clean frontal hardware read."
   },
   {
@@ -92,7 +120,11 @@
     "focalX": "50%",
     "focalY": "50%",
     "fit": "contain",
-    "specs": ["Screenshot", "No Crop", "Reference"],
+    "specs": [
+      "Screenshot",
+      "No Crop",
+      "Reference"
+    ],
     "description": "A screenshot-derived archive entry rendered in contain mode so interface evidence remains uncropped."
   },
   {
@@ -104,7 +136,11 @@
     "focalX": "52%",
     "focalY": "46%",
     "fit": "cover",
-    "specs": ["Workbench", "Inspection", "Case Lines"],
+    "specs": [
+      "Workbench",
+      "Inspection",
+      "Case Lines"
+    ],
     "description": "A workshop-stage build record that keeps the enclosure silhouette and inspection context intact."
   },
   {
@@ -116,7 +152,11 @@
     "focalX": "50%",
     "focalY": "45%",
     "fit": "cover",
-    "specs": ["RGB Lane", "Side Panel", "Clean Crop"],
+    "specs": [
+      "RGB Lane",
+      "Side Panel",
+      "Clean Crop"
+    ],
     "description": "A side-panel showcase pass tuned around the primary glow rail and internal component stack."
   },
   {
@@ -128,7 +168,11 @@
     "focalX": "54%",
     "focalY": "42%",
     "fit": "cover",
-    "specs": ["Portrait Safe", "Vault Frame", "Hardware ID"],
+    "specs": [
+      "Portrait Safe",
+      "Vault Frame",
+      "Hardware ID"
+    ],
     "description": "A portrait-leaning capture with card-safe focal metadata to protect the tower's top silhouette."
   }
 ]
