@@ -17,20 +17,22 @@
     "description": ""
   },
   {
-    "codename": "Helios Lane",
+    "codename": "Kuda R3",
     "generation": "Gen 2024",
-    "hardwareClass": "Showcase",
-    "status": "Field Ready",
+    "hardwareClass": "Flagship",
+    "status": "Deployed",
     "image": "/assets/builds/20240801_103114.jpg",
     "focalX": "48%",
     "focalY": "42%",
     "fit": "cover",
     "specs": [
-      "Glass Chassis",
-      "RGB Bus",
-      "Clean Airflow"
+      "Ryzen X3D",
+      "6900XT",
+      "Superior Cooling",
+      "Active HUD",
+      "Gaming Focused"
     ],
-    "description": "A luminous hard-lane tower profile balanced around case silhouette and internal light continuity."
+    "description": ""
   },
   {
     "codename": "Vault Nine",
