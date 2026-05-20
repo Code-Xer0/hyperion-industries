@@ -68,7 +68,7 @@
     "description": "Sensor Panel Custom deployment."
   },
   {
-    "codename": "Licht Matter",
+    "codename": "Antimatter-UV",
     "generation": "Gen 2022",
     "hardwareClass": "Compact",
     "status": "Sealed",
