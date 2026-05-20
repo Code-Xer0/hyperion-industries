@@ -1,7 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { motion, useAnimation } from 'framer-motion';
 import showcaseItems from '../../data/showcase.json';
-import HoverEditor from './HoverEditor';
 import './Carousel3D.css';
 
 export default function Carousel3D() {
@@ -62,8 +61,8 @@ export default function Carousel3D() {
           const isHidden = Math.abs(offset) > 3;
 
           return (
-            <HoverEditor key={item.codename} model="showcase" index={index}>
               <article 
+                key={item.codename}
                 className={`artifact-card ${isActive ? 'is-active' : ''} ${isHidden ? 'is-hidden' : ''}`}
                 style={{
                   '--offset': clampedOffset,
@@ -106,7 +105,6 @@ export default function Carousel3D() {
                   </div>
                 </div>
               </article>
-            </HoverEditor>
           );
         })}
       </motion.div>
