@@ -12,7 +12,6 @@ import ContactPage from './pages/ContactPage';
 import NewsletterPage from './pages/NewsletterPage';
 import StorePage from './pages/StorePage';
 import EditorPage from './pages/EditorPage';
-import CardStudioPage from './pages/CardStudioPage';
 import { HelmetProvider } from 'react-helmet-async';
 import SingularityBackground from './components/ui/SingularityBackground';
 import { EditorProvider, useEditor } from './context/EditorContext';
@@ -75,7 +74,7 @@ export default function App() {
               <Route path="/build-archive" element={<BuildArchivePage />} />
               <Route path="/gallery" element={<GalleryPage />} />
               <Route path="/card-studio/studio.html" element={<StaticRedirect to="/assets/card-studio/studio.html" />} />
-              <Route path="/card-studio" element={<CardStudioPage />} />
+              <Route path="/card-studio" element={<StaticRedirect to="/assets/card-studio/studio.html" />} />
               <Route path="/dxcard/*" element={<StaticRedirect to="/dxcard/index.html" />} />
               {isDev && <Route path="/editor" element={<EditorPage />} />}
               <Route path="/dev-diary" element={<DevDiaryPage />} />
