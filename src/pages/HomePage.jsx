@@ -12,8 +12,11 @@ import operators from '../data/operators.json';
 import content from '../data/content.json';
 import { Helmet } from 'react-helmet-async';
 import HoverEditor from '../components/ui/HoverEditor';
+import { useTheme } from '../context/ThemeContext';
 
 export default function HomePage() {
+  const { brandMark } = useTheme();
+
   return (
     <PageShell className="home">
       <Helmet>
@@ -47,7 +50,7 @@ export default function HomePage() {
                 </div>
               </div>
               <div className="hero-visual">
-                <img src="/assets/branding/hyperion/Hyblklogoonly.png" alt="Hyperion Industries" className="hero-lockup" />
+                <img src={brandMark} alt="Hyperion Industries" className="hero-lockup" />
               </div>
             </div>
           </HoverEditor>

@@ -4,6 +4,7 @@ import SectionHero from '../components/ui/SectionHero';
 import './SubPage.css';
 import content from '../data/content.json';
 import HoverEditor from '../components/ui/HoverEditor';
+import MediaFrame from '../components/ui/MediaFrame';
 
 export default function ForgePage() {
   const lanes = [
@@ -53,8 +54,8 @@ export default function ForgePage() {
         <div className="shell">
           <HoverEditor model="content">
             <div className="sp-media-strip">
-              <img src={content.forge.mediaStrip.image1} alt="Hyperion custom PC desk setup" />
-              <img src={content.forge.mediaStrip.image2} alt="White custom PC build" />
+              <MediaFrame media={content.forge.mediaStrip.image1} alt="Hyperion custom PC desk setup" />
+              <MediaFrame media={content.forge.mediaStrip.image2} alt="White custom PC build" />
             </div>
             <div className="sp-actions" style={{ justifyContent: 'center', marginTop: '28px' }}>
               <Link to="/build-archive" className="btn btn-gold">Open Artifact Archive</Link>

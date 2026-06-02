@@ -1,18 +1,22 @@
 import { Link } from 'react-router-dom';
 import './SystemCard.css';
+import { useTheme } from '../../context/ThemeContext';
+import { mediaSource } from '../../utils/media';
 
 export default function SystemCard({ system }) {
   const { code, name, tagline, description, status, statusLabel, link, linkLabel, icon, color } = system;
+  const { brandMark } = useTheme();
 
   const badgeClass = status === 'live' ? 'b-live' : status === 'building' ? 'b-building' : 'b-concept';
   const isExternal = link && link.startsWith('http');
+  const iconSrc = mediaSource(icon)?.includes('/assets/branding/hyperion/') ? brandMark : mediaSource(icon);
 
   return (
     <div className={`sys-row ${color}`}>
       <div className="sys-left">
         <span className="sys-num">{code}</span>
         <span className="sys-name">
-          {icon && <img src={icon} alt="" className="sys-icon" />}
+          {iconSrc && <img src={iconSrc} alt="" className="sys-icon" />}
           {name}
         </span>
         <span className="sys-tagline">{tagline}</span>

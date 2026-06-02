@@ -1,11 +1,12 @@
 .sys-row {
-  background: var(--surface); padding: 32px 36px;
+  background: var(--glass); padding: 32px 36px;
   display: grid; grid-template-columns: 280px 1fr auto;
   gap: 40px; align-items: center;
   border-left: 3px solid transparent; transition: background 0.16s, transform 0.22s, box-shadow 0.22s;
   position: relative;
+  backdrop-filter: blur(16px);
 }
-.sys-row:hover { background: var(--surface-up); transform: translateY(-2px); box-shadow: 0 0 0 1px rgba(255,199,44,0.06), 0 24px 90px rgba(0,0,0,0.34); }
+.sys-row:hover { background: var(--glass-hover); transform: translateY(-2px); box-shadow: 0 0 0 1px rgba(0,229,255,0.12), 0 24px 90px rgba(0,0,0,0.38); }
 .sys-row.cyan { border-left-color: var(--cyan); }
 .sys-row.red { border-left-color: var(--red); }
 .sys-row.gold { border-left-color: var(--gold); }
@@ -14,7 +15,13 @@
 .sys-left { display: flex; flex-direction: column; gap: 6px; }
 .sys-num { font-family: var(--font-display); font-size: 8px; letter-spacing: 0.2em; color: var(--text-dim); font-weight: 600; }
 .sys-name { font-family: var(--font-display); font-size: 18px; font-weight: 700; letter-spacing: 0.06em; display: flex; align-items: center; gap: 10px; }
-.sys-icon { width: 28px; height: 28px; object-fit: contain; }
+.sys-icon {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  border: 0;
+  background: transparent;
+}
 .sys-row.cyan .sys-name { color: var(--cyan); }
 .sys-row.red .sys-name { color: var(--red); }
 .sys-row.gold .sys-name { color: var(--gold); }

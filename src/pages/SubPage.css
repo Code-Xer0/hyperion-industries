@@ -20,10 +20,11 @@
 
 /* ── System Cards ── */
 .sp-system-card, .sp-lane-card {
-  border: 1px solid var(--border);
+  border: 1px solid var(--glass-edge);
   background: var(--card-bg);
   box-shadow: var(--shadow-card);
   border-radius: var(--r-md); padding: 26px;
+  backdrop-filter: blur(16px);
   transition: border-color 0.2s, transform 0.2s;
 }
 .sp-system-card:hover, .sp-lane-card:hover {
@@ -50,9 +51,10 @@
 
 /* ── Info Panels ── */
 .sp-panel {
-  border: 1px solid var(--border); border-radius: var(--r-md);
+  border: 1px solid var(--glass-edge); border-radius: var(--r-md);
   padding: 28px;
   background: var(--card-bg);
+  backdrop-filter: blur(16px);
 }
 .sp-panel h2 { font-size: clamp(28px,4vw,48px); font-weight: 800; line-height: 1; margin-bottom: 16px; }
 .sp-panel h2 em { color: var(--gold); font-style: normal; }
@@ -60,12 +62,14 @@
 
 /* ── Media Strip ── */
 .sp-media-strip { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 10px; }
+.sp-media-strip .media-frame,
 .sp-media-strip img {
   width: 100%; height: 100%; min-height: 260px; object-fit: cover;
-  border-radius: var(--r-md); border: 1px solid rgba(255,199,44,0.16);
+  border-radius: var(--r-md); border: 1px solid rgba(0,229,255,0.16);
   filter: saturate(1.08) brightness(0.9);
   transition: transform 0.5s var(--ease-out);
 }
+.sp-media-strip .media-frame:hover,
 .sp-media-strip img:hover { transform: scale(1.02); }
 
 /* ── Contact list ── */

@@ -2,9 +2,11 @@ import { Link } from 'react-router-dom';
 import navData from '../../data/navigation.json';
 import './Footer.css';
 import HoverEditor from '../ui/HoverEditor';
+import { useTheme } from '../../context/ThemeContext';
 
 export default function Footer() {
   const { footer } = navData;
+  const { brandMark } = useTheme();
   const year = new Date().getFullYear();
 
   const renderLink = (item, i) => {
@@ -19,7 +21,7 @@ export default function Footer() {
           <HoverEditor model="navigation">
             <div className="footer-brand">
               <div className="footer-logo-row">
-                <img src="/assets/branding/hyperion/Hyblklogoonly.png" alt="" className="footer-mark" />
+                <img src={brandMark} alt="" className="footer-mark" />
                 <span className="footer-wm">Hyperion Industries</span>
               </div>
               <p className="footer-desc">Local-first intelligence infrastructure. Built for people who need custody, continuity, and control.</p>

@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom';
 import PageShell from '../components/layout/PageShell';
 import SectionHero from '../components/ui/SectionHero';
-import SystemCard from '../components/cards/SystemCard';
 import systems from '../data/systems.json';
 import content from '../data/content.json';
 import './SubPage.css';

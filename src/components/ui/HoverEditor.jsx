@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useEditor } from '../../context/EditorContext';
 
 export default function HoverEditor({ model, index = null, children }) {

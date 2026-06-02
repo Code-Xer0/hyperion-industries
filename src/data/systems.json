@@ -9,7 +9,7 @@
     "statusLabel": "Architecture Phase",
     "link": null,
     "linkLabel": null,
-    "icon": "/assets/branding/hyperion/Hyblklogoonly.png",
+    "icon": "/assets/branding/hyperion/hyperion-orbit.svg",
     "color": "gray",
     "chips": ["World-state", "Events", "Material conditions"]
   },
@@ -65,7 +65,7 @@
     "statusLabel": "Research",
     "link": null,
     "linkLabel": null,
-    "icon": "/assets/branding/hyperion/Hyblklogoonly.png",
+    "icon": "/assets/branding/hyperion/hyperion-orbit.svg",
     "color": "gold",
     "chips": ["Integration", "Frameworks", "Resolution"]
   },
@@ -79,7 +79,7 @@
     "statusLabel": "Research",
     "link": null,
     "linkLabel": null,
-    "icon": "/assets/branding/hyperion/Hyblklogoonly.png",
+    "icon": "/assets/branding/hyperion/hyperion-orbit.svg",
     "color": "cyan",
     "chips": ["Insight", "Pattern recognition", "Latent structure"]
   },
@@ -93,7 +93,7 @@
     "statusLabel": "Research",
     "link": null,
     "linkLabel": null,
-    "icon": "/assets/branding/hyperion/Hyblklogoonly.png",
+    "icon": "/assets/branding/hyperion/hyperion-orbit.svg",
     "color": "red",
     "chips": ["Empathy", "Relational impact", "Felt consequence"]
   },
@@ -107,7 +107,7 @@
     "statusLabel": "Research Lane",
     "link": null,
     "linkLabel": null,
-    "icon": "/assets/branding/hyperion/Hyblklogoonly.png",
+    "icon": "/assets/branding/hyperion/hyperion-orbit.svg",
     "color": "gold",
     "chips": ["Sovereign container", "Doctrine", "Narrative integration"]
   }

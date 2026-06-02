@@ -5,10 +5,18 @@
   border-bottom: 1px solid rgba(255,199,44,0.1);
   background: var(--bg);
 }
-.gallery-operator-hero > img {
+.gallery-operator-hero > img,
+.gallery-operator-hero .gallery-operator-media {
   position: absolute; inset: 0; width: 100%; height: 100%;
-  object-fit: cover; object-position: 50% 45%;
   opacity: 0.82; filter: saturate(1.08) contrast(1.05) brightness(0.86);
+  border: 0; border-radius: 0;
+}
+.gallery-operator-hero > img {
+  object-fit: cover; object-position: 50% 45%;
+}
+.gallery-operator-hero .gallery-operator-media img,
+.gallery-operator-hero .gallery-operator-media video {
+  object-position: 50% 45%;
 }
 .gallery-operator-overlay {
   position: absolute; inset: 0; z-index: 1;
@@ -31,6 +39,12 @@
 .gallery-asset-card img {
   width: 100%; height: 100%; min-height: 420px; display: block;
   object-fit: cover; filter: saturate(1.08) brightness(0.88);
+}
+.gallery-asset-card .media-frame {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  border-radius: 0;
 }
 .gallery-asset-card.reference img { object-fit: contain; padding: 10px; background: #020203; }
 .gallery-asset-overlay {

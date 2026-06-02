@@ -1,6 +1,7 @@
-import React from 'react';
 import { motion } from 'framer-motion';
 import './OperatorCard.css';
+import MediaFrame from '../ui/MediaFrame';
+import { mediaSource } from '../../utils/media';
 
 export default function OperatorCard({ operator }) {
   const isKesh = operator.id === 'HYP-OP-002';
@@ -23,8 +24,8 @@ export default function OperatorCard({ operator }) {
             background: operator.artBackground || "linear-gradient(135deg,#0a1628 0%,#1a2744 50%,#0d1f3c 100%)",
             display: "flex", alignItems: "center", justifyContent: "center"
         }}>
-          {operator.image ? (
-            <img src={operator.image} alt={operator.name} />
+          {mediaSource(operator.image) ? (
+            <MediaFrame media={operator.image} alt={operator.name} className="card-media" />
           ) : (
             <div style={{ fontFamily: "var(--font-display)", fontSize: "96px", fontWeight: "900", color: "rgba(138,180,248,0.12)", letterSpacing: "-0.02em", userSelect: "none" }}>
               {operator.attr || "K"}

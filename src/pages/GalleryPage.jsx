@@ -7,11 +7,13 @@ import './SubPage.css';
 import HoverEditor from '../components/ui/HoverEditor';
 import galleryAssets from '../data/gallery.json';
 import content from '../data/content.json';
+import MediaFrame from '../components/ui/MediaFrame';
+import { mediaSource } from '../utils/media';
 
 const isDev = import.meta.env.DEV;
 
 /* ── Inline Gallery Manager (dev-only) ─────────────────────────── */
-function GalleryManager() {
+function GalleryManager({ onItemsChange }) {
   const [items, setItems] = useState(null);
   const [selected, setSelected] = useState(null);
   const [saving, setSaving] = useState(false);
@@ -21,9 +23,12 @@ function GalleryManager() {
   const reload = useCallback(() => {
     fetch('/api/data/gallery')
       .then(r => r.json())
-      .then(setItems)
+      .then((data) => {
+        setItems(data);
+        onItemsChange?.(data);
+      })
       .catch(() => setItems([]));
-  }, []);
+  }, [onItemsChange]);
 
   useEffect(() => { reload(); }, [reload]);
 
@@ -69,6 +74,7 @@ function GalleryManager() {
     const newItem = { src: '', label: 'New Asset', desc: 'Description…', type: 'Portraits' };
     const updated = [newItem, ...items];
     setItems(updated);
+    onItemsChange?.(updated);
     setSelected(0);
     saveDraft(updated);
   };
@@ -77,6 +83,7 @@ function GalleryManager() {
     if (!window.confirm(`Delete "${items[idx].label}"?`)) return;
     const updated = items.filter((_, i) => i !== idx);
     setItems(updated);
+    onItemsChange?.(updated);
     setSelected(null);
     saveDraft(updated);
   };
@@ -87,6 +94,7 @@ function GalleryManager() {
     const updated = [...items];
     [updated[idx], updated[target]] = [updated[target], updated[idx]];
     setItems(updated);
+    onItemsChange?.(updated);
     setSelected(target);
     saveDraft(updated);
   };
@@ -95,6 +103,7 @@ function GalleryManager() {
     const updated = [...items];
     updated[idx] = { ...updated[idx], [key]: value };
     setItems(updated);
+    onItemsChange?.(updated);
   };
 
   const handleImageUpload = async (e, idx) => {
@@ -139,7 +148,7 @@ function GalleryManager() {
           {items.map((item, idx) => (
             <div key={idx} onClick={() => setSelected(idx)} style={{ padding: '12px 16px', cursor: 'pointer', borderBottom: '1px solid rgba(255,255,255,0.03)', background: selected === idx ? 'rgba(255,199,44,0.08)' : 'transparent', borderLeft: selected === idx ? '3px solid #ffc72c' : '3px solid transparent' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                {item.src && <img src={item.src} alt="" style={{ width: '36px', height: '36px', objectFit: 'cover', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.08)' }} />}
+                {mediaSource(item.src || item) && <MediaFrame media={item.src || item} compact alt="" className="ed-thumb-frame" />}
                 <div style={{ flex: 1, overflow: 'hidden' }}>
                   <div style={{ fontSize: '12px', fontWeight: 700, color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.label}</div>
                   <div style={{ fontSize: '9px', color: 'rgba(255,255,255,0.3)', marginTop: '2px' }}>{item.type}</div>
@@ -168,13 +177,13 @@ function GalleryManager() {
               <label style={labelSt}>Asset File</label>
               <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
                 <div style={{ width: '120px', height: '120px', borderRadius: '8px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(0,0,0,0.4)', flexShrink: 0 }}>
-                  {current.src ? <img src={current.src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(255,255,255,0.15)', fontSize: '11px' }}>No image</div>}
+                  {current.src ? <MediaFrame media={current.src} compact alt="" /> : <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(255,255,255,0.15)', fontSize: '11px' }}>No media</div>}
                 </div>
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <input type="text" value={current.src} onChange={(e) => updateField(selected, 'src', e.target.value)} style={inputSt} />
+                  <input type="text" value={mediaSource(current.src)} onChange={(e) => updateField(selected, 'src', e.target.value)} style={inputSt} />
                   <label style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '7px 14px', background: 'rgba(255,199,44,0.1)', border: '1px solid rgba(255,199,44,0.2)', color: '#ffc72c', borderRadius: '5px', cursor: 'pointer', fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', alignSelf: 'flex-start' }}>
-                    {uploadingField === selected ? 'Uploading…' : '↑ Upload Image'}
-                    <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => handleImageUpload(e, selected)} disabled={uploadingField === selected} />
+                    {uploadingField === selected ? 'Uploading…' : '↑ Upload Media'}
+                    <input type="file" accept="image/*,video/mp4,video/webm,video/ogg,video/quicktime" style={{ display: 'none' }} onChange={(e) => handleImageUpload(e, selected)} disabled={uploadingField === selected} />
                   </label>
                 </div>
               </div>
@@ -211,7 +220,15 @@ function GalleryManager() {
 /* ── Page ─────────────────────────────────────────────────────── */
 export default function GalleryPage() {
   const [filter, setFilter] = useState('All');
-  const assets = galleryAssets;
+  const [assets, setAssets] = useState(galleryAssets);
+
+  useEffect(() => {
+    if (!isDev) return;
+    fetch('/api/data/gallery')
+      .then((response) => response.json())
+      .then(setAssets)
+      .catch(() => setAssets(galleryAssets));
+  }, []);
 
   const filteredAssets = filter === 'All' ? assets : assets.filter(a => a.type === filter);
 
@@ -231,7 +248,7 @@ export default function GalleryPage() {
       {/* ── Operator Hero ── */}
       <HoverEditor model="content">
         <section className="gallery-operator-hero">
-          <img src={content.gallery.operatorHero.image} alt="Δeus χ wide Hyperion operator visual" />
+          <MediaFrame media={content.gallery.operatorHero.image} alt="Δeus χ wide Hyperion operator visual" className="gallery-operator-media" />
           <div className="gallery-operator-overlay" />
           <div className="shell gallery-operator-content">
             <div className="sp-label">Completed asset</div>
@@ -246,8 +263,8 @@ export default function GalleryPage() {
         <section className="section section-alt">
           <div className="shell">
             <div className="sp-media-strip">
-              <img src={content.gallery.mediaStrip.image1} alt="Wide Hyperion Δeus χ brand plate" />
-              <img src={content.gallery.mediaStrip.image2} alt="Circular Δeus χ avatar asset" />
+              <MediaFrame media={content.gallery.mediaStrip.image1} alt="Wide Hyperion Δeus χ brand plate" />
+              <MediaFrame media={content.gallery.mediaStrip.image2} alt="Circular Δeus χ avatar asset" />
             </div>
           </div>
         </section>
@@ -286,7 +303,7 @@ export default function GalleryPage() {
             {filteredAssets.map((a, i) => {
               return (
                 <article key={i} className={`gallery-asset-card${a.reference ? ' reference' : ''}`}>
-                  <img src={a.src} alt={a.label} />
+                  <MediaFrame media={a.src || a} alt={a.label} />
                   <div className="gallery-asset-overlay" />
                   <div className="gallery-asset-label">
                     <strong>{a.label}</strong>
@@ -307,7 +324,7 @@ export default function GalleryPage() {
               <span style={{ fontSize: '11px', fontWeight: 800, color: '#ffc72c', textTransform: 'uppercase', letterSpacing: '0.15em', fontFamily: 'var(--font-display)' }}>Gallery Manager</span>
               <div style={{ flex: 1, height: '1px', background: 'rgba(255,199,44,0.15)' }} />
             </div>
-            <GalleryManager />
+            <GalleryManager onItemsChange={setAssets} />
           </div>
         </section>
       )}

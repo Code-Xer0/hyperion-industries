@@ -1,13 +1,17 @@
 import { useState, useCallback, useEffect } from 'react';
-import { motion, useAnimation } from 'framer-motion';
-import showcaseItems from '../../data/showcase.json';
+import { motion } from 'framer-motion';
+import defaultShowcaseItems from '../../data/showcase.json';
+import MediaFrame from './MediaFrame';
 import './Carousel3D.css';
 
-export default function Carousel3D() {
+export default function Carousel3D({ items = defaultShowcaseItems }) {
   const [activeIndex, setActiveIndex] = useState(0);
-  const controls = useAnimation();
-  
+  const showcaseItems = items?.length ? items : defaultShowcaseItems;
   const total = showcaseItems.length;
+
+  useEffect(() => {
+    setActiveIndex((current) => Math.min(current, Math.max(total - 1, 0)));
+  }, [total]);
 
   const wrapIndex = useCallback((index) => {
     return (index + total) % total;
@@ -86,7 +90,14 @@ export default function Carousel3D() {
                   </header>
                   
                   <div className="ac-image-bay" style={{ '--focal-x': item.focalX, '--focal-y': item.focalY, '--fit': item.fit }}>
-                    <img src={item.image} alt={`${item.codename} custom PC build`} draggable="false" />
+                    <MediaFrame
+                      media={item.image}
+                      alt={`${item.codename} custom PC build`}
+                      fit={item.fit}
+                      focalX={item.focalX}
+                      focalY={item.focalY}
+                      draggable="false"
+                    />
                   </div>
                   
                   <div className="ac-body">

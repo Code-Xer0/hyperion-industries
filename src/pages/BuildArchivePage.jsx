@@ -4,13 +4,16 @@ import PageShell from '../components/layout/PageShell';
 import SectionHero from '../components/ui/SectionHero';
 import Carousel3D from '../components/ui/Carousel3D';
 import HoverEditor from '../components/ui/HoverEditor';
+import MediaFrame from '../components/ui/MediaFrame';
+import { mediaSource } from '../utils/media';
 import content from '../data/content.json';
+import showcaseData from '../data/showcase.json';
 import './SubPage.css';
 
 const isDev = import.meta.env.DEV;
 
 /* ── Inline Build Manager (dev-only) ─────────────────────────── */
-function BuildManager() {
+function BuildManager({ onItemsChange }) {
   const [items, setItems] = useState(null);
   const [selected, setSelected] = useState(null);
   const [saving, setSaving] = useState(false);
@@ -21,9 +24,12 @@ function BuildManager() {
   const reload = useCallback(() => {
     fetch('/api/data/showcase')
       .then(r => r.json())
-      .then(setItems)
+      .then((data) => {
+        setItems(data);
+        onItemsChange?.(data);
+      })
       .catch(() => setItems([]));
-  }, []);
+  }, [onItemsChange]);
 
   useEffect(() => { reload(); }, [reload]);
 
@@ -88,6 +94,7 @@ function BuildManager() {
     };
     const updated = [newItem, ...items];
     setItems(updated);
+    onItemsChange?.(updated);
     setSelected(0);
     saveDraft(updated);
   };
@@ -96,6 +103,7 @@ function BuildManager() {
     if (!window.confirm(`Delete "${items[idx].codename}"?`)) return;
     const updated = items.filter((_, i) => i !== idx);
     setItems(updated);
+    onItemsChange?.(updated);
     setSelected(null);
     saveDraft(updated);
   };
@@ -106,6 +114,7 @@ function BuildManager() {
     const updated = [...items];
     [updated[idx], updated[target]] = [updated[target], updated[idx]];
     setItems(updated);
+    onItemsChange?.(updated);
     setSelected(target);
     saveDraft(updated);
   };
@@ -114,6 +123,7 @@ function BuildManager() {
     const updated = [...items];
     updated[idx] = { ...updated[idx], [key]: value };
     setItems(updated);
+    onItemsChange?.(updated);
   };
 
   const handleImageUpload = async (e, idx) => {
@@ -178,7 +188,7 @@ function BuildManager() {
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                {item.image && <img src={item.image} alt="" style={{ width: '36px', height: '36px', objectFit: 'cover', borderRadius: '4px', border: '1px solid var(--border-soft)' }} />}
+                {mediaSource(item.image) && <MediaFrame media={item.image} alt="" compact className="ed-thumb-frame" />}
                 <div style={{ flex: 1, overflow: 'hidden' }}>
                   <div style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.codename}</div>
                   <div style={{ fontSize: '9px', color: 'var(--text-muted)', marginTop: '2px' }}>{item.generation} · {item.hardwareClass}</div>
@@ -222,16 +232,16 @@ function BuildManager() {
               <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
                 <div style={{ width: '160px', height: '120px', borderRadius: '8px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(0,0,0,0.4)', flexShrink: 0 }}>
                   {current.image ? (
-                    <img src={current.image} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <MediaFrame media={current.image} alt="" compact />
                   ) : (
                     <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(255,255,255,0.15)', fontSize: '11px' }}>No image</div>
                   )}
                 </div>
                 <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <input type="text" value={current.image} onChange={(e) => updateField(selected, 'image', e.target.value)} placeholder="/assets/builds/photo.jpg" style={inputSt} />
+                  <input type="text" value={mediaSource(current.image)} onChange={(e) => updateField(selected, 'image', e.target.value)} placeholder="/assets/builds/photo.jpg" style={inputSt} />
                   <label style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '7px 14px', background: 'rgba(255,199,44,0.1)', border: '1px solid rgba(255,199,44,0.2)', color: '#ffc72c', borderRadius: '5px', cursor: 'pointer', fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', alignSelf: 'flex-start' }}>
-                    {uploadingField === selected ? 'Uploading…' : '↑ Upload Image'}
-                    <input type="file" accept="image/*" style={{ display: 'none' }} onChange={(e) => handleImageUpload(e, selected)} disabled={uploadingField === selected} />
+                    {uploadingField === selected ? 'Uploading…' : '↑ Upload Media'}
+                    <input type="file" accept="image/*,video/mp4,video/webm,video/ogg,video/quicktime" style={{ display: 'none' }} onChange={(e) => handleImageUpload(e, selected)} disabled={uploadingField === selected} />
                   </label>
                   {/* focal point controls */}
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '8px', marginTop: '4px' }}>
@@ -281,6 +291,16 @@ function BuildManager() {
 
 /* ── Page ─────────────────────────────────────────────────────── */
 export default function BuildArchivePage() {
+  const [showcaseItems, setShowcaseItems] = useState(showcaseData);
+
+  useEffect(() => {
+    if (!isDev) return;
+    fetch('/api/data/showcase')
+      .then((response) => response.json())
+      .then(setShowcaseItems)
+      .catch(() => setShowcaseItems(showcaseData));
+  }, []);
+
   return (
     <PageShell>
       <HoverEditor model="content">
@@ -296,7 +316,7 @@ export default function BuildArchivePage() {
 
       <section className="section" style={{ overflow: 'hidden' }}>
         <div className="shell">
-          <Carousel3D />
+          <Carousel3D items={showcaseItems} />
         </div>
       </section>
 
@@ -308,7 +328,7 @@ export default function BuildArchivePage() {
               <span style={{ fontSize: '11px', fontWeight: 800, color: 'var(--gold)', textTransform: 'uppercase', letterSpacing: '0.15em', fontFamily: 'var(--font-display)' }}>Build Manager</span>
               <div style={{ flex: 1, height: '1px', background: 'var(--border-gold)' }} />
             </div>
-            <BuildManager />
+            <BuildManager onItemsChange={setShowcaseItems} />
           </div>
         </section>
       )}

@@ -1,11 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 432 432" role="img" aria-labelledby="title desc">
-  <title id="title">Hyperion orbital pillar mark</title>
-  <desc id="desc">Transparent vector mark with white pillar forms, a four-point star, orbit arcs, and a gold orbital ring.</desc>
+  <title id="title">Hyperion orbital pillar mark for light mode</title>
+  <desc id="desc">Transparent vector mark with dark pillar forms, a four-point star, orbit arcs, and a gold orbital ring.</desc>
   <defs>
     <linearGradient id="towerFill" x1="162" y1="99" x2="262" y2="323" gradientUnits="userSpaceOnUse">
-      <stop offset="0" stop-color="#ffffff"/>
-      <stop offset="0.58" stop-color="#eef5f5"/>
-      <stop offset="1" stop-color="#cfdcdd"/>
+      <stop offset="0" stop-color="#071014"/>
+      <stop offset="0.58" stop-color="#12232a"/>
+      <stop offset="1" stop-color="#31464d"/>
     </linearGradient>
     <linearGradient id="goldFill" x1="117" y1="258" x2="336" y2="166" gradientUnits="userSpaceOnUse">
       <stop offset="0" stop-color="#ffd24a"/>
@@ -15,7 +15,7 @@
   </defs>
 
   <g id="hyperion-mark" fill="none" fill-rule="evenodd">
-    <g id="orbit-arcs" stroke="#f4fbfb" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" opacity="0.95">
+    <g id="orbit-arcs" stroke="#071014" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" opacity="0.9">
       <path d="M227 104c16.5 1.4 31.7 8.4 44 19"/>
       <path d="M290 149c7.1 12 11.5 25.8 13 40"/>
       <path d="M305 215c-5.5 37.1-31 74-66 91"/>

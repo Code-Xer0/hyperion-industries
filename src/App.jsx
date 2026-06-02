@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Nav from './components/layout/Nav';
 import Footer from './components/layout/Footer';
@@ -11,6 +12,7 @@ import ContactPage from './pages/ContactPage';
 import NewsletterPage from './pages/NewsletterPage';
 import StorePage from './pages/StorePage';
 import EditorPage from './pages/EditorPage';
+import CardStudioPage from './pages/CardStudioPage';
 import { HelmetProvider } from 'react-helmet-async';
 import SingularityBackground from './components/ui/SingularityBackground';
 import { EditorProvider, useEditor } from './context/EditorContext';
@@ -48,6 +50,14 @@ function EditModeToggle() {
   );
 }
 
+function StaticRedirect({ to }) {
+  useEffect(() => {
+    window.location.replace(to);
+  }, [to]);
+
+  return null;
+}
+
 export default function App() {
   const isDev = import.meta.env.DEV;
 
@@ -64,6 +74,8 @@ export default function App() {
               <Route path="/forge" element={<ForgePage />} />
               <Route path="/build-archive" element={<BuildArchivePage />} />
               <Route path="/gallery" element={<GalleryPage />} />
+              <Route path="/card-studio" element={<CardStudioPage />} />
+              <Route path="/dxcard/*" element={<StaticRedirect to="/dxcard/index.html" />} />
               {isDev && <Route path="/editor" element={<EditorPage />} />}
               <Route path="/dev-diary" element={<DevDiaryPage />} />
               <Route path="/contact" element={<ContactPage />} />
