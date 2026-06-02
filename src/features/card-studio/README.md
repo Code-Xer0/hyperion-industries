@@ -1,8 +1,13 @@
 # Hyperion Card Studio Source-Port Scaffold
 
-The live `/card-studio` route wraps `public/assets/card-studio/studio.html`, copied from:
+The live `/card-studio` route wraps `public/assets/card-studio/studio.html`, copied from the Business Card DX template:
 
-`C:\Users\Inf3r\Downloads\Hyperion Card Studio (standalone).html`
+`C:\Users\Inf3r\Git\hyperion-studio\Business Card. Dx. (Template)\Hyperion Card Studio (standalone).html`
+
+The shipped default state is the Ivory card template with the gold accent:
+
+- `accent`: `#cba35a`
+- `heroTemplate`: `ivory`
 
 This is intentionally a hybrid first pass. The standalone bundle remains the shipped tool surface while the React route provides Hyperion site navigation and deployment routing. The live GitHub Pages path also includes `public/card-studio/index.html` so `/card-studio` resolves on a static host without SPA fallback. The compatibility route `/card-studio/studio.html` and matching static redirect file both point to the non-conflicting static asset path.
 
