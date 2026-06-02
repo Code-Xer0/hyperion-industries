@@ -20,7 +20,7 @@ export default function CardStudioPage() {
           </div>
           <a
             className="btn btn-ghost card-studio-open"
-            href="/card-studio/studio.html"
+            href="/assets/card-studio/studio.html"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -31,7 +31,7 @@ export default function CardStudioPage() {
         <div className="card-studio-frame glass-panel">
           <iframe
             title="Hyperion Card Studio"
-            src="/card-studio/studio.html"
+            src="/assets/card-studio/studio.html"
             loading="eager"
             referrerPolicy="same-origin"
             sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-downloads allow-modals"
