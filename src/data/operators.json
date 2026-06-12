@@ -1,6 +1,8 @@
 [
   {
     "id": "HYP-OP-001",
+    "slug": "victor-amani",
+    "theme": "operator-red",
     "name": "Δeus χ",
     "stars": "★ ★ ★ ★ ★ ★",
     "attr": "Δ",
@@ -25,6 +27,8 @@
   },
   {
     "id": "HYP-OP-002",
+    "slug": "keshawn-rowe",
+    "theme": "operator-navy",
     "name": "Keshawn Rowe",
     "stars": "★ ★ ★ ★ ★",
     "attr": "K",

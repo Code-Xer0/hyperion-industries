@@ -1,5 +1,6 @@
 {
   "main": [
+    { "label": "Meet the Founders", "path": "/founders" },
     { "label": "Systems", "path": "/systems" },
     { "label": "Forge", "path": "/forge" },
     { "label": "Archive", "path": "/build-archive" },
@@ -19,6 +20,7 @@
       { "label": "Forge Builds", "path": "/forge" }
     ],
     "explore": [
+      { "label": "Meet the Founders", "path": "/founders" },
       { "label": "Systems", "path": "/systems" },
       { "label": "Build Archive", "path": "/build-archive" },
       { "label": "Gallery", "path": "/gallery" },

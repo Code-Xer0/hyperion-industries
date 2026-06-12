@@ -1,5 +1,6 @@
 const IMAGE_EXT = /\.(png|jpe?g|webp|gif|svg|avif)$/i;
 const VIDEO_EXT = /\.(mp4|webm|ogg|mov)$/i;
+const AUDIO_EXT = /\.(mp3|wav|flac|aac|m4a|oga)$/i;
 
 export function isMediaObject(value) {
   return Boolean(value && typeof value === 'object' && !Array.isArray(value) && (value.type || value.src || value.embedUrl));
@@ -11,9 +12,11 @@ export function mediaKind(value) {
     if (value.type) return value.type;
     if (value.embedUrl) return 'embed';
     if (VIDEO_EXT.test(value.src || '')) return 'video';
+    if (AUDIO_EXT.test(value.src || '')) return 'audio';
     return 'image';
   }
   if (VIDEO_EXT.test(value)) return 'video';
+  if (AUDIO_EXT.test(value)) return 'audio';
   if (/youtube\.com|youtu\.be|vimeo\.com/i.test(value)) return 'embed';
   return IMAGE_EXT.test(value) || value.includes('/assets/') ? 'image' : 'unknown';
 }
@@ -56,7 +59,7 @@ export function getEmbedSrc(url = '') {
 }
 
 export function isMediaFieldKey(key = '') {
-  return /(image|media|src|poster|video|icon|asset|thumbnail|hero)$/i.test(key);
+  return /(image|media|src|poster|video|audio|icon|asset|thumbnail|hero)$/i.test(key);
 }
 
 export function toMediaObject(value, overrides = {}) {

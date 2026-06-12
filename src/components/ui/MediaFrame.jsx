@@ -40,6 +40,15 @@ export default function MediaFrame({
     );
   }
 
+  if (item.type === 'audio') {
+    return (
+      <figure className={`media-frame is-audio ${compact ? 'is-compact' : ''} ${className}`} style={style}>
+        <audio src={item.src} controls preload="metadata" />
+        {item.caption && <figcaption>{item.caption}</figcaption>}
+      </figure>
+    );
+  }
+
   if (item.type === 'embed') {
     const src = getEmbedSrc(item.embedUrl || item.src);
     return (

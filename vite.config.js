@@ -19,10 +19,19 @@ const ALLOWED_UPLOAD_MIME = new Set([
   'video/webm',
   'video/ogg',
   'video/quicktime',
+  'audio/mpeg',
+  'audio/wav',
+  'audio/x-wav',
+  'audio/flac',
+  'audio/aac',
+  'audio/mp4',
+  'audio/x-m4a',
+  'audio/ogg',
 ]);
 
 const IMAGE_RE = /\.(png|jpe?g|webp|gif|svg|avif)$/i;
 const VIDEO_RE = /\.(mp4|webm|ogg|mov)$/i;
+const AUDIO_RE = /\.(mp3|wav|flac|aac|m4a|oga)$/i;
 
 function safeAssetName(filename) {
   const ext = path.extname(filename || '').toLowerCase();
@@ -36,6 +45,7 @@ function safeAssetName(filename) {
 
 function mediaTypeForPath(assetPath) {
   if (VIDEO_RE.test(assetPath)) return 'video';
+  if (AUDIO_RE.test(assetPath)) return 'audio';
   if (/youtube\.com|youtu\.be|vimeo\.com/i.test(assetPath)) return 'embed';
   return 'image';
 }
@@ -46,7 +56,7 @@ function listMediaFiles(rootDir, publicPrefix) {
     const fullPath = path.join(rootDir, entry.name);
     const relPath = `${publicPrefix}/${entry.name}`.replace(/\\/g, '/');
     if (entry.isDirectory()) return listMediaFiles(fullPath, relPath);
-    if (!IMAGE_RE.test(entry.name) && !VIDEO_RE.test(entry.name)) return [];
+    if (!IMAGE_RE.test(entry.name) && !VIDEO_RE.test(entry.name) && !AUDIO_RE.test(entry.name)) return [];
     const stat = fs.statSync(fullPath);
     const type = mediaTypeForPath(entry.name);
     return [{
@@ -63,6 +73,44 @@ function listMediaFiles(rootDir, publicPrefix) {
       },
     }];
   });
+}
+
+// ── Telemetry dev sink (mirrors the Vercel KV function in production) ──
+const TEL_FILE = path.resolve(__dirname, 'telemetry/events.ndjson');
+function appendTelemetry(evt) {
+  try {
+    fs.mkdirSync(path.dirname(TEL_FILE), { recursive: true });
+    fs.appendFileSync(TEL_FILE, JSON.stringify(evt) + '\n');
+  } catch { /* ignore */ }
+}
+function readTelemetry() {
+  try {
+    return fs.readFileSync(TEL_FILE, 'utf-8').split('\n').filter(Boolean)
+      .map((l) => { try { return JSON.parse(l); } catch { return null; } }).filter(Boolean);
+  } catch { return []; }
+}
+function aggregate(events) {
+  const totals = {}; const sessions = new Set(); const tracks = {}; const byDay = {};
+  for (const ev of events) {
+    const e = ev.e || 'unknown';
+    totals[e] = (totals[e] || 0) + 1;
+    if (ev.s) sessions.add(ev.s);
+    const day = new Date(ev.ts || Date.now()).toISOString().slice(0, 10);
+    byDay[day] = byDay[day] || {};
+    byDay[day][e] = (byDay[day][e] || 0) + 1;
+    if (ev.t) {
+      const tr = tracks[ev.t] || (tracks[ev.t] = { id: ev.t, title: ev.title || ev.t, play: 0, complete: 0, skip: 0, download: 0 });
+      if (tr[e] !== undefined) tr[e] += 1;
+      if (ev.title) tr.title = ev.title;
+    }
+  }
+  const plays = totals.play || 0; const completes = totals.complete || 0;
+  return {
+    totals, uniqueSessions: sessions.size, events: events.length,
+    completionRate: plays ? +(completes / plays).toFixed(3) : 0,
+    tracks: Object.values(tracks).sort((a, b) => b.play - a.play),
+    byDay, updated: Date.now(),
+  };
 }
 
 function localCmsPlugin() {
@@ -118,6 +166,7 @@ function localCmsPlugin() {
         if (req.url === '/api/media' && req.method === 'GET') {
           const roots = [
             [path.resolve(__dirname, 'public/assets/uploads'), '/assets/uploads'],
+            [path.resolve(__dirname, 'public/assets/radio'), '/assets/radio'],
             [path.resolve(__dirname, 'public/assets/builds'), '/assets/builds'],
             [path.resolve(__dirname, 'public/assets/operators'), '/assets/operators'],
             [path.resolve(__dirname, 'public/assets/branding'), '/assets/branding'],
@@ -143,7 +192,10 @@ function localCmsPlugin() {
               }
               
               const base64Content = data.split(';base64,').pop();
-              const uploadDir = path.resolve(__dirname, 'public/assets/uploads');
+              const fileType = detectedMime.startsWith('video/') ? 'video'
+                : detectedMime.startsWith('audio/') ? 'audio' : 'image';
+              const subdir = fileType === 'audio' ? 'radio' : 'uploads';
+              const uploadDir = path.resolve(__dirname, `public/assets/${subdir}`);
               
               if (!fs.existsSync(uploadDir)) {
                 fs.mkdirSync(uploadDir, { recursive: true });
@@ -152,8 +204,8 @@ function localCmsPlugin() {
               const safeName = safeAssetName(filename);
               const targetPath = path.resolve(uploadDir, safeName);
               fs.writeFileSync(targetPath, base64Content, { encoding: 'base64' });
-              const assetPath = `/assets/uploads/${safeName}`;
-              const type = detectedMime.startsWith('video/') ? 'video' : 'image';
+              const assetPath = `/assets/${subdir}/${safeName}`;
+              const type = fileType;
               
               res.setHeader('Content-Type', 'application/json');
               res.end(JSON.stringify({
@@ -162,7 +214,7 @@ function localCmsPlugin() {
                 media: {
                   type,
                   src: assetPath,
-                  controls: type === 'video',
+                  controls: type === 'video' || type === 'audio',
                   muted: type === 'video',
                 },
               }));
@@ -194,6 +246,22 @@ function localCmsPlugin() {
               }
             });
           });
+          return;
+        }
+
+        if (req.url === '/api/telemetry' && req.method === 'POST') {
+          let tbody = '';
+          req.on('data', (c) => { tbody += c; });
+          req.on('end', () => {
+            try { const evt = JSON.parse(tbody || '{}'); evt.ts = evt.ts || Date.now(); appendTelemetry(evt); } catch { /* ignore */ }
+            res.statusCode = 204; res.end();
+          });
+          return;
+        }
+
+        if (req.url.startsWith('/api/stats') && req.method === 'GET') {
+          res.setHeader('Content-Type', 'application/json');
+          res.end(JSON.stringify(aggregate(readTelemetry())));
           return;
         }
 

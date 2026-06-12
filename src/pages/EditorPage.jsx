@@ -11,6 +11,7 @@ const MODELS = [
   'destinations',
   'systems',
   'operators',
+  'radio',
   'gallery',
   'showcase',
   'newsletter',
@@ -22,6 +23,7 @@ const MODEL_META = {
   destinations: { label: 'Destinations', mode: 'collection', titleKey: 'title', hint: 'Homepage routing cards.' },
   systems: { label: 'Systems', mode: 'collection', titleKey: 'name', hint: 'System stack rows and status badges.' },
   operators: { label: 'Operators', mode: 'collection', titleKey: 'name', hint: 'Founding operator cards.' },
+  radio: { label: 'Hyperion Radio', mode: 'collection', titleKey: 'title', hint: 'Radio tracks — upload audio, set static + animated art, edit details.' },
   gallery: { label: 'Gallery', mode: 'collection', titleKey: 'label', hint: 'Gallery assets, media, and references.' },
   showcase: { label: 'Build Archive', mode: 'collection', titleKey: 'codename', hint: 'Build cards and carousel entries.' },
   newsletter: { label: 'Newsletter', mode: 'document', hint: 'Future newsletter lane.' },
@@ -42,6 +44,7 @@ function collectionTemplate(model) {
     destinations: { id: 'new-destination', color: 'cyan', status: 'Draft', title: 'New Destination', purpose: '', cta: 'Open', path: '/' },
     systems: { id: 'new-system', code: 'OS -- 00', name: 'New System', tagline: '', description: '', status: 'concept', statusLabel: 'Draft', link: null, linkLabel: null, icon: HYPERION_MARK_DEFAULT, color: 'cyan', chips: [] },
     operators: { id: 'HYP-OP-NEW', name: 'New Operator', attr: 'H', image: null, typeLine: 'Operator', description: '', focuses: [], flavor: '', stats: [], serial: 'HYP-OP-NEW' },
+    radio: { id: 'new-track', title: 'New Track', artist: 'Hyperion Operator', detail: '', duration: 0, audio: '', artStatic: '', artAnimated: '' },
     gallery: { src: '', label: 'New Asset', desc: '', type: 'References', reference: false },
     showcase: { codename: 'NEW BUILD', generation: 'Gen 2026', hardwareClass: 'Draft', status: 'Draft', image: '', focalX: '50%', focalY: '50%', fit: 'cover', specs: [], description: '' },
   };

@@ -22,3 +22,19 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Cowork Stage 1-2 working + diligence assets - NEVER publish to the public site/repo
+cowork-assets/
+Hyperion Investor Diligence/
+
+# Telemetry dev sink + secrets
+telemetry/
+.env
+.env*.local
+
+# Private operator console + ontology + tracker (NEVER publish / never link)
+private/
+
+# Machine-local MCP tool config (may carry env/PAT)
+.mcp.json
+.mcp.json.bak-*

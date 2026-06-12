@@ -1,8 +1,14 @@
-import { useEffect } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Nav from './components/layout/Nav';
 import Footer from './components/layout/Footer';
 import HomePage from './pages/HomePage';
+import FoundersPage from './pages/FoundersPage';
+import FounderPage from './pages/FounderPage';
+
+// Operator-only surfaces: DEV-gated lazy imports so the production bundle
+// contains neither the code nor the route — no source/route leakage.
+const RadioStatsPage = import.meta.env.DEV ? lazy(() => import('./pages/RadioStatsPage')) : () => null;
 import SystemsPage from './pages/SystemsPage';
 import ForgePage from './pages/ForgePage';
 import BuildArchivePage from './pages/BuildArchivePage';
@@ -11,7 +17,7 @@ import DevDiaryPage from './pages/DevDiaryPage';
 import ContactPage from './pages/ContactPage';
 import NewsletterPage from './pages/NewsletterPage';
 import StorePage from './pages/StorePage';
-import EditorPage from './pages/EditorPage';
+const EditorPage = import.meta.env.DEV ? lazy(() => import('./pages/EditorPage')) : () => null;
 import { HelmetProvider } from 'react-helmet-async';
 import SingularityBackground from './components/ui/SingularityBackground';
 import { EditorProvider, useEditor } from './context/EditorContext';
@@ -67,8 +73,12 @@ export default function App() {
           <BrowserRouter>
             <SingularityBackground />
             <Nav />
+            <Suspense fallback={null}>
             <Routes>
               <Route path="/" element={<HomePage />} />
+              <Route path="/founders" element={<FoundersPage />} />
+              <Route path="/founders/:slug" element={<FounderPage />} />
+              {isDev && <Route path="/radio-stats" element={<RadioStatsPage />} />}
               <Route path="/systems" element={<SystemsPage />} />
               <Route path="/forge" element={<ForgePage />} />
               <Route path="/build-archive" element={<BuildArchivePage />} />
@@ -82,6 +92,7 @@ export default function App() {
               <Route path="/newsletter" element={<NewsletterPage />} />
               <Route path="/store" element={<StorePage />} />
             </Routes>
+            </Suspense>
             <Footer />
             {isDev && <EditModeToggle />}
             {isDev && <EditorModal />}

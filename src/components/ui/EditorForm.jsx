@@ -35,7 +35,7 @@ function joinPath(path) {
 }
 
 function mediaAccept() {
-  return 'image/*,video/mp4,video/webm,video/ogg,video/quicktime';
+  return 'image/*,video/mp4,video/webm,video/ogg,video/quicktime,audio/mpeg,audio/wav,audio/flac,audio/aac,audio/mp4,audio/x-m4a,audio/ogg';
 }
 
 export default function EditorForm({
