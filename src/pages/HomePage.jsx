@@ -13,6 +13,7 @@ import content from '../data/content.json';
 import { Helmet } from 'react-helmet-async';
 import HoverEditor from '../components/ui/HoverEditor';
 import { useTheme } from '../context/ThemeContext';
+import './FoundersPage.css';
 
 export default function HomePage() {
   const { brandMark } = useTheme();
@@ -203,9 +204,23 @@ export default function HomePage() {
           <div className="ops-grid">
             {operators.map((op, i) => (
               <HoverEditor key={op.id} model="operators" index={i}>
-                <OperatorCard operator={op} />
+                <Link
+                  to={`/founders/${op.slug}`}
+                  className="founder-link"
+                  aria-label={`Open ${op.name}'s operator dossier — full founder page`}
+                >
+                  <span className="dossier-chip" aria-hidden="true">Open dossier <span className="ar">→</span></span>
+                  <OperatorCard operator={op} />
+                  <div className="dossier-cta">
+                    <span>⌖</span> Open operator dossier <span className="ar">→</span>
+                  </div>
+                </Link>
               </HoverEditor>
             ))}
+          </div>
+
+          <div style={{ textAlign: 'center', marginTop: '36px' }}>
+            <Link to="/founders" className="btn btn-ghost">Meet the Founders →</Link>
           </div>
         </div>
       </ScrollReveal>

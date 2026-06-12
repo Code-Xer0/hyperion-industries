@@ -483,16 +483,30 @@ body:has(.founder-page) #singularity { display: none !important; }
 .founder-page[data-cards="float"] .sx-card:nth-child(3n),
 .founder-page[data-cards="float"] .syscard:nth-child(4n+3) { --fl-dur: 6.8s; animation-delay: -4.7s; }
 .founder-page[data-cards="float"] .syscard:nth-child(4n) { --fl-dur: 7.9s; animation-delay: -1.8s; }
+/* perimeter trace: a comet of accent light orbits the FULL border ring of the
+   card (rounded corners included) — a conic gradient clipped to a 1.5px ring
+   via mask-composite, driven by a registered --angle so it animates smoothly. */
+@property --fp-trace-angle { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
 .founder-page .sx-card::before, .founder-page .syscard::before, .founder-page .agent::before {
-  content: ''; position: absolute; top: 0; left: -14%; width: 14%; height: 1px; z-index: 4; pointer-events: none;
-  background: linear-gradient(90deg, transparent, var(--accent-bright), transparent);
-  opacity: 0; animation: fp-card-trace 7.5s linear infinite;
+  content: ''; position: absolute; inset: 0; z-index: 4; pointer-events: none;
+  border-radius: inherit; padding: 1.5px; opacity: 0.65;
+  background: conic-gradient(from var(--fp-trace-angle),
+    transparent 0deg 286deg,
+    color-mix(in srgb, var(--accent-bright) 35%, transparent) 322deg,
+    var(--accent-bright) 350deg,
+    #fff 354deg,
+    transparent 360deg);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  animation: fp-trace-orbit 7.5s linear infinite;
 }
 .founder-page .sx-card:nth-child(3n+2)::before, .founder-page .syscard:nth-child(4n+1)::before, .founder-page .agent:nth-child(2)::before { animation-delay: -2.5s; }
 .founder-page .sx-card:nth-child(3n)::before, .founder-page .syscard:nth-child(4n+2)::before, .founder-page .agent:nth-child(3)::before { animation-delay: -5s; }
 .founder-page .syscard:nth-child(4n+3)::before { animation-delay: -3.7s; }
+@keyframes fp-trace-orbit { to { --fp-trace-angle: 360deg; } }
 @keyframes fp-card-float { 0%, 100% { translate: 0 calc(-1px * var(--amb, 1)); } 50% { translate: 0 calc(-7px * var(--amb, 1)); } }
-@keyframes fp-card-trace { 0% { left: -14%; opacity: 0; } 10% { opacity: 0.7; } 50% { opacity: 0.45; } 90% { opacity: 0.7; } 100% { left: 100%; opacity: 0; } }
 
 /* ════════ GRAVITY LATTICE + GRAIN ════════ */
 .founder-page .fp-lattice { position: fixed; inset: 0; z-index: 60; width: 100%; height: 100%; pointer-events: none; mix-blend-mode: screen; opacity: var(--fp-lattice-op, 0.55); transition: opacity 0.4s var(--ease); }

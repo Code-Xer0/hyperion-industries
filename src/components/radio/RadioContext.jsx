@@ -95,13 +95,27 @@ export function RadioProvider({ tracks, children }) {
     }, SIM_MS);
   }, [hasReal, list, onEnded, stopSim]);
 
+  // Bind the current track's file to the audio element if it isn't already.
+  // loadTrack only runs on skip/select — without this, the FIRST Play after a
+  // fresh page load hits an element with no src and silently no-ops (the
+  // "songs only play after skipping forward and back" bug).
+  const ensureSrc = useCallback(() => {
+    const a = audioRef.current;
+    if (!a || !hasReal(idxRef.current)) return;
+    const want = list[idxRef.current].audio;
+    if (!(a.src || '').endsWith(want)) {
+      a.src = want; a.load();
+      if (simRef.current > 0) { try { a.currentTime = simRef.current; } catch { /* applied on loadedmetadata */ } }
+    }
+  }, [list, hasReal]);
+
   const startPlayback = useCallback(() => {
     setPlaying(true); playingRef.current = true;
     logEvent('play', telOf(idxRef.current));
-    if (hasReal(idxRef.current)) { audioRef.current?.play().catch(() => {}); }
+    if (hasReal(idxRef.current)) { ensureSrc(); audioRef.current?.play().catch(() => {}); }
     else { startSim(); }
     persist();
-  }, [hasReal, startSim, persist]);
+  }, [hasReal, ensureSrc, startSim, persist]);
 
   const pause = useCallback(() => {
     setPlaying(false); playingRef.current = false;
@@ -138,13 +152,14 @@ export function RadioProvider({ tracks, children }) {
 
   const seekTo = useCallback((frac) => {
     logEvent('seek', telOf(idxRef.current));
+    ensureSrc();
     const f = Math.min(1, Math.max(0, frac));
     const d = (hasReal(idxRef.current) ? (audioRef.current?.duration || list[idxRef.current]?.duration) : list[idxRef.current]?.duration) || 0;
     const t = f * d;
     simRef.current = t; setCurTime(t);
     if (hasReal(idxRef.current) && audioRef.current) audioRef.current.currentTime = t;
     persist();
-  }, [hasReal, list, persist]);
+  }, [hasReal, ensureSrc, list, persist]);
 
   const setVolume = useCallback((v) => { setVol(v); if (audioRef.current) audioRef.current.volume = v; persist(); }, [persist]);
   const toggleShuffle = useCallback(() => setShuffle((s) => !s), []);
@@ -155,7 +170,14 @@ export function RadioProvider({ tracks, children }) {
     const a = audioRef.current;
     if (!a) return;
     const onTime = () => { if (hasReal(idxRef.current)) { simRef.current = a.currentTime || 0; setCurTime(simRef.current); } };
-    const onMeta = () => { if (hasReal(idxRef.current)) setDur(a.duration || list[idxRef.current]?.duration || 0); };
+    const onMeta = () => {
+      if (!hasReal(idxRef.current)) return;
+      setDur(a.duration || list[idxRef.current]?.duration || 0);
+      // restore a persisted position once real metadata is in (first bind)
+      if (simRef.current > 1 && Math.abs((a.currentTime || 0) - simRef.current) > 1 && simRef.current < (a.duration || Infinity)) {
+        try { a.currentTime = simRef.current; } catch { /* ignore */ }
+      }
+    };
     const onEnd = () => onEnded();
     a.addEventListener('timeupdate', onTime);
     a.addEventListener('loadedmetadata', onMeta);
