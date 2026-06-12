@@ -20,7 +20,7 @@ export function RadioProvider({ tracks, children }) {
   const audioRef = useRef(null);
   if (audioRef.current === null && typeof Audio !== 'undefined') {
     const a = new Audio();
-    a.preload = 'metadata';
+    a.preload = 'auto';
     audioRef.current = a;
   }
 
@@ -109,6 +109,11 @@ export function RadioProvider({ tracks, children }) {
     }
   }, [list, hasReal]);
 
+  // Warm the CURRENT track as soon as the surface mounts (preload=auto starts
+  // buffering immediately), so the first Play is near-instant instead of
+  // waiting on a cold fetch.
+  useEffect(() => { ensureSrc(); }, [ensureSrc]);
+
   const startPlayback = useCallback(() => {
     setPlaying(true); playingRef.current = true;
     logEvent('play', telOf(idxRef.current));
@@ -191,8 +196,28 @@ export function RadioProvider({ tracks, children }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hasReal, list, onEnded]);
 
+  // While a track is playing, quietly pre-buffer the NEXT one in playlist
+  // order so next/auto-advance starts without a network gap. (One hidden
+  // element; the main player then hits the warm HTTP cache.)
+  const prefetchRef = useRef(null);
+  useEffect(() => {
+    if (!playing || list.length < 2) return;
+    const nxt = list[(idx + 1) % list.length];
+    if (!nxt?.audio) return;
+    let p = prefetchRef.current;
+    if (!p && typeof Audio !== 'undefined') {
+      p = new Audio(); p.preload = 'auto'; p.muted = true;
+      prefetchRef.current = p;
+    }
+    if (p && !(p.src || '').endsWith(nxt.audio)) { p.src = nxt.audio; p.load(); }
+  }, [playing, idx, list]);
+
   // cleanup on unmount
-  useEffect(() => () => { stopSim(); try { audioRef.current?.pause(); } catch { /* noop */ } }, [stopSim]);
+  useEffect(() => () => {
+    stopSim();
+    try { audioRef.current?.pause(); } catch { /* noop */ }
+    try { prefetchRef.current?.removeAttribute('src'); prefetchRef.current = null; } catch { /* noop */ }
+  }, [stopSim]);
 
   const track = list[idx] || null;
   const progress = dur > 0 ? Math.min(1, curTime / dur) : 0;

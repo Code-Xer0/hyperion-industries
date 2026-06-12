@@ -7,8 +7,13 @@ from the site carry full metadata. Idempotent — safe to re-run after adding
 tracks or editing the registry.
 
 Usage:  python scripts/tag_audio.py        (from the repo root)
-Needs:  pip install mutagen
+Needs:  pip install mutagen pillow
+
+Embedded cover art is downscaled to a 600px JPEG (~100KB). ID3 tags sit at the
+FRONT of the MP3, so oversized art delays time-to-first-audio-byte on streaming
+playback — full-res art stays on the site as the separate artStatic PNG.
 """
+import io
 import json
 import sys
 from pathlib import Path
@@ -23,6 +28,22 @@ PUBLIC = ROOT / 'public'
 COPYRIGHT = '© 2026 Hyperion Industries LLC'
 PUBLISHER = 'Hyperion Radio'
 ENC = 3  # UTF-8
+COVER_PX = 600
+COVER_QUALITY = 85
+
+
+def cover_bytes(art: Path):
+    """600px JPEG for embedding; falls back to raw bytes if Pillow is absent."""
+    try:
+        from PIL import Image
+        im = Image.open(art).convert('RGB')
+        im.thumbnail((COVER_PX, COVER_PX), Image.LANCZOS)
+        buf = io.BytesIO()
+        im.save(buf, 'JPEG', quality=COVER_QUALITY, optimize=True)
+        return buf.getvalue(), 'image/jpeg'
+    except Exception:
+        mime = 'image/png' if art.suffix.lower() == '.png' else 'image/jpeg'
+        return art.read_bytes(), mime
 
 
 def tag(track: dict, total: int) -> str:
@@ -55,8 +76,8 @@ def tag(track: dict, total: int) -> str:
     art_rel = (track.get('artStatic') or '').lstrip('/')
     art = PUBLIC / art_rel if art_rel else None
     if art and art.exists():
-        mime = 'image/png' if art.suffix.lower() == '.png' else 'image/jpeg'
-        tags.add(APIC(encoding=ENC, mime=mime, type=3, desc='Cover', data=art.read_bytes()))
+        data, mime = cover_bytes(art)
+        tags.add(APIC(encoding=ENC, mime=mime, type=3, desc='Cover', data=data))
 
     tags.save(mp3, v2_version=3)
     return f"OK    {track['trackNo']:>2}/{total}  {track['title']} — {track.get('artist')}"
