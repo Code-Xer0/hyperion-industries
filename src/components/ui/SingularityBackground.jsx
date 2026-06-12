@@ -1,6 +1,11 @@
 import { useEffect, useRef } from 'react';
 
-export default function SingularityBackground() {
+/**
+ * The site-wide ambient particle lattice (drifting particles + proximity
+ * lines + mouse gravity). `color` is an "r, g, b" string — defaults to the
+ * main-site gold; the founder surface mounts its own instance in operator red.
+ */
+export default function SingularityBackground({ color = '255, 199, 44', id = 'singularity', style }) {
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -76,7 +81,7 @@ export default function SingularityBackground() {
       draw() {
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(255, 199, 44, 0.4)';
+        ctx.fillStyle = `rgba(${color}, 0.4)`;
         ctx.fill();
       }
     }
@@ -106,7 +111,7 @@ export default function SingularityBackground() {
             ctx.beginPath();
             ctx.moveTo(particles[i].x, particles[i].y);
             ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.strokeStyle = `rgba(255, 199, 44, ${opacity * 0.15})`;
+            ctx.strokeStyle = `rgba(${color}, ${opacity * 0.15})`;
             ctx.lineWidth = 1;
             ctx.stroke();
           }
@@ -117,7 +122,7 @@ export default function SingularityBackground() {
     const drawMouseGlow = () => {
       if (mouse.active) {
         const gradient = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, mouse.radius);
-        gradient.addColorStop(0, 'rgba(255, 199, 44, 0.04)');
+        gradient.addColorStop(0, `rgba(${color}, 0.04)`);
         gradient.addColorStop(1, 'transparent');
         ctx.fillStyle = gradient;
         ctx.beginPath();
@@ -149,17 +154,18 @@ export default function SingularityBackground() {
       window.removeEventListener('pointerleave', handlePointerLeave);
       cancelAnimationFrame(animationFrameId);
     };
-  }, []);
+  }, [color]);
 
   return (
     <canvas
       ref={canvasRef}
-      id="singularity"
+      id={id}
       style={{
         position: 'fixed',
         inset: 0,
         pointerEvents: 'none',
         zIndex: 0,
+        ...style,
       }}
     />
   );

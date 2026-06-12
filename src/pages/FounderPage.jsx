@@ -4,6 +4,7 @@ import { Helmet } from 'react-helmet-async';
 import operators from '../data/operators.json';
 import radioTracks from '../data/radio.json';
 import GravityLattice from '../components/ui/GravityLattice';
+import SingularityBackground from '../components/ui/SingularityBackground';
 import { RadioProvider } from '../components/radio/RadioContext';
 import RadioConsole from '../components/radio/RadioConsole';
 import MiniPlayer from '../components/radio/MiniPlayer';
@@ -12,20 +13,14 @@ import { track as logEvent } from '../utils/telemetry';
 import { initPointerFx } from '../utils/pointerFx';
 import './FounderPage.css';
 
-/* Layered ambience — fixed, screen-blended, pointer-transparent. Tuned via
-   --amb (Tweaks slider). Under prefers-reduced-motion the glow layers stay
-   as static light; only the continuous drift/stream motion is disabled. */
-function AmbienceField() {
-  return (
-    <div className="fp-amb" aria-hidden="true">
-      <i className="amb-glow g-red" />
-      <i className="amb-glow g-violet" />
-      <i className="amb-glow g-gold" />
-      <i className="amb-streams" />
-      <i className="amb-scan" />
-    </div>
-  );
-}
+/* Ambient background = the SAME particle lattice as the main site, recolored
+   to the operator accent (red by default; follows the Tweaks accent). Mounted
+   inside .founder-page above its opaque base, screen-blended. */
+const hexToRgbStr = (hex) => {
+  const h = (hex || '#FF2E2E').replace('#', '');
+  return `${parseInt(h.slice(0, 2), 16)}, ${parseInt(h.slice(2, 4), 16)}, ${parseInt(h.slice(4, 6), 16)}`;
+};
+const PARTICLE_STYLE = { zIndex: 56, mixBlendMode: 'screen' };
 
 const A = (f) => `/assets/founder/${f}`;
 const SUBSTACK = 'https://victoramani.substack.com/';
@@ -49,6 +44,7 @@ function accentVars(key) {
 function StubFounder({ operator, theme }) {
   return (
     <main className="founder-page" data-theme={theme} data-grain="on">
+      <SingularityBackground id="fp-particles" color={theme === 'operator-navy' ? '90, 160, 255' : '255, 46, 46'} style={PARTICLE_STYLE} />
       <div className="fp-grain" aria-hidden="true" />
       <Helmet>
         <title>{operator.name} — Founder, Hyperion Industries</title>
@@ -126,7 +122,7 @@ export default function FounderPage() {
           '--fp-lattice-op': (0.55 * tweaks.amb / 100).toFixed(3),
         }}
       >
-        <AmbienceField />
+        <SingularityBackground id="fp-particles" color={hexToRgbStr(ACCENTS[tweaks.accent]?.b)} style={PARTICLE_STYLE} />
         {tweaks.lattice && <GravityLattice intensity={Math.min(1.4, tweaks.amb / 100)} />}
         {tweaks.grain && <div className="fp-grain" aria-hidden="true" />}
         <Helmet>
@@ -460,6 +456,8 @@ export default function FounderPage() {
                     ['BUILDING', 'The .OS system family', 'CHRON.OS, KAIR.OS, MNEM.OS and the operator runtime — local-first AI workflows, deployment tooling, and identity-linked operator products.'],
                     ['FOCUS', 'Capital · product · partner network', 'Non-dilutive funding, strategic investment, BIPOC founder support, and sovereignty-aligned technical growth.'],
                     ['PRACTICE', 'Architecture & deployment', 'Software architecture, local-first AI, deployment systems, NFC identity tools, and automation frameworks — practical systems people can actually use.'],
+                    ['RESEARCH', 'Independent AI safety & evaluation', '2.5+ years of research-grade engagement across frontier model families — evaluation methodology, capability-emergence diagnostics, behavioral drift analysis, and the MYTH.OS architecture specification feeding the .OS family.'],
+                    ['RECORD', 'A decade inside live infrastructure', 'Ten+ years of enterprise and nonprofit IT — IBM deployment operations, nonprofit IT directorship, hybrid Azure identity migrations, endpoint security, and the service desks where systems meet people.'],
                   ].map(([when, h, p]) => (
                     <div className="tl-row" key={when}>
                       <div className="tl-when">{when}</div>

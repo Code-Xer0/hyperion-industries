@@ -620,49 +620,11 @@ body:has(.founder-page) #singularity { display: none !important; }
   .fp-tweaks { width: calc(100vw - 40px); }
 }
 
-/* ════════ LAYERED AMBIENCE — "quietly expensive operator console" ════════
-   Tunable via --amb (Tweaks slider) and the per-layer vars below. All layers
-   are fixed, pointer-transparent, GPU-friendly (transform/opacity only). */
-.founder-page {
-  --amb-glow-op: calc(0.5 * var(--amb, 1));
-  --amb-stream-op: calc(0.05 * var(--amb, 1));
-  --amb-scan-op: calc(0.028 * var(--amb, 1));
-}
-.founder-page .fp-amb { position: fixed; inset: 0; z-index: 56; pointer-events: none; overflow: hidden; }
-.founder-page .fp-amb i { position: absolute; display: block; }
-.founder-page .amb-glow { width: 62vmax; height: 62vmax; border-radius: 50%;
-  filter: blur(70px); mix-blend-mode: screen; opacity: var(--amb-glow-op);
-  will-change: transform; }
-.founder-page .g-red { left: -18vmax; top: -16vmax;
-  background: radial-gradient(circle, rgba(225,0,0,0.13), transparent 62%);
-  animation: amb-drift-a 84s ease-in-out infinite alternate; }
-.founder-page .g-violet { right: -22vmax; top: 24vh;
-  background: radial-gradient(circle, rgba(120,60,200,0.10), transparent 62%);
-  animation: amb-drift-b 104s ease-in-out infinite alternate; }
-.founder-page .g-gold { left: 28vw; bottom: -30vmax;
-  background: radial-gradient(circle, rgba(212,175,55,0.07), transparent 62%);
-  animation: amb-drift-c 122s ease-in-out infinite alternate; }
-@keyframes amb-drift-a { from { transform: translate3d(0,0,0) scale(1); } to { transform: translate3d(9vw,7vh,0) scale(1.12); } }
-@keyframes amb-drift-b { from { transform: translate3d(0,0,0) scale(1.08); } to { transform: translate3d(-8vw,-9vh,0) scale(0.96); } }
-@keyframes amb-drift-c { from { transform: translate3d(0,0,0) scale(1); } to { transform: translate3d(-6vw,-6vh,0) scale(1.1); } }
-/* faint data-streams: sparse vertical dashes drifting down at two speeds */
-.founder-page .amb-streams { inset: -20% 0; opacity: var(--amb-stream-op); mix-blend-mode: screen;
-  background-image:
-    repeating-linear-gradient(180deg, transparent 0 86px, var(--accent-bright) 86px 92px, transparent 92px 240px),
-    repeating-linear-gradient(180deg, transparent 0 130px, rgba(212,175,55,0.8) 130px 134px, transparent 134px 360px);
-  background-size: 3px 240px, 2px 360px;
-  background-position: 12vw 0, 78vw 0;
-  background-repeat: repeat;
-  -webkit-mask-image: linear-gradient(90deg, transparent 4vw, #000 18vw, #000 30vw, transparent 42vw, transparent 64vw, #000 76vw, #000 86vw, transparent 96vw);
-  mask-image: linear-gradient(90deg, transparent 4vw, #000 18vw, #000 30vw, transparent 42vw, transparent 64vw, #000 76vw, #000 86vw, transparent 96vw);
-  animation: amb-fall 26s linear infinite; will-change: background-position; }
-@keyframes amb-fall { to { background-position: 12vw 240px, 78vw 360px; } }
-/* low-opacity scanlines */
-.founder-page .amb-scan { inset: 0; opacity: var(--amb-scan-op); mix-blend-mode: overlay;
-  background: repeating-linear-gradient(180deg, rgba(255,255,255,0.5) 0 1px, transparent 1px 3px); }
-/* signal pulse — the room breathes a little while the radio is on air */
-.founder-page.is-playing .g-red { animation: amb-drift-a 84s ease-in-out infinite alternate, amb-signal 4.4s ease-in-out infinite; }
-@keyframes amb-signal { 0%,100% { opacity: var(--amb-glow-op); } 50% { opacity: calc(var(--amb-glow-op) * 1.45); } }
+/* ════════ AMBIENT BACKGROUND ════════
+   The founder surface runs the SAME particle lattice as the main site
+   (#fp-particles, a SingularityBackground instance) recolored to the operator
+   accent — mounted in JSX, screen-blended above the page's opaque base. */
+.founder-page #fp-particles { opacity: calc(0.9 * var(--amb, 1)); transition: opacity 0.4s var(--ease); }
 
 /* ════════ POINTER-AWARE CARD LIGHTING ════════ */
 .founder-page .post, .founder-page .ns-item { position: relative; }
@@ -695,9 +657,6 @@ body:has(.founder-page) #singularity { display: none !important; }
 .founder-page .tag:hover::after { left: 120%; }
 
 @media (prefers-reduced-motion: reduce) {
-  /* keep static glow layers; stop continuous movement (new ambience layers only) */
-  .founder-page .amb-glow, .founder-page.is-playing .g-red { animation: none; }
-  .founder-page .amb-streams { animation: none; }
   .founder-page.is-playing .trk.on { animation: none; }
   .founder-page.is-playing .seek-fill::after { animation: none; }
 }
