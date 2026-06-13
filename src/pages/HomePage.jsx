@@ -209,7 +209,6 @@ export default function HomePage() {
                   className="founder-link"
                   aria-label={`Open ${op.name}'s operator dossier — full founder page`}
                 >
-                  <span className="dossier-chip" aria-hidden="true">Open dossier <span className="ar">→</span></span>
                   <OperatorCard operator={op} />
                   <div className="dossier-cta">
                     <span>⌖</span> Open operator dossier <span className="ar">→</span>

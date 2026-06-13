@@ -3,62 +3,60 @@ import './OperatorCard.css';
 import MediaFrame from '../ui/MediaFrame';
 import { mediaSource } from '../../utils/media';
 
+const THEME_BY_ID = { 'HYP-OP-002': 'operator-navy' };
+
+/**
+ * OperatorCard — operator-dossier card used on the homepage roster and the
+ * Meet-the-Founders index. Frosted glass, persona-accented by `operator.theme`
+ * (operator-red / operator-navy), portrait + stat readout + focus chips.
+ * Display-only: it lives inside a <Link> on both pages, so no nested controls.
+ */
 export default function OperatorCard({ operator }) {
-  const isKesh = operator.id === 'HYP-OP-002';
-  const cardClass = isKesh ? 'op-card kesh-card' : 'op-card';
+  const theme = operator.theme || THEME_BY_ID[operator.id] || 'operator-red';
+  const hasImg = !!mediaSource(operator.image);
 
   return (
-    <motion.div 
-      className={cardClass}
-      whileHover={{ y: -8, scale: 1.02 }}
-      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+    <motion.article
+      className="op-card"
+      data-theme={theme}
+      whileHover={{ y: -6 }}
+      transition={{ type: 'spring', stiffness: 320, damping: 24 }}
     >
-      <div className="card-inner">
-        <div className="card-topbar">
-          <div className="card-stars">{operator.stars || "★ ★ ★ ★ ★"}</div>
-          <div className="card-attr" title={operator.attrTitle || "OPERATIONS"}>{operator.attr || "K"}</div>
-        </div>
-        <div className="card-name">{operator.name}</div>
-        
-        <div className="card-art" style={{
-            background: operator.artBackground || "linear-gradient(135deg,#0a1628 0%,#1a2744 50%,#0d1f3c 100%)",
-            display: "flex", alignItems: "center", justifyContent: "center"
-        }}>
-          {mediaSource(operator.image) ? (
-            <MediaFrame media={operator.image} alt={operator.name} className="card-media" />
-          ) : (
-            <div style={{ fontFamily: "var(--font-display)", fontSize: "96px", fontWeight: "900", color: "rgba(138,180,248,0.12)", letterSpacing: "-0.02em", userSelect: "none" }}>
-              {operator.attr || "K"}
-            </div>
-          )}
-          <div className="card-art-overlay"></div>
-        </div>
-        
-        <div className="card-typeline">
-          <span className="card-type-ornament">◈</span>
-          <span>{operator.typeLine}</span>
-          <span className="card-type-ornament">◈</span>
-        </div>
-        
-        <div className="card-textbox">
-          <p className="card-effect">{operator.description}</p>
-          {operator.focuses && (
-            <div className="card-focuses">
-              {operator.focuses.map((focus, idx) => (
-                <div key={idx} className="card-focus"><span className="focus-diamond">◆</span>{focus}</div>
-              ))}
-            </div>
-          )}
-          <div className="card-flavor">{operator.flavor}</div>
-        </div>
-        
-        <div className="card-stats">
-          {operator.stats && operator.stats.map((stat, idx) => (
-            <div key={idx} className="card-stat">{stat.label}<span>{stat.value}</span></div>
+      <span className="op-corner tl" /><span className="op-corner tr" />
+      <span className="op-corner bl" /><span className="op-corner br" />
+
+      <div className="op-card-top">
+        <span className="op-kicker">Operator dossier</span>
+        <span className="op-attr" title={operator.attrTitle || ''}>{operator.attr || 'H'}</span>
+      </div>
+
+      <div className="op-portrait" style={operator.artBackground ? { background: operator.artBackground } : undefined}>
+        {hasImg
+          ? <MediaFrame media={operator.image} alt={operator.name} className="op-media" />
+          : <span className="op-watermark" aria-hidden="true">{operator.attr || 'H'}</span>}
+        <span className="op-portrait-scrim" aria-hidden="true" />
+        {operator.stars && <span className="op-stars">{operator.stars}</span>}
+      </div>
+
+      <div className="op-body">
+        <h3 className="op-name">{operator.name}</h3>
+        {operator.typeLine && <div className="op-typeline">{operator.typeLine}</div>}
+        {operator.description && <p className="op-desc">{operator.description}</p>}
+        {operator.focuses && operator.focuses.length > 0 && (
+          <div className="op-focuses">
+            {operator.focuses.slice(0, 4).map((f, i) => <span className="op-focus" key={i}>{f}</span>)}
+          </div>
+        )}
+      </div>
+
+      {operator.stats && operator.stats.length > 0 && (
+        <div className="op-stats">
+          {operator.stats.map((s, i) => (
+            <div className="op-stat" key={i}><b>{s.value}</b><span>{s.label}</span></div>
           ))}
         </div>
-        <div className="card-serial">{operator.serial}</div>
-      </div>
-    </motion.div>
+      )}
+      {operator.serial && <div className="op-serial">{operator.serial}</div>}
+    </motion.article>
   );
 }
