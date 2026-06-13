@@ -9,12 +9,20 @@ const GLYPH = '/assets/founder/01.png';
 function CoverArt({ track }) {
   // Large player shows MOVING art when artAnimated is set (video or gif/webp),
   // else falls back to the static cover. (The mini player always uses static.)
+  // Animated sources aren't guaranteed square: render them object-fit:contain
+  // over a blurred static-art fill so off-aspect art letterboxes gracefully
+  // instead of getting center-cropped.
   const anim = track?.artAnimated;
   if (anim) {
-    if (VIDEO_RE.test(anim)) {
-      return <video src={anim} autoPlay loop muted playsInline poster={track.artStatic || undefined} />;
-    }
-    return <img src={anim} alt={`${track.title} cover`} />;
+    const media = VIDEO_RE.test(anim)
+      ? <video className="cover-fit" src={anim} autoPlay loop muted playsInline poster={track.artStatic || undefined} />
+      : <img className="cover-fit" src={anim} alt={`${track.title} cover`} />;
+    return (
+      <>
+        {track.artStatic && <img className="cover-blur" src={track.artStatic} alt="" aria-hidden="true" />}
+        {media}
+      </>
+    );
   }
   return <img src={track?.artStatic} alt={track ? `${track.title} cover` : 'cover art'} />;
 }

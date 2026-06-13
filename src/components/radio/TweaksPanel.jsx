@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const SWATCHES = [
   { key: 'red', color: '#E10000', title: 'Operator Red' },
@@ -8,59 +8,118 @@ const SWATCHES = [
 ];
 
 /**
- * Tweaks panel — the owner-facing control surface ported 1:1 from the design.
- * Accent (incl. ember), ambient intensity, card motion, gravity lattice
- * (off by default), film grain, and portrait visibility. State + persistence
- * live in FounderPage; this is the presentational panel + gear toggle.
+ * Console tuning drawer — the operator-facing display controls.
+ * Docked off-screen on the left edge (a thin tab stays visible) so it costs
+ * no space on mobile; a one-time hint bounce on page visit signals it exists.
+ * Accessibility-first: real dialog semantics, focus moved in on open, Escape
+ * and scrim close, full keyboard operability, generous touch targets.
  */
 export default function TweaksPanel({ tweaks, onChange }) {
   const [open, setOpen] = useState(false);
+  const [hint, setHint] = useState(false);
+  const drawerRef = useRef(null);
+  const tabRef = useRef(null);
+
+  // one-time clue bounce shortly after the page mounts (skipped for reduced motion)
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const t1 = setTimeout(() => setHint(true), 1600);
+    const t2 = setTimeout(() => setHint(false), 4400);
+    return () => { clearTimeout(t1); clearTimeout(t2); };
+  }, []);
+
+  // focus management: move focus into the drawer on open, restore on close
+  useEffect(() => {
+    if (open) drawerRef.current?.querySelector('button, input, [tabindex]')?.focus();
+    else tabRef.current?.focus({ preventScroll: true });
+  }, [open]);
+
+  // Escape closes from anywhere inside
+  const onKeyDown = (e) => { if (e.key === 'Escape') setOpen(false); };
 
   return (
     <>
-      <button className="fp-gear" aria-label="Tweaks" title="Tweaks" onClick={() => setOpen((o) => !o)}>
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6">
-          <circle cx="12" cy="12" r="3" />
-          <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+      <button
+        ref={tabRef}
+        className={`fp-dock-tab${hint && !open ? ' hint' : ''}${open ? ' is-open' : ''}`}
+        aria-expanded={open}
+        aria-controls="fp-console-drawer"
+        aria-label={open ? 'Close display console' : 'Open display console'}
+        title="Display console"
+        onClick={() => setOpen((o) => !o)}
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true">
+          <path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3" />
+          <path d="M1.5 14h5M9.5 8h5M17.5 16h5" />
         </svg>
+        <span className="fp-dock-label">Console</span>
       </button>
 
-      {open && (
-        <div className="fp-tweaks" role="dialog" aria-label="Tweaks">
-          <div className="th"><span>Tweaks</span><button onClick={() => setOpen(false)} aria-label="Close">×</button></div>
+      {open && <div className="fp-drawer-scrim" onClick={() => setOpen(false)} aria-hidden="true" />}
 
-          <div className="fp-tw">
-            <div className="lbl">Accent</div>
-            <div className="fp-swatches">
-              {SWATCHES.map((s) => (
-                <button key={s.key} className={`fp-sw${tweaks.accent === s.key ? ' on' : ''}`} style={{ background: s.color }}
-                  title={s.title} aria-label={s.title} onClick={() => onChange('accent', s.key)} />
-              ))}
-            </div>
+      <aside
+        id="fp-console-drawer"
+        ref={drawerRef}
+        className={`fp-drawer${open ? ' open' : ''}`}
+        role="dialog"
+        aria-label="Display console — visual tuning"
+        aria-hidden={!open}
+        onKeyDown={onKeyDown}
+      >
+        <header className="fp-drawer-head">
+          <div>
+            <strong>Display console</strong>
+            <span>Visual tuning · saved on this device</span>
           </div>
+          <button className="fp-drawer-close" onClick={() => setOpen(false)} aria-label="Close console">×</button>
+        </header>
 
-          <div className="fp-tw">
-            <div className="lbl">Ambient intensity <span className="val">{tweaks.amb}%</span></div>
-            <input className="fp-range" type="range" min="0" max="160" step="10" value={tweaks.amb}
-              onChange={(e) => onChange('amb', Number(e.target.value))} aria-label="Ambient intensity" />
+        <section className="fp-ctl" aria-labelledby="fp-ctl-accent">
+          <h3 id="fp-ctl-accent">Signal color</h3>
+          <div className="fp-accent-row" role="radiogroup" aria-labelledby="fp-ctl-accent">
+            {SWATCHES.map((s) => (
+              <button
+                key={s.key}
+                role="radio"
+                aria-checked={tweaks.accent === s.key}
+                aria-label={s.title}
+                className={`fp-accent-chip${tweaks.accent === s.key ? ' on' : ''}`}
+                onClick={() => onChange('accent', s.key)}
+              >
+                <i style={{ background: s.color }} aria-hidden="true" />
+                <span>{s.title.split(' ').pop()}</span>
+              </button>
+            ))}
           </div>
+        </section>
 
-          <div className="fp-tw">
-            <div className="lbl">Card motion</div>
-            <div className="fp-seg">
-              <button className={tweaks.cards === 'float' ? 'on' : ''} onClick={() => onChange('cards', 'float')}>Float</button>
-              <button className={tweaks.cards === 'still' ? 'on' : ''} onClick={() => onChange('cards', 'still')}>Still</button>
-            </div>
-          </div>
+        <section className="fp-ctl">
+          <label htmlFor="fp-amb-range"><h3>Ambience level <output htmlFor="fp-amb-range">{tweaks.amb}%</output></h3></label>
+          <input
+            id="fp-amb-range"
+            className="fp-range"
+            type="range" min="0" max="160" step="10"
+            value={tweaks.amb}
+            onChange={(e) => onChange('amb', Number(e.target.value))}
+            aria-valuetext={`${tweaks.amb} percent`}
+          />
+        </section>
 
-          <div className="fp-tw">
-            <div className="lbl">Display</div>
-            <label className="fp-toggle"><input type="checkbox" checked={tweaks.lattice} onChange={(e) => onChange('lattice', e.target.checked)} /> Gravity lattice</label>
-            <label className="fp-toggle"><input type="checkbox" checked={tweaks.grain} onChange={(e) => onChange('grain', e.target.checked)} /> Film grain</label>
-            <label className="fp-toggle"><input type="checkbox" checked={tweaks.portrait} onChange={(e) => onChange('portrait', e.target.checked)} /> Show portrait</label>
+        <section className="fp-ctl" aria-labelledby="fp-ctl-motion">
+          <h3 id="fp-ctl-motion">Card motion</h3>
+          <div className="fp-switch-row" role="radiogroup" aria-labelledby="fp-ctl-motion">
+            <button role="radio" aria-checked={tweaks.cards === 'float'} className={tweaks.cards === 'float' ? 'on' : ''} onClick={() => onChange('cards', 'float')}>Drift</button>
+            <button role="radio" aria-checked={tweaks.cards === 'still'} className={tweaks.cards === 'still' ? 'on' : ''} onClick={() => onChange('cards', 'still')}>Still</button>
           </div>
-        </div>
-      )}
+        </section>
+
+        <section className="fp-ctl" aria-labelledby="fp-ctl-layers">
+          <h3 id="fp-ctl-layers">Layers</h3>
+          <label className="fp-line"><input type="checkbox" checked={tweaks.lattice} onChange={(e) => onChange('lattice', e.target.checked)} /> <span>Gravity wells</span></label>
+          <label className="fp-line"><input type="checkbox" checked={tweaks.grain} onChange={(e) => onChange('grain', e.target.checked)} /> <span>Film grain</span></label>
+          <label className="fp-line"><input type="checkbox" checked={tweaks.portrait} onChange={(e) => onChange('portrait', e.target.checked)} /> <span>Operator portrait</span></label>
+        </section>
+      </aside>
     </>
   );
 }

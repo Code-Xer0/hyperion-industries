@@ -26,9 +26,9 @@ const A = (f) => `/assets/founder/${f}`;
 const SUBSTACK = 'https://victoramani.substack.com/';
 
 const TW_KEY = 'hyperion_founder_tweaks';
-// Gravity lattice OFF by default (owner asked to drop the wiregrid); it stays
-// available as a Tweaks toggle. Card float + grain stay on — the alive feel.
-const DEFAULT_TWEAKS = { accent: 'red', amb: 100, cards: 'float', grain: true, lattice: false, portrait: true };
+// "lattice" now renders gravity WELLS only (the wire-grid is gone for good —
+// operator directive); wells default on. Card float + grain stay on.
+const DEFAULT_TWEAKS = { accent: 'red', amb: 100, cards: 'float', grain: true, lattice: true, portrait: true };
 const ACCENTS = {
   red:     { a: '#E10000', b: '#FF2E2E', dim: 'rgba(225,0,0,0.14)',   muted: 'rgba(225,0,0,0.06)',   glow: 'rgba(225,0,0,0.28)',   bd: 'rgba(225,0,0,0.30)', bd2: 'rgba(225,0,0,0.55)' },
   gold:    { a: '#D4AF37', b: '#F0C94A', dim: 'rgba(212,175,55,0.16)', muted: 'rgba(212,175,55,0.07)', glow: 'rgba(212,175,55,0.28)', bd: 'rgba(212,175,55,0.32)', bd2: 'rgba(212,175,55,0.6)' },
@@ -83,6 +83,14 @@ export default function FounderPage() {
   });
   useEffect(() => { try { localStorage.setItem(TW_KEY, JSON.stringify(tweaks)); } catch { /* ignore */ } }, [tweaks]);
   const setTweak = (k, v) => setTweaks((t) => ({ ...t, [k]: v }));
+
+  // What-I-build cards: collapsed preview → tap/click to expand (multi-open)
+  const [openBuild, setOpenBuild] = useState(() => new Set());
+  const toggleBuild = (i) => setOpenBuild((prev) => {
+    const n = new Set(prev);
+    if (n.has(i)) n.delete(i); else n.add(i);
+    return n;
+  });
 
   useEffect(() => { window.scrollTo(0, 0); }, [slug]);
   useEffect(() => { if (slug === 'victor-amani') logEvent('visit', { page: 'founder/victor-amani', ref: document.referrer || '' }); }, [slug]);
@@ -208,22 +216,41 @@ export default function FounderPage() {
             </div>
             <div className="sx-cardgrid">
               {[
-                ['Operator Systems', '01 · Operator', 'Human-centered control surfaces for people carrying active state across fragmented tools.', <><circle cx="12" cy="8" r="4" /><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7" /></>],
-                ['Operational Systems', '02 · Operational', 'Machine, agent, archive, and process layers that govern behavior, preserve state, and expose authority.', <><rect x="3" y="4" width="18" height="6" rx="1.5" /><rect x="3" y="14" width="18" height="6" rx="1.5" /><path d="M7 7h.01M7 17h.01" /></>],
-                ['Governed Memory', '03 · Memory', 'Memory is not context bloat. It is source-anchored recall, provenance, and controlled retrieval.', <><ellipse cx="12" cy="5.5" rx="8" ry="3" /><path d="M4 5.5v13c0 1.7 3.6 3 8 3s8-1.3 8-3v-13M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3" /></>],
-                ['Local-First Custody', '04 · Custody', 'The operator should know what is local, what is remote, what is remembered, what is approved, and what is allowed to leave.', <><path d="M12 2 4 6v6c0 5 3.4 8.6 8 10 4.6-1.4 8-5 8-10V6l-8-4z" /><path d="M9.5 12l1.8 1.8L15 10" /></>],
-                ['Agentic Governance', '05 · Governance', 'AI can assist, propose, route, and accelerate. High-consequence mutation belongs behind gates.', <><circle cx="6" cy="6" r="2.5" /><circle cx="6" cy="18" r="2.5" /><circle cx="18" cy="12" r="2.5" /><path d="M8.5 6H13a3 3 0 0 1 3 3v0M8.5 18H13a3 3 0 0 0 3-3v0" /></>],
-                ['Continuity Infrastructure', '06 · Continuity', 'Systems for preserving the thread across devices, documents, agents, people, and time.', <><path d="M7 9a3 3 0 1 0 0 6h2.5M17 9a3 3 0 1 1 0 6h-2.5M9.5 12h5" /></>],
-              ].map(([title, sub, body, paths]) => (
-                <article className="sx-card hoverable" key={sub}>
-                  <span className="sx-card-trace" />
-                  <div className="sx-card-head">
-                    <div className="sx-glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">{paths}</svg></div>
-                    <div className="sx-card-id"><div className="sx-card-title">{title}</div><div className="sx-card-sub">{sub}</div></div>
-                  </div>
-                  <div className="sx-card-body"><p>{body}</p></div>
-                </article>
-              ))}
+                ['Operator Systems', '01 · Operator', 'Human-centered control surfaces for people carrying active state across fragmented tools.', 'Surfaces: operator consoles · dashboards · the founder card itself.', <><circle cx="12" cy="8" r="4" /><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7" /></>],
+                ['Operational Systems', '02 · Operational', 'Machine, agent, archive, and process layers that govern behavior, preserve state, and expose authority.', 'Surfaces: TAL.OS substrate · Hyperion Connect mesh · agent runtimes.', <><rect x="3" y="4" width="18" height="6" rx="1.5" /><rect x="3" y="14" width="18" height="6" rx="1.5" /><path d="M7 7h.01M7 17h.01" /></>],
+                ['Governed Memory', '03 · Memory', 'Memory is not context bloat. It is source-anchored recall, provenance, and controlled retrieval.', 'Surfaces: MNEM.OS continuity engine · CHRON.OS archive intelligence.', <><ellipse cx="12" cy="5.5" rx="8" ry="3" /><path d="M4 5.5v13c0 1.7 3.6 3 8 3s8-1.3 8-3v-13M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3" /></>],
+                ['Local-First Custody', '04 · Custody', 'The operator should know what is local, what is remote, what is remembered, what is approved, and what is allowed to leave.', 'Doctrine: the classification ladder below — Sovereign through Public.', <><path d="M12 2 4 6v6c0 5 3.4 8.6 8 10 4.6-1.4 8-5 8-10V6l-8-4z" /><path d="M9.5 12l1.8 1.8L15 10" /></>],
+                ['Agentic Governance', '05 · Governance', 'AI can assist, propose, route, and accelerate. High-consequence mutation belongs behind gates.', 'Doctrine: read ≠ write · write ≠ run · run ≠ publish.', <><circle cx="6" cy="6" r="2.5" /><circle cx="6" cy="18" r="2.5" /><circle cx="18" cy="12" r="2.5" /><path d="M8.5 6H13a3 3 0 0 1 3 3v0M8.5 18H13a3 3 0 0 0 3-3v0" /></>],
+                ['Continuity Infrastructure', '06 · Continuity', 'Systems for preserving the thread across devices, documents, agents, people, and time.', 'Surfaces: KAIR.OS timing · SCEN.OS context · the thread across devices.', <><path d="M7 9a3 3 0 1 0 0 6h2.5M17 9a3 3 0 1 1 0 6h-2.5M9.5 12h5" /></>],
+              ].map(([title, sub, body, more, paths], i) => {
+                const isOpen = openBuild.has(i);
+                return (
+                  <article className={`sx-card hoverable fp-xcard${isOpen ? ' is-open' : ''}`} key={sub}>
+                    <span className="sx-card-trace" />
+                    <button
+                      type="button"
+                      className="fp-xhead"
+                      aria-expanded={isOpen}
+                      aria-controls={`fp-build-${i}`}
+                      onClick={() => toggleBuild(i)}
+                    >
+                      <div className="sx-glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">{paths}</svg></div>
+                      <div className="sx-card-id"><div className="sx-card-title">{title}</div><div className="sx-card-sub">{sub}</div></div>
+                      <span className="fp-xchev" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M6 9l6 6 6-6" /></svg>
+                      </span>
+                    </button>
+                    <div id={`fp-build-${i}`} className="fp-xbody" role="region" aria-label={`${title} — details`}>
+                      <div className="fp-xbody-inner">
+                        <div className="sx-card-body">
+                          <p>{body}</p>
+                          <p className="fp-xmore">{more}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </article>
+                );
+              })}
             </div>
           </div>
         </section>
