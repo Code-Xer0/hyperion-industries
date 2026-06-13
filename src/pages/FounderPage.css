@@ -75,6 +75,12 @@
   --hair:  rgba(255,255,255,0.07);
   --hair2: rgba(255,255,255,0.15);
 
+  /* ── //H¥PE persona signal colors (Kairo = sovereign gold, the one above) ── */
+  --p-operator: #FF2E2E;
+  --p-lilith: #b06cff;
+  --p-eva: #e6ecff;
+  --p-kairo: #D4AF37;
+
   position: relative;
   z-index: 1;
   background: var(--bg);
@@ -206,7 +212,7 @@ body:has(.founder-page) #singularity { display: none !important; }
 .founder-page .hero-inner { position: relative; z-index: 2; max-width: var(--maxw); margin: 0 auto; width: 100%; }
 .founder-page .hero-grid { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 48px; align-items: center; }
 .founder-page .hero-glyph-wrap { display: flex; align-items: center; gap: 18px; margin-bottom: 30px; }
-.founder-page .hero-glyph { width: 64px; height: 64px; object-fit: contain; mix-blend-mode: screen; filter: drop-shadow(0 0 22px var(--accent-glow)); }
+.founder-page .hero-glyph { width: 64px; height: 64px; object-fit: contain; filter: drop-shadow(0 0 22px var(--accent-glow)); }
 .founder-page .hero-id { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.2em; color: var(--text-muted); text-transform: uppercase; line-height: 1.7; }
 .founder-page .hero-id b { color: var(--accent-bright); font-weight: 500; }
 .founder-page .hero-name {
@@ -223,13 +229,27 @@ body:has(.founder-page) #singularity { display: none !important; }
 .founder-page .hero-meta span { display: inline-flex; align-items: center; gap: 9px; }
 .founder-page .hero-meta span::before { content: ''; width: 5px; height: 5px; background: var(--accent); border-radius: 1px; transform: rotate(45deg); }
 .founder-page .hero-aside { width: 300px; display: none; }
-.founder-page .hero-creed { border: 1px solid var(--border); background: rgba(13,14,22,0.6); backdrop-filter: blur(8px); border-radius: var(--r-xl); padding: 26px 24px; }
-.founder-page .hero-creed .ch { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.2em; color: var(--text-muted); text-transform: uppercase; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
-.founder-page .hero-creed .ch::before { content:''; width:6px; height:6px; border-radius:50%; background: var(--accent); box-shadow: 0 0 8px var(--accent); }
-.founder-page .hero-creed ul { list-style: none; display: flex; flex-direction: column; gap: 11px; }
-.founder-page .hero-creed li { font-family: var(--font-mono); font-size: 12.5px; color: var(--silver); line-height: 1.4; padding-left: 18px; position: relative; }
-.founder-page .hero-creed li::before { content: '\203A'; position: absolute; left: 0; color: var(--accent); }
+/* operator creed — a sworn artifact, not a bullet list */
+.founder-page .hero-creed { position: relative; overflow: hidden; border: 1px solid var(--hair2);
+  background: var(--sx-glass2); backdrop-filter: blur(26px) saturate(1.2); -webkit-backdrop-filter: blur(26px) saturate(1.2);
+  border-radius: 14px; padding: 26px 24px 22px;
+  box-shadow: 0 18px 54px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.06); }
+.founder-page .hero-creed .creed-mark { position: absolute; right: -34px; top: -26px; width: 150px; opacity: 0.08;
+  transform: rotate(10deg); pointer-events: none; }
+.founder-page .hero-creed .ch { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.2em; color: var(--text-muted);
+  text-transform: uppercase; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.founder-page .hero-creed .ch > span:first-child { display: inline-flex; align-items: center; gap: 8px; }
+.founder-page .hero-creed .ch > span:first-child::before { content:''; width:6px; height:6px; border-radius:50%; background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+.founder-page .hero-creed .creed-id { color: var(--gold); letter-spacing: 0.16em; }
+.founder-page .hero-creed ul { list-style: none; display: flex; flex-direction: column; }
+.founder-page .hero-creed li { display: flex; align-items: baseline; gap: 11px; font-family: var(--font-mono);
+  font-size: 12.5px; color: var(--silver); line-height: 1.45; padding: 9px 0; border-bottom: 1px solid var(--hair); }
+.founder-page .hero-creed li:last-of-type { border-bottom: none; }
+.founder-page .hero-creed li i { font-style: normal; font-family: var(--font-jb); font-size: 10px; color: var(--accent-bright); flex-shrink: 0; }
 .founder-page .hero-creed li b { color: var(--text); font-weight: 500; }
+.founder-page .hero-creed .creed-foot { margin-top: 14px; padding-top: 13px; border-top: 1px solid var(--accent-border);
+  font-family: var(--font-wordmark); font-size: 13px; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase;
+  color: var(--accent-bright); text-shadow: 0 0 18px var(--accent-glow); }
 @media (min-width: 980px) { .founder-page .hero-aside { display: block; } }
 .founder-page .scroll-cue { position: absolute; bottom: 26px; left: 50%; transform: translateX(-50%); z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.24em; color: var(--text-muted); text-transform: uppercase; }
 .founder-page .scroll-cue .ln { width: 1px; height: 38px; background: linear-gradient(var(--accent), transparent); animation: fp-cue 2.2s var(--ease) infinite; }
@@ -341,14 +361,32 @@ body:has(.founder-page) #singularity { display: none !important; }
 .founder-page .post h3 { font-family: var(--font-head); font-size: 17px; font-weight: 600; line-height: 1.28; color: var(--text); }
 .founder-page .post .more { font-family: var(--font-mono); font-size: 11.5px; color: var(--accent-bright); letter-spacing: 0.06em; margin-top: auto; display: inline-flex; gap: 6px; align-items: center; }
 
-/* ════════ LETTER ════════ */
-.founder-page .letter { max-width: 760px; }
-.founder-page .letter p { font-size: 16.5px; color: var(--text-dim); font-weight: 300; line-height: 1.78; margin-bottom: 22px; text-wrap: pretty; }
+/* ════════ LETTER — from the operator's desk ════════
+   Deliberate, sincere, frosted: letterhead + serial, drop cap, sealed with
+   the sigil stamp. The one card on the page allowed to feel personal. */
+.founder-page .letter { position: relative; max-width: 760px; overflow: hidden;
+  background: rgba(19,14,13,0.88); backdrop-filter: blur(32px) saturate(1.25); -webkit-backdrop-filter: blur(32px) saturate(1.25);
+  border: 1px solid var(--hair2); border-top: 2px solid var(--accent);
+  border-radius: 18px; padding: clamp(28px, 4.5vw, 52px);
+  box-shadow: 0 30px 90px rgba(0,0,0,0.6), 0 0 70px var(--accent-muted), inset 0 1px 0 rgba(255,255,255,0.06); }
+.founder-page .letter-head { display: flex; align-items: center; gap: 16px; margin-bottom: 30px;
+  padding-bottom: 20px; border-bottom: 1px solid var(--hair); }
+.founder-page .letter-mark { width: 44px; height: 44px; flex-shrink: 0; filter: drop-shadow(0 0 14px var(--accent-glow)); }
+.founder-page .letter-eyebrow { font-family: var(--font-wordmark); font-size: 12px; font-weight: 700;
+  letter-spacing: 0.2em; text-transform: uppercase; color: var(--text); }
+.founder-page .letter-serial { margin-top: 5px; font-family: var(--font-mono); font-size: 10px;
+  letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-muted); }
+.founder-page .letter p { position: relative; z-index: 1; font-size: 16.5px; color: var(--text-dim); font-weight: 300; line-height: 1.85; margin-bottom: 24px; text-wrap: pretty; }
 .founder-page .letter p b { color: var(--text); font-weight: 500; }
 .founder-page .letter .open { font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.08em; color: var(--silver); margin-bottom: 26px; }
-.founder-page .sig { margin-top: 36px; padding-top: 26px; border-top: 1px solid var(--border); }
-.founder-page .sig-typed { font-family: var(--font-mono); font-size: 14px; letter-spacing: 0.06em; color: var(--text); }
-.founder-page .sig-typed .sub { color: var(--text-muted); display: block; margin-top: 5px; font-size: 11.5px; letter-spacing: 0.1em; }
+.founder-page .letter .lead-p::first-letter { float: left; font-family: var(--font-head); font-weight: 600;
+  font-size: 52px; line-height: 0.86; color: var(--accent-bright); margin: 5px 12px 0 0;
+  text-shadow: 0 0 24px var(--accent-glow); }
+.founder-page .sig { position: relative; z-index: 1; margin-top: 38px; padding-top: 26px; border-top: 1px solid var(--border); }
+.founder-page .sig-typed { font-family: var(--font-mono); font-size: 15px; letter-spacing: 0.06em; color: var(--text); }
+.founder-page .sig-typed .sub { color: var(--text-muted); display: block; margin-top: 6px; font-size: 11.5px; letter-spacing: 0.1em; }
+.founder-page .sig-stamp { position: absolute; right: clamp(18px, 4vw, 44px); bottom: 4px; width: 118px;
+  opacity: 0.12; transform: rotate(-9deg); pointer-events: none; }
 
 /* ════════ INQUIRIES ════════ */
 .founder-page .inq-layout { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(40px,5vw,72px); align-items: start; }
@@ -404,7 +442,7 @@ body:has(.founder-page) #singularity { display: none !important; }
 .founder-page .radio-shell { border: 1px solid var(--border2); border-radius: var(--r-2xl); overflow: hidden; background: radial-gradient(1200px 400px at 80% -10%, var(--accent-muted), transparent 60%), var(--surface); box-shadow: 0 40px 120px rgba(0,0,0,0.6); }
 .founder-page .radio-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 22px; border-bottom: 1px solid var(--border); background: var(--bg3); font-family: var(--font-mono); }
 .founder-page .radio-brand { display: flex; align-items: center; gap: 12px; }
-.founder-page .radio-brand img { width: 26px; height: 26px; object-fit: contain; mix-blend-mode: screen; }
+.founder-page .radio-brand img { width: 26px; height: 26px; object-fit: contain; filter: drop-shadow(0 0 8px var(--accent-glow)); }
 .founder-page .radio-brand .rb-name { font-family: var(--font-wordmark); font-weight: 800; font-size: 14px; letter-spacing: 0.16em; color: var(--text); }
 .founder-page .radio-brand .rb-name .accent { color: var(--accent-bright); }
 .founder-page .radio-status { display: flex; align-items: center; gap: 9px; font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-muted); }
@@ -425,6 +463,12 @@ body:has(.founder-page) #singularity { display: none !important; }
 .founder-page .np-eyebrow { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em; color: var(--accent); text-transform: uppercase; }
 .founder-page .np-title { font-family: var(--font-head); font-weight: 600; font-size: 22px; line-height: 1.12; color: var(--text); letter-spacing: -0.01em; }
 .founder-page .np-artist { font-family: var(--font-mono); font-size: 12.5px; color: var(--text-dim); letter-spacing: 0.04em; }
+.founder-page .np-artist[data-persona="operator"] { color: var(--p-operator); }
+.founder-page .np-artist[data-persona="lilith"] { color: var(--p-lilith); }
+.founder-page .np-artist[data-persona="eva"] { color: var(--p-eva); }
+.founder-page .np-credit { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.1em;
+  text-transform: uppercase; color: var(--text-muted); margin-top: 2px; }
+.founder-page .np-credit b { color: var(--p-kairo); font-weight: 500; }
 .founder-page .seek { display: flex; flex-direction: column; gap: 8px; }
 .founder-page .seek-bar { height: 6px; border-radius: 3px; background: var(--surface2); position: relative; cursor: pointer; }
 .founder-page .seek-fill { position: absolute; inset: 0 auto 0 0; width: 0%; background: linear-gradient(90deg, var(--accent), var(--accent-bright)); border-radius: 3px; }
@@ -454,7 +498,9 @@ body:has(.founder-page) #singularity { display: none !important; }
 .founder-page .trk:hover { background: var(--bg3); }
 .founder-page .trk.on { background: var(--accent-dim); border-color: var(--accent-border); }
 .founder-page .trk .trk-n { font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); text-align: center; }
-.founder-page .trk.on .trk-n { color: var(--accent-bright); }
+.founder-page .trk[data-persona="operator"] .trk-n { color: var(--p-operator); }
+.founder-page .trk[data-persona="lilith"] .trk-n { color: var(--p-lilith); }
+.founder-page .trk[data-persona="eva"] .trk-n { color: var(--p-eva); }
 .founder-page .trk .trk-art { width: 52px; height: 52px; border-radius: var(--r-sm); overflow: hidden; border: 1px solid var(--border); background:#000; position: relative; }
 .founder-page .trk .trk-art img { width: 100%; height: 100%; object-fit: cover; }
 .founder-page .trk .trk-art .eq { position: absolute; inset: 0; display: none; align-items: center; justify-content: center; gap: 2px; background: rgba(0,0,0,0.55); }
@@ -471,8 +517,16 @@ body:has(.founder-page) #singularity { display: none !important; }
 .founder-page .trk .trk-dl { color: var(--text-muted); display: grid; place-items: center; width: 28px; height: 28px; border-radius: 6px; transition: color var(--t-std), background var(--t-std); flex-shrink: 0; }
 .founder-page .trk .trk-dl:hover { color: var(--accent-bright); background: var(--accent-dim); }
 .founder-page .trk .trk-dl svg { width: 15px; height: 15px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
-.founder-page .radio-foot { padding: 14px 22px; border-top: 1px solid var(--border); background: var(--bg3); font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.04em; color: var(--text-muted); display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.founder-page .radio-foot .accent { color: var(--accent-bright); }
+.founder-page .radio-foot { padding: 14px 22px; border-top: 1px solid var(--border); background: var(--bg3); font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.04em; color: var(--text-muted); display: flex; align-items: center; justify-content: space-between; gap: 12px 18px; flex-wrap: wrap; }
+.founder-page .rf-brand { font-family: var(--font-wordmark); font-weight: 800; font-size: 12px; letter-spacing: 0.18em; color: var(--text); }
+.founder-page .rf-roster { display: inline-flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.founder-page .rf-m { display: inline-flex; align-items: center; gap: 7px; font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--silver); }
+.founder-page .rf-m i { width: 6px; height: 6px; border-radius: 50%; }
+.founder-page .rf-m[data-persona="operator"] i { background: var(--p-operator); box-shadow: 0 0 8px var(--p-operator); }
+.founder-page .rf-m[data-persona="lilith"] i { background: var(--p-lilith); box-shadow: 0 0 8px var(--p-lilith); }
+.founder-page .rf-m[data-persona="eva"] i { background: var(--p-eva); box-shadow: 0 0 8px var(--p-eva); }
+.founder-page .rf-m[data-persona="kairo"] { color: var(--p-kairo); }
+.founder-page .rf-m[data-persona="kairo"] i { background: var(--p-kairo); box-shadow: 0 0 8px var(--p-kairo); }
 
 /* ════════ AMBIENT — card traces + float (founder page only) ════════ */
 .founder-page[data-cards="float"] .sx-card,
@@ -560,7 +614,7 @@ body:has(.founder-page) #singularity { display: none !important; }
 .fp-reopen { position: fixed; right: 20px; bottom: 20px; z-index: 150; width: 52px; height: 52px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.15); background: rgba(20,16,15,0.86); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); box-shadow: 0 14px 40px rgba(0,0,0,0.6); cursor: pointer; display: none; place-items: center; padding: 0; overflow: hidden; transition: transform var(--t-std,220ms) cubic-bezier(0.2,0,0,1); }
 .fp-reopen.show { display: grid; }
 .fp-reopen:hover { transform: scale(1.06); }
-.fp-reopen img { width: 28px; height: 28px; object-fit: contain; mix-blend-mode: screen; filter: drop-shadow(0 0 8px rgba(225,0,0,0.28)); }
+.fp-reopen img { width: 28px; height: 28px; object-fit: contain; filter: drop-shadow(0 0 8px rgba(225,0,0,0.28)); }
 
 /* ════════ RESPONSIVE ════════ */
 @media (max-width: 1024px) {
@@ -698,26 +752,51 @@ body:has(.founder-page) #singularity { display: none !important; }
 .founder-page .fp-lit .fp-cursor-glow { opacity: 1; }
 .founder-page .fp-lit { border-color: var(--accent-border) !important; }
 
-/* ════════ EXPANDABLE PREVIEW CARDS (What I build) ════════
-   Collapsed = glyph + title (the preview); tap/click expands the dossier body.
-   Animates via grid-template-rows so height is content-driven and cheap. */
+/* ════════ DOSSIER PREVIEW CARDS → CENTER-STAGE LIGHTBOX ════════
+   Grid holds compact previews; the selected card lifts out (framer shared
+   layout) and lands centered over the dimmed page. Pacing: spring morph for
+   the card, content fades up a beat later; everything eases back on close. */
 .founder-page .fp-xhead { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 64px;
-  padding: 14px 16px; background: none; border: 0; border-bottom: 1px solid transparent;
-  color: inherit; font: inherit; text-align: left; cursor: pointer;
-  transition: border-color var(--t-std) var(--ease); }
-.founder-page .fp-xcard.is-open .fp-xhead { border-bottom-color: var(--hair); }
+  padding: 14px 16px; background: none; border: 0; border-bottom: 1px solid var(--hair);
+  color: inherit; font: inherit; text-align: left; cursor: pointer; }
 .founder-page .fp-xhead:focus-visible { outline: 2px solid var(--accent-bright); outline-offset: -4px; border-radius: 12px; }
-.founder-page .fp-xchev { margin-left: auto; flex-shrink: 0; width: 30px; height: 30px; border-radius: 8px;
+.founder-page .fp-xopen { margin-left: auto; flex-shrink: 0; width: 30px; height: 30px; border-radius: 50%;
   display: grid; place-items: center; color: var(--text-muted); border: 1px solid var(--hair);
-  transition: transform 0.3s var(--ease), color var(--t-std), border-color var(--t-std); }
-.founder-page .fp-xchev svg { width: 15px; height: 15px; }
-.founder-page .fp-xcard:hover .fp-xchev { color: var(--accent-bright); border-color: var(--accent-border); }
-.founder-page .fp-xcard.is-open .fp-xchev { transform: rotate(180deg); color: var(--accent-bright); }
-.founder-page .fp-xbody { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.34s var(--ease); }
-.founder-page .fp-xcard.is-open .fp-xbody { grid-template-rows: 1fr; }
-.founder-page .fp-xbody-inner { overflow: hidden; min-height: 0; }
+  transition: transform 0.3s var(--ease), color var(--t-std), border-color var(--t-std), background var(--t-std); }
+.founder-page .fp-xopen svg { width: 14px; height: 14px; }
+.founder-page .fp-xcard:hover .fp-xopen { color: #fff; border-color: var(--accent-border2); background: var(--accent-dim); transform: rotate(90deg); }
+.founder-page .fp-xpeek { padding: 12px 16px 15px; font-size: 13px; font-weight: 300; line-height: 1.55; color: var(--text-muted);
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .founder-page .fp-xmore { font-family: var(--font-mono); font-size: 11.5px; letter-spacing: 0.04em;
-  color: var(--text-muted); border-top: 1px solid var(--hair); padding-top: 11px; margin-top: 13px; }
+  color: var(--text-muted); border-top: 1px solid var(--hair); padding-top: 12px; margin-top: 16px; }
+
+.fp-stage-scrim { position: fixed; inset: 0; z-index: 300; background: rgba(6,4,4,0.66);
+  backdrop-filter: blur(7px) saturate(0.9); -webkit-backdrop-filter: blur(7px) saturate(0.9); }
+.fp-stage-wrap { position: fixed; inset: 0; z-index: 301; display: grid; place-items: center;
+  padding: clamp(14px, 4vw, 40px); overflow-y: auto; }
+.founder-page .fp-stage-card { position: relative; width: min(620px, 100%); max-height: min(82vh, 700px);
+  display: flex; flex-direction: column; overflow: hidden; border-radius: 18px;
+  background: var(--sx-glass2); backdrop-filter: blur(30px) saturate(1.25); -webkit-backdrop-filter: blur(30px) saturate(1.25);
+  border: 1px solid var(--accent-border); box-shadow: 0 50px 140px rgba(0,0,0,0.78), 0 0 60px var(--accent-muted), inset 0 1px 0 rgba(255,255,255,0.07); }
+.founder-page .fp-stage-head { display: flex; align-items: center; gap: 14px; padding: 20px 22px;
+  border-bottom: 1px solid var(--hair); flex-shrink: 0; }
+.founder-page .fp-stage-head .sx-glyph { width: 46px; height: 46px; }
+.founder-page .fp-stage-head .sx-card-title { font-size: 20px; }
+.founder-page .fp-stage-close { margin-left: auto; flex-shrink: 0; width: 40px; height: 40px; border-radius: 50%;
+  display: grid; place-items: center; color: var(--silver); border: 1px solid var(--hair2); background: var(--sx-inset);
+  cursor: pointer; transition: color var(--t-std), border-color var(--t-std), background var(--t-std); }
+.founder-page .fp-stage-close:hover { color: #fff; border-color: var(--accent-border2); background: var(--accent-dim); }
+.founder-page .fp-stage-close:focus-visible { outline: 2px solid var(--accent-bright); outline-offset: 2px; }
+.founder-page .fp-stage-close svg { width: 16px; height: 16px; }
+.founder-page .fp-stage-body { position: relative; padding: 24px 24px 20px; overflow-y: auto; }
+.founder-page .fp-stage-mark { position: absolute; right: -28px; top: -20px; width: 168px; opacity: 0.07;
+  pointer-events: none; transform: rotate(8deg); }
+.founder-page .fp-stage-lead { font-size: 16.5px; font-weight: 300; line-height: 1.7; color: var(--text-dim); text-wrap: pretty; }
+.founder-page .fp-stage-lead + .fp-xmore { margin-top: 18px; }
+.founder-page .fp-stage-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--hair); }
+.founder-page .fp-stage-hint { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--text-muted); }
 
 /* ════════ MICRO-POLISH — buttons, tracks, seek, badges ════════ */
 .founder-page .tbtn:active, .fp-mini .mp-btn:active { scale: 0.9; }

@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
 import operators from '../data/operators.json';
 import radioTracks from '../data/radio.json';
@@ -23,6 +24,7 @@ const hexToRgbStr = (hex) => {
 const PARTICLE_STYLE = { zIndex: 56, mixBlendMode: 'screen' };
 
 const A = (f) => `/assets/founder/${f}`;
+const MARK = '/assets/founder/hyperion-mark.svg';
 const SUBSTACK = 'https://victoramani.substack.com/';
 
 const TW_KEY = 'hyperion_founder_tweaks';
@@ -40,6 +42,17 @@ function accentVars(key) {
   return { '--accent': c.a, '--accent-bright': c.b, '--accent-dim': c.dim, '--accent-muted': c.muted, '--accent-glow': c.glow, '--accent-border': c.bd, '--accent-border2': c.bd2 };
 }
 
+/* What-I-build dossier cards (preview in grid → full card on the stage) */
+const BUILD_CARDS = [
+  { title: 'Operator Systems', sub: '01 · Operator', body: 'Human-centered control surfaces for people carrying active state across fragmented tools.', more: 'Surfaces: operator consoles · dashboards · the founder card itself.', icon: <><circle cx="12" cy="8" r="4" /><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7" /></> },
+  { title: 'Operational Systems', sub: '02 · Operational', body: 'Machine, agent, archive, and process layers that govern behavior, preserve state, and expose authority.', more: 'Surfaces: TAL.OS substrate · Hyperion Connect mesh · agent runtimes.', icon: <><rect x="3" y="4" width="18" height="6" rx="1.5" /><rect x="3" y="14" width="18" height="6" rx="1.5" /><path d="M7 7h.01M7 17h.01" /></> },
+  { title: 'Governed Memory', sub: '03 · Memory', body: 'Memory is not context bloat. It is source-anchored recall, provenance, and controlled retrieval.', more: 'Surfaces: MNEM.OS continuity engine · CHRON.OS archive intelligence.', icon: <><ellipse cx="12" cy="5.5" rx="8" ry="3" /><path d="M4 5.5v13c0 1.7 3.6 3 8 3s8-1.3 8-3v-13M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3" /></> },
+  { title: 'Local-First Custody', sub: '04 · Custody', body: 'The operator should know what is local, what is remote, what is remembered, what is approved, and what is allowed to leave.', more: 'Doctrine: the classification ladder below — Sovereign through Public.', icon: <><path d="M12 2 4 6v6c0 5 3.4 8.6 8 10 4.6-1.4 8-5 8-10V6l-8-4z" /><path d="M9.5 12l1.8 1.8L15 10" /></> },
+  { title: 'Agentic Governance', sub: '05 · Governance', body: 'AI can assist, propose, route, and accelerate. High-consequence mutation belongs behind gates.', more: 'Doctrine: read ≠ write · write ≠ run · run ≠ publish.', icon: <><circle cx="6" cy="6" r="2.5" /><circle cx="6" cy="18" r="2.5" /><circle cx="18" cy="12" r="2.5" /><path d="M8.5 6H13a3 3 0 0 1 3 3v0M8.5 18H13a3 3 0 0 0 3-3v0" /></> },
+  { title: 'Continuity Infrastructure', sub: '06 · Continuity', body: 'Systems for preserving the thread across devices, documents, agents, people, and time.', more: 'Surfaces: KAIR.OS timing · SCEN.OS context · the thread across devices.', icon: <><path d="M7 9a3 3 0 1 0 0 6h2.5M17 9a3 3 0 1 1 0 6h-2.5M9.5 12h5" /></> },
+];
+const STAGE_SPRING = { type: 'spring', stiffness: 230, damping: 27, mass: 0.9 };
+
 /* ── navy stub for founders without a full profile yet (e.g. Keshawn) ── */
 function StubFounder({ operator, theme }) {
   return (
@@ -53,7 +66,7 @@ function StubFounder({ operator, theme }) {
       <section className="fp-hero">
         <div className="hero-inner">
           <div className="hero-glyph-wrap">
-            <img src={A('01.png')} alt="Hyperion glyph" className="hero-glyph" />
+            <img src={MARK} alt="Hyperion sigil" className="hero-glyph" />
             <div className="hero-id">HYPERION INDUSTRIES<br /><b>Operator Profile · Founder</b></div>
           </div>
           <h1 className="hero-name">{operator.name}</h1>
@@ -84,13 +97,27 @@ export default function FounderPage() {
   useEffect(() => { try { localStorage.setItem(TW_KEY, JSON.stringify(tweaks)); } catch { /* ignore */ } }, [tweaks]);
   const setTweak = (k, v) => setTweaks((t) => ({ ...t, [k]: v }));
 
-  // What-I-build cards: collapsed preview → tap/click to expand (multi-open)
-  const [openBuild, setOpenBuild] = useState(() => new Set());
-  const toggleBuild = (i) => setOpenBuild((prev) => {
-    const n = new Set(prev);
-    if (n.has(i)) n.delete(i); else n.add(i);
-    return n;
-  });
+  // What-I-build cards: preview cards in the grid; the selected card lifts out
+  // into a centered lightbox over a dimmed page (operator-chosen pattern).
+  const [stage, setStage] = useState(null);
+  const stageReturnRef = useRef(null);
+  const reduceMotion = useReducedMotion();
+  const openStage = (i, evt) => { stageReturnRef.current = evt?.currentTarget || null; setStage(i); };
+  const closeStage = () => {
+    setStage(null);
+    requestAnimationFrame(() => stageReturnRef.current?.focus?.({ preventScroll: true }));
+  };
+
+  // scroll lock + Escape while the stage is open
+  useEffect(() => {
+    if (stage == null) return;
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const onKey = (e) => { if (e.key === 'Escape') closeStage(); };
+    window.addEventListener('keydown', onKey);
+    return () => { document.body.style.overflow = prevOverflow; window.removeEventListener('keydown', onKey); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [stage]);
 
   useEffect(() => { window.scrollTo(0, 0); }, [slug]);
   useEffect(() => { if (slug === 'victor-amani') logEvent('visit', { page: 'founder/victor-amani', ref: document.referrer || '' }); }, [slug]);
@@ -147,7 +174,7 @@ export default function FounderPage() {
             <div className="hero-grid">
               <div className="hero-text">
                 <div className="hero-glyph-wrap">
-                  <img src={A('01.png')} alt="Hyperion glyph" className="hero-glyph" />
+                  <img src={MARK} alt="Hyperion sigil" className="hero-glyph" />
                   <div className="hero-id">HYPERION INDUSTRIES<br /><b>Operator Profile · Founder</b></div>
                 </div>
                 <h1 className="hero-name">Kushinda Furaha&nbsp;Zeleke</h1>
@@ -163,15 +190,19 @@ export default function FounderPage() {
                 </div>
               </div>
               <aside className="hero-aside">
-                <div className="hero-creed hud">
-                  <div className="ch">Operator Creed</div>
+                <div className="hero-creed">
+                  <span className="portrait-corner tl" /><span className="portrait-corner tr" />
+                  <span className="portrait-corner bl" /><span className="portrait-corner br" />
+                  <img className="creed-mark" src={MARK} alt="" aria-hidden="true" />
+                  <div className="ch"><span>Operator Creed</span><span className="creed-id">OP-00</span></div>
                   <ul>
-                    <li>I write state with <b>intent</b>.</li>
-                    <li>I execute action with <b>authority</b>.</li>
-                    <li>I protect privacy by <b>design</b>.</li>
-                    <li>I control what remains <b>me</b>.</li>
-                    <li>I engineer the <b>future</b>.</li>
+                    <li><i>01</i><span>I write state with <b>intent</b>.</span></li>
+                    <li><i>02</i><span>I execute action with <b>authority</b>.</span></li>
+                    <li><i>03</i><span>I protect privacy by <b>design</b>.</span></li>
+                    <li><i>04</i><span>I control what remains <b>me</b>.</span></li>
+                    <li><i>05</i><span>I engineer the <b>future</b>.</span></li>
                   </ul>
+                  <div className="creed-foot">I operate.</div>
                 </div>
               </aside>
             </div>
@@ -215,43 +246,86 @@ export default function FounderPage() {
               <h2 className="section-title">Six layers of one<br />continuous runtime.</h2>
             </div>
             <div className="sx-cardgrid">
-              {[
-                ['Operator Systems', '01 · Operator', 'Human-centered control surfaces for people carrying active state across fragmented tools.', 'Surfaces: operator consoles · dashboards · the founder card itself.', <><circle cx="12" cy="8" r="4" /><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7" /></>],
-                ['Operational Systems', '02 · Operational', 'Machine, agent, archive, and process layers that govern behavior, preserve state, and expose authority.', 'Surfaces: TAL.OS substrate · Hyperion Connect mesh · agent runtimes.', <><rect x="3" y="4" width="18" height="6" rx="1.5" /><rect x="3" y="14" width="18" height="6" rx="1.5" /><path d="M7 7h.01M7 17h.01" /></>],
-                ['Governed Memory', '03 · Memory', 'Memory is not context bloat. It is source-anchored recall, provenance, and controlled retrieval.', 'Surfaces: MNEM.OS continuity engine · CHRON.OS archive intelligence.', <><ellipse cx="12" cy="5.5" rx="8" ry="3" /><path d="M4 5.5v13c0 1.7 3.6 3 8 3s8-1.3 8-3v-13M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3" /></>],
-                ['Local-First Custody', '04 · Custody', 'The operator should know what is local, what is remote, what is remembered, what is approved, and what is allowed to leave.', 'Doctrine: the classification ladder below — Sovereign through Public.', <><path d="M12 2 4 6v6c0 5 3.4 8.6 8 10 4.6-1.4 8-5 8-10V6l-8-4z" /><path d="M9.5 12l1.8 1.8L15 10" /></>],
-                ['Agentic Governance', '05 · Governance', 'AI can assist, propose, route, and accelerate. High-consequence mutation belongs behind gates.', 'Doctrine: read ≠ write · write ≠ run · run ≠ publish.', <><circle cx="6" cy="6" r="2.5" /><circle cx="6" cy="18" r="2.5" /><circle cx="18" cy="12" r="2.5" /><path d="M8.5 6H13a3 3 0 0 1 3 3v0M8.5 18H13a3 3 0 0 0 3-3v0" /></>],
-                ['Continuity Infrastructure', '06 · Continuity', 'Systems for preserving the thread across devices, documents, agents, people, and time.', 'Surfaces: KAIR.OS timing · SCEN.OS context · the thread across devices.', <><path d="M7 9a3 3 0 1 0 0 6h2.5M17 9a3 3 0 1 1 0 6h-2.5M9.5 12h5" /></>],
-              ].map(([title, sub, body, more, paths], i) => {
-                const isOpen = openBuild.has(i);
-                return (
-                  <article className={`sx-card hoverable fp-xcard${isOpen ? ' is-open' : ''}`} key={sub}>
-                    <span className="sx-card-trace" />
-                    <button
-                      type="button"
-                      className="fp-xhead"
-                      aria-expanded={isOpen}
-                      aria-controls={`fp-build-${i}`}
-                      onClick={() => toggleBuild(i)}
-                    >
-                      <div className="sx-glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">{paths}</svg></div>
-                      <div className="sx-card-id"><div className="sx-card-title">{title}</div><div className="sx-card-sub">{sub}</div></div>
-                      <span className="fp-xchev" aria-hidden="true">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M6 9l6 6 6-6" /></svg>
-                      </span>
-                    </button>
-                    <div id={`fp-build-${i}`} className="fp-xbody" role="region" aria-label={`${title} — details`}>
-                      <div className="fp-xbody-inner">
-                        <div className="sx-card-body">
-                          <p>{body}</p>
-                          <p className="fp-xmore">{more}</p>
-                        </div>
-                      </div>
-                    </div>
-                  </article>
-                );
-              })}
+              {BUILD_CARDS.map((c, i) => (
+                <motion.article
+                  layoutId={reduceMotion ? undefined : `fp-build-${i}`}
+                  className="sx-card hoverable fp-xcard"
+                  key={c.sub}
+                  style={{ visibility: stage === i ? 'hidden' : 'visible' }}
+                >
+                  <span className="sx-card-trace" />
+                  <button
+                    type="button"
+                    className="fp-xhead"
+                    aria-haspopup="dialog"
+                    aria-expanded={stage === i}
+                    onClick={(e) => openStage(i, e)}
+                  >
+                    <div className="sx-glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">{c.icon}</svg></div>
+                    <div className="sx-card-id"><div className="sx-card-title">{c.title}</div><div className="sx-card-sub">{c.sub}</div></div>
+                    <span className="fp-xopen" aria-hidden="true">
+                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M12 5v14M5 12h14" /></svg>
+                    </span>
+                  </button>
+                  <div className="fp-xpeek" aria-hidden="true">{c.body}</div>
+                </motion.article>
+              ))}
             </div>
+
+            {/* ── STAGE: selected dossier lifts out over the dimmed page ── */}
+            <AnimatePresence>
+              {stage != null && (
+                <>
+                  <motion.div
+                    className="fp-stage-scrim"
+                    initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                    transition={{ duration: 0.32, ease: [0.2, 0, 0, 1] }}
+                    onClick={closeStage}
+                  />
+                  <motion.div
+                    className="fp-stage-wrap"
+                    role="dialog" aria-modal="true" aria-labelledby="fp-stage-title"
+                    initial={{ opacity: 1 }} animate={{ opacity: 1 }} exit={{ opacity: 1, transition: { duration: 0.45 } }}
+                    onClick={(e) => { if (e.target === e.currentTarget) closeStage(); }}
+                  >
+                    <motion.article
+                      layoutId={reduceMotion ? undefined : `fp-build-${stage}`}
+                      className="sx-card fp-stage-card"
+                      initial={reduceMotion ? { opacity: 0 } : undefined}
+                      animate={reduceMotion ? { opacity: 1 } : undefined}
+                      exit={reduceMotion ? { opacity: 0 } : undefined}
+                      transition={{ layout: STAGE_SPRING, duration: 0.28 }}
+                    >
+                      <header className="fp-stage-head">
+                        <div className="sx-glyph"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">{BUILD_CARDS[stage].icon}</svg></div>
+                        <div className="sx-card-id">
+                          <div className="sx-card-title" id="fp-stage-title">{BUILD_CARDS[stage].title}</div>
+                          <div className="sx-card-sub">{BUILD_CARDS[stage].sub} · layer dossier</div>
+                        </div>
+                        <button type="button" className="fp-stage-close" onClick={closeStage} aria-label="Close dossier" autoFocus>
+                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M6 6l12 12M18 6L6 18" /></svg>
+                        </button>
+                      </header>
+                      <motion.div
+                        className="fp-stage-body"
+                        initial={{ opacity: 0, y: reduceMotion ? 0 : 14 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: reduceMotion ? 0 : 8 }}
+                        transition={{ duration: 0.34, delay: reduceMotion ? 0 : 0.16, ease: [0.2, 0, 0, 1] }}
+                      >
+                        <img className="fp-stage-mark" src={MARK} alt="" aria-hidden="true" />
+                        <p className="fp-stage-lead">{BUILD_CARDS[stage].body}</p>
+                        <p className="fp-xmore">{BUILD_CARDS[stage].more}</p>
+                        <div className="fp-stage-foot">
+                          <span className="sx-num">{BUILD_CARDS[stage].sub.split(' ')[0]}</span>
+                          <span className="fp-stage-hint">ESC or tap outside to close</span>
+                        </div>
+                      </motion.div>
+                    </motion.article>
+                  </motion.div>
+                </>
+              )}
+            </AnimatePresence>
           </div>
         </section>
 
@@ -534,11 +608,12 @@ export default function FounderPage() {
             <div className="head-block">
               <div className="eyebrow">//H¥PE · Hyperion Radio</div>
               <h2 className="section-title">Not a band.<br />A transmission.</h2>
-              <p className="section-lead">Operator. Lilith. Eva. — cyberpunk rap, glitch rock, future bass, and cinematic system anthems. Stream the signal while you read.</p>
+              <p className="section-lead">Operator. Lilith. Eva. Kairo. — cyberpunk rap, glitch rock, future bass, and cinematic system anthems. Stream the signal while you read.</p>
               <div className="sx-topo" style={{ marginTop: 18 }}>
                 <span className="sx-chip"><span className="led" /><span className="cv">Operator holds the gate</span></span>
                 <span className="sx-chip"><span className="led" style={{ background: '#b06cff', boxShadow: '0 0 8px #b06cff' }} /><span className="cv">Lilith breaks the lie</span></span>
                 <span className="sx-chip"><span className="led" style={{ background: '#e6ecff', boxShadow: '0 0 8px #e6ecff' }} /><span className="cv">Eva keeps the tether</span></span>
+                <span className="sx-chip"><span className="led gold" /><span className="cv">Kairo builds the world</span></span>
               </div>
             </div>
             <RadioConsole />
@@ -551,15 +626,23 @@ export default function FounderPage() {
         <section className="section bg3">
           <div className="wrap">
             <div className="head-block"><div className="eyebrow">A note to operators</div></div>
-            <div className="letter sx-panel">
+            <div className="letter">
+              <div className="letter-head">
+                <img src={MARK} alt="" className="letter-mark" aria-hidden="true" />
+                <div>
+                  <div className="letter-eyebrow">From the operator's desk</div>
+                  <div className="letter-serial">Transmission · OP-00 · Hyperion Industries · 2026</div>
+                </div>
+              </div>
               <p className="open">From the operator —</p>
-              <p>If you are reading this, you are probably carrying more state than your tools admit: scattered memory, unclear authority, broken context — absorbed quietly, by you. I have spent years on the wrong side of systems that looked legitimate on paper and failed in practice. <b>Hyperion is the counter-system.</b></p>
+              <p className="lead-p">If you are reading this, you are probably carrying more state than your tools admit: scattered memory, unclear authority, broken context — absorbed quietly, by you. I have spent years on the wrong side of systems that looked legitimate on paper and failed in practice. <b>Hyperion is the counter-system.</b></p>
               <p>Modern software produces more output than ever. The problem is that it keeps losing continuity. AI can assist. The operator decides. Consequence is owned. I am not building tools that quietly mutate your environment — I am building the missing layer that keeps you, your machines, and your archive in coherent state.</p>
               <p>Local-first is not isolation. It is <b>consent with state visibility.</b> Memory is not context bloat. It is governed continuity. The operator is not the bottleneck to remove — the operator is the authority layer to protect.</p>
               <p>That is the whole of it. Build with me, or watch what gets built. Either way — <b>keep the thread.</b></p>
               <div className="sig">
                 <div className="sig-typed">— Victor Amani<span className="sub">FOUNDER · HYPERION INDUSTRIES · KUSHINDA FURAHA ZELEKE</span></div>
               </div>
+              <img className="sig-stamp" src={MARK} alt="" aria-hidden="true" />
             </div>
           </div>
         </section>

@@ -17,7 +17,7 @@ const CARD_SEL = [
 ].join(',');
 
 // large surfaces feel wrong rotating — highlight only
-const NO_TILT_SEL = '.radio-shell, .contact-card, .portrait-land';
+const NO_TILT_SEL = '.radio-shell, .contact-card, .portrait-land, .fp-stage-card';
 
 const MAX_TILT = 2.4; // degrees
 

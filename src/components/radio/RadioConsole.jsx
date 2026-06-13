@@ -4,7 +4,13 @@ import HoverEditor from '../ui/HoverEditor';
 import { track as logEvent } from '../../utils/telemetry';
 
 const VIDEO_RE = /\.(mp4|webm|ogg|mov)$/i;
-const GLYPH = '/assets/founder/01.png';
+const GLYPH = '/assets/founder/hyperion-mark.svg';
+const MEMBERS = [
+  ['The Operator', 'operator'],
+  ['Lilith', 'lilith'],
+  ['Eva', 'eva'],
+  ['Kairo', 'kairo'],
+];
 
 function CoverArt({ track }) {
   // Large player shows MOVING art when artAnimated is set (video or gif/webp),
@@ -84,7 +90,8 @@ export default function RadioConsole() {
           <div className="np-meta">
             <div className="np-eyebrow">Now playing · {String(idx + 1).padStart(2, '0')}</div>
             <div className="np-title">{track.title}</div>
-            <div className="np-artist">{track.artist}</div>
+            <div className="np-artist" data-persona={track.persona}>{track.artist}</div>
+            <div className="np-credit">Produced by <b>{track.producer || 'Kairo'}</b> · Composed by {track.composer || 'Xero'}</div>
           </div>
 
           <div className="seek">
@@ -133,7 +140,7 @@ export default function RadioConsole() {
           <div className="radio-list">
             {tracks.map((t, i) => (
               <HoverEditor key={t.id || i} model="radio" index={i}>
-                <div className={`trk${i === idx ? ' on' : ''}`} role="button" tabIndex={0}
+                <div className={`trk${i === idx ? ' on' : ''}`} data-persona={t.persona} role="button" tabIndex={0}
                   onClick={() => select(i)}
                   onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); select(i); } }}>
                   <span className="trk-n">{String(i + 1).padStart(2, '0')}</span>
@@ -161,8 +168,12 @@ export default function RadioConsole() {
       </div>
 
       <div className="radio-foot">
-        <span style={{ width: 7, height: 7, borderRadius: '50%', background: 'var(--accent)', boxShadow: '0 0 8px var(--accent)' }} />
-        <span>Player wired for live audio · drop a song into a track's <span className="accent">audio</span> field in Edit Mode. Until then it runs in preview mode.</span>
+        <span className="rf-brand">//H¥PE</span>
+        <span className="rf-roster">
+          {MEMBERS.map(([name, p]) => (
+            <span className="rf-m" data-persona={p} key={p}><i aria-hidden="true" />{name}</span>
+          ))}
+        </span>
       </div>
     </div>
   );

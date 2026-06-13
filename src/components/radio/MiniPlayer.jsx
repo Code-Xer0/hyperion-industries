@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useRadio } from './RadioContext';
 
-const GLYPH = '/assets/founder/01.png';
+const GLYPH = '/assets/founder/hyperion-mark.svg';
 
 /**
  * Persistent mini Hyperion Radio player — fixed bottom-right, stays in view as
