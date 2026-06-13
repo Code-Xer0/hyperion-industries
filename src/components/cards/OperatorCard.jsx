@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 import './OperatorCard.css';
 import MediaFrame from '../ui/MediaFrame';
 import { mediaSource } from '../../utils/media';
@@ -6,22 +5,17 @@ import { mediaSource } from '../../utils/media';
 const THEME_BY_ID = { 'HYP-OP-002': 'operator-navy' };
 
 /**
- * OperatorCard — operator-dossier card used on the homepage roster and the
- * Meet-the-Founders index. Frosted glass, persona-accented by `operator.theme`
- * (operator-red / operator-navy), portrait + stat readout + focus chips.
- * Display-only: it lives inside a <Link> on both pages, so no nested controls.
+ * OperatorCard — operator-dossier card (homepage roster + founders index).
+ * Frosted glass, persona-accented by `operator.theme`. Idle float; on hover/
+ * focus the card blurs and surfaces an "Open profile" interface. Display-only:
+ * it lives inside a <Link> on both pages, so no nested controls.
  */
 export default function OperatorCard({ operator }) {
   const theme = operator.theme || THEME_BY_ID[operator.id] || 'operator-red';
   const hasImg = !!mediaSource(operator.image);
 
   return (
-    <motion.article
-      className="op-card"
-      data-theme={theme}
-      whileHover={{ y: -6 }}
-      transition={{ type: 'spring', stiffness: 320, damping: 24 }}
-    >
+    <article className="op-card" data-theme={theme}>
       <span className="op-corner tl" /><span className="op-corner tr" />
       <span className="op-corner bl" /><span className="op-corner br" />
 
@@ -35,7 +29,6 @@ export default function OperatorCard({ operator }) {
           ? <MediaFrame media={operator.image} alt={operator.name} className="op-media" />
           : <span className="op-watermark" aria-hidden="true">{operator.attr || 'H'}</span>}
         <span className="op-portrait-scrim" aria-hidden="true" />
-        {operator.stars && <span className="op-stars">{operator.stars}</span>}
       </div>
 
       <div className="op-body">
@@ -49,14 +42,23 @@ export default function OperatorCard({ operator }) {
         )}
       </div>
 
-      {operator.stats && operator.stats.length > 0 && (
-        <div className="op-stats">
-          {operator.stats.map((s, i) => (
-            <div className="op-stat" key={i}><b>{s.value}</b><span>{s.label}</span></div>
-          ))}
-        </div>
-      )}
       {operator.serial && <div className="op-serial">{operator.serial}</div>}
-    </motion.article>
+
+      {/* hover/focus interface — blurs the card, surfaces the open-profile hint */}
+      <div className="op-hover" aria-hidden="true">
+        <div className="op-hover-inner">
+          <span className="op-hover-glyph">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M14 3h7v7M21 3l-9 9M19 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h5" />
+            </svg>
+          </span>
+          <span className="op-hover-label">Open profile</span>
+          <span className="op-hover-sub">{operator.name} · dossier →</span>
+        </div>
+      </div>
+
+      {/* touch devices have no hover — a persistent cue keeps the affordance */}
+      <div className="op-cue" aria-hidden="true">Open profile <span className="ar">→</span></div>
+    </article>
   );
 }

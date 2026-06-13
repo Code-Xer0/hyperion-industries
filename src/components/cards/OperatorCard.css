@@ -1,12 +1,13 @@
 /* ════════ OPERATOR DOSSIER CARDS ════════
-   Used on the homepage roster + the Meet-the-Founders index. Persona-accented
-   frosted-glass dossiers — coherent with the founder-page surface. */
+   Homepage roster + Meet-the-Founders index. Persona-accented frosted-glass
+   dossiers — coherent with the founder-page surface. Idle float; hover/focus
+   blurs the card and surfaces an "Open profile" interface. */
 .ops-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(290px, 360px));
+  grid-template-columns: repeat(auto-fit, minmax(290px, 350px));
   justify-content: center;
   align-items: stretch;
-  gap: 24px;
+  gap: 28px;
   margin-top: 48px;
 }
 
@@ -26,13 +27,19 @@
   -webkit-backdrop-filter: blur(20px) saturate(1.2);
   border: 1px solid var(--border, #2A2D31);
   box-shadow: 0 24px 70px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
-  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  animation: op-float 7s ease-in-out infinite;
+  will-change: translate;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease, scale 0.3s cubic-bezier(0.16,1,0.3,1);
 }
 .op-card[data-theme="operator-navy"] {
   --oc: #2f7bff; --ocb: #5aa0ff;
   --ocg: rgba(47,123,255,0.32); --ocd: rgba(47,123,255,0.14); --ocbd: rgba(47,123,255,0.45);
 }
 body.theme-light .op-card { background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.7)); }
+
+@keyframes op-float { 0%, 100% { translate: 0 0; } 50% { translate: 0 -9px; } }
+.ops-grid > *:nth-child(odd) .op-card { animation-duration: 8.4s; animation-delay: -3.2s; }
+.ops-grid > *:nth-child(3n) .op-card { animation-duration: 7.6s; animation-delay: -1.4s; }
 
 /* accent edge-light along the top */
 .op-card::before {
@@ -41,13 +48,16 @@ body.theme-light .op-card { background: linear-gradient(180deg, rgba(255,255,255
   opacity: 0.85;
 }
 .op-card:hover {
+  scale: 1.025;
+  animation-play-state: paused;
   border-color: var(--ocbd);
-  box-shadow: 0 32px 92px rgba(0,0,0,0.6), 0 0 54px var(--ocd), inset 0 1px 0 rgba(255,255,255,0.07);
+  box-shadow: 0 36px 100px rgba(0,0,0,0.62), 0 0 60px var(--ocd), inset 0 1px 0 rgba(255,255,255,0.07);
 }
+.founder-link:focus-visible .op-card { scale: 1.025; animation-play-state: paused; border-color: var(--ocbd); }
 
-/* HUD corner brackets — reveal on hover */
-.op-corner { position: absolute; width: 16px; height: 16px; border: 1.5px solid var(--oc); z-index: 4; opacity: 0; transition: opacity 0.25s ease; pointer-events: none; }
-.op-card:hover .op-corner { opacity: 0.9; }
+/* HUD corner brackets — reveal on hover/focus */
+.op-corner { position: absolute; width: 16px; height: 16px; border: 1.5px solid var(--oc); z-index: 7; opacity: 0; transition: opacity 0.28s ease; pointer-events: none; }
+.op-card:hover .op-corner, .founder-link:focus-visible .op-corner { opacity: 0.95; }
 .op-corner.tl { top: 8px; left: 8px; border-right: 0; border-bottom: 0; }
 .op-corner.tr { top: 8px; right: 8px; border-left: 0; border-bottom: 0; }
 .op-corner.bl { bottom: 8px; left: 8px; border-right: 0; border-top: 0; }
@@ -61,35 +71,60 @@ body.theme-light .op-card { background: linear-gradient(180deg, rgba(255,255,255
   background: var(--ocd); border: 1px solid var(--ocbd);
 }
 
+/* portrait window — matched to the 3:4 operator portraits so they fit clean */
 .op-portrait {
-  position: relative; margin: 14px 16px 0; height: 196px; border-radius: 12px; overflow: hidden;
+  position: relative; margin: 14px 16px 0; aspect-ratio: 3 / 4; border-radius: 12px; overflow: hidden;
   background: #07080a; border: 1px solid rgba(255,255,255,0.07);
   display: flex; align-items: center; justify-content: center;
 }
-.op-portrait .op-media, .op-portrait img, .op-portrait video { width: 100%; height: 100%; object-fit: cover; }
+.op-portrait .op-media, .op-portrait img, .op-portrait video { width: 100%; height: 100%; object-fit: cover; object-position: 50% 22%; }
 .op-portrait .op-media { border: 0; border-radius: 0; background: transparent; }
 .op-portrait-scrim { position: absolute; inset: 0; z-index: 1; pointer-events: none;
-  background: linear-gradient(180deg, transparent 42%, rgba(6,7,10,0.88)); }
-.op-portrait::after { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; box-shadow: inset 0 0 64px var(--ocd); }
-.op-card:hover .op-portrait img, .op-card:hover .op-portrait video { transform: scale(1.04); }
-.op-portrait img, .op-portrait video { transition: transform 0.5s cubic-bezier(0.16,1,0.3,1); }
-.op-watermark { font-family: var(--font-display); font-size: 120px; font-weight: 900; color: rgba(255,255,255,0.06); user-select: none; line-height: 1; }
-.op-stars { position: absolute; left: 13px; bottom: 11px; z-index: 2; font-size: 11px; letter-spacing: 0.1em; color: var(--ocb); text-shadow: 0 1px 6px rgba(0,0,0,0.85); }
+  background: linear-gradient(180deg, transparent 52%, rgba(6,7,10,0.9)); }
+.op-portrait::after { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none; box-shadow: inset 0 0 70px var(--ocd); }
+.op-card:hover .op-portrait img, .op-card:hover .op-portrait video { transform: scale(1.05); }
+.op-portrait img, .op-portrait video { transition: transform 0.6s cubic-bezier(0.16,1,0.3,1); }
+.op-watermark { font-family: var(--font-display); font-size: 150px; font-weight: 900; color: rgba(255,255,255,0.06); user-select: none; line-height: 1; }
 
 .op-body { padding: 16px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
-.op-name { font-family: var(--font-display); font-size: 21px; font-weight: 800; letter-spacing: 0.01em; line-height: 1.1; color: var(--text, #F5F5F2); }
+.op-name { font-family: var(--font-display); font-size: 22px; font-weight: 800; letter-spacing: 0.01em; line-height: 1.1; color: var(--text, #F5F5F2); }
 .op-typeline { font-family: var(--font-display); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ocb); }
 .op-desc { font-size: 12.5px; line-height: 1.6; color: var(--text-soft, #C9C9C3); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 .op-focuses { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
 .op-focus { font-family: var(--font-display); font-size: 9.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-soft); padding: 4px 9px; border-radius: 100px; border: 1px solid var(--border); background: rgba(255,255,255,0.025); }
-
-.op-stats { display: flex; gap: 8px; padding: 0 16px 14px; }
-.op-stat { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 10px 6px; border-radius: 10px; background: rgba(255,255,255,0.025); border: 1px solid var(--border); }
-.op-stat b { font-family: var(--font-display); font-size: 15px; font-weight: 800; color: var(--ocb); }
-.op-stat span { font-size: 8px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-muted); }
 .op-serial { padding: 0 16px 16px; font-family: var(--font-display); font-size: 8.5px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-muted); text-align: center; opacity: 0.7; }
 
+/* ── hover/focus interface: blur the card, surface "Open profile" ── */
+.op-hover {
+  position: absolute; inset: 0; z-index: 8; display: grid; place-items: center; opacity: 0; pointer-events: none;
+  background: radial-gradient(circle at 50% 38%, var(--ocd), rgba(6,7,10,0.6));
+  backdrop-filter: blur(8px) saturate(1.1); -webkit-backdrop-filter: blur(8px) saturate(1.1);
+  transition: opacity 0.3s cubic-bezier(0.16,1,0.3,1);
+}
+.op-card:hover .op-hover, .founder-link:focus-visible .op-hover { opacity: 1; }
+.op-hover-inner { display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; padding: 16px; transform: translateY(10px); transition: transform 0.32s cubic-bezier(0.16,1,0.3,1); }
+.op-card:hover .op-hover-inner, .founder-link:focus-visible .op-hover-inner { transform: translateY(0); }
+.op-hover-glyph { width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; color: var(--ocb); border: 1.5px solid var(--ocbd); background: var(--ocd); box-shadow: 0 0 34px var(--ocg); }
+.op-hover-glyph svg { width: 24px; height: 24px; }
+.op-hover-label { font-family: var(--font-display); font-size: 15px; font-weight: 800; letter-spacing: 0.18em; text-transform: uppercase; color: #fff; }
+.op-hover-sub { font-family: var(--font-display); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-soft); }
+
+/* touch / coarse pointers can't hover — show a persistent cue instead */
+.op-cue { display: none; }
+@media (hover: none), (pointer: coarse) {
+  .op-card { animation: none; }
+  .op-hover { display: none; }
+  .op-cue {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    margin: 0 16px 16px; padding: 11px; border-radius: 10px;
+    border: 1px solid var(--ocbd); background: var(--ocd); color: var(--ocb);
+    font-family: var(--font-display); font-size: 11px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .op-portrait img, .op-portrait video { transition: none; }
-  .op-card:hover .op-portrait img, .op-card:hover .op-portrait video { transform: none; }
+  .op-card { animation: none; transition: border-color 0.3s ease, box-shadow 0.3s ease; }
+  .op-card:hover { scale: 1; }
+  .op-portrait img, .op-portrait video, .op-card:hover .op-portrait img, .op-card:hover .op-portrait video { transition: none; transform: none; }
+  .op-hover-inner { transform: none; }
 }
