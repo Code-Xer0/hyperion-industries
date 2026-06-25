@@ -9,9 +9,9 @@
     { "label": "Contact", "path": "/contact" }
   ],
   "cta": [
-    { "label": "CARD STUDIO ↗", "path": "/card-studio", "variant": "ghost" },
+    { "label": "CARD STUDIO", "path": "/card-studio", "variant": "gold" },
     { "label": "CHR0N.OS ↗", "href": "https://chr0nos.app", "variant": "ghost", "external": true },
-    { "label": "Get in Touch →", "path": "/contact", "variant": "gold" }
+    { "label": "Start Inquiry →", "path": "/contact", "variant": "ghost" }
   ],
   "footer": {
     "systems": [
@@ -28,9 +28,9 @@
       { "label": "Dev Diary", "path": "/dev-diary" }
     ],
     "connect": [
-      { "label": "Contact", "path": "/contact" },
+      { "label": "Start Inquiry", "path": "/contact" },
       { "label": "Newsletter", "path": "/newsletter" },
-      { "label": "Store", "path": "/store", "note": "Coming soon" }
+      { "label": "Store", "path": "/store", "note": "Staged" }
     ]
   }
 }

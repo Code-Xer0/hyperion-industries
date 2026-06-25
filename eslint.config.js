@@ -5,7 +5,7 @@ import reactRefresh from 'eslint-plugin-react-refresh'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist', 'src_snapshot', 'public/assets/card']),
+  globalIgnores(['dist', 'src_snapshot', 'public/assets/card', 'public/assets/card-studio']),
   {
     files: ['**/*.{js,jsx}'],
     extends: [

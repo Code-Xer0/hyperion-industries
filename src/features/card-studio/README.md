@@ -1,15 +1,24 @@
-# Hyperion Card Studio Source-Port Scaffold
+# Hyperion Card Studio Product Room
 
-The live `/card-studio` path serves the Business Card DX landing bundle directly on the static host. The fallback standalone asset is mirrored at `public/assets/card-studio/studio.html`, copied from the Business Card DX template:
+The live `/card-studio` path serves the final static Card Studio product room. The standalone editor artifact remains available at `public/assets/card-studio/studio.html`, copied from the Business Card DX final source:
 
-`C:\Users\Inf3r\Git\hyperion-studio\Business Card. Dx. (Template)\Hyperion Card Studio (standalone).html`
+`C:\Users\Inf3r\Git\business-card-dx\Business Card. Dx. (Final)`
+
+The final artifact includes the room pages, shared catalog, standalone studio, template components, physical card preview, image-slot behavior, and order wizard.
 
 The shipped default state is the Ivory card template with the gold accent:
 
 - `accent`: `#cba35a`
 - `heroTemplate`: `ivory`
 
-This is intentionally a hybrid first pass. The standalone bundle remains the shipped tool surface while the React route only redirects during local Vite development. The live GitHub Pages path includes `public/card-studio/index.html` so `/card-studio` resolves as the canonical clean landing URL without SPA fallback or iframe chrome. The compatibility route `/card-studio/studio.html` and matching static redirect file both point to the non-conflicting static asset path.
+The route is intentionally direct: `/card-studio` redirects into `public/assets/card-studio/Hyperion Card Studio.html`, while `/card-studio/studio.html` preserves the non-conflicting standalone editor path.
+
+Ordering posture:
+
+- Digital portrait card is primary.
+- Physical NFC card preview is secondary fulfillment.
+- Live catalog pricing: Digital `$0`, PVC from `$39`, Metal from `$89`, Pro `$9/mo` or `$90/yr`, Team custom.
+- Final pricing authority lives in `public/assets/card-studio/catalog.jsx`.
 
 Future native port work should extract these parts from the standalone bundle:
 
