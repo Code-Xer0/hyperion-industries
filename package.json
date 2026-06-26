@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
+    "substrate:audit": "node scripts/audit-portal.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
