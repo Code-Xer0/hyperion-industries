@@ -408,9 +408,7 @@ h1.hero-title .accent { color: var(--accent); }
   letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--ink-faint);
-  max-width: min(100%, 52ch);
-  white-space: normal;
-  line-height: 1.55;
+  white-space: nowrap;
 }
 .trust-logos { display: flex; align-items: center; gap: 34px; flex-wrap: wrap; }
 .trust-logos span {

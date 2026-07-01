@@ -38,3 +38,8 @@ private/
 # Machine-local MCP tool config (may carry env/PAT)
 .mcp.json
 .mcp.json.bak-*
+
+# Hyperion alignment files (local-only — do not commit/push)
+HYPERION_POSTURE.md
+CLAUDE.md
+AGENTS.md

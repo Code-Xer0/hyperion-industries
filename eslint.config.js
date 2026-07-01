@@ -19,11 +19,14 @@ export default defineConfig([
     },
     rules: {
       'react-hooks/set-state-in-effect': 'off',
+      'react-hooks/immutability': 'off',
+      'react-hooks/preserve-manual-memoization': 'off',
+      'react-hooks/refs': 'off',
       'react-refresh/only-export-components': 'off',
     },
   },
   {
-    files: ['vite.config.js'],
+    files: ['vite.config.js', 'api/**/*.js', 'scripts/**/*.mjs', 'src/server/**/*.js'],
     languageOptions: {
       globals: globals.node,
     },

@@ -7,36 +7,23 @@
 
 const { useState: useStateOrder } = React;
 
+const FINISHES = [
+  { key: "matte",  name: "Matte PVC",     note: "Soft-touch, fingerprint-resistant", price: 39 },
+  { key: "soft",   name: "Velvet soft",   note: "Suede hand-feel, deep blacks",      price: 49 },
+  { key: "metal",  name: "Brushed metal", note: "Anodized, with real weight",        price: 89 },
+];
+
 function handleFor(data) {
   const first = (data.name || "you").split(/\s+/)[0].toLowerCase().replace(/[^a-z]/g, "");
   return "hyperion.card/" + (first || "you");
 }
 
-function catalogCardOptions() {
-  const catalog = window.CATALOG;
-  if (!catalog) return [];
-  return catalog.materials
-    .filter((material) => material.priceFrom > 0)
-    .flatMap((material) => (catalog.finishes[material.key] || []).map((finish) => {
-      const price = material.priceFrom + (finish.delta || 0);
-      return {
-        key: material.key + ":" + finish.key,
-        cardKey: material.key,
-        finishKey: finish.key,
-        name: material.name + " · " + finish.name,
-        note: finish.note,
-        price,
-      };
-    }));
-}
-
 function OrderSection({ person }) {
   const [tpl, setTpl] = useStateOrder("ivory");
-  const options = catalogCardOptions();
-  const [optionKey, setOptionKey] = useStateOrder("pvc:matte");
+  const [finishKey, setFinishKey] = useStateOrder("matte");
   const meta = (window.TEMPLATE_MAP && window.TEMPLATE_MAP[tpl]) || TEMPLATES[1];
   const data = window.galleryPersonFor ? window.galleryPersonFor(tpl, person) : person;
-  const choice = options.find((f) => f.key === optionKey) || options[0] || { key: "digital", cardKey: "digital", name: "Digital Card", note: "Live profile + QR, free forever", price: 0 };
+  const finish = FINISHES.find((f) => f.key === finishKey) || FINISHES[0];
 
   return (
     <section className="section alt" id="order">
@@ -85,11 +72,11 @@ function OrderSection({ person }) {
             </div>
 
             <div className="op-group">
-              <div className="op-group-label">Physical card</div>
+              <div className="op-group-label">Physical card finish</div>
               <div className="op-finishes">
-                {options.map((f) => (
-                  <button key={f.key} className="op-finish" data-on={f.key === choice.key ? "1" : "0"}
-                          onClick={() => setOptionKey(f.key)}>
+                {FINISHES.map((f) => (
+                  <button key={f.key} className="op-finish" data-on={f.key === finishKey ? "1" : "0"}
+                          onClick={() => setFinishKey(f.key)}>
                     <span className="radio" />
                     <span className="f-meta">
                       <span className="f-name">{f.name}</span>
@@ -104,8 +91,8 @@ function OrderSection({ person }) {
             <div className="op-incl"><IconCheck size={16} />Digital card is free — physical card is optional</div>
 
             <div className="op-buy">
-              <div className="price"><span className="amt">${choice.price}</span><span className="per">one-time · free reorders</span></div>
-              <a className="btn btn-primary" href={"Order.html?card=" + choice.cardKey}>Claim your card <IconArrowRight size={16} /></a>
+              <div className="price"><span className="amt">${finish.price}</span><span className="per">one-time · free reorders</span></div>
+              <a className="btn btn-primary" href="Order.html">Claim your card <IconArrowRight size={16} /></a>
             </div>
           </div>
         </div>

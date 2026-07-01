@@ -124,7 +124,7 @@ function FeaturesPage() {
               <div className="eyebrow">And more</div>
               <h2 className="h-sec">Built in, not bolted on</h2>
             </div>
-            <div className="uses">
+            <div className="uses" style={{ gridTemplateColumns: "repeat(3,1fr)" }}>
               {rest.map((f) => {
                 const Icon = window[f.icon] || IconBolt;
                 return (
