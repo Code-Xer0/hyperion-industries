@@ -1,0 +1,857 @@
+{
+  "schemaVersion": 1,
+  "site": {
+    "name": "Hyperion Industries",
+    "origin": "https://hyperion-industries.dev",
+    "defaultTitle": "Hyperion Industries - Public Web Portal",
+    "defaultDescription": "A public portal for Hyperion systems, studio work, field services, doctrine, access lanes, and public-safe status.",
+    "deployment": {
+      "primaryRisk": "Pushes to main deploy GitHub Pages through .github/workflows/deploy.yml; public deployment is withheld without operator approval.",
+      "publicApiPosture": "Vercel-style api functions are staged in-repo, but the live GitHub Pages surface does not currently serve JSON api routes.",
+      "liveApiVerifiedAt": "2026-06-25",
+      "liveApiResult": "GET /api/order-intake and /api/stats returned the SPA HTML shell on the live site."
+    }
+  },
+  "statusVocabulary": [
+    "planned",
+    "in_development",
+    "preview",
+    "public_beta",
+    "restricted",
+    "private",
+    "local_only",
+    "manual_update_required",
+    "unavailable",
+    "degraded"
+  ],
+  "navigation": {
+    "main": [
+      { "label": "Systems", "path": "/systems" },
+      { "label": "Studio", "path": "/studio" },
+      { "label": "Field", "path": "/field" },
+      { "label": "Doctrine", "path": "/doctrine" },
+      { "label": "Status", "path": "/status" },
+      { "label": "Access", "path": "/access" }
+    ],
+    "cta": [
+      { "label": "Card Studio", "path": "/studio/card-studio", "variant": "gold" },
+      { "label": "CHR0N.OS", "path": "/access/chronos-public-beta", "variant": "ghost" },
+      { "label": "Start Inquiry", "path": "/access/contact", "variant": "ghost" }
+    ],
+    "footer": {
+      "systems": [
+        { "label": "CHR0N.OS", "path": "/access/chronos-public-beta", "note": "Public beta" },
+        { "label": "Mnem.OS", "path": "/systems", "note": "In development" },
+        { "label": "Hyperion Connect", "path": "/systems", "note": "Restricted" }
+      ],
+      "explore": [
+        { "label": "Gateway", "path": "/" },
+        { "label": "Systems", "path": "/systems" },
+        { "label": "Studio", "path": "/studio" },
+        { "label": "Field", "path": "/field" },
+        { "label": "Doctrine", "path": "/doctrine" },
+        { "label": "Status", "path": "/status" }
+      ],
+      "connect": [
+        { "label": "Access", "path": "/access" },
+        { "label": "Contact", "path": "/access/contact" },
+        { "label": "Card Studio", "path": "/studio/card-studio" }
+      ]
+    }
+  },
+  "routeMetadata": {
+    "\/": {
+      "zoneId": "gateway",
+      "title": "Hyperion Industries - Gateway",
+      "description": "The public gateway into Hyperion systems, studio work, field services, doctrine, access lanes, and public-safe status.",
+      "canonicalUrl": "https://hyperion-industries.dev/",
+      "robots": "index,follow",
+      "openGraph": {
+        "title": "Hyperion Industries - Gateway",
+        "description": "Local-first intelligence infrastructure, organized as a public portal.",
+        "image": "/assets/branding/hyperion/Hyblkstd.png",
+        "type": "website"
+      }
+    },
+    "\/systems": {
+      "zoneId": "systems",
+      "title": "Systems - Hyperion Web Portal",
+      "description": "Public map of Hyperion systems, their access posture, and their authority boundaries.",
+      "canonicalUrl": "https://hyperion-industries.dev/systems",
+      "robots": "index,follow",
+      "openGraph": {
+        "title": "Hyperion Systems",
+        "description": "A public-safe systems map for CHR0N.OS, Mnem.OS, Hyperion Nest, Hyperion Connect, ARG.OS, SCEN.OS, HORUS/Decksmith, KAIR.OS, and future systems.",
+        "image": "/assets/branding/hyperion/hyperion-orbit.svg",
+        "type": "website"
+      }
+    },
+    "\/studio": {
+      "zoneId": "studio",
+      "title": "Studio - Hyperion Web Portal",
+      "description": "The public commercial and creative production lane for Card Studio, identity artifacts, reports, and proposal templates.",
+      "canonicalUrl": "https://hyperion-industries.dev/studio",
+      "robots": "index,follow",
+      "openGraph": {
+        "title": "Hyperion Studio",
+        "description": "Card Studio and future public production rooms inside the Hyperion portal.",
+        "image": "/assets/card-studio/profession-card-mockups.png",
+        "type": "website"
+      }
+    },
+    "\/studio\/card-studio": {
+      "zoneId": "studio",
+      "roomId": "card-studio",
+      "title": "Card Studio - Hyperion Web Portal",
+      "description": "Identity Fabrication and Smart Business Card Lane inside the Hyperion Studio zone.",
+      "canonicalUrl": "https://hyperion-industries.dev/studio/card-studio",
+      "robots": "index,follow",
+      "openGraph": {
+        "title": "Hyperion Card Studio",
+        "description": "Smart business cards, digital cards, NFC finishes, and operator-reviewed draft invoice ordering.",
+        "image": "/assets/card-studio/profession-card-mockups.png",
+        "type": "website"
+      }
+    },
+    "\/field": {
+      "zoneId": "field",
+      "title": "Field - Hyperion Web Portal",
+      "description": "The public real-world IT, service, build, deployment, and field documentation lane.",
+      "canonicalUrl": "https://hyperion-industries.dev/field",
+      "robots": "index,follow",
+      "openGraph": {
+        "title": "Hyperion Field",
+        "description": "Hardware installs, custom systems, workstation deployments, closeout reports, and service intake.",
+        "image": "/assets/uploads/20240801_103114.jpg",
+        "type": "website"
+      }
+    },
+    "\/field\/build-archive": {
+      "zoneId": "field",
+      "roomId": "build-archive",
+      "title": "Build Archive - Hyperion Field",
+      "description": "Public archive of field build artifacts and completed custom systems.",
+      "canonicalUrl": "https://hyperion-industries.dev/field/build-archive",
+      "robots": "index,follow",
+      "openGraph": {
+        "title": "Hyperion Build Archive",
+        "description": "Completed builds and field artifacts organized as a public-safe archive.",
+        "image": "/assets/builds/20240801_103114.jpg",
+        "type": "website"
+      }
+    },
+    "\/doctrine": {
+      "zoneId": "doctrine",
+      "title": "Doctrine - Hyperion Web Portal",
+      "description": "Public doctrine for local-first custody, governed AI, continuity, memory, field execution, and state exposure.",
+      "canonicalUrl": "https://hyperion-industries.dev/doctrine",
+      "robots": "index,follow",
+      "openGraph": {
+        "title": "Hyperion Doctrine",
+        "description": "The public philosophy and operator doctrine behind Hyperion.",
+        "image": "/assets/branding/hyperion/Hyblkstd.png",
+        "type": "article"
+      }
+    },
+    "\/access": {
+      "zoneId": "access",
+      "title": "Access - Hyperion Web Portal",
+      "description": "Public access lanes for beta downloads, demo requests, Card Studio orders, field work, support, and partnerships.",
+      "canonicalUrl": "https://hyperion-industries.dev/access",
+      "robots": "index,follow",
+      "openGraph": {
+        "title": "Hyperion Access",
+        "description": "Public routes for requests, downloads, support, and ordering.",
+        "image": "/assets/branding/chronos/chronos-icon-updated.png",
+        "type": "website"
+      }
+    },
+    "\/access\/contact": {
+      "zoneId": "access",
+      "laneId": "contact",
+      "title": "Contact - Hyperion Access",
+      "description": "Public-safe contact routes for Card Studio, field work, beta access, demos, support, partnerships, and funding inquiries.",
+      "canonicalUrl": "https://hyperion-industries.dev/access/contact",
+      "robots": "index,follow",
+      "openGraph": {
+        "title": "Contact Hyperion",
+        "description": "Start the right public-safe inquiry.",
+        "image": "/assets/branding/hyperion/Hyblkstd.png",
+        "type": "website"
+      }
+    },
+    "\/access\/chronos-public-beta": {
+      "zoneId": "access",
+      "laneId": "chronos-public-beta",
+      "title": "CHR0N.OS Public Beta - Hyperion Access",
+      "description": "Public beta access lane for CHR0N.OS archive and recovery workflows.",
+      "canonicalUrl": "https://hyperion-industries.dev/access/chronos-public-beta",
+      "robots": "index,follow",
+      "openGraph": {
+        "title": "CHR0N.OS Public Beta",
+        "description": "Local-first archival intelligence for public beta users.",
+        "image": "/assets/branding/chronos/chronos-icon-updated.png",
+        "type": "website"
+      }
+    },
+    "\/status": {
+      "zoneId": "status",
+      "title": "Status - Hyperion Web Portal",
+      "description": "Public-safe posture for Hyperion release lanes, availability, restrictions, and known gaps.",
+      "canonicalUrl": "https://hyperion-industries.dev/status",
+      "robots": "index,follow",
+      "openGraph": {
+        "title": "Hyperion Public Status",
+        "description": "Declassified public posture, not private telemetry.",
+        "image": "/assets/branding/hyperion/hyperion-orbit.svg",
+        "type": "website"
+      }
+    },
+    "\/founders": {
+      "zoneId": "gateway",
+      "title": "Founders - Hyperion Industries",
+      "description": "Public founder and operator profiles for Hyperion Industries.",
+      "canonicalUrl": "https://hyperion-industries.dev/founders",
+      "robots": "index,follow",
+      "openGraph": {
+        "title": "Hyperion Founders",
+        "description": "Public founder profiles and operator-facing writing.",
+        "image": "/assets/operators/deus-x-wide-brand.png",
+        "type": "website"
+      }
+    },
+    "\/gallery": {
+      "zoneId": "studio",
+      "title": "Gallery - Hyperion Studio",
+      "description": "Public-safe visuals, operator cards, renders, wallpapers, and brand artifacts.",
+      "canonicalUrl": "https://hyperion-industries.dev/gallery",
+      "robots": "index,follow",
+      "openGraph": {
+        "title": "Hyperion Gallery",
+        "description": "Visual artifacts inside the public Studio zone.",
+        "image": "/assets/operators/deus-x-terminal-frame.png",
+        "type": "website"
+      }
+    },
+    "\/dev-diary": {
+      "zoneId": "doctrine",
+      "title": "Dev Diary - Hyperion Doctrine",
+      "description": "Public-safe lab notes, roadmap posture, and development writing.",
+      "canonicalUrl": "https://hyperion-industries.dev/dev-diary",
+      "robots": "index,follow",
+      "openGraph": {
+        "title": "Hyperion Dev Diary",
+        "description": "Public notes on systems, releases, and field work.",
+        "image": "/assets/branding/hyperion/Hyblkstd.png",
+        "type": "article"
+      }
+    },
+    "\/newsletter": {
+      "zoneId": "access",
+      "title": "Newsletter - Hyperion Access",
+      "description": "Staged newsletter route for future public release notes, build drops, and product updates.",
+      "canonicalUrl": "https://hyperion-industries.dev/newsletter",
+      "robots": "index,follow",
+      "openGraph": {
+        "title": "Hyperion Newsletter",
+        "description": "A staged signal route for future public updates.",
+        "image": "/assets/branding/hyperion/Hyblkstd.png",
+        "type": "website"
+      }
+    }
+  },
+  "legacyRedirects": [
+    { "from": "/card-studio", "to": "/studio/card-studio" },
+    { "from": "/forge", "to": "/field" },
+    { "from": "/store", "to": "/access" },
+    { "from": "/contact", "to": "/access/contact" },
+    { "from": "/build-archive", "to": "/field/build-archive" },
+    { "from": "/systems.html", "to": "/systems" },
+    { "from": "/forge.html", "to": "/field" },
+    { "from": "/showcase.html", "to": "/field/build-archive" },
+    { "from": "/gallery.html", "to": "/studio" },
+    { "from": "/contact.html", "to": "/access/contact" },
+    { "from": "/builds.html", "to": "/field/build-archive" },
+    { "from": "/build-archive.html", "to": "/field/build-archive" },
+    { "from": "/dev-diary.html", "to": "/doctrine" },
+    { "from": "/newsletter.html", "to": "/access" },
+    { "from": "/store.html", "to": "/access" }
+  ],
+  "zones": [
+    {
+      "id": "gateway",
+      "slug": "/",
+      "title": "Gateway",
+      "shortLabel": "Gateway",
+      "subtitle": "The public entry point into the Hyperion ecosystem.",
+      "purpose": "Route visitors into the public zone without exposing private operator authority.",
+      "publicPosture": "preview",
+      "accessLevel": "open",
+      "status": "preview",
+      "visibility": "public",
+      "launchReadiness": "preview",
+      "cta": [
+        { "label": "View Systems", "route": "/systems" },
+        { "label": "Enter Studio", "route": "/studio" },
+        { "label": "Start Inquiry", "route": "/access/contact" }
+      ],
+      "relatedSystems": ["chronos", "mnemos", "hyperion-connect"],
+      "relatedRooms": ["card-studio", "field-services", "public-status"],
+      "featuredArtifacts": ["hyperion-public-portal", "operator-card"],
+      "notesForFrontend": "Keep this as the portal gateway, not a generic landing-page hero."
+    },
+    {
+      "id": "systems",
+      "slug": "/systems",
+      "title": "Systems",
+      "shortLabel": "Systems",
+      "subtitle": "A public map of Hyperion systems and boundaries.",
+      "purpose": "Expose system shape, access posture, and public routes without leaking consoles, memory, or control surfaces.",
+      "publicPosture": "preview",
+      "accessLevel": "mixed",
+      "status": "preview",
+      "visibility": "public",
+      "launchReadiness": "preview",
+      "cta": [
+        { "label": "Open CHR0N Beta Lane", "route": "/access/chronos-public-beta" },
+        { "label": "Request Demo", "route": "/access/contact" }
+      ],
+      "relatedSystems": ["chronos", "mnemos", "hyperion-nest", "hyperion-connect", "argos", "scenos", "horus-decksmith", "kairos", "future-systems"],
+      "relatedRooms": ["public-status", "chronos-public-beta"],
+      "featuredArtifacts": ["systems-map"],
+      "notesForFrontend": "System cards should be data-driven and show declassified posture only."
+    },
+    {
+      "id": "studio",
+      "slug": "/studio",
+      "title": "Studio",
+      "shortLabel": "Studio",
+      "subtitle": "Commercial and creative production lanes.",
+      "purpose": "House Card Studio, identity artifacts, field reports, client-facing artifacts, proposal templates, ordering flows, and future studio products.",
+      "publicPosture": "preview",
+      "accessLevel": "open",
+      "status": "preview",
+      "visibility": "public",
+      "launchReadiness": "preview",
+      "cta": [
+        { "label": "Open Card Studio", "route": "/studio/card-studio" },
+        { "label": "Request Draft Invoice", "route": "/access/contact" }
+      ],
+      "relatedSystems": ["chronos"],
+      "relatedRooms": ["card-studio"],
+      "featuredArtifacts": ["profession-card-mockups"],
+      "notesForFrontend": "Card Studio is a room in the portal, not an orphan microsite."
+    },
+    {
+      "id": "field",
+      "slug": "/field",
+      "title": "Field",
+      "shortLabel": "Field",
+      "subtitle": "Real-world IT, service, hardware, and deployment work.",
+      "purpose": "Route site work, hardware installs, workstation deployments, closeout reports, client work posture, and field intake.",
+      "publicPosture": "preview",
+      "accessLevel": "request_access",
+      "status": "preview",
+      "visibility": "public",
+      "launchReadiness": "preview",
+      "cta": [
+        { "label": "Request Field Work", "route": "/access/contact" },
+        { "label": "View Build Archive", "route": "/field/build-archive" }
+      ],
+      "relatedSystems": ["hyperion-connect", "kairos", "scenos"],
+      "relatedRooms": ["field-services", "build-archive"],
+      "featuredArtifacts": ["build-archive"],
+      "notesForFrontend": "Keep field work inquiry-led until service terms and support boundaries are explicit."
+    },
+    {
+      "id": "doctrine",
+      "slug": "/doctrine",
+      "title": "Doctrine",
+      "shortLabel": "Doctrine",
+      "subtitle": "The public philosophy behind the system.",
+      "purpose": "Publish public essays and doctrine around continuity, local-first custody, governed AI, memory, field execution, and state exposure.",
+      "publicPosture": "preview",
+      "accessLevel": "open",
+      "status": "preview",
+      "visibility": "public",
+      "launchReadiness": "preview",
+      "cta": [
+        { "label": "Read Founder Notes", "route": "/founders/victor-amani" },
+        { "label": "Start Inquiry", "route": "/access/contact" }
+      ],
+      "relatedSystems": ["chronos", "mnemos"],
+      "relatedRooms": ["continuity-layer", "operator-doctrine"],
+      "featuredArtifacts": ["continuity-layer"],
+      "notesForFrontend": "Doctrine can be editorial, but should not imply private capability access."
+    },
+    {
+      "id": "access",
+      "slug": "/access",
+      "title": "Access",
+      "shortLabel": "Access",
+      "subtitle": "Public request, download, support, and onboarding lanes.",
+      "purpose": "Collect public-safe paths for beta downloads, request forms, demos, contact routes, field job requests, Card Studio ordering, public build links, and onboarding.",
+      "publicPosture": "preview",
+      "accessLevel": "mixed",
+      "status": "preview",
+      "visibility": "public",
+      "launchReadiness": "preview",
+      "cta": [
+        { "label": "Contact Hyperion", "route": "/access/contact" },
+        { "label": "CHR0N Public Beta", "route": "/access/chronos-public-beta" }
+      ],
+      "relatedSystems": ["chronos", "mnemos"],
+      "relatedRooms": ["chronos-public-beta", "contact"],
+      "featuredArtifacts": ["public-intake-contracts"],
+      "notesForFrontend": "Forms are public-safe intake models only. No sensitive external service is wired without approval."
+    },
+    {
+      "id": "status",
+      "slug": "/status",
+      "title": "Status",
+      "shortLabel": "Status",
+      "subtitle": "Declassified public posture.",
+      "purpose": "Show public-safe release lanes, known gaps, restricted/private labels, build posture, and service availability without private telemetry.",
+      "publicPosture": "preview",
+      "accessLevel": "open",
+      "status": "preview",
+      "visibility": "public",
+      "launchReadiness": "preview",
+      "cta": [
+        { "label": "View CHR0N Beta", "route": "/access/chronos-public-beta" },
+        { "label": "Report Issue", "route": "/access/contact" }
+      ],
+      "relatedSystems": ["chronos", "mnemos", "hyperion-connect"],
+      "relatedRooms": ["public-status"],
+      "featuredArtifacts": ["status-contract"],
+      "notesForFrontend": "This is public posture, not live telemetry."
+    }
+  ],
+  "rooms": [
+    {
+      "id": "card-studio",
+      "zoneId": "studio",
+      "slug": "/studio/card-studio",
+      "title": "Card Studio",
+      "shortLabel": "Card Studio",
+      "subtitle": "Identity Fabrication / Smart Business Card Lane",
+      "purpose": "Compose public identity artifacts, digital cards, physical NFC card previews, and operator-reviewed order requests.",
+      "publicPosture": "preview",
+      "accessLevel": "open",
+      "status": "preview",
+      "visibility": "public",
+      "launchReadiness": "preview",
+      "cta": [
+        { "label": "Open Studio Room", "route": "/studio/card-studio" },
+        { "label": "Request Draft Invoice", "route": "/access/contact" }
+      ],
+      "relatedSystems": ["chronos"],
+      "relatedArtifacts": ["profession-card-mockups", "operator-card"],
+      "pricing": {
+        "currency": "USD",
+        "publicCheckoutEnabled": false,
+        "pricingPosture": "public_prices_operator_review",
+        "activePricingSource": "src/data/commerce.json and public/assets/card-studio/catalog.jsx",
+        "digital": { "label": "Digital card", "price": 0, "note": "Free forever" },
+        "physicalFinishes": [
+          { "key": "pvc-matte", "label": "PVC NFC Card - Matte", "price": 39 },
+          { "key": "pvc-gloss", "label": "PVC NFC Card - Gloss", "price": 39 },
+          { "key": "pvc-soft", "label": "PVC NFC Card - Soft-touch", "price": 49 },
+          { "key": "metal-brushed", "label": "Metal NFC Card - Brushed steel", "price": 89 },
+          { "key": "metal-matte", "label": "Metal NFC Card - Matte black", "price": 99 },
+          { "key": "metal-polished", "label": "Metal NFC Card - Polished black", "price": 109 },
+          { "key": "metal-gold", "label": "Metal NFC Card - 24k gold accent", "price": 129 }
+        ],
+        "plans": [
+          { "key": "starter", "label": "Starter", "price": "$0", "period": "free forever" },
+          { "key": "pro", "label": "Pro", "price": "$9", "period": "/ month", "note": "or $90/yr" },
+          { "key": "team", "label": "Team", "price": "Custom", "period": "per seat" }
+        ]
+      },
+      "fulfillmentNotes": "Payment and fulfillment move through operator-reviewed Shopify draft invoices. No public cart or checkout is live."
+    },
+    {
+      "id": "build-archive",
+      "zoneId": "field",
+      "slug": "/field/build-archive",
+      "title": "Build Archive",
+      "shortLabel": "Archive",
+      "subtitle": "Public field artifact archive",
+      "purpose": "Show completed builds and field artifacts without exposing client telemetry or private service notes.",
+      "publicPosture": "preview",
+      "accessLevel": "open",
+      "status": "preview",
+      "visibility": "public",
+      "launchReadiness": "preview",
+      "cta": [
+        { "label": "View Archive", "route": "/field/build-archive" },
+        { "label": "Request Field Work", "route": "/access/contact" }
+      ],
+      "relatedSystems": ["hyperion-connect"],
+      "relatedArtifacts": ["forge-system"]
+    }
+  ],
+  "systems": [
+    {
+      "id": "chronos",
+      "name": "CHR0N.OS",
+      "codename": "Archive & Recovery Lane",
+      "description": "Local-first archival intelligence for files that need custody, provenance, memory, and recovery workflows.",
+      "publicSummary": "Public beta for archive intake, provenance-preserving copy workflows, file/context inspection, chronological sorting, and search-oriented organization.",
+      "posture": "public_beta",
+      "access": "download",
+      "authorityBoundary": "Public download links are allowed. Private CHR0N consoles, internal build infrastructure, governed memory commits, and sensitive logs are not exposed.",
+      "relatedZones": ["systems", "access", "doctrine", "status"],
+      "relatedArtifacts": ["chronos-public-beta"],
+      "docsRoute": "/access/chronos-public-beta",
+      "downloadRoute": "/access/chronos-public-beta",
+      "statusRoute": "/status",
+      "privateRoutePlaceholder": null,
+      "hidePrivateControls": true,
+      "visibility": "public",
+      "truthSource": "https://github.com/Code-Xer0/CHR0N.OS-Preview/releases/tag/v0.2.2-beta.1",
+      "lastVerified": "2026-06-25"
+    },
+    {
+      "id": "mnemos",
+      "name": "Mnem.OS",
+      "codename": "Continuity Layer",
+      "description": "Memory and continuity authority for long-horizon context, snapshots, priors, histories, archives, and recall structures.",
+      "publicSummary": "Public shape can be described. Private memory and governed commits are not public.",
+      "posture": "in_development",
+      "access": "request_access",
+      "authorityBoundary": "No private memory, vaults, operator state, or governed memory commits are exposed.",
+      "relatedZones": ["systems", "doctrine", "status"],
+      "relatedArtifacts": ["continuity-layer"],
+      "docsRoute": "/doctrine",
+      "downloadRoute": null,
+      "statusRoute": "/status",
+      "privateRoutePlaceholder": "restricted-memory-authority",
+      "hidePrivateControls": true,
+      "visibility": "public"
+    },
+    {
+      "id": "hyperion-nest",
+      "name": "Hyperion Nest",
+      "codename": "Operator-Gated Council Lane",
+      "description": "Publicly described as an operator-gated coordination and model-depot lane.",
+      "publicSummary": "Restricted system. Public can see shape only.",
+      "posture": "restricted",
+      "access": "restricted",
+      "authorityBoundary": "No live agent deployment controls, model acquisition authority, or council execution surfaces are public.",
+      "relatedZones": ["systems", "status"],
+      "relatedArtifacts": [],
+      "docsRoute": "/systems",
+      "downloadRoute": null,
+      "statusRoute": "/status",
+      "privateRoutePlaceholder": "restricted-operator-console",
+      "hidePrivateControls": true,
+      "visibility": "public"
+    },
+    {
+      "id": "hyperion-connect",
+      "name": "Hyperion Connect",
+      "codename": "Bridge / Transport Layer",
+      "description": "Connector, relay, and bridge posture for local systems and adjacent runtimes.",
+      "publicSummary": "Public can see the bridge concept and restricted posture, not the control bus.",
+      "posture": "restricted",
+      "access": "restricted",
+      "authorityBoundary": "No remote command surfaces, private relay telemetry, pairing secrets, or device command controls are public.",
+      "relatedZones": ["systems", "field", "status"],
+      "relatedArtifacts": ["field-services"],
+      "docsRoute": "/systems",
+      "downloadRoute": null,
+      "statusRoute": "/status",
+      "privateRoutePlaceholder": "restricted-connect-console",
+      "hidePrivateControls": true,
+      "visibility": "public"
+    },
+    {
+      "id": "argos",
+      "name": "ARG.OS",
+      "codename": "Negotiation / Argument Layer",
+      "description": "A reasoning and negotiation-facing lane for contracts, arguments, and structured positions.",
+      "publicSummary": "In development; public shape only.",
+      "posture": "in_development",
+      "access": "request_access",
+      "authorityBoundary": "No private negotiation records, client data, or agent actuation controls are exposed.",
+      "relatedZones": ["systems", "doctrine"],
+      "relatedArtifacts": [],
+      "docsRoute": "/systems",
+      "downloadRoute": null,
+      "statusRoute": "/status",
+      "privateRoutePlaceholder": "restricted-argos-console",
+      "hidePrivateControls": true,
+      "visibility": "public"
+    },
+    {
+      "id": "scenos",
+      "name": "SCEN.OS",
+      "codename": "Scene / Context Layer",
+      "description": "A scene and context lane for surfaces, rooms, ambient state, and public-safe presentation.",
+      "publicSummary": "In development; public shape only.",
+      "posture": "in_development",
+      "access": "request_access",
+      "authorityBoundary": "No private scene state, device telemetry, or control surfaces are exposed.",
+      "relatedZones": ["systems", "field", "studio"],
+      "relatedArtifacts": [],
+      "docsRoute": "/systems",
+      "downloadRoute": null,
+      "statusRoute": "/status",
+      "privateRoutePlaceholder": "restricted-scenos-runtime",
+      "hidePrivateControls": true,
+      "visibility": "public"
+    },
+    {
+      "id": "horus-decksmith",
+      "name": "HORUS / Decksmith",
+      "codename": "Observer / Artifact Deck Lane",
+      "description": "Public-facing artifact, deck, and observer lane for reports and structured outputs.",
+      "publicSummary": "Preview concept connected to Studio and Doctrine.",
+      "posture": "preview",
+      "access": "request_access",
+      "authorityBoundary": "No internal agent orchestration, sensitive decks, or private client artifacts are exposed.",
+      "relatedZones": ["studio", "doctrine", "systems"],
+      "relatedArtifacts": ["field-reports", "proposal-templates"],
+      "docsRoute": "/studio",
+      "downloadRoute": null,
+      "statusRoute": "/status",
+      "privateRoutePlaceholder": "restricted-decksmith-workbench",
+      "hidePrivateControls": true,
+      "visibility": "public"
+    },
+    {
+      "id": "kairos",
+      "name": "KAIR.OS",
+      "codename": "Timing / Execution Layer",
+      "description": "A timing, cadence, and execution lane for operator-visible service and device workflows.",
+      "publicSummary": "Restricted and in development; public shape only.",
+      "posture": "restricted",
+      "access": "restricted",
+      "authorityBoundary": "No hardware control, private device state, or command execution surfaces are public.",
+      "relatedZones": ["systems", "field", "status"],
+      "relatedArtifacts": [],
+      "docsRoute": "/systems",
+      "downloadRoute": null,
+      "statusRoute": "/status",
+      "privateRoutePlaceholder": "restricted-kairos-runtime",
+      "hidePrivateControls": true,
+      "visibility": "public"
+    },
+    {
+      "id": "future-systems",
+      "name": "Future Systems",
+      "codename": "Reserved Public Slots",
+      "description": "Placeholder for future public systems as they become safe to describe.",
+      "publicSummary": "Planned. No capability is implied.",
+      "posture": "planned",
+      "access": "request_access",
+      "authorityBoundary": "No future private authority is implied by this public placeholder.",
+      "relatedZones": ["systems"],
+      "relatedArtifacts": [],
+      "docsRoute": "/systems",
+      "downloadRoute": null,
+      "statusRoute": "/status",
+      "privateRoutePlaceholder": null,
+      "hidePrivateControls": true,
+      "visibility": "public"
+    }
+  ],
+  "accessLanes": [
+    {
+      "id": "chronos-public-beta",
+      "zoneId": "access",
+      "slug": "/access/chronos-public-beta",
+      "title": "CHR0N.OS Public Beta",
+      "subtitle": "Archive & Recovery Lane",
+      "posture": "public_beta",
+      "access": "download",
+      "visibility": "public",
+      "systemId": "chronos",
+      "publicBeta": {
+        "version": "v0.2.2-beta.1",
+        "releaseName": "CHR0N.OS v0.2.2 beta 1",
+        "releaseUrl": "https://github.com/Code-Xer0/CHR0N.OS-Preview/releases/tag/v0.2.2-beta.1",
+        "publishedAt": "2026-06-06T05:32:44Z",
+        "localFirstPosture": "Local-first preview lane. Installer and portable builds are public beta artifacts; private console functions are not exposed.",
+        "betaWarning": "Public beta software. Use non-critical test archives first and keep original files under your own custody.",
+        "releaseNotesRoute": "https://github.com/Code-Xer0/CHR0N.OS-Preview/releases/tag/v0.2.2-beta.1",
+        "knownIssues": {
+          "status": "manual_update_required",
+          "note": "Known issues must be manually maintained from release notes or operator review."
+        },
+        "supportRoute": "/access/contact",
+        "changelogRoute": "https://github.com/Code-Xer0/CHR0N.OS-Preview/releases",
+        "assets": [
+          {
+            "label": "Windows installer",
+            "kind": "installer",
+            "url": "https://github.com/Code-Xer0/CHR0N.OS-Preview/releases/download/v0.2.2-beta.1/CHRON.OS-v0.2.2-beta.1-windows-setup.exe",
+            "sha256": "ae650a6ae8e8d6bc6aaecd2c5fc70a8396fa839477fe87a5b3cbdafdc2342e79",
+            "sizeBytes": 76011470
+          },
+          {
+            "label": "Portable Windows ZIP",
+            "kind": "portable",
+            "url": "https://github.com/Code-Xer0/CHR0N.OS-Preview/releases/download/v0.2.2-beta.1/CHRON.OS-v0.2.2-beta.1-portable-windows.zip",
+            "sha256": "dc5bfe56a6ccab7fcad07a81805bca97c213a6331f84bc0a4d48da6bc6e32864",
+            "sizeBytes": 88183971
+          },
+          {
+            "label": "Windows MSI",
+            "kind": "msi",
+            "url": "https://github.com/Code-Xer0/CHR0N.OS-Preview/releases/download/v0.2.2-beta.1/CHRON.OS-v0.2.2-beta.1-windows.msi",
+            "sha256": "685267e2fc7d4700c28ccc8ba0f43b4fd3b4378f0812066870467e32875ae535",
+            "sizeBytes": 77463552
+          }
+        ]
+      }
+    },
+    {
+      "id": "contact",
+      "zoneId": "access",
+      "slug": "/access/contact",
+      "title": "Contact / Intake",
+      "subtitle": "Public-safe inquiry routing",
+      "posture": "preview",
+      "access": "open",
+      "visibility": "public",
+      "intakeModels": ["contact", "field_work", "card_studio_order", "beta_access", "demo_request", "chronos_beta_issue", "partnership_funding"]
+    }
+  ],
+  "intakeModels": [
+    {
+      "id": "contact",
+      "label": "General contact",
+      "route": "/api/public-intake",
+      "requiredFields": ["name", "email", "message"],
+      "allowedFields": ["name", "email", "organization", "message", "preferredRoute"],
+      "publicSafeOnly": true,
+      "persistence": "staged_memory_only",
+      "externalService": "none"
+    },
+    {
+      "id": "field_work",
+      "label": "Request field work",
+      "route": "/api/public-intake",
+      "requiredFields": ["name", "email", "message"],
+      "allowedFields": ["name", "email", "organization", "siteRegion", "timeline", "budgetRange", "message"],
+      "publicSafeOnly": true,
+      "persistence": "staged_memory_only",
+      "externalService": "none"
+    },
+    {
+      "id": "card_studio_order",
+      "label": "Request Card Studio order",
+      "route": "/api/public-intake",
+      "requiredFields": ["name", "email", "message"],
+      "allowedFields": ["name", "email", "organization", "template", "finish", "quantity", "profileUrl", "shippingRegion", "message"],
+      "publicSafeOnly": true,
+      "persistence": "staged_memory_only",
+      "externalService": "none"
+    },
+    {
+      "id": "beta_access",
+      "label": "Request beta access",
+      "route": "/api/public-intake",
+      "requiredFields": ["name", "email", "system", "message"],
+      "allowedFields": ["name", "email", "organization", "system", "useCase", "message"],
+      "publicSafeOnly": true,
+      "persistence": "staged_memory_only",
+      "externalService": "none"
+    },
+    {
+      "id": "demo_request",
+      "label": "Request demo",
+      "route": "/api/public-intake",
+      "requiredFields": ["name", "email", "message"],
+      "allowedFields": ["name", "email", "organization", "system", "timeline", "message"],
+      "publicSafeOnly": true,
+      "persistence": "staged_memory_only",
+      "externalService": "none"
+    },
+    {
+      "id": "chronos_beta_issue",
+      "label": "Report CHR0N beta issue",
+      "route": "/api/public-intake",
+      "requiredFields": ["name", "email", "message"],
+      "allowedFields": ["name", "email", "version", "platform", "issueType", "message"],
+      "publicSafeOnly": true,
+      "persistence": "staged_memory_only",
+      "externalService": "none"
+    },
+    {
+      "id": "partnership_funding",
+      "label": "Partnership / funding inquiry",
+      "route": "/api/public-intake",
+      "requiredFields": ["name", "email", "message"],
+      "allowedFields": ["name", "email", "organization", "inquiryType", "timeline", "message"],
+      "publicSafeOnly": true,
+      "persistence": "staged_memory_only",
+      "externalService": "none"
+    }
+  ],
+  "publicStatus": [
+    {
+      "id": "portal-substrate",
+      "label": "Hyperion Web Portal",
+      "posture": "preview",
+      "access": "open",
+      "summary": "Portal substrate and public routing are being organized around structured data.",
+      "truthSource": "repo:src/data/portal.json",
+      "lastVerified": "2026-06-25"
+    },
+    {
+      "id": "chronos-public-beta",
+      "label": "CHR0N.OS Public Beta",
+      "posture": "public_beta",
+      "access": "download",
+      "summary": "Public beta assets are available through GitHub release v0.2.2-beta.1.",
+      "truthSource": "https://github.com/Code-Xer0/CHR0N.OS-Preview/releases/tag/v0.2.2-beta.1",
+      "lastVerified": "2026-06-25"
+    },
+    {
+      "id": "card-studio-ordering",
+      "label": "Card Studio Ordering",
+      "posture": "preview",
+      "access": "request_access",
+      "summary": "Public pricing is visible; payment and fulfillment remain operator-reviewed via draft invoices.",
+      "truthSource": "src/data/commerce.json",
+      "lastVerified": "2026-06-25"
+    },
+    {
+      "id": "public-api",
+      "label": "Public API functions",
+      "posture": "manual_update_required",
+      "access": "restricted",
+      "summary": "API contracts exist in-repo, but live GitHub Pages deployment does not currently serve JSON api routes.",
+      "truthSource": "manual live probe 2026-06-25",
+      "lastVerified": "2026-06-25"
+    }
+  ],
+  "safetyRules": {
+    "publicMaySee": [
+      "product and system descriptions",
+      "public beta status",
+      "public build and download links",
+      "Card Studio order lane",
+      "public field service offerings",
+      "public doctrine and writing",
+      "public status language",
+      "request and contact routes",
+      "public-safe demos"
+    ],
+    "publicMustNotAccess": [
+      "real operator consoles",
+      "private memory",
+      "agent deployment controls",
+      "vaults or secrets",
+      "client telemetry",
+      "remote command surfaces",
+      "governed memory commits",
+      "internal build infrastructure",
+      "sensitive logs",
+      "private Slack or agent orchestration"
+    ]
+  }
+}
