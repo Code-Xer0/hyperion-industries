@@ -1,0 +1,14 @@
+{
+  "serverInfo": {
+    "name": "Hyperion Industries MCP",
+    "version": "1.0.0"
+  },
+  "endpoints": {
+    "transport": "https://hyperion-industries.dev/mcp"
+  },
+  "capabilities": {
+    "tools": true,
+    "resources": true,
+    "prompts": false
+  }
+}
