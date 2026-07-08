@@ -1,0 +1,4 @@
+Contact: mailto:security@hyperion-industries.dev
+Expires: 2027-07-08T00:00:00Z
+Preferred-Languages: en
+Canonical: https://hyperion-industries.dev/.well-known/security.txt
