@@ -16,6 +16,7 @@ const route = (path, label, family, options = {}) => {
     previewPosition: options.previewPosition ?? 'center',
     mark: options.mark ?? null,
     markAlt: options.markAlt ?? '',
+    markPlacement: options.markPlacement ?? 'left',
     external: options.external ?? false,
     utility: options.utility ?? false,
   };
@@ -100,6 +101,7 @@ export const cityFamilies = [
         previewPosition: 'center',
         mark: '/assets/operators/victor-operator-mark.png',
         markAlt: 'Victor Amani Hyperion operator mark',
+        markPlacement: 'right',
       }),
       route('/founders/keshawn-rowe', 'Keshawn Rowe', 'operators', {
         status: 'PROFILE IN PROGRESS',

@@ -507,7 +507,7 @@ export default function Nav() {
                           <div className="city-route-preview-scrim" />
                           {previewDestination.mark && (
                             <img
-                              className="city-route-preview-mark"
+                              className={`city-route-preview-mark is-${previewDestination.markPlacement || 'left'}`}
                               src={previewDestination.mark}
                               alt={previewDestination.markAlt}
                             />
