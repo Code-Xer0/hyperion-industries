@@ -15,6 +15,7 @@ export interface Env {
   OPENROUTER_API_KEY?: string;
   OPENROUTER_MODEL?: string;
   SITE_ORIGIN?: string;
+  INTAKE_API_ORIGIN?: string;
   INQUIRY_NOTIFY_TO?: string;
   INQUIRY_FROM_EMAIL?: string;
   INQUIRY_CONSENT_VERSION?: string;

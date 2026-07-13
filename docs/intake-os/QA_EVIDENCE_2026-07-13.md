@@ -6,7 +6,7 @@ Date: 2026-07-13
 
 | Gate | Result |
 | --- | --- |
-| `npm run check` in `workers/operator` | PASS — corpus current, TypeScript clean, 7 files / 54 tests |
+| `npm run check` in `workers/operator` | PASS — corpus current, TypeScript clean, 7 files / 58 tests |
 | `npm run lint` | PASS — 0 errors, 9 pre-existing warnings |
 | `npm run substrate:audit` | PASS — 11 contract routes, 9 systems, 7 intake models |
 | `node scripts/verify-order-apis.mjs` | PASS |
@@ -38,6 +38,18 @@ The browser matrix completed Forge, Pandora, Continuity, Operator Identity, Supp
 - Idempotent replay returned the original receipt.
 - Local D1 counts: one submission, one routing decision, one audit event, and one held outbox record.
 
-## Not yet accepted live
+## Live acceptance evidence
 
-Cloudflare account authorization, production D1 migration, Resend sender/secret verification, live magic-link delivery, live public submission, public GitHub Pages commit/hash verification, and production console checks remain blocked pending approved credentials and deployment access. These are not reported as passing.
+- Wrangler authenticated to the approved Cloudflare account; D1 `hyperion-operator` was created in ENAM and all four additive migrations applied.
+- `GET https://hyperion-operator.hyperion-industries-intake.workers.dev/api/intake/status` returned JSON contract `1.0.1`; evaluation and storage reported `ready`.
+- Credentialed CORS and the bounded `content-type, idempotency-key` preflight passed from `https://hyperion-industries.dev`.
+- A synthetic General submission persisted once with receipt `rcp_3801d107a17a45818e7d75898d3a7b70`; replay returned the same receipt with `duplicate=true`.
+- The live receipt status is `received for operator review`; no downstream domain mutation was performed.
+- GitHub Pages deployed intake commit `6fed42b` successfully in Actions run `29289303887`; the endpoint-binding follow-up is verified locally and must be present in the final deployed commit.
+
+## Remaining live gates
+
+- Resend is not authenticated in the operator browser, no `RESEND_API_KEY` secret exists, and status truthfully reports resume as `configuration_required`; live magic-link delivery and redemption are not accepted.
+- Cloudflare returned `403` for cron-schedule creation under the authorized OAuth scope. The daily retention handler is tested, but its production trigger remains pending.
+- Branded Worker custom domains returned an edge `522` before Worker execution and were detached. The verified `workers.dev` endpoint is the release transport until the zone-level custom-domain issue is resolved.
+- Final public browser and console acceptance must be repeated after the endpoint-binding commit is deployed by Pages.

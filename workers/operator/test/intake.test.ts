@@ -243,7 +243,7 @@ describe("magic links and versioned drafts", () => {
     expect(response.status).toBe(429);
   });
 
-  it("exchanges a live token once and sets a secure HttpOnly SameSite cookie", async () => {
+  it("exchanges a live token once and sets a secure cross-site HttpOnly cookie", async () => {
     const db = new MockD1().queueFirst({
       id: "grt_1", email_hash: "emailhash", draft_id: "drf_abcdefghijkl",
       expires_at: "2026-07-13T12:15:00.000Z", consumed_at: null, session_expires_at: null,
@@ -252,7 +252,7 @@ describe("magic links and versioned drafts", () => {
       postJson("/api/intake/resume/exchange", { token: "a".repeat(64) }), resumeEnv(db), executionContext().ctx,
     );
     expect(response.status).toBe(200);
-    expect(response.headers.get("set-cookie")).toMatch(/Secure; HttpOnly; SameSite=Strict/);
+    expect(response.headers.get("set-cookie")).toMatch(/Secure; HttpOnly; SameSite=None/);
     expect(await response.json()).toMatchObject({ draft_id: "drf_abcdefghijkl" });
   });
 

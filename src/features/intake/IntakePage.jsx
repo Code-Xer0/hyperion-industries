@@ -25,6 +25,9 @@ import './IntakePage.css';
 const STEPS = ['Aperture', 'Handshake', 'Signal', 'Load / Limits', 'Fit', 'Review', 'Dispatch'];
 const LOCAL_PREFIX = 'hyperion-intake-v1';
 const LOCAL_RETENTION_MS = 14 * 24 * 60 * 60 * 1000;
+const API_ORIGIN = import.meta.env.PROD
+  ? 'https://hyperion-operator.hyperion-industries-intake.workers.dev'
+  : '';
 const FORM_IDS = {
   forge: 'forge-build-profile',
   pandora: 'pandora-readiness',
@@ -67,8 +70,9 @@ function findLocalDraft(draftId) {
 }
 
 async function api(path, options = {}) {
-  const response = await fetch(path, {
+  const response = await fetch(`${API_ORIGIN}${path}`, {
     ...options,
+    credentials: 'include',
     headers: { 'content-type': 'application/json', ...(options.headers || {}) },
   });
   const body = response.status === 204 ? null : await response.json().catch(() => null);

@@ -21,6 +21,29 @@ describe("HTTP boundary", () => {
     expect((await worker.fetch(originless, baseEnv(), ctx)).status).toBe(403);
   });
 
+  it("accepts state changes through the configured first-party API origin", async () => {
+    const worker = createWorker();
+    const { ctx } = executionContext();
+    const request = new Request("https://hyperion-operator.hyperion-industries-intake.workers.dev/api/intake/evaluate", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        origin: "https://hyperion-industries.dev",
+        "sec-fetch-site": "cross-site",
+      },
+      body: JSON.stringify({
+        lane: "general",
+        answers: { need: "A governed intake route" },
+        automated_classification: false,
+      }),
+    });
+
+    const response = await worker.fetch(request, baseEnv(), ctx);
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("access-control-allow-origin")).toBe("https://hyperion-industries.dev");
+  });
+
   it("rejects oversized bodies before parsing", async () => {
     const worker = createWorker();
     const { ctx } = executionContext();

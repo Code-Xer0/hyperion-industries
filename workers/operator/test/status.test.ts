@@ -46,4 +46,61 @@ describe("GET /api/operator/status", () => {
       logs: "metadata_only",
     });
   });
+
+  it("returns credentialed CORS headers only for the configured first-party API domain", async () => {
+    const worker = createWorker({ randomUUID: () => "cors-status" });
+    const { ctx } = executionContext();
+    const response = await worker.fetch(
+      new Request("https://hyperion-operator.hyperion-industries-intake.workers.dev/api/operator/status", {
+        headers: { origin: "https://hyperion-industries.dev" },
+      }),
+      baseEnv(),
+      ctx,
+    );
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("access-control-allow-origin")).toBe("https://hyperion-industries.dev");
+    expect(response.headers.get("access-control-allow-credentials")).toBe("true");
+    expect(response.headers.get("vary")).toContain("Origin");
+  });
+
+  it("accepts a bounded first-party CORS preflight", async () => {
+    const worker = createWorker({ randomUUID: () => "cors-preflight" });
+    const { ctx } = executionContext();
+    const response = await worker.fetch(
+      new Request("https://hyperion-operator.hyperion-industries-intake.workers.dev/api/intake/submissions", {
+        method: "OPTIONS",
+        headers: {
+          origin: "https://hyperion-industries.dev",
+          "access-control-request-method": "POST",
+          "access-control-request-headers": "content-type, idempotency-key",
+        },
+      }),
+      baseEnv(),
+      ctx,
+    );
+
+    expect(response.status).toBe(204);
+    expect(response.headers.get("access-control-allow-origin")).toBe("https://hyperion-industries.dev");
+    expect(response.headers.get("access-control-allow-headers")).toBe("content-type, idempotency-key");
+  });
+});
+
+describe("edge pass-through", () => {
+  it("forwards non-Operator routes to the existing public origin", async () => {
+    const originResponse = new Response("public site", {
+      status: 200,
+      headers: { "content-type": "text/html; charset=utf-8" },
+    });
+    const fetcher = vi.fn(async () => originResponse);
+    const worker = createWorker({ fetcher });
+    const { ctx } = executionContext();
+    const request = new Request("https://hyperion-industries.dev/intake");
+
+    const response = await worker.fetch(request, {}, ctx);
+
+    expect(fetcher).toHaveBeenCalledOnce();
+    expect(fetcher).toHaveBeenCalledWith(request);
+    expect(response).toBe(originResponse);
+  });
 });

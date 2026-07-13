@@ -1,5 +1,5 @@
 import { handleChat } from "./chat";
-import { enforceSameOrigin, errorResponse, finalizeResponse, HttpError, jsonResponse } from "./http";
+import { browserCorsOrigin, enforceSameOrigin, errorResponse, finalizeResponse, HttpError, jsonResponse } from "./http";
 import { handleInquiry, purgeExpiredInquiries } from "./inquiries";
 import {
   handleDraft,
@@ -47,6 +47,32 @@ export function createWorker(overrides: Partial<RuntimeDependencies> = {}): Oper
       const requestId = deps.randomUUID();
       const startedAt = deps.now().getTime();
       const url = new URL(request.url);
+      const operatorOwnedPath = url.pathname.startsWith("/api/operator") || url.pathname.startsWith("/api/intake");
+
+      // This Worker is the zone's edge owner. Preserve every unrelated public
+      // route by forwarding it to the configured origin without inspection.
+      if (!operatorOwnedPath) return deps.fetcher(request);
+
+      const corsOrigin = browserCorsOrigin(request, env);
+      if (request.method === "OPTIONS") {
+        const requestedMethod = request.headers.get("access-control-request-method")?.toUpperCase();
+        const requestedHeaders = (request.headers.get("access-control-request-headers") ?? "")
+          .split(",").map((value) => value.trim().toLowerCase()).filter(Boolean);
+        const supportedHeaders = new Set(["content-type", "idempotency-key"]);
+        if (!corsOrigin || !requestedMethod || !["GET", "POST", "PUT", "DELETE"].includes(requestedMethod)
+          || requestedHeaders.some((value) => !supportedHeaders.has(value))) {
+          return finalizeResponse(errorResponse(new HttpError(403, "cors_preflight_rejected", "CORS preflight rejected.")), requestId);
+        }
+        return finalizeResponse(new Response(null, {
+          status: 204,
+          headers: {
+            "access-control-allow-methods": "GET, POST, PUT, DELETE, OPTIONS",
+            "access-control-allow-headers": "content-type, idempotency-key",
+            "access-control-max-age": "600",
+          },
+        }), requestId, corsOrigin);
+      }
+
       let response: Response;
       let reason: string | undefined;
 
@@ -97,7 +123,7 @@ export function createWorker(overrides: Partial<RuntimeDependencies> = {}): Oper
         duration_ms: Math.max(0, deps.now().getTime() - startedAt),
         reason,
       });
-      return finalizeResponse(response, requestId);
+      return finalizeResponse(response, requestId, corsOrigin);
     },
 
     async scheduled(_controller, env, ctx) {

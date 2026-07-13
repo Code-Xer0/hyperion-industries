@@ -144,7 +144,7 @@ function cookieValue(request: Request, name: string): string | null {
 }
 
 function responseCookie(name: string, value: string): string {
-  return `${name}=${encodeURIComponent(value)}; Path=/api/intake; Max-Age=${INTAKE_COOKIE_DAYS * 86400}; Secure; HttpOnly; SameSite=Strict`;
+  return `${name}=${encodeURIComponent(value)}; Path=/api/intake; Max-Age=${INTAKE_COOKIE_DAYS * 86400}; Secure; HttpOnly; SameSite=None`;
 }
 
 function cleanString(value: unknown, maximum: number): string | null {

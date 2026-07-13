@@ -4,7 +4,7 @@ Date: 2026-07-13
 
 ## Outcome
 
-Hyperion Site Intake OS v1 is source-complete and locally verified as a seven-lane public custody edge for Forge, Pandora, Continuity, Operator Identity, Support, Relationships, and General signals.
+Hyperion Site Intake OS v1 is deployed as a seven-lane public custody edge for Forge, Pandora, Continuity, Operator Identity, Support, Relationships, and General signals. Public evaluation, immutable D1 submission, and idempotent receipt replay are live. Magic-link resume remains configuration-gated pending Resend authorization.
 
 The public release stops at **received for operator review**. It does not create or mutate CRM contacts, orders, jobs, tickets, payments, deliverables, memory, CHR0N records, Founder Command state, or domain-system records.
 
@@ -12,13 +12,14 @@ The public release stops at **received for operator review**. It does not create
 
 | Surface | State | Authority |
 | --- | --- | --- |
-| React intake experience | Source-complete / local QA passed | Capture, local draft recovery, deterministic preview, receipt display |
-| Operator Worker and D1 migrations | Source-complete / local QA passed | Validate, persist immutable public evidence, route deterministically, issue resume sessions, hold outbox records |
+| React intake experience | Live / endpoint-binding release in progress | Capture, local draft recovery, deterministic preview, receipt display |
+| Operator Worker and D1 migrations | Live / storage and evaluation ready | Validate, persist immutable public evidence, route deterministically, issue resume sessions, hold outbox records |
 | Founder Command delivery feed | Source-complete / deployment-gated | Deliver immutable records and record per-item custody acknowledgments only |
 | Founder Command review and promotion | Contracted / not activated | Future local review, preview, approval-receipt issue, and explicit operator-authorized apply |
 | Domain adapters | Not implemented | No domain writes in v1 |
 | Nest analysis | Disabled | No write or execution authority |
-| Cloudflare, D1, Resend, public Pages | Deployment blocked pending authorization | No live-state claim until credentials, bindings, migration, probes, and acceptance pass |
+| Cloudflare Worker, D1, public Pages | Live / verified Worker endpoint | Public capture and immutable receipt only |
+| Resend and scheduled retention | Configuration required | Resume email and daily purge remain disabled until their named gates pass |
 
 ## Public experience
 
@@ -48,7 +49,7 @@ See `CUSTODY_CHAIN_V1.md` and `shared/intake/contracts/schemas/custody-control.s
 ## Verification summary
 
 - Worker corpus check and TypeScript check passed.
-- Worker suite passed: 7 files, 54 tests.
+- Worker suite passed: 7 files, 58 tests.
 - Site ESLint passed with zero errors and nine pre-existing radio-hook warnings.
 - Order API posture and substrate audits passed.
 - Production build passed.
@@ -59,18 +60,16 @@ See `CUSTODY_CHAIN_V1.md` and `shared/intake/contracts/schemas/custody-control.s
 - Automated WCAG A/AA scan found only an empty document-title issue; the title ownership was corrected and the targeted rerun returned zero violations.
 - Controlled local D1 acceptance persisted one synthetic submission, one decision, one audit event, and one `held_for_review` outbox record; idempotent replay returned the original receipt.
 
-## Deployment gate
+## Live deployment posture
 
-Do not push or publish this release until all are true:
-
-1. Wrangler is authenticated to the approved Cloudflare account.
-2. The D1 database is created, the real ID replaces the zero placeholder, and migrations apply in order.
-3. `signal@intake.hyperion-industries.dev` is verified in Resend and `RESEND_API_KEY` is stored only as a Wrangler secret.
-4. The current Founder Command service-token digest is stored as a Worker secret; raw tokens stay in Windows Credential Manager.
-5. The Worker is deployed first and `/api/intake/status` returns JSON on the public origin.
-6. A controlled magic link to `hello@hyperion-industries.dev` is delivered and redeemed.
-7. A synthetic public submission persists once, replay returns the same receipt, and the receipt says `received for operator review`.
-8. Only then may the two-commit `codex/Chonoslanding` release be pushed to trigger GitHub Pages.
+- Wrangler is authenticated to the approved Cloudflare account.
+- D1 `hyperion-operator` is bound and migrations `0001` through `0004` are applied.
+- The verified runtime endpoint is `https://hyperion-operator.hyperion-industries-intake.workers.dev`; exact-origin credentialed CORS permits only the public site.
+- Evaluation, immutable submission, and idempotent receipt replay passed live acceptance.
+- The broad analytics edge Worker was retired only after its GA4 behavior was preserved in the compiled site.
+- Resend authentication, the production `RESEND_API_KEY`, controlled magic-link delivery, and redemption remain pending. Resume status therefore stays `configuration_required`.
+- The tested retention handler has no production cron because Cloudflare rejected schedule creation for the current OAuth scope. Run a bounded manual purge if required before the trigger is authorized.
+- The Founder Command service-token digest is not configured; the operator feed remains unavailable and no downstream delivery is claimed.
 
 ## Rollback
 

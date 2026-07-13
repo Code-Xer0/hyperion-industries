@@ -63,6 +63,7 @@ export function allowRateLimit(): RateLimitBinding {
 export function baseEnv(overrides: Partial<Env> = {}): Env {
   return {
     SITE_ORIGIN: "https://hyperion-industries.dev",
+    INTAKE_API_ORIGIN: "https://hyperion-operator.hyperion-industries-intake.workers.dev",
     OPENROUTER_API_KEY: "test-openrouter-key",
     CHAT_RATE_LIMITER: allowRateLimit(),
     INQUIRY_RATE_LIMITER: allowRateLimit(),
