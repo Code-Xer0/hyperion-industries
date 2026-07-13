@@ -1,65 +1,72 @@
 import { Link } from 'react-router-dom';
 import PageShell from '../components/layout/PageShell';
-import SectionHero from '../components/ui/SectionHero';
+import RoomShell from '../components/portal/RoomShell';
 import HoverEditor from '../components/ui/HoverEditor';
 import content from '../data/content.json';
 import './SubPage.css';
 
+const entries = [
+  { tag: 'Shipped', title: 'Public site stabilization', desc: 'Core public routes, commercial lanes, proof assets, and contact paths are being tightened for real traffic.' },
+  { tag: 'Building', title: 'Interactive City rooms', desc: 'The public site is moving from stacked pages into bounded rooms with explicit transit and maturity signage.' },
+  { tag: 'Testing', title: 'Archive presentation', desc: 'Heavy proof collections remain in dedicated rooms so performance, focus, and context can be managed separately.' },
+];
+
+const stations = [
+  { id: 'current', label: 'Current' },
+  { id: 'shipped', label: 'Shipped' },
+  { id: 'next', label: 'Next' },
+  { id: 'gaps', label: 'Known Gaps' },
+];
+
 export default function DevDiaryPage() {
-  const entries = [
-    { tag: 'Shipped', title: 'Public site stabilization', desc: 'Homepage messaging, Forge separation, systems pages, gallery assets, and public-ready contact paths are being tightened for near-term traffic.' },
-    { tag: 'Building', title: 'Routed ecosystem', desc: 'Hyperion is moving from one long brochure into a hub with dedicated wings for systems, builds, media, updates, and commerce placeholders.' },
-    { tag: 'Testing', title: 'Archive presentation', desc: 'The build archive keeps the heavier trading-card carousel away from the homepage so performance and focus can be managed separately.' },
-  ];
+  const panels = {
+    current: <div className="room-note-grid">{entries.map((entry, index) => <DiaryEntry key={entry.title} entry={entry} index={index} />)}</div>,
+    shipped: <DiaryFocus entry={entries[0]} label="Current public milestone" />,
+    next: (
+      <HoverEditor model="content">
+        <div className="room-panel-grid">
+          <div className="room-panel-copy">
+            <span className="sp-label">What comes next</span>
+            <h2>{content.devdiary.roadmap.title}</h2>
+            <p>{content.devdiary.roadmap.desc}</p>
+          </div>
+          <div className="sp-panel">
+            <div className="sp-chips">{['Room navigation', 'Public proof', 'Responsive QA', 'Operator handoff'].map((item) => <span key={item} className="sp-chip">{item}</span>)}</div>
+          </div>
+        </div>
+      </HoverEditor>
+    ),
+    gaps: (
+      <div className="room-panel-copy">
+        <h2>Known gaps stay visible.</h2>
+        <p>Some product captures remain withheld until private state can be removed. Store and newsletter lanes remain staged. No public checkout, account system, or command surface is implied.</p>
+        <div className="room-action-row"><Link to="/contact" className="btn btn-gold">Send a Signal</Link></div>
+      </div>
+    ),
+  };
 
   return (
     <PageShell>
-      <HoverEditor model="content">
-        <SectionHero
-          eyebrow={content.devdiary.hero.eyebrow}
-          title={content.devdiary.hero.title}
-          lead={content.devdiary.hero.lead}
-        >
-          <Link to="/contact" className="btn btn-gold">Contact Hyperion</Link>
-          <Link to="/" className="btn btn-ghost">Back to Hub</Link>
-        </SectionHero>
-      </HoverEditor>
-
-      <section className="section section-alt">
-        <div className="shell">
-          <div className="sp-label">Current Status</div>
-          <div className="sp-grid-3">
-            {entries.map(e => (
-              <article key={e.title} className="sp-lane-card">
-                <div className="sp-status">{e.tag}</div>
-                <h3 style={{ margin: '8px 0' }}>{e.title}</h3>
-                <p>{e.desc}</p>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="section">
-        <div className="shell">
-          <div className="sp-grid-2">
-            <HoverEditor model="content">
-              <div>
-                <div className="sp-label">What will live here</div>
-                <h2 className="h2" style={{ fontFamily: 'var(--font-display)' }}>{content.devdiary.roadmap.title}</h2>
-              </div>
-              <div className="sp-panel">
-                <p>{content.devdiary.roadmap.desc}</p>
-                <div className="sp-chips">
-                  {['What shipped', 'What changed', 'What is next', 'Known gaps'].map(c => (
-                    <span key={c} className="sp-chip">{c}</span>
-                  ))}
-                </div>
-              </div>
-            </HoverEditor>
-          </div>
-        </div>
-      </section>
+      <RoomShell eyebrow="Public Record / Development Diary" title="Development Diary" summary={content.devdiary.hero.lead} status="PUBLIC NOTES" tone="map" stations={stations} panels={panels} defaultStation="current" />
     </PageShell>
+  );
+}
+
+function DiaryEntry({ entry, index }) {
+  return (
+    <article className="room-note">
+      <span>{String(index + 1).padStart(2, '0')} · {entry.tag}</span>
+      <h3>{entry.title}</h3>
+      <p>{entry.desc}</p>
+    </article>
+  );
+}
+
+function DiaryFocus({ entry, label }) {
+  return (
+    <div className="room-panel-grid">
+      <div className="room-panel-copy"><span className="sp-label">{label}</span><h2>{entry.title}</h2><p>{entry.desc}</p></div>
+      <div className="sp-panel"><div className="sp-status">{entry.tag}</div><p>Public notes describe shipping posture only. Internal source, client state, and operator controls remain outside this room.</p></div>
+    </div>
   );
 }

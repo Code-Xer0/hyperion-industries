@@ -7,8 +7,8 @@
  * hover depress (`scale` property) without fighting either.
  *
  * Desktop-only by design: gated on (hover:hover) and (pointer:fine).
- * Tilt is disabled under prefers-reduced-motion; the cursor highlight remains
- * (it is input-driven, not continuous animation).
+ * Tilt and cursor highlighting are input-driven and remain limited to fine
+ * pointers, so touch and coarse-pointer surfaces stay stable.
  */
 
 const CARD_SEL = [
@@ -25,7 +25,6 @@ export function initPointerFx(root) {
   if (!root) return () => {};
   const fine = window.matchMedia('(hover: hover) and (pointer: fine)');
   if (!fine.matches) return () => {};
-  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const glow = document.createElement('div');
   glow.className = 'fp-cursor-glow';
@@ -44,7 +43,7 @@ export function initPointerFx(root) {
     const py = (ev.clientY - r.top) / r.height;
     glow.style.setProperty('--mx', `${(px * 100).toFixed(2)}%`);
     glow.style.setProperty('--my', `${(py * 100).toFixed(2)}%`);
-    if (!reduce && !card.matches(NO_TILT_SEL)) {
+    if (!card.matches(NO_TILT_SEL)) {
       const rx = ((0.5 - py) * MAX_TILT).toFixed(3);
       const ry = ((px - 0.5) * MAX_TILT).toFixed(3);
       card.style.transform = `perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg)`;
@@ -84,6 +83,82 @@ export function initPointerFx(root) {
     root.removeEventListener('pointermove', onMove);
     root.removeEventListener('pointerleave', onLeave);
     if (raf) cancelAnimationFrame(raf);
+    leave();
+    glow.remove();
+  };
+}
+
+const PUBLIC_SURFACE_SEL = [
+  '.room-note',
+  '.city-district-card',
+  '.city-proof',
+  '.district-media',
+  '.district-diagram-node',
+  '.gallery-asset-card',
+  '.city-launch-route',
+  '.gate-operator-link .op-card',
+].join(',');
+
+/**
+ * Delegated highlight for public City surfaces. Depth remains in CSS hover and
+ * focus states, so this effect cannot fight layout transforms or card motion.
+ */
+export function initSurfaceFx(root = document) {
+  const fine = window.matchMedia('(hover: hover) and (pointer: fine)');
+  if (!fine.matches) return () => {};
+
+  const glow = document.createElement('span');
+  glow.className = 'surface-cursor-glow';
+  glow.setAttribute('aria-hidden', 'true');
+
+  let surface = null;
+  let pointerEvent = null;
+  let animationFrame = 0;
+
+  const leave = () => {
+    if (!surface) return;
+    surface.classList.remove('is-surface-lit');
+    if (glow.parentNode === surface) surface.removeChild(glow);
+    surface = null;
+  };
+
+  const enter = (target) => {
+    if (surface === target) return;
+    leave();
+    surface = target;
+    surface.classList.add('is-surface-lit');
+    surface.appendChild(glow);
+  };
+
+  const apply = () => {
+    animationFrame = 0;
+    if (!surface || !pointerEvent) return;
+
+    const bounds = surface.getBoundingClientRect();
+    if (!bounds.width || !bounds.height) return;
+    glow.style.setProperty('--mx', `${((pointerEvent.clientX - bounds.left) / bounds.width) * 100}%`);
+    glow.style.setProperty('--my', `${((pointerEvent.clientY - bounds.top) / bounds.height) * 100}%`);
+  };
+
+  const onMove = (event) => {
+    const target = event.target instanceof Element
+      ? event.target.closest(PUBLIC_SURFACE_SEL)
+      : null;
+
+    if (target && root.contains(target)) enter(target);
+    else leave();
+
+    pointerEvent = event;
+    if (!animationFrame) animationFrame = window.requestAnimationFrame(apply);
+  };
+
+  root.addEventListener('pointermove', onMove, { passive: true });
+  root.addEventListener('pointerleave', leave, { passive: true });
+
+  return () => {
+    root.removeEventListener('pointermove', onMove);
+    root.removeEventListener('pointerleave', leave);
+    if (animationFrame) window.cancelAnimationFrame(animationFrame);
     leave();
     glow.remove();
   };

@@ -1,165 +1,262 @@
 import { useEffect, useRef } from 'react';
 
+const DEFAULT_PRIMARY = '255, 199, 44';
+
+const parseRgb = (value) => {
+  const channels = String(value ?? DEFAULT_PRIMARY)
+    .split(',')
+    .map((channel) => Number.parseFloat(channel.trim()));
+
+  return channels.length === 3 && channels.every(Number.isFinite)
+    ? channels.map((channel) => Math.max(0, Math.min(255, channel)))
+    : [255, 199, 44];
+};
+
+const mixChannels = (first, second, amount) => first.map(
+  (channel, index) => Math.round(channel + ((second[index] - channel) * amount)),
+);
+
+const rgbString = (channels) => channels.map(Math.round).join(', ');
+
 /**
- * The site-wide ambient particle lattice (drifting particles + proximity
- * lines + mouse gravity). `color` is an "r, g, b" string — defaults to the
- * main-site gold; the founder surface mounts its own instance in operator red.
+ * Site-wide ambient particle lattice. Route palette changes interpolate inside
+ * one loop; founder dossiers can still mount their own color-compatible copy.
  */
-export default function SingularityBackground({ color = '255, 199, 44', id = 'singularity', style }) {
+export default function SingularityBackground({
+  color = DEFAULT_PRIMARY,
+  secondaryColor = color,
+  intensity = 1,
+  density = 1,
+  speed = 1,
+  interactive = true,
+  id = 'singularity',
+  dataAmbient,
+  style,
+}) {
   const canvasRef = useRef(null);
+  const redrawRef = useRef(null);
+  const targetRef = useRef({
+    primary: parseRgb(color),
+    secondary: parseRgb(secondaryColor),
+    intensity,
+    density,
+    speed,
+    interactive,
+  });
+
+  targetRef.current = {
+    primary: parseRgb(color),
+    secondary: parseRgb(secondaryColor),
+    intensity: Math.max(0, intensity),
+    density: Math.max(0.2, density),
+    speed: Math.max(0, speed),
+    interactive,
+  };
+
+  useEffect(() => {
+    redrawRef.current?.();
+  }, [color, secondaryColor, intensity, density, speed, interactive]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas) return undefined;
 
-    const ctx = canvas.getContext('2d');
-    let animationFrameId;
-    
-    // Setup dimensions
+    const context = canvas.getContext('2d');
+    if (!context) return undefined;
+
+    const coarsePointer = window.matchMedia('(pointer: coarse)');
+    const current = {
+      primary: [...targetRef.current.primary],
+      secondary: [...targetRef.current.secondary],
+      intensity: targetRef.current.intensity,
+    };
+    const pointer = {
+      x: window.innerWidth / 2,
+      y: window.innerHeight / 2,
+      radius: 190,
+      active: false,
+    };
+
     let width = window.innerWidth;
     let height = window.innerHeight;
-    canvas.width = width;
-    canvas.height = height;
+    let particles = [];
+    let animationFrameId = 0;
+    let previousFrame = 0;
 
-    const handleResize = () => {
+    const shouldInteract = () => !coarsePointer.matches
+      && targetRef.current.interactive;
+
+    const initParticles = () => {
+      const mobile = Math.min(width, height) < 720;
+      const cap = mobile ? 45 : 90;
+      const areaCount = Math.floor((width * height) / 18000);
+      const count = Math.max(18, Math.min(cap, Math.round(areaCount * targetRef.current.density)));
+
+      particles = Array.from({ length: count }, () => ({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        vx: (Math.random() - 0.5) * 0.68,
+        vy: (Math.random() - 0.5) * 0.68,
+        radius: (Math.random() * 1.35) + 0.45,
+        tone: Math.random(),
+      }));
+    };
+
+    const sizeCanvas = () => {
       width = window.innerWidth;
       height = window.innerHeight;
-      canvas.width = width;
-      canvas.height = height;
+      const pixelRatio = Math.min(window.devicePixelRatio || 1, 1.5);
+      canvas.width = Math.round(width * pixelRatio);
+      canvas.height = Math.round(height * pixelRatio);
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+      context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+      pointer.x = width / 2;
+      pointer.y = height / 2;
       initParticles();
     };
-    window.addEventListener('resize', handleResize);
 
-    // Mouse state
-    const mouse = { x: width / 2, y: height / 2, radius: 180, active: false };
-
-    const handlePointerMove = (e) => {
-      mouse.x = e.clientX;
-      mouse.y = e.clientY;
-      mouse.active = true;
-    };
-    const handlePointerLeave = () => {
-      mouse.active = false;
+    const easePalette = (snap = false) => {
+      const amount = snap ? 1 : 0.055;
+      ['primary', 'secondary'].forEach((key) => {
+        current[key] = current[key].map(
+          (channel, index) => channel + ((targetRef.current[key][index] - channel) * amount),
+        );
+      });
+      current.intensity += (targetRef.current.intensity - current.intensity) * amount;
     };
 
-    window.addEventListener('pointermove', handlePointerMove, { passive: true });
-    window.addEventListener('pointerleave', handlePointerLeave);
+    const draw = ({ advance = true, snap = false } = {}) => {
+      easePalette(snap);
+      context.clearRect(0, 0, width, height);
 
-    // Particle class
-    class Particle {
-      constructor() {
-        this.x = Math.random() * width;
-        this.y = Math.random() * height;
-        this.vx = (Math.random() - 0.5) * 0.8;
-        this.vy = (Math.random() - 0.5) * 0.8;
-        this.radius = Math.random() * 1.5 + 0.5;
+      const primary = rgbString(current.primary);
+      const interactivePointer = shouldInteract() && pointer.active;
+
+      if (interactivePointer) {
+        const gradient = context.createRadialGradient(
+          pointer.x,
+          pointer.y,
+          0,
+          pointer.x,
+          pointer.y,
+          pointer.radius,
+        );
+        gradient.addColorStop(0, `rgba(${primary}, ${0.055 * current.intensity})`);
+        gradient.addColorStop(1, `rgba(${primary}, 0)`);
+        context.fillStyle = gradient;
+        context.beginPath();
+        context.arc(pointer.x, pointer.y, pointer.radius, 0, Math.PI * 2);
+        context.fill();
       }
 
-      update() {
-        // Singularity / gravity effect
-        if (mouse.active) {
-          const dx = mouse.x - this.x;
-          const dy = mouse.y - this.y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
-          
-          if (distance < mouse.radius) {
-            // Gentle attraction
-            const force = (mouse.radius - distance) / mouse.radius;
-            this.x += dx * force * 0.02;
-            this.y += dy * force * 0.02;
+      particles.forEach((particle) => {
+        if (advance) {
+          if (interactivePointer) {
+            const dx = pointer.x - particle.x;
+            const dy = pointer.y - particle.y;
+            const distance = Math.hypot(dx, dy);
+            if (distance > 0 && distance < pointer.radius) {
+              const force = (pointer.radius - distance) / pointer.radius;
+              particle.x += dx * force * 0.012;
+              particle.y += dy * force * 0.012;
+            }
           }
+
+          particle.x += particle.vx * targetRef.current.speed;
+          particle.y += particle.vy * targetRef.current.speed;
+          if (particle.x < 0 || particle.x > width) particle.vx *= -1;
+          if (particle.y < 0 || particle.y > height) particle.vy *= -1;
         }
 
-        this.x += this.vx;
-        this.y += this.vy;
-
-        // Bounce
-        if (this.x < 0 || this.x > width) this.vx *= -1;
-        if (this.y < 0 || this.y > height) this.vy *= -1;
-      }
-
-      draw() {
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(${color}, 0.4)`;
-        ctx.fill();
-      }
-    }
-
-    let particles = [];
-    const initParticles = () => {
-      particles = [];
-      const density = Math.floor((width * height) / 16000);
-      const count = Math.min(density, 120); // Cap at 120 for performance
-      for (let i = 0; i < count; i++) {
-        particles.push(new Particle());
-      }
-    };
-
-    initParticles();
-
-    // Render loop
-    const connectParticles = () => {
-      for (let i = 0; i < particles.length; i++) {
-        for (let j = i + 1; j < particles.length; j++) {
-          const dx = particles[i].x - particles[j].x;
-          const dy = particles[i].y - particles[j].y;
-          const distance = Math.sqrt(dx * dx + dy * dy);
-
-          if (distance < 120) {
-            const opacity = 1 - (distance / 120);
-            ctx.beginPath();
-            ctx.moveTo(particles[i].x, particles[i].y);
-            ctx.lineTo(particles[j].x, particles[j].y);
-            ctx.strokeStyle = `rgba(${color}, ${opacity * 0.15})`;
-            ctx.lineWidth = 1;
-            ctx.stroke();
-          }
-        }
-      }
-    };
-
-    const drawMouseGlow = () => {
-      if (mouse.active) {
-        const gradient = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, mouse.radius);
-        gradient.addColorStop(0, `rgba(${color}, 0.04)`);
-        gradient.addColorStop(1, 'transparent');
-        ctx.fillStyle = gradient;
-        ctx.beginPath();
-        ctx.arc(mouse.x, mouse.y, mouse.radius, 0, Math.PI * 2);
-        ctx.fill();
-      }
-    };
-
-    const animate = () => {
-      ctx.clearRect(0, 0, width, height);
-
-      drawMouseGlow();
-
-      particles.forEach(p => {
-        p.update();
-        p.draw();
+        const particleColor = mixChannels(current.primary, current.secondary, particle.tone);
+        context.beginPath();
+        context.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+        context.fillStyle = `rgba(${rgbString(particleColor)}, ${0.36 * current.intensity})`;
+        context.fill();
       });
 
-      connectParticles();
+      for (let first = 0; first < particles.length; first += 1) {
+        for (let second = first + 1; second < particles.length; second += 1) {
+          const distance = Math.hypot(
+            particles[first].x - particles[second].x,
+            particles[first].y - particles[second].y,
+          );
+          if (distance >= 118) continue;
 
-      animationFrameId = requestAnimationFrame(animate);
+          const opacity = (1 - (distance / 118)) * 0.16 * current.intensity;
+          context.beginPath();
+          context.moveTo(particles[first].x, particles[first].y);
+          context.lineTo(particles[second].x, particles[second].y);
+          context.strokeStyle = `rgba(${primary}, ${opacity})`;
+          context.lineWidth = 1;
+          context.stroke();
+        }
+      }
     };
 
-    animate();
+    const animate = (timestamp) => {
+      if (document.hidden) return;
+
+      if (timestamp - previousFrame >= 1000 / 30) {
+        previousFrame = timestamp;
+        draw();
+      }
+      animationFrameId = window.requestAnimationFrame(animate);
+    };
+
+    const start = () => {
+      window.cancelAnimationFrame(animationFrameId);
+      if (document.hidden) {
+        draw({ advance: false, snap: true });
+        return;
+      }
+      animationFrameId = window.requestAnimationFrame(animate);
+    };
+
+    const handlePointerMove = (event) => {
+      if (!shouldInteract()) return;
+      pointer.x = event.clientX;
+      pointer.y = event.clientY;
+      pointer.active = true;
+    };
+    const handlePointerLeave = () => { pointer.active = false; };
+    const handleVisibility = () => start();
+    const handleResize = () => {
+      sizeCanvas();
+      if (document.hidden) draw({ advance: false, snap: true });
+    };
+
+    redrawRef.current = () => {
+      if (document.hidden) draw({ advance: false, snap: true });
+    };
+
+    sizeCanvas();
+    start();
+
+    window.addEventListener('resize', handleResize, { passive: true });
+    window.addEventListener('pointermove', handlePointerMove, { passive: true });
+    window.addEventListener('pointerleave', handlePointerLeave);
+    document.addEventListener('visibilitychange', handleVisibility);
+    coarsePointer.addEventListener('change', handlePointerLeave);
 
     return () => {
+      redrawRef.current = null;
+      window.cancelAnimationFrame(animationFrameId);
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('pointermove', handlePointerMove);
       window.removeEventListener('pointerleave', handlePointerLeave);
-      cancelAnimationFrame(animationFrameId);
+      document.removeEventListener('visibilitychange', handleVisibility);
+      coarsePointer.removeEventListener('change', handlePointerLeave);
     };
-  }, [color]);
+  }, []);
 
   return (
     <canvas
       ref={canvasRef}
       id={id}
+      data-ambient={dataAmbient}
+      aria-hidden="true"
       style={{
         position: 'fixed',
         inset: 0,

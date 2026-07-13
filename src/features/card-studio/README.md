@@ -2,7 +2,7 @@
 
 The live `/card-studio` path serves the Business Card DX landing bundle directly on the static host. The fallback standalone asset is mirrored at `public/assets/card-studio/studio.html`, copied from the Business Card DX template:
 
-`C:\Users\Inf3r\Git\hyperion-studio\Business Card. Dx. (Template)\Hyperion Card Studio (standalone).html`
+`<workspace>\hyperion-studio\Business Card. Dx. (Template)\Hyperion Card Studio (standalone).html`
 
 The shipped default state is the Ivory card template with the gold accent:
 

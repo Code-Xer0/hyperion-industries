@@ -26,9 +26,16 @@ export default function OperatorCard({ operator }) {
 
       <div className="op-portrait" style={operator.artBackground ? { background: operator.artBackground } : undefined}>
         {hasImg
-          ? <MediaFrame media={operator.image} alt={operator.name} className="op-media" />
+          ? <MediaFrame media={operator.image} alt={operator.imageAlt || operator.name} className="op-media" />
           : <span className="op-watermark" aria-hidden="true">{operator.attr || 'H'}</span>}
         <span className="op-portrait-scrim" aria-hidden="true" />
+        {operator.mark && (
+          <img
+            className="op-mark-lockup"
+            src={operator.mark}
+            alt={operator.markAlt || `${operator.name} operator mark`}
+          />
+        )}
       </div>
 
       <div className="op-body">

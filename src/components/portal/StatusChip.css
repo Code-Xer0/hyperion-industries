@@ -1,0 +1,36 @@
+.city-status {
+  --status-color: var(--cyan-bright);
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  max-width: 100%;
+  gap: 8px;
+  color: var(--status-color);
+  font-family: var(--font-display);
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+
+.city-status-dot {
+  width: 6px;
+  height: 6px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--status-color);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--status-color) 65%, transparent);
+}
+
+.city-status-live { --status-color: var(--cyan-bright); }
+.city-status-shipping { --status-color: #76e6a6; }
+.city-status-inquiry,
+.city-status-doctrine { --status-color: var(--gold); }
+.city-status-development,
+.city-status-poc { --status-color: #ff7b6f; }
+.city-status-concept,
+.city-status-architecture { --status-color: #a7a9b4; }
+.city-status-map { --status-color: var(--text-muted); }
+
+.city-status.is-compact { font-size: 8px; }
+

@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 432 432" role="img" aria-labelledby="title desc">
+  <title id="title">Hyperion orbital pillar mark</title>
+  <desc id="desc">Transparent vector mark with white pillar forms, a four-point star, orbit arcs, and a gold orbital ring.</desc>
+  <defs>
+    <linearGradient id="towerFill" x1="162" y1="99" x2="262" y2="323" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffffff"></stop>
+      <stop offset="0.58" stop-color="#eef5f5"></stop>
+      <stop offset="1" stop-color="#cfdcdd"></stop>
+    </linearGradient>
+    <linearGradient id="goldFill" x1="117" y1="258" x2="336" y2="166" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#ffd24a"></stop>
+      <stop offset="0.45" stop-color="#f6b60b"></stop>
+      <stop offset="1" stop-color="#ffc20d"></stop>
+    </linearGradient>
+  </defs>
+
+  <g id="hyperion-mark" fill="none" fill-rule="evenodd">
+    <g id="orbit-arcs" stroke="#f4fbfb" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" opacity="0.95">
+      <path d="M227 104c16.5 1.4 31.7 8.4 44 19"></path>
+      <path d="M290 149c7.1 12 11.5 25.8 13 40"></path>
+      <path d="M305 215c-5.5 37.1-31 74-66 91"></path>
+    </g>
+
+    <g id="pillars" fill="url(#towerFill)">
+      <path d="M182 100 164 110v119l18-2z"></path>
+      <path d="M164 264v18l18 10v-31z"></path>
+      <path d="M215 252 200 257v66l15-11z"></path>
+      <path d="M236 127 253 137v75l-18 6z"></path>
+      <path d="M253 239 235 245v44l18-12z"></path>
+    </g>
+
+    <g id="star-and-core" fill="url(#towerFill)">
+      <path d="M208.5 142c1.8 15.9 6.3 25.5 16.5 30-10.2 4.2-14.8 13.5-16.3 26.8-1.7-13.4-6.1-22.3-15.7-26.5 9.7-4.4 13.3-13.3 15.5-30.3z"></path>
+      <circle cx="208.5" cy="220.1" r="6"></circle>
+    </g>
+
+    <g id="gold-orbit" fill="url(#goldFill)">
+      <circle cx="281" cy="134" r="6.9"></circle>
+      <circle cx="105" cy="253" r="6.8"></circle>
+      <path d="M332 173c-5.7-6.2-10.8-8-17-8 4.8 3 9.4 6.9 10 9 .9 2.8.3 5.9-2 8-10.4 12.7-27.2 23.2-49 30-32.9 12.7-70.2 23.2-104 27-15 1.7-27.7-3.2-34-14-3.4-6.6-.2-20.3 16-37-12.7 8.4-22.2 18.7-26 31-6.2 14.3-6 26.6 3 33 10.3 8.1 27.4 6.9 47 3 25.1-5 54.3-14.1 84-26 25.4-10.2 49.8-22.6 68-41 6.3-6.2 6.9-12.4 4-15z"></path>
+    </g>
+  </g>
+</svg>

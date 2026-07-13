@@ -24,7 +24,7 @@
   padding: 6px 12px;
   border-radius: 6px;
   border: 1px solid var(--border-gold);
-  background: rgba(5, 5, 6, 0.82);
+  background: var(--room-heading-bg);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   font-family: var(--font-display);
@@ -74,6 +74,40 @@
   color: var(--text);
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .founder-link .dossier-chip { transition: opacity 0.22s ease; transform: none; }
+.founders-room-roster { position: relative; isolation: isolate; display: grid; grid-template-columns: minmax(240px, 0.55fr) minmax(0, 1.45fr); gap: 34px; align-items: center; min-height: calc(100% - 34px); }
+.founders-cross-signal {
+  position: absolute;
+  z-index: -1;
+  inset: -36px -48px;
+  width: calc(100% + 96px);
+  height: calc(100% + 72px);
+  object-fit: cover;
+  object-position: center;
+  opacity: 0.2;
+  filter: saturate(0.78) contrast(1.08);
+  mask-image: radial-gradient(ellipse at 66% 52%, #000 0%, rgba(0,0,0,0.72) 40%, transparent 78%);
+  pointer-events: none;
+  animation: founders-signal-breathe 9s ease-in-out infinite;
+}
+.founders-room-roster .ops-intro { max-width: 420px; text-align: left; }
+.founders-room-roster .ops-grid { margin-top: 0; }
+.founders-room-roster .op-card { height: min(58vh, 520px); }
+.founders-room-roster .op-portrait { height: 260px; flex: 0 0 auto; aspect-ratio: auto; }
+.founders-room-roster .op-desc { -webkit-line-clamp: 2; }
+.founders-room-roster .op-focuses { display: none; }
+.founders-room-shell .room-panel { overflow: auto; }
+
+@media (max-width: 900px) {
+  .founders-room-roster { grid-template-columns: 1fr; align-items: start; }
+  .founders-room-roster .ops-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .founders-room-roster .op-card { height: 500px; }
+}
+
+@media (max-width: 560px) {
+  .founders-room-roster .ops-grid { grid-template-columns: 1fr; }
+}
+
+@keyframes founders-signal-breathe {
+  0%, 100% { opacity: 0.16; transform: scale(1); }
+  50% { opacity: 0.25; transform: scale(1.025); }
 }

@@ -3,7 +3,7 @@
   position: relative; min-height: 520px; overflow: hidden;
   border-top: 1px solid rgba(255,59,59,0.16);
   border-bottom: 1px solid rgba(255,199,44,0.1);
-  background: var(--bg);
+  background: transparent;
 }
 .gallery-operator-hero > img,
 .gallery-operator-hero .gallery-operator-media {
@@ -62,4 +62,32 @@
   .gallery-asset-grid { grid-template-columns: 1fr; }
   .gallery-operator-content { align-items: flex-start; text-align: left; padding-bottom: 42px; }
   .gallery-operator-hero, .gallery-operator-content { min-height: 460px; }
+}
+
+.gallery-room-featured { position: relative; display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.65fr); min-height: calc(100% - 34px); overflow: hidden; border: 1px solid var(--border-soft); background: var(--room-card-bg); backdrop-filter: blur(10px); }
+.gallery-room-featured .gallery-operator-media { min-height: 0; height: 100%; border: 0; }
+.gallery-room-featured .gallery-operator-media img,
+.gallery-room-featured .gallery-operator-media video { width: 100%; height: 100%; object-fit: cover; object-position: center; }
+.gallery-room-caption { align-self: center; padding: 28px; }
+.gallery-room-caption h2 { margin: 12px 0; color: var(--text); font-size: clamp(28px, 4vw, 52px); line-height: 0.95; }
+.gallery-room-caption p { color: var(--text-muted); font-size: 12px; line-height: 1.65; }
+.gallery-room-browser { display: grid; grid-template-rows: auto minmax(0, 1fr); gap: 14px; min-height: calc(100% - 34px); }
+.gallery-room-filter { display: flex; flex-wrap: wrap; gap: 7px; }
+.gallery-room-filter button { padding: 7px 12px; border: 1px solid var(--border-soft); background: transparent; color: var(--text-dim); font-family: var(--font-display); font-size: 8px; text-transform: uppercase; cursor: pointer; }
+.gallery-room-filter button.is-active,
+.gallery-room-filter button:hover,
+.gallery-room-filter button:focus-visible { border-color: var(--gold); color: var(--gold); outline: none; }
+.gallery-room-browser .gallery-asset-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); min-height: 0; overflow: auto; padding-right: 4px; }
+.gallery-room-browser .gallery-asset-card { min-height: 260px; }
+.gallery-room-browser .gallery-asset-card img { min-height: 260px; }
+.gallery-room-proof { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(260px, 0.65fr); gap: 28px; align-items: center; min-height: calc(100% - 34px); }
+
+@media (max-width: 1100px) {
+  .gallery-room-browser .gallery-asset-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 760px) {
+  .gallery-room-featured,
+  .gallery-room-proof { grid-template-columns: 1fr; }
+  .gallery-room-browser .gallery-asset-grid { grid-template-columns: 1fr; }
 }

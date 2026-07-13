@@ -67,6 +67,19 @@
   --entry-deck-base: linear-gradient(180deg, rgba(5,5,6,0.98), rgba(13,13,13,0.88));
   --shadow-card: 0 24px 90px rgba(0,0,0,0.34), inset 0 0 0 1px rgba(255,255,255,0.026);
   --shadow-glass: 0 18px 70px rgba(0,0,0,0.44), inset 0 0 0 1px rgba(255,255,255,0.03);
+  --room-shell-bg: rgba(3, 6, 9, 0.56);
+  --room-heading-bg: rgba(5, 8, 12, 0.64);
+  --room-rail-bg: rgba(5, 8, 12, 0.52);
+  --room-panel-bg: rgba(5, 8, 12, 0.24);
+  --room-card-bg: rgba(8, 12, 18, 0.48);
+  --room-text-scrim: rgba(3, 6, 9, 0.54);
+  --room-glass-blur: 13px;
+  --ambient-canvas-opacity: 0.9;
+  --motion-room-enter: 440ms;
+  --motion-route-enter: 620ms;
+  --motion-ease-cinematic: cubic-bezier(0.22, 1, 0.36, 1);
+  --ambient-primary: rgb(255, 199, 44);
+  --ambient-secondary: rgb(33, 214, 232);
 }
 
 body.theme-light {
@@ -111,6 +124,53 @@ body.theme-light {
   --entry-deck-base: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(247,245,239,0.9));
   --shadow-card: 0 18px 50px rgba(55,43,19,0.1);
   --shadow-glass: 0 22px 80px rgba(55,43,19,0.12), inset 0 0 0 1px rgba(255,255,255,0.78);
+  --room-shell-bg: rgba(249, 247, 241, 0.64);
+  --room-heading-bg: rgba(252, 250, 245, 0.72);
+  --room-rail-bg: rgba(249, 247, 241, 0.6);
+  --room-panel-bg: rgba(255, 255, 255, 0.3);
+  --room-card-bg: rgba(255, 255, 255, 0.58);
+  --room-text-scrim: rgba(255, 255, 255, 0.68);
+  --room-glass-blur: 13px;
+  --ambient-canvas-opacity: 0.72;
+}
+
+.room-note,
+.city-district-card,
+.city-proof,
+.district-media,
+.district-diagram-node,
+.gallery-asset-card,
+.city-launch-route,
+.gate-operator-link .op-card {
+  position: relative;
+  isolation: isolate;
+}
+
+.surface-cursor-glow {
+  --mx: 50%;
+  --my: 50%;
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: radial-gradient(
+    260px circle at var(--mx) var(--my),
+    color-mix(in srgb, var(--ambient-primary) 16%, transparent),
+    transparent 68%
+  );
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms ease;
+}
+
+.is-surface-lit > .surface-cursor-glow { opacity: 1; }
+.room-note:focus-within,
+.city-district-card:focus-visible,
+.city-proof:focus-within,
+.district-media:focus-within,
+.district-diagram-node:focus-within,
+.gallery-asset-card:focus-within,
+.gate-operator-link:focus-visible .op-card {
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--cyan-bright) 55%, transparent), var(--shadow-glass);
 }
 
 /* Light mode specific background tweaks */
@@ -219,22 +279,43 @@ h1, h2, h3, h4, h5, h6 {
 /* ── Route transition ── */
 .page-enter {
   opacity: 0;
-  transform: translateY(18px);
+  filter: brightness(0.84) saturate(0.86);
+  transform: translateY(12px) scale(0.998);
 }
 .page-active {
   opacity: 1;
+  filter: brightness(1) saturate(1);
   transform: translateY(0);
-  transition: opacity 0.5s var(--ease-out), transform 0.5s var(--ease-out);
+  transition:
+    opacity var(--motion-route-enter) var(--motion-ease-cinematic),
+    filter var(--motion-route-enter) var(--motion-ease-cinematic),
+    transform var(--motion-route-enter) var(--motion-ease-cinematic);
 }
 
-/* ── Reduced motion ── */
-@media (prefers-reduced-motion: reduce) {
-  .page-enter, .page-active {
-    opacity: 1 !important;
-    transform: none !important;
-    transition: none !important;
-  }
+/* Shared command controls live at the application level, not inside navigation. */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 10px 20px;
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.16s ease, border-color 0.16s ease, color 0.16s ease, transform 0.16s ease;
+  white-space: nowrap;
 }
+.btn-gold { border-color: var(--gold); background: var(--gold); color: #0a0900; box-shadow: 0 0 24px rgba(255, 199, 44, 0.16); }
+.btn-gold:hover { background: #ffd454; color: #0a0900; transform: translateY(-1px); }
+.btn-ghost { border-color: var(--glass-edge); background: color-mix(in srgb, var(--glass-solid) 66%, transparent); color: var(--text-soft); }
+.btn-ghost:hover { border-color: color-mix(in srgb, var(--cyan-bright) 42%, transparent); color: var(--cyan-bright); transform: translateY(-1px); }
+.btn:focus-visible { outline: 2px solid var(--cyan-bright); outline-offset: 2px; }
 
 /* ── Responsive ── */
 @media (max-width: 1024px) {
