@@ -60,9 +60,106 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=Orbitron:wght@400;500;700;800;900&family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+    <!-- Hyperion Signal Continuity — GA4 Base Tag -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-9RVGM6Q4T7"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-9RVGM6Q4T7', {
+        send_page_view: true,
+        cookie_flags: 'SameSite=None;Secure'
+      });
+    </script>
   </head>
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+    <!-- Hyperion Signal Continuity — GA4 Custom Events -->
+    <script>
+      (() => {
+        'use strict';
+        if (typeof gtag !== 'function') return;
+
+        const returnVisitCookie = 'hyperion_rv';
+        const getCookie = (name) => {
+          const match = document.cookie.match(new RegExp(`(^| )${name}=([^;]+)`));
+          return match ? match[2] : null;
+        };
+        const setCookie = (name, value, days) => {
+          const expiry = new Date();
+          expiry.setTime(expiry.getTime() + (days * 24 * 60 * 60 * 1000));
+          document.cookie = `${name}=${value};expires=${expiry.toUTCString()};path=/;SameSite=Lax;Secure`;
+        };
+
+        const returnCount = getCookie(returnVisitCookie);
+        if (returnCount) {
+          const nextCount = Number.parseInt(returnCount, 10) + 1;
+          gtag('event', 'return_visit', { visit_count: nextCount });
+          setCookie(returnVisitCookie, nextCount, 365);
+        } else {
+          setCookie(returnVisitCookie, '1', 365);
+        }
+
+        let deepScrollFired = false;
+        window.addEventListener('scroll', () => {
+          if (deepScrollFired) return;
+          const scrollPercent = (window.scrollY + window.innerHeight) / document.documentElement.scrollHeight;
+          if (scrollPercent >= 0.75) {
+            deepScrollFired = true;
+            gtag('event', 'deep_scroll', {
+              percent_scrolled: 75,
+              page_path: window.location.pathname
+            });
+          }
+        }, { passive: true });
+
+        document.addEventListener('click', (event) => {
+          const element = event.target.closest('a, button, [data-track]');
+          if (!element) return;
+
+          const href = element.getAttribute('href') || '';
+          const text = (element.textContent || '').trim().substring(0, 100);
+          const trackedEvent = element.getAttribute('data-track');
+          if (trackedEvent) {
+            gtag('event', trackedEvent, { element_text: text, page_path: window.location.pathname });
+            return;
+          }
+
+          if (/\/(articles?|blog|posts?|writing)\//i.test(href)) {
+            gtag('event', 'article_view', { article_url: href, article_title: text });
+          }
+          if (/^(mailto:|tel:)/i.test(href)) {
+            gtag('event', 'contact_click', {
+              contact_type: href.startsWith('mailto:') ? 'email' : 'phone',
+              contact_target: href
+            });
+          }
+          if (href.includes('substack.com')) {
+            gtag('event', 'substack_click', { substack_url: href, link_text: text });
+          }
+          if (href.includes('github.com')) {
+            gtag('event', 'github_click', { github_url: href, link_text: text });
+          }
+          if (/drive\.google\.com|docs\.google\.com/i.test(href)) {
+            gtag('event', 'drive_asset_click', { drive_url: href, link_text: text });
+          }
+          if (/\.(pdf|docx?|xlsx?|pptx?|zip|tar|gz|csv|json)$/i.test(href)) {
+            gtag('event', 'download_click', { file_url: href, file_type: href.split('.').pop().toLowerCase() });
+          }
+          if (/\/(pricing|plans?)\b/i.test(href)) {
+            gtag('event', 'pricing_view', { pricing_url: href });
+          }
+          if (element.tagName === 'A' && element.hostname && element.hostname !== window.location.hostname
+              && !/substack\.com|github\.com|drive\.google\.com|docs\.google\.com/i.test(href)) {
+            gtag('event', 'external_link_click', { outbound_url: href, link_text: text });
+          }
+          if (element.closest('.hero, [class*="hero"], #hero, [data-section="hero"]')
+              || element.classList.contains('cta') || element.closest('.cta, [class*="cta"]')) {
+            gtag('event', 'hero_cta_click', { cta_text: text, cta_url: href, page_path: window.location.pathname });
+          }
+        });
+      })();
+    </script>
   </body>
 </html>

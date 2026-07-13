@@ -1,0 +1,145 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.hyperion-industries.dev/intake/routing-decision.v1.json",
+  "title": "Hyperion Intake Routing Decision v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "decision_id", "intake_id", "submission_id", "ruleset_version",
+    "agent_contract_version", "primary_route", "client_summary", "internal_summary",
+    "claims", "missing_information", "contradictions", "route_proposals",
+    "next_action_proposals", "safety_flags", "created_at"
+  ],
+  "properties": {
+    "decision_id": { "type": "string", "pattern": "^rte_[A-Za-z0-9_-]{12,64}$" },
+    "intake_id": { "type": "string" },
+    "submission_id": { "type": "string" },
+    "ruleset_version": { "type": "string" },
+    "agent_contract_version": { "type": "string" },
+    "created_at": { "type": "string", "format": "date-time" },
+    "primary_route": { "enum": ["forge", "pandora", "continuity", "identity", "support", "relationship", "general", "security_review"] },
+    "secondary_routes": { "type": "array", "uniqueItems": true, "items": { "type": "string" } },
+    "diagnostic": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "class_code": { "type": "string", "pattern": "^(F[0-5X]|P[0-5X])$" },
+        "class_label": { "type": "string", "maxLength": 120 },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "confidence_label": { "enum": ["low", "medium", "high"] },
+        "dimension_scores": {
+          "type": "object",
+          "additionalProperties": { "type": "number", "minimum": 0, "maximum": 4 }
+        },
+        "hard_blockers": { "type": "array", "items": { "type": "string", "maxLength": 500 } }
+      }
+    },
+    "client_summary": { "type": "string", "maxLength": 2500 },
+    "internal_summary": { "type": "string", "maxLength": 5000 },
+    "entities": { "type": "array", "items": { "$ref": "#/$defs/entity" } },
+    "needs": { "type": "array", "items": { "$ref": "#/$defs/evidencedText" } },
+    "constraints": { "type": "array", "items": { "$ref": "#/$defs/evidencedText" } },
+    "claims": { "type": "array", "items": { "$ref": "#/$defs/claim" } },
+    "missing_information": { "type": "array", "items": { "$ref": "#/$defs/missing" } },
+    "contradictions": { "type": "array", "items": { "$ref": "#/$defs/contradiction" } },
+    "route_proposals": { "type": "array", "items": { "$ref": "#/$defs/route" } },
+    "next_action_proposals": { "type": "array", "items": { "$ref": "#/$defs/action" } },
+    "safety_flags": { "type": "array", "items": { "$ref": "#/$defs/safety" } }
+  },
+  "$defs": {
+    "evidenceId": { "type": "string", "pattern": "^(art_[A-Za-z0-9_-]+|[a-z0-9][a-z0-9._-]+)$" },
+    "entity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "label", "evidence_ids"],
+      "properties": {
+        "type": { "enum": ["person", "organization", "site", "system", "workload", "product"] },
+        "label": { "type": "string", "maxLength": 240 },
+        "evidence_ids": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/evidenceId" } }
+      }
+    },
+    "evidencedText": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["text", "evidence_ids", "posture"],
+      "properties": {
+        "text": { "type": "string", "maxLength": 1000 },
+        "evidence_ids": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/evidenceId" } },
+        "posture": { "enum": ["client_stated", "artifact_supported", "inferred", "unknown"] }
+      }
+    },
+    "claim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["claim_id", "subject", "predicate", "value", "source_module", "context_scope", "authority_scope", "confidence", "status", "evidence_ids", "review_state"],
+      "properties": {
+        "claim_id": { "type": "string", "pattern": "^clm_[A-Za-z0-9_-]{12,64}$" },
+        "subject": { "type": "string", "maxLength": 240 },
+        "predicate": { "type": "string", "maxLength": 120 },
+        "value": { "type": ["string", "number", "integer", "boolean", "null"] },
+        "source_module": { "const": "site_intake" },
+        "context_scope": { "type": "string", "maxLength": 240 },
+        "authority_scope": { "enum": ["source_fact", "relationship", "order", "support", "provenance", "memory_candidate", "arbitration"] },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "status": { "enum": ["client_stated", "artifact_supported", "inferred", "disputed", "unknown"] },
+        "evidence_ids": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/evidenceId" } },
+        "review_state": { "enum": ["proposed", "accepted", "rejected", "needs_review"] }
+      }
+    },
+    "missing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["question", "reason", "blocking_level"],
+      "properties": {
+        "question": { "type": "string", "maxLength": 500 },
+        "reason": { "type": "string", "maxLength": 1000 },
+        "blocking_level": { "enum": ["none", "route", "assessment", "quote", "safety"] }
+      }
+    },
+    "contradiction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["description", "evidence_ids", "severity"],
+      "properties": {
+        "description": { "type": "string", "maxLength": 1000 },
+        "evidence_ids": { "type": "array", "minItems": 2, "items": { "$ref": "#/$defs/evidenceId" } },
+        "severity": { "enum": ["informational", "route_affecting", "blocking"] }
+      }
+    },
+    "route": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["domain", "record_type", "rationale", "evidence_ids", "gate"],
+      "properties": {
+        "domain": { "enum": ["crm", "order_management", "chron", "mnem", "arg", "founder_command", "pandora", "tal", "nest"] },
+        "record_type": { "type": "string", "maxLength": 120 },
+        "rationale": { "type": "string", "maxLength": 1000 },
+        "evidence_ids": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/evidenceId" } },
+        "gate": { "enum": ["no_gate", "soft_gate", "hard_gate"] }
+      }
+    },
+    "action": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["action_type", "description", "gate", "reversible", "evidence_ids"],
+      "properties": {
+        "action_type": { "enum": ["create_crm_activity", "create_order_intent", "create_command_card", "preserve_source", "draft_clarification", "schedule_assessment", "draft_quote", "archive", "decline", "escalate_security", "propose_memory_candidate"] },
+        "description": { "type": "string", "maxLength": 1000 },
+        "gate": { "enum": ["no_gate", "soft_gate", "hard_gate"] },
+        "reversible": { "type": "boolean" },
+        "evidence_ids": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/evidenceId" } }
+      }
+    },
+    "safety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "severity", "description", "evidence_ids"],
+      "properties": {
+        "code": { "type": "string", "maxLength": 120 },
+        "severity": { "enum": ["info", "warning", "critical"] },
+        "description": { "type": "string", "maxLength": 1000 },
+        "evidence_ids": { "type": "array", "items": { "$ref": "#/$defs/evidenceId" } }
+      }
+    }
+  }
+}

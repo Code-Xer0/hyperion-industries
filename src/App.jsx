@@ -9,6 +9,7 @@ import DistrictPage from './pages/DistrictPage';
 // Operator-only surfaces: DEV-gated lazy imports so the production bundle
 // contains neither the code nor the route — no source/route leakage.
 const RadioStatsPage = import.meta.env.DEV ? lazy(() => import('./pages/RadioStatsPage')) : () => null;
+const IntakePage = lazy(() => import('./features/intake/IntakePage'));
 import SystemsPage from './pages/SystemsPage';
 import BuildArchivePage from './pages/BuildArchivePage';
 import GalleryPage from './pages/GalleryPage';
@@ -79,6 +80,9 @@ export default function App() {
               <Route path="/founders/:slug" element={<FounderPage />} />
               {isDev && <Route path="/radio-stats" element={<RadioStatsPage />} />}
               <Route path="/systems" element={<SystemsPage />} />
+              <Route path="/intake" element={<IntakePage />} />
+              <Route path="/intake/resume" element={<IntakePage resumeMode />} />
+              <Route path="/intake/:lane" element={<IntakePage />} />
               <Route path="/chronos" element={<DistrictPage districtId="chronos" />} />
               <Route path="/forge" element={<DistrictPage districtId="forge" />} />
               <Route path="/pandora" element={<DistrictPage districtId="pandora" />} />

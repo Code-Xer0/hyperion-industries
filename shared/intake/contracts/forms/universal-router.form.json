@@ -1,0 +1,59 @@
+{
+  "form_id": "universal-router",
+  "version": "1.0.0",
+  "title": "Start a signal",
+  "estimated_minutes": 1,
+  "questions": [
+    {
+      "id": "router.mission",
+      "type": "single_select",
+      "label": "What are you trying to move forward?",
+      "required": true,
+      "options": [
+        { "value": "machine", "label": "A machine built around my work" },
+        { "value": "local_ai", "label": "Local AI or private compute" },
+        { "value": "continuity", "label": "A workflow that keeps losing state" },
+        { "value": "identity", "label": "Operator identity or NFC" },
+        { "value": "support", "label": "Help with an existing Hyperion system" },
+        { "value": "relationship", "label": "Partnership, funding, media, or ecosystem" },
+        { "value": "unknown", "label": "I am not sure yet" }
+      ]
+    },
+    {
+      "id": "router.scope",
+      "type": "single_select",
+      "label": "Who is this for?",
+      "required": true,
+      "options": [
+        { "value": "self", "label": "Me" },
+        { "value": "team", "label": "A team" },
+        { "value": "organization", "label": "An organization or site" },
+        { "value": "multiple_sites", "label": "Multiple sites" }
+      ]
+    },
+    {
+      "id": "router.next_step",
+      "type": "single_select",
+      "label": "What would be most useful next?",
+      "required": true,
+      "options": [
+        { "value": "recommendation", "label": "A proposed fit" },
+        { "value": "quote", "label": "A quote path" },
+        { "value": "assessment", "label": "An assessment" },
+        { "value": "support", "label": "Support" },
+        { "value": "conversation", "label": "A conversation" }
+      ]
+    }
+  ],
+  "routing_rules": [
+    { "when": { "router.mission": "machine" }, "primary_form": "forge-build-profile" },
+    { "when": { "router.mission": "local_ai" }, "primary_form": "pandora-readiness" },
+    { "when": { "router.mission": "continuity" }, "primary_form": "continuity-assessment" },
+    { "when": { "router.mission": "identity" }, "primary_form": "operator-identity" },
+    { "when": { "router.mission": "support" }, "primary_form": "support" },
+    { "when": { "router.mission": "relationship" }, "primary_form": "relationship" },
+    { "when": { "router.mission": "unknown" }, "primary_form": "general" },
+    { "when_all": [{ "router.mission": "machine" }, { "router.scope": "multiple_sites" }], "secondary_form": "pandora-readiness" },
+    { "when_all": [{ "router.mission": "local_ai" }, { "router.scope": "self" }], "secondary_form": "forge-build-profile" }
+  ]
+}

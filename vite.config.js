@@ -286,6 +286,12 @@ function spaFallbackPlugin() {
 
 // https://vite.dev/config/
 export default defineConfig({
+  server: {
+    proxy: { '/api/intake': { target: 'http://127.0.0.1:8788', changeOrigin: false } },
+  },
+  preview: {
+    proxy: { '/api/intake': { target: 'http://127.0.0.1:8788', changeOrigin: false } },
+  },
   plugins: [
     { enforce: 'pre', ...mdx() },
     react(),

@@ -38,7 +38,7 @@ export default function HomePage() {
           <h2>Infrastructure that remembers who holds authority.</h2>
           <p className="gate-lead">Local-first software, custom hardware, identity, and continuity systems for people who intend to keep control of the work.</p>
           <div className="room-action-row">
-            <Link to="/contact" className="btn btn-gold"><Radio size={15} aria-hidden="true" />Start Intake</Link>
+            <Link to="/intake" className="btn btn-gold"><Radio size={15} aria-hidden="true" />Start a signal</Link>
             <Link to="/#city" className="btn btn-ghost">Open City Map</Link>
             <a href="https://chr0nos.app" className="btn btn-ghost" target="_blank" rel="noopener noreferrer">CHR0N.OS <ArrowUpRight size={14} aria-hidden="true" /></a>
           </div>
@@ -117,7 +117,7 @@ export default function HomePage() {
         </div>
         <div className="room-action-row">
           <Link to="/alignment" className="btn btn-ghost">Alignment Posture</Link>
-          <Link to="/contact" className="btn btn-gold">Send a Signal</Link>
+          <Link to="/intake" className="btn btn-gold">Start a signal</Link>
         </div>
       </div>
     ),

@@ -10,7 +10,7 @@
   "cta": [
     { "label": "CARDS / NFC ↗", "path": "/card-studio", "variant": "ghost" },
     { "label": "CHR0N.OS ↗", "href": "https://chr0nos.app", "variant": "ghost", "external": true },
-    { "label": "Start Intake →", "path": "/contact", "variant": "gold" }
+    { "label": "Start a signal →", "path": "/intake", "variant": "gold" }
   ],
   "footer": {
     "systems": [

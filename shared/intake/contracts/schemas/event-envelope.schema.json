@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.hyperion-industries.dev/events/intake-event.v1.json",
+  "title": "Hyperion Intake CloudEvent v1",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["specversion", "id", "source", "type", "time", "datacontenttype", "subject", "intakeid", "traceid", "schemauri", "dataclassification", "authorityclass", "data"],
+  "properties": {
+    "specversion": { "const": "1.0" },
+    "id": { "type": "string", "minLength": 16, "maxLength": 128 },
+    "source": { "type": "string", "format": "uri-reference" },
+    "type": { "type": "string", "pattern": "^com\\.hyperion\\.[a-z0-9_.-]+\\.v[0-9]+$" },
+    "time": { "type": "string", "format": "date-time" },
+    "datacontenttype": { "const": "application/json" },
+    "subject": { "type": "string", "maxLength": 240 },
+    "intakeid": { "type": "string" },
+    "traceid": { "type": "string", "minLength": 16, "maxLength": 64 },
+    "schemauri": { "type": "string", "format": "uri" },
+    "dataclassification": { "enum": ["public", "client_confidential", "restricted"] },
+    "authorityclass": { "enum": ["display", "reference", "claim", "mutation", "proposal", "operator"] },
+    "idempotencykey": { "type": "string", "maxLength": 200 },
+    "data": { "type": "object" }
+  }
+}

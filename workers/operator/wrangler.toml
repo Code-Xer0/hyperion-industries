@@ -1,0 +1,81 @@
+# Production binding for the Hyperion public intake Worker.
+name = "hyperion-operator"
+main = "src/index.ts"
+compatibility_date = "2026-07-13"
+workers_dev = false
+routes = [
+  { pattern = "https://hyperion-industries.dev/api/operator*", zone_name = "hyperion-industries.dev" },
+  { pattern = "https://hyperion-industries.dev/api/intake*", zone_name = "hyperion-industries.dev" }
+]
+
+[vars]
+SITE_ORIGIN = "https://hyperion-industries.dev"
+OPENROUTER_MODEL = "openai/gpt-5.2"
+INQUIRY_NOTIFY_TO = "hello@hyperion-industries.dev"
+INQUIRY_FROM_EMAIL = "operator@hyperion-industries.dev"
+INQUIRY_CONSENT_VERSION = "2026-07-13"
+INTAKE_RESUME_FROM = "signal@intake.hyperion-industries.dev"
+INTAKE_COOKIE_NAME = "hyperion_resume"
+FOUNDER_COMMAND_PULL_KEY_ID = "fc-intake-v1"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "hyperion-operator"
+database_id = "d6e34723-f12f-4570-8de7-90891052c600"
+migrations_dir = "migrations"
+
+[[send_email]]
+name = "INQUIRY_EMAIL"
+destination_address = "hello@hyperion-industries.dev"
+allowed_sender_addresses = ["operator@hyperion-industries.dev"]
+
+[[ratelimits]]
+name = "CHAT_RATE_LIMITER"
+namespace_id = "41001"
+
+  [ratelimits.simple]
+  limit = 12
+  period = 60
+
+[[ratelimits]]
+name = "INQUIRY_RATE_LIMITER"
+namespace_id = "41002"
+
+  [ratelimits.simple]
+  limit = 5
+  period = 60
+
+[[ratelimits]]
+name = "INTAKE_RESUME_RATE_LIMITER"
+namespace_id = "41003"
+
+  [ratelimits.simple]
+  limit = 5
+  period = 60
+
+[[ratelimits]]
+name = "INTAKE_SUBMISSION_RATE_LIMITER"
+namespace_id = "41004"
+
+  [ratelimits.simple]
+  limit = 8
+  period = 60
+
+[[ratelimits]]
+name = "INTAKE_OPERATOR_RATE_LIMITER"
+namespace_id = "41005"
+
+  [ratelimits.simple]
+  limit = 120
+  period = 60
+
+# Production retention schedule: `17 4 * * *`.
+# The schedule is managed as a separate Cloudflare trigger so a trigger-permission
+# failure cannot roll back the API route deployment.
+
+# Add OPENROUTER_API_KEY with `wrangler secret put OPENROUTER_API_KEY`.
+# Add RESEND_API_KEY with `wrangler secret put RESEND_API_KEY`; never place it in this file.
+# Add FOUNDER_COMMAND_PULL_TOKEN_SHA256 with `wrangler secret put FOUNDER_COMMAND_PULL_TOKEN_SHA256`.
+# During rotation, add FOUNDER_COMMAND_PULL_PREVIOUS_TOKEN_SHA256 as a secret and set
+# FOUNDER_COMMAND_PULL_PREVIOUS_UNTIL to a bounded ISO-8601 overlap deadline.
+# Production routes intentionally keep the API on the public site origin.
