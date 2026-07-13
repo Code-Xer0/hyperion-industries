@@ -11,6 +11,7 @@ import {
   purgeExpiredIntake,
 } from "./intake";
 import { logMetadata } from "./log";
+import { handleOperatorAck, handleOperatorFeed, handleOperatorStatus } from "./operator-feed";
 import { handleStatus } from "./status";
 import type { Env, OperatorWorker, RuntimeDependencies } from "./types";
 
@@ -23,6 +24,9 @@ const ROUTES = new Map([
   ["/api/intake/resume/request", "POST"],
   ["/api/intake/resume/exchange", "POST"],
   ["/api/intake/submissions", "POST"],
+  ["/api/intake/operator/status", "GET"],
+  ["/api/intake/operator/feed", "GET"],
+  ["/api/intake/operator/ack", "POST"],
 ]);
 
 const DRAFT_ROUTE = /^\/api\/intake\/drafts\/(drf_[A-Za-z0-9_-]{12,64})$/;
@@ -57,12 +61,16 @@ export function createWorker(overrides: Partial<RuntimeDependencies> = {}): Oper
           throw new HttpError(405, "method_not_allowed", "Method not allowed.", { allow: expectedMethod });
         }
 
-        if (["POST", "PUT", "DELETE"].includes(request.method)) enforceSameOrigin(request, env);
+        const operatorFeedRoute = url.pathname.startsWith("/api/intake/operator/");
+        if (["POST", "PUT", "DELETE"].includes(request.method) && !operatorFeedRoute) enforceSameOrigin(request, env);
 
         if (draftMatch) response = await handleDraft(request, env, draftMatch[1] ?? "", deps);
         else if (url.pathname === "/api/operator/status") response = handleStatus(env);
         else if (url.pathname === "/api/operator/chat") response = await handleChat(request, env, requestId, deps);
         else if (url.pathname === "/api/operator/inquiries") response = await handleInquiry(request, env, requestId, deps);
+        else if (url.pathname === "/api/intake/operator/status") response = await handleOperatorStatus(request, env);
+        else if (url.pathname === "/api/intake/operator/feed") response = await handleOperatorFeed(request, env);
+        else if (url.pathname === "/api/intake/operator/ack") response = await handleOperatorAck(request, env, deps);
         else if (url.pathname === "/api/intake/status") response = handleIntakeStatus(env);
         else if (url.pathname === "/api/intake/evaluate") response = await handleIntakeEvaluate(request);
         else if (url.pathname === "/api/intake/resume/request") response = await handleResumeRequest(request, env, requestId, deps);

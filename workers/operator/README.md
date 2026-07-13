@@ -71,6 +71,12 @@ Tests mock OpenRouter, D1, rate-limit bindings, and email. Live chat in `wrangle
 ## Files
 
 - `wrangler.toml`: binding and cron template with a zero D1 placeholder; no secret values
+
+## Founder Command intake feed
+
+The service-authenticated `/api/intake/operator/*` routes expose held-for-review intake revisions to the local Founder Command adapter. A delivery acknowledgement writes only `intake_consumer_receipts`; it never changes the source `intake_outbox` state or authorizes domain work.
+
+Store the raw pull token only in Founder Command's Windows Credential Manager. Store only its lowercase SHA-256 digest in the Worker secret `FOUNDER_COMMAND_PULL_TOKEN_SHA256`.
 - `migrations/0001_operator_inquiries.sql`: initial structured D1 schema
 - `migrations/0002_operator_inquiry_budget.sql`: forward migration for optional budget
 - `corpus/public-corpus.source.json`: reviewed public allowlist

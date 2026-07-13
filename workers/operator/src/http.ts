@@ -181,12 +181,13 @@ export async function enforceRateLimit(
 export async function enforceRateLimitKey(
   binding: RateLimitBinding | undefined,
   key: string,
+  scope = "service",
 ): Promise<void> {
   if (!binding) {
     throw new HttpError(503, "rate_limit_unavailable", "Abuse protection is temporarily unavailable.");
   }
   try {
-    const result = await binding.limit({ key });
+    const result = await binding.limit({ key: `${scope}:${key}` });
     if (!result.success) {
       throw new HttpError(429, "rate_limited", "Too many requests. Please try again later.", { "retry-after": "60" });
     }

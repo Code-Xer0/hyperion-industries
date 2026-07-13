@@ -13,6 +13,7 @@ Configure the template bindings as follows:
 | `INQUIRY_RATE_LIMITER` | Anonymous abuse limit for intake traffic |
 | `INQUIRY_EMAIL` | Fixed-destination notification binding |
 | `OPENROUTER_API_KEY` | Wrangler secret, never a plain variable |
+| `FOUNDER_COMMAND_PULL_TOKEN_SHA256` | Wrangler secret containing only the pull-token SHA-256 digest |
 | `OPENROUTER_MODEL` | Server-only model override |
 | `SITE_ORIGIN` | Canonical HTTPS origin used by strict POST checks |
 | `INQUIRY_NOTIFY_TO` | Verified notification destination |

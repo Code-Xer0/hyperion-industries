@@ -32,6 +32,11 @@ export function handleStatus(env: Env): Response {
       isEmailAddress(env.INTAKE_RESUME_FROM?.trim()) &&
       origin.valid,
   );
+  const operatorFeedReady = Boolean(
+    env.DB &&
+      env.INTAKE_OPERATOR_RATE_LIMITER &&
+      /^[a-f0-9]{64}$/i.test(env.FOUNDER_COMMAND_PULL_TOKEN_SHA256?.trim() ?? ""),
+  );
 
   return jsonResponse({
     service: SERVICE_NAME,
@@ -43,6 +48,7 @@ export function handleStatus(env: Env): Response {
       inquiry_notification: notificationReady ? "ready" : "configuration_required",
       intake_storage: intakeStorageReady ? "ready" : "configuration_required",
       intake_resume: resumeReady ? "ready" : "configuration_required",
+      intake_operator_feed: operatorFeedReady ? "ready" : "configuration_required",
     },
     corpus: CORPUS_METADATA,
     privacy: {

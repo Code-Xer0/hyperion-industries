@@ -7,12 +7,14 @@ export class MockStatement {
   readonly owner: MockD1;
   readonly run: ReturnType<typeof vi.fn>;
   readonly first: ReturnType<typeof vi.fn>;
+  readonly all: ReturnType<typeof vi.fn>;
 
   constructor(sql: string, owner: MockD1) {
     this.sql = sql;
     this.owner = owner;
     this.run = vi.fn(async () => ({ meta: { changes: this.owner.runChanges.shift() ?? 1 } }));
     this.first = vi.fn(async () => this.owner.firstResults.shift() ?? null);
+    this.all = vi.fn(async () => ({ results: this.owner.allResults.shift() ?? [] }));
   }
 
   bind(...values: unknown[]): MockStatement {
@@ -25,6 +27,7 @@ export class MockD1 {
   readonly statements: MockStatement[] = [];
   readonly batches: MockStatement[][] = [];
   readonly firstResults: unknown[] = [];
+  readonly allResults: unknown[][] = [];
   readonly runChanges: number[] = [];
   batchError: Error | null = null;
   readonly prepare = vi.fn((sql: string) => {
@@ -40,6 +43,11 @@ export class MockD1 {
 
   queueFirst(...values: unknown[]): MockD1 {
     this.firstResults.push(...values);
+    return this;
+  }
+
+  queueAll(...values: unknown[][]): MockD1 {
+    this.allResults.push(...values);
     return this;
   }
 
@@ -60,6 +68,7 @@ export function baseEnv(overrides: Partial<Env> = {}): Env {
     INQUIRY_RATE_LIMITER: allowRateLimit(),
     INTAKE_RESUME_RATE_LIMITER: allowRateLimit(),
     INTAKE_SUBMISSION_RATE_LIMITER: allowRateLimit(),
+    INTAKE_OPERATOR_RATE_LIMITER: allowRateLimit(),
     ...overrides,
   };
 }

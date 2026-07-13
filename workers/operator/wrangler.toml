@@ -56,10 +56,22 @@ namespace_id = "41004"
   limit = 8
   period = 60
 
+[[ratelimits]]
+name = "INTAKE_OPERATOR_RATE_LIMITER"
+namespace_id = "41005"
+
+  [ratelimits.simple]
+  limit = 120
+  period = 60
+
 [triggers]
 crons = ["17 4 * * *"]
 
 # Add OPENROUTER_API_KEY with `wrangler secret put OPENROUTER_API_KEY`.
 # Add RESEND_API_KEY with `wrangler secret put RESEND_API_KEY`; never place it in this file.
+# Add FOUNDER_COMMAND_PULL_TOKEN_SHA256 with `wrangler secret put FOUNDER_COMMAND_PULL_TOKEN_SHA256`.
 # Route this Worker on the same origin as SITE_ORIGIN, for example:
-# routes = [{ pattern = "hyperion-industries.dev/api/operator/*", zone_name = "hyperion-industries.dev" }]
+# routes = [
+#   { pattern = "hyperion-industries.dev/api/operator/*", zone_name = "hyperion-industries.dev" },
+#   { pattern = "hyperion-industries.dev/api/intake/*", zone_name = "hyperion-industries.dev" }
+# ]

@@ -1,2 +1,4 @@
 # Only needed to exercise chat locally. Automated tests use mocked fetch and bindings.
 OPENROUTER_API_KEY=replace_for_local_development
+# Store only the SHA-256 digest of the local Founder Command pull token.
+FOUNDER_COMMAND_PULL_TOKEN_SHA256=replace_with_64_lowercase_hex_characters
