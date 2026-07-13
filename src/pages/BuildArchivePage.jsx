@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import PageShell from '../components/layout/PageShell';
-import SectionHero from '../components/ui/SectionHero';
+import RoomShell from '../components/portal/RoomShell';
 import Carousel3D from '../components/ui/Carousel3D';
 import HoverEditor from '../components/ui/HoverEditor';
 import MediaFrame from '../components/ui/MediaFrame';
@@ -301,28 +301,25 @@ export default function BuildArchivePage() {
       .catch(() => setShowcaseItems(showcaseData));
   }, []);
 
+  const panels = {
+    browse: <div className="archive-room-carousel"><Carousel3D items={showcaseItems} /></div>,
+    posture: (
+      <div className="room-panel-grid"><div className="room-panel-copy"><span className="sp-label">Public build record</span><h2>{content.buildarchive.footer.title}</h2><p>{content.buildarchive.footer.desc}</p></div><div className="room-note-grid archive-posture-notes"><article className="room-note"><span>01</span><h3>Artifact</h3><p>Completed builds remain visible as proof of fabrication and handoff.</p></article><article className="room-note"><span>02</span><h3>Boundary</h3><p>Client records, private specifications, and internal work state remain excluded.</p></article></div></div>
+    ),
+    inquiry: (
+      <div className="room-panel-grid"><div className="room-panel-copy"><h2>Build around the workload.</h2><p>Share what the machine has to do, where it will live, the timing, and the support reality.</p><div className="room-action-row"><Link to="/forge" className="btn btn-ghost">Enter the Forge</Link><a href="mailto:forge@hyperion-industries.dev?subject=Build%20Inquiry" className="btn btn-gold">Start Inquiry</a></div></div></div>
+    ),
+  };
+
   return (
     <PageShell>
       <HoverEditor model="content">
-        <SectionHero
-          eyebrow={content.buildarchive.hero.eyebrow}
-          title={content.buildarchive.hero.title}
-          lead={content.buildarchive.hero.lead}
-        >
-          <Link to="/forge" className="btn btn-gold">Enter the Forge</Link>
-          <a href="mailto:forge@hyperion-industries.dev?subject=Build%20Inquiry" className="btn btn-ghost">Start Inquiry</a>
-        </SectionHero>
+        <RoomShell eyebrow="Public Record / Forge" title="Build Archive" summary={content.buildarchive.hero.lead} status="PUBLIC ARCHIVE" tone="inquiry" stations={[{ id: 'browse', label: 'Browse' }, { id: 'posture', label: 'Posture' }, { id: 'inquiry', label: 'Inquiry' }]} panels={panels} defaultStation="browse" className="archive-room-shell" />
       </HoverEditor>
-
-      <section className="section" style={{ overflow: 'hidden' }}>
-        <div className="shell">
-          <Carousel3D items={showcaseItems} />
-        </div>
-      </section>
 
       {/* Dev-only inline build manager */}
       {isDev && (
-        <section className="section" style={{ paddingTop: 0 }}>
+        <section className="section dev-room-manager">
           <div className="shell">
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
               <span style={{ fontSize: '11px', fontWeight: 800, color: 'var(--gold)', textTransform: 'uppercase', letterSpacing: '0.15em', fontFamily: 'var(--font-display)' }}>Build Manager</span>
@@ -333,17 +330,6 @@ export default function BuildArchivePage() {
         </section>
       )}
 
-      <section className="section section-alt">
-        <HoverEditor model="content">
-          <div className="shell" style={{ textAlign: 'center' }}>
-            <h2 className="h2" style={{ fontFamily: 'var(--font-display)' }}>{content.buildarchive.footer.title}</h2>
-            <p className="body-lead" style={{ margin: '0 auto' }}>{content.buildarchive.footer.desc}</p>
-            <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', margin: '28px auto 0' }}>
-              <a href="mailto:forge@hyperion-industries.dev" className="btn btn-gold">Contact the Forge</a>
-            </div>
-          </div>
-        </HoverEditor>
-      </section>
     </PageShell>
   );
 }

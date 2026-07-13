@@ -14,7 +14,6 @@ export default function GravityLattice({ className = 'fp-lattice', intensity = 1
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     let W = 0, H = 0, dpr = 1, raf = null, running = false, last = 0;
     let wellR = 300;
@@ -87,18 +86,17 @@ export default function GravityLattice({ className = 'fp-lattice', intensity = 1
 
     function setup() {
       resize(); initMasses(); col = accentRGB();
-      if (reduce) draw();   // static glow pools, no drift
-      else start();
+      start();
     }
 
     let rt;
     const onResize = () => {
       clearTimeout(rt);
-      rt = setTimeout(() => { resize(); initMasses(); if (reduce) draw(); }, 160);
+      rt = setTimeout(() => { resize(); initMasses(); }, 160);
     };
     const onVisibility = () => {
       if (document.hidden) stop();
-      else if (!reduce) start();
+      else start();
     };
 
     setup();

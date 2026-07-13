@@ -1,16 +1,15 @@
 import { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Nav from './components/layout/Nav';
-import Footer from './components/layout/Footer';
 import HomePage from './pages/HomePage';
 import FoundersPage from './pages/FoundersPage';
 import FounderPage from './pages/FounderPage';
+import DistrictPage from './pages/DistrictPage';
 
 // Operator-only surfaces: DEV-gated lazy imports so the production bundle
 // contains neither the code nor the route — no source/route leakage.
 const RadioStatsPage = import.meta.env.DEV ? lazy(() => import('./pages/RadioStatsPage')) : () => null;
 import SystemsPage from './pages/SystemsPage';
-import ForgePage from './pages/ForgePage';
 import BuildArchivePage from './pages/BuildArchivePage';
 import GalleryPage from './pages/GalleryPage';
 import DevDiaryPage from './pages/DevDiaryPage';
@@ -19,7 +18,7 @@ import NewsletterPage from './pages/NewsletterPage';
 import StorePage from './pages/StorePage';
 const EditorPage = import.meta.env.DEV ? lazy(() => import('./pages/EditorPage')) : () => null;
 import { HelmetProvider } from 'react-helmet-async';
-import SingularityBackground from './components/ui/SingularityBackground';
+import AmbientCityLayer from './components/ui/AmbientCityLayer';
 import { EditorProvider, useEditor } from './context/EditorContext';
 import { ThemeProvider } from './context/ThemeContext';
 import EditorModal from './components/ui/EditorModal';
@@ -71,7 +70,7 @@ export default function App() {
       <ThemeProvider>
         <EditorProvider>
           <BrowserRouter>
-            <SingularityBackground />
+            <AmbientCityLayer />
             <Nav />
             <Suspense fallback={null}>
             <Routes>
@@ -80,7 +79,17 @@ export default function App() {
               <Route path="/founders/:slug" element={<FounderPage />} />
               {isDev && <Route path="/radio-stats" element={<RadioStatsPage />} />}
               <Route path="/systems" element={<SystemsPage />} />
-              <Route path="/forge" element={<ForgePage />} />
+              <Route path="/chronos" element={<DistrictPage districtId="chronos" />} />
+              <Route path="/forge" element={<DistrictPage districtId="forge" />} />
+              <Route path="/pandora" element={<DistrictPage districtId="pandora" />} />
+              <Route path="/talos" element={<DistrictPage districtId="talos" />} />
+              <Route path="/identity" element={<DistrictPage districtId="identity" />} />
+              <Route path="/mnemos" element={<DistrictPage districtId="mnemos" />} />
+              <Route path="/software-estate" element={<DistrictPage districtId="software-estate" />} />
+              <Route path="/succession" element={<DistrictPage districtId="succession" />} />
+              <Route path="/pandora-lite" element={<DistrictPage districtId="pandora-lite" />} />
+              <Route path="/architecture" element={<DistrictPage districtId="architecture" />} />
+              <Route path="/alignment" element={<DistrictPage districtId="alignment" />} />
               <Route path="/build-archive" element={<BuildArchivePage />} />
               <Route path="/gallery" element={<GalleryPage />} />
               <Route path="/card-studio/studio.html" element={<StaticRedirect to="/assets/card-studio/studio.html" />} />
@@ -93,7 +102,6 @@ export default function App() {
               <Route path="/store" element={<StorePage />} />
             </Routes>
             </Suspense>
-            <Footer />
             {isDev && <EditModeToggle />}
             {isDev && <EditorModal />}
           </BrowserRouter>

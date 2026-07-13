@@ -81,7 +81,7 @@
       "robots": "index,follow",
       "openGraph": {
         "title": "Hyperion Systems",
-        "description": "A public-safe systems map for CHR0N.OS, Mnem.OS, Hyperion Nest, Hyperion Connect, ARG.OS, SCEN.OS, HORUS/Decksmith, KAIR.OS, and future systems.",
+        "description": "A public-safe systems map for approved live, shipping, inquiry, in-development, and research lanes.",
         "image": "/assets/branding/hyperion/hyperion-orbit.svg",
         "type": "website"
       }
@@ -316,7 +316,7 @@
         { "label": "Open CHR0N Beta Lane", "route": "/access/chronos-public-beta" },
         { "label": "Request Demo", "route": "/access/contact" }
       ],
-      "relatedSystems": ["chronos", "mnemos", "hyperion-nest", "hyperion-connect", "argos", "scenos", "horus-decksmith", "kairos", "future-systems"],
+      "relatedSystems": ["chronos", "mnemos", "hyperion-nest", "hyperion-connect", "argos", "scenos", "horus-decksmith", "future-systems"],
       "relatedRooms": ["public-status", "chronos-public-beta"],
       "featuredArtifacts": ["systems-map"],
       "notesForFrontend": "System cards should be data-driven and show declassified posture only."
@@ -358,7 +358,7 @@
         { "label": "Request Field Work", "route": "/access/contact" },
         { "label": "View Build Archive", "route": "/field/build-archive" }
       ],
-      "relatedSystems": ["hyperion-connect", "kairos", "scenos"],
+      "relatedSystems": ["hyperion-connect", "scenos"],
       "relatedRooms": ["field-services", "build-archive"],
       "featuredArtifacts": ["build-archive"],
       "notesForFrontend": "Keep field work inquiry-led until service terms and support boundaries are explicit."
@@ -625,18 +625,18 @@
       "name": "KAIR.OS",
       "codename": "Timing / Execution Layer",
       "description": "A timing, cadence, and execution lane for operator-visible service and device workflows.",
-      "publicSummary": "Restricted and in development; public shape only.",
-      "posture": "restricted",
-      "access": "restricted",
+      "publicSummary": "Internal/private. Not part of the public portal.",
+      "posture": "private",
+      "access": "private",
       "authorityBoundary": "No hardware control, private device state, or command execution surfaces are public.",
-      "relatedZones": ["systems", "field", "status"],
+      "relatedZones": [],
       "relatedArtifacts": [],
-      "docsRoute": "/systems",
+      "docsRoute": null,
       "downloadRoute": null,
-      "statusRoute": "/status",
+      "statusRoute": null,
       "privateRoutePlaceholder": "restricted-kairos-runtime",
       "hidePrivateControls": true,
-      "visibility": "public"
+      "visibility": "private"
     },
     {
       "id": "future-systems",

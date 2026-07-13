@@ -152,7 +152,6 @@ export default function FounderPage() {
     const onKey = (e) => { if (e.key === 'Escape') closeStage(); };
     window.addEventListener('keydown', onKey);
     return () => { document.body.style.overflow = prevOverflow; window.removeEventListener('keydown', onKey); };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stage]);
 
   useEffect(() => { window.scrollTo(0, 0); }, [slug]);
@@ -207,8 +206,8 @@ export default function FounderPage() {
           <meta property="og:description" content="Systems architect and infrastructure operator building local-first systems for memory, governance, continuity, and human-controlled AI." />
           <meta property="og:type" content="profile" />
           <meta property="og:url" content="https://hyperion-industries.dev/founders/victor-amani" />
-          <meta property="og:image" content="https://hyperion-industries.dev/assets/founder/17.jpg" />
-          <meta property="og:image:alt" content="Victor Amani, founder of Hyperion Industries" />
+          <meta property="og:image" content={`https://hyperion-industries.dev${operator.heroImage}`} />
+          <meta property="og:image:alt" content={operator.heroImageAlt} />
           <meta name="twitter:card" content="summary_large_image" />
         </Helmet>
 
@@ -226,7 +225,7 @@ export default function FounderPage() {
         {/* ════════ HERO ════════ */}
         <section className="fp-hero fp-room-section" data-fp-room="profile">
           <div className="hero-bg">
-            <img src={A('17.jpg')} alt="The Hyperion Operator standing before a red-lit city of converging system data" />
+            <img src={operator.heroImage || A('17.jpg')} alt={operator.heroImageAlt || 'The Hyperion Operator standing before a red-lit city of converging system data'} />
           </div>
           <div className="hero-inner">
             <div className="hero-grid">

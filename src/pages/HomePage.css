@@ -13,7 +13,7 @@
 .gate-film-shade { z-index: -2; background: linear-gradient(90deg, rgba(2, 5, 8, 0.68) 0%, rgba(2, 5, 8, 0.36) 48%, rgba(2, 5, 8, 0.18) 100%), linear-gradient(0deg, rgba(2, 5, 8, 0.48), transparent 54%); }
 .gate-city-room .hero-canvas { z-index: -1; opacity: 0.86; }
 
-.gate-signal-room { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(260px, 0.55fr); align-items: center; gap: 28px; min-height: calc(100% - 32px); }
+.gate-signal-room { position: relative; display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(260px, 0.55fr); align-items: center; gap: 28px; min-height: calc(100% - 32px); }
 .gate-copy { min-width: 0; }
 .gate-kicker,
 .city-label { color: var(--gold); font-family: var(--font-display); font-size: 8px; font-weight: 700; text-transform: uppercase; }
@@ -22,7 +22,8 @@
 .gate-copy .city-status-rail { max-width: 920px; margin-top: clamp(24px, 5vh, 54px); background: rgba(2, 5, 8, 0.46); backdrop-filter: blur(12px); }
 .gate-copy .city-status-stop { padding: 9px 10px; }
 .gate-copy .city-status-stop:nth-child(n + 4) { display: none; }
-.gate-operator { align-self: end; justify-self: center; width: min(100%, 340px); pointer-events: none; }
+.gate-operator { position: absolute; z-index: 2; right: -1%; bottom: -8px; width: min(250px, 24%); pointer-events: none; }
+.gate-operator .operator-mascot { width: 100%; }
 
 .gate-room-heading { display: flex; align-items: end; justify-content: space-between; gap: 24px; margin-bottom: 22px; }
 .gate-room-heading h2 { margin: 8px 0 0; color: var(--text); font-size: clamp(32px, 5vw, 62px); line-height: 0.95; }

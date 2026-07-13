@@ -4,10 +4,16 @@
     "slug": "victor-amani",
     "theme": "operator-red",
     "name": "Δeus χ",
-    "stars": "★ ★ ★ ★ ★ ★",
     "attr": "Δ",
     "attrTitle": "SYSTEMS",
-    "image": "/assets/operators/deus-x-dossier-safe.png",
+    "image": "/assets/operators/victor-amani-dossier.png",
+    "imageAlt": "Victor Amani as the Hyperion Operator in a red-lit systems portrait",
+    "mark": "/assets/operators/victor-operator-mark.png",
+    "markAlt": "Victor Amani Hyperion operator mark",
+    "previewImage": "/assets/operators/victor-transmission.gif",
+    "previewPosition": "center",
+    "heroImage": "/assets/operators/victor-city-operating-edge.png",
+    "heroImageAlt": "The Hyperion Operator at the threshold between fragmented records and a coherent systems city",
     "artBackground": "#07080a",
     "typeLine": "Founding Operator · Systems Architecture",
     "description": "Founder and systems architect behind CHR0N.OS, Mnem.OS, and the local-first infrastructure direction.",
@@ -18,22 +24,21 @@
       "Forge direction"
     ],
     "flavor": "\"Technology should augment human continuity and agency — not replace custody, understanding, or control.\"",
-    "stats": [
-      { "label": "SYS", "value": "9400" },
-      { "label": "CLR", "value": "Ω-CLASS" },
-      { "label": "UPTIME", "value": "∞" }
-    ],
-    "serial": "HYP-OP-001 · MYTHIC · UNRESTRICTED"
+    "serial": "HYP-OP-001 · PUBLIC DOSSIER · SYSTEMS"
   },
   {
     "id": "HYP-OP-002",
     "slug": "keshawn-rowe",
     "theme": "operator-navy",
     "name": "Keshawn Rowe",
-    "stars": "★ ★ ★ ★ ★",
     "attr": "K",
     "attrTitle": "OPERATIONS",
-    "image": null,
+    "image": "/assets/operators/keshawn-rowe-dossier.jpeg",
+    "imageAlt": "Keshawn Rowe in a blue and violet city at night",
+    "mark": "/assets/operators/keshawn-wraith-mark.jpeg",
+    "markAlt": "WRAITH — Ghostly & Lethal",
+    "previewImage": "/assets/operators/keshawn-rowe-dossier.jpeg",
+    "previewPosition": "center 30%",
     "artBackground": "linear-gradient(135deg,#0a1628 0%,#1a2744 50%,#0d1f3c 100%)",
     "typeLine": "Founding Operator · Operations & Deployment",
     "description": "Operations lead focused on deployment, field systems, build intake, and translating Hyperion systems into real-world use.",
@@ -44,11 +49,6 @@
       "Client handoff"
     ],
     "flavor": "\"Good infrastructure disappears. The best systems are the ones people trust without thinking twice.\"",
-    "stats": [
-      { "label": "OPS", "value": "8800" },
-      { "label": "DEP", "value": "ALPHA" },
-      { "label": "FIELD", "value": "∞" }
-    ],
-    "serial": "HYP-OP-002 · RARE · FIELD-CERTIFIED"
+    "serial": "HYP-OP-002 · PUBLIC DOSSIER · IN PROGRESS"
   }
 ]

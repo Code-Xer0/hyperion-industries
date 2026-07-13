@@ -1,14 +1,20 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
+  Archive,
   ArrowUpRight,
   ChevronRight,
   Command,
+  Cpu,
+  Fingerprint,
+  Handshake,
   MapPinned,
   Moon,
+  Orbit,
   Search,
   Send,
   Sun,
+  UsersRound,
   Volume2,
   VolumeX,
   X,
@@ -26,6 +32,17 @@ const searchableText = (destination) => [
   ...(destination.keywords || []),
 ].join(' ').toLowerCase();
 
+const familyIcons = {
+  systems: Orbit,
+  infrastructure: Cpu,
+  identity: Fingerprint,
+  record: Archive,
+  alignment: Handshake,
+  operators: UsersRound,
+};
+
+const interactiveSelector = 'a[href], button:not([disabled]), [role="button"], [role="tab"]';
+
 export default function Nav() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -39,6 +56,8 @@ export default function Nav() {
   const inputRef = useRef(null);
   const launcherRef = useRef(null);
   const soundtrackRef = useRef(null);
+  const feedbackContextRef = useRef(null);
+  const feedbackTargetRef = useRef(null);
   const returnFocusRef = useRef(null);
   const current = getCityDestination(location.pathname);
   const activeFamily = cityFamilies.find((family) => family.id === activeFamilyId) || cityFamilies[0];
@@ -67,8 +86,6 @@ export default function Nav() {
 
   const closeLauncher = useCallback(() => {
     setLauncherOpen(false);
-    soundtrackRef.current?.pause();
-    setSoundEnabled(false);
     setQuery('');
     setActiveIndex(0);
     requestAnimationFrame(() => returnFocusRef.current?.focus?.());
@@ -100,11 +117,77 @@ export default function Nav() {
 
   useEffect(() => {
     setLauncherOpen(false);
-    soundtrackRef.current?.pause();
-    setSoundEnabled(false);
     setQuery('');
     setActiveIndex(0);
   }, [location.pathname]);
+
+  const getFeedbackContext = useCallback(() => {
+    if (feedbackContextRef.current) return feedbackContextRef.current;
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) return null;
+    feedbackContextRef.current = new AudioContextClass();
+    return feedbackContextRef.current;
+  }, []);
+
+  const playInterfaceCue = useCallback((kind) => {
+    if (!soundEnabled) return;
+    const context = getFeedbackContext();
+    if (!context) return;
+    if (context.state === 'suspended') context.resume().catch(() => {});
+
+    const now = context.currentTime;
+    const oscillator = context.createOscillator();
+    const gain = context.createGain();
+    const frequencies = { hover: 520, focus: 620, press: 180 };
+    const duration = kind === 'press' ? 0.075 : 0.045;
+    oscillator.type = kind === 'press' ? 'triangle' : 'sine';
+    oscillator.frequency.setValueAtTime(frequencies[kind] || 440, now);
+    if (kind === 'press') oscillator.frequency.exponentialRampToValueAtTime(280, now + duration);
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(kind === 'press' ? 0.045 : 0.018, now + 0.008);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+    oscillator.connect(gain);
+    gain.connect(context.destination);
+    oscillator.start(now);
+    oscillator.stop(now + duration + 0.01);
+  }, [getFeedbackContext, soundEnabled]);
+
+  useEffect(() => {
+    const findInteractive = (target) => target instanceof Element ? target.closest(interactiveSelector) : null;
+    const onPointerOver = (event) => {
+      if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+      const interactive = findInteractive(event.target);
+      if (!interactive || interactive === feedbackTargetRef.current || interactive.contains(event.relatedTarget)) return;
+      feedbackTargetRef.current = interactive;
+      playInterfaceCue('hover');
+    };
+    const onPointerOut = (event) => {
+      const interactive = findInteractive(event.target);
+      if (interactive && !interactive.contains(event.relatedTarget)) feedbackTargetRef.current = null;
+    };
+    const onPointerDown = (event) => {
+      if (!findInteractive(event.target)) return;
+      playInterfaceCue('press');
+      if (event.pointerType === 'touch' && navigator.vibrate) navigator.vibrate(8);
+    };
+    const onFocusIn = (event) => {
+      if (findInteractive(event.target)) playInterfaceCue('focus');
+    };
+    document.addEventListener('pointerover', onPointerOver, { passive: true });
+    document.addEventListener('pointerout', onPointerOut, { passive: true });
+    document.addEventListener('pointerdown', onPointerDown, { passive: true });
+    document.addEventListener('focusin', onFocusIn, { passive: true });
+    return () => {
+      document.removeEventListener('pointerover', onPointerOver);
+      document.removeEventListener('pointerout', onPointerOut);
+      document.removeEventListener('pointerdown', onPointerDown);
+      document.removeEventListener('focusin', onFocusIn);
+    };
+  }, [playInterfaceCue]);
+
+  useEffect(() => () => {
+    feedbackContextRef.current?.close?.().catch(() => {});
+  }, []);
 
   useEffect(() => {
     setActiveIndex(0);
@@ -158,6 +241,7 @@ export default function Nav() {
 
     soundtrack.volume = 0.28;
     try {
+      await getFeedbackContext()?.resume?.();
       await soundtrack.play();
       setSoundEnabled(true);
     } catch {
@@ -230,6 +314,17 @@ export default function Nav() {
         <div className="nav-controls">
           <button
             type="button"
+            onClick={toggleSoundtrack}
+            className="nav-score-button"
+            aria-pressed={soundEnabled}
+            aria-label={soundEnabled ? 'Turn City score off' : 'Turn City score on'}
+            title={soundEnabled ? 'Turn City score off' : 'Turn City score on'}
+          >
+            {soundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
+            <span className="nav-score-copy"><strong>Score</strong><small>{soundEnabled ? 'On' : 'Off'}</small></span>
+          </button>
+          <button
+            type="button"
             onClick={toggleTheme}
             className="nav-icon-button"
             aria-label={isLightMode ? 'Switch to dark mode' : 'Switch to light mode'}
@@ -243,6 +338,15 @@ export default function Nav() {
           </Link>
         </div>
       </nav>
+
+      <audio
+        ref={soundtrackRef}
+        src="/assets/city/navigation/world-engine.mp3"
+        preload="none"
+        loop
+        onPlay={() => setSoundEnabled(true)}
+        onPause={() => setSoundEnabled(false)}
+      />
 
       <AnimatePresence>
         {launcherOpen && (
@@ -278,8 +382,6 @@ export default function Nav() {
                 <div className="city-launcher-skyline" />
                 <div className="city-launcher-grid" />
               </div>
-
-              <audio ref={soundtrackRef} src="/assets/city/navigation/world-engine.mp3" preload="none" loop />
 
               <header className="city-launcher-head">
                 <div className="city-launcher-title-lockup">
@@ -356,20 +458,28 @@ export default function Nav() {
                     >
                       <span className="city-transit-label">District lines</span>
                       {cityFamilies.map((family, index) => (
-                        <button
-                          key={family.id}
-                          type="button"
-                          className={family.id === activeFamily.id ? 'is-active' : ''}
-                          onClick={() => selectFamily(family)}
-                          aria-pressed={family.id === activeFamily.id}
-                        >
-                          <span className={`city-line-signal is-${family.id}`}>{String(index + 1).padStart(2, '0')}</span>
-                          <span>
-                            <strong>{family.label}</strong>
-                            <small>{family.routes.length} rooms</small>
-                          </span>
-                          <ChevronRight size={16} aria-hidden="true" />
-                        </button>
+                        (() => {
+                          const FamilyIcon = familyIcons[family.id] || MapPinned;
+                          return (
+                            <button
+                              key={family.id}
+                              type="button"
+                              className={family.id === activeFamily.id ? 'is-active' : ''}
+                              onClick={() => selectFamily(family)}
+                              aria-pressed={family.id === activeFamily.id}
+                            >
+                              <span className={`city-line-signal is-${family.id}`}>
+                                <FamilyIcon size={16} strokeWidth={1.5} aria-hidden="true" />
+                                <small>{String(index + 1).padStart(2, '0')}</small>
+                              </span>
+                              <span>
+                                <strong>{family.label}</strong>
+                                <small>{family.routes.length} rooms</small>
+                              </span>
+                              <ChevronRight size={16} aria-hidden="true" />
+                            </button>
+                          );
+                        })()
                       ))}
                     </aside>
 

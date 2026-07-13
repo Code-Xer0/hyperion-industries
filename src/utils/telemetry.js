@@ -6,6 +6,7 @@
  * NDJSON sink) and by the Vercel function (Vercel KV) in production. */
 
 const SID_KEY = 'hyperion_sid';
+const TELEMETRY_ENDPOINT = import.meta.env.VITE_TELEMETRY_ENDPOINT || '';
 
 function dnt() {
   try {
@@ -25,13 +26,13 @@ function sessionId() {
 }
 
 export function track(event, props = {}) {
-  if (dnt()) return;
+  if (dnt() || !TELEMETRY_ENDPOINT) return;
   try {
     const body = JSON.stringify({ e: event, s: sessionId(), ts: Date.now(), ...props });
     if (navigator.sendBeacon) {
-      navigator.sendBeacon('/api/telemetry', new Blob([body], { type: 'application/json' }));
+      navigator.sendBeacon(TELEMETRY_ENDPOINT, new Blob([body], { type: 'application/json' }));
     } else {
-      fetch('/api/telemetry', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body, keepalive: true }).catch(() => {});
+      fetch(TELEMETRY_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body, keepalive: true }).catch(() => {});
     }
   } catch { /* never let telemetry break playback */ }
 }

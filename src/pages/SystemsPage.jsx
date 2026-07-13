@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import PageShell from '../components/layout/PageShell';
-import SectionHero from '../components/ui/SectionHero';
+import RoomShell from '../components/portal/RoomShell';
 import systems from '../data/systems.json';
 import content from '../data/content.json';
 import './SubPage.css';
@@ -222,84 +222,33 @@ export default function SystemsPage() {
   const primary = systems.filter(s => s.id === 'chronos' || s.id === 'mnemos');
   const secondary = systems.filter(s => s.id !== 'chronos' && s.id !== 'mnemos');
 
+  const panels = {
+    directory: (
+      <div className="systems-room-directory">
+        <div className="systems-room-intro"><span className="sp-label">Public Systems Directory</span><h2>{content.systems.hero.title}</h2><p>{content.systems.hero.lead}</p></div>
+        <div className="sp-grid-3">{systems.map((system) => <SystemCard key={system.id} system={system} compact />)}</div>
+      </div>
+    ),
+    active: <div className="sp-grid-2 systems-active-room">{primary.map((system) => <SystemCard key={system.id} system={system} />)}</div>,
+    lanes: <div className="sp-grid-3 systems-lane-room">{secondary.map((system) => <SystemCard key={system.id} system={system} compact />)}</div>,
+    maturity: (
+      <div className="room-note-grid">
+        <article className="room-note"><span>01</span><h3>Public or shipping</h3><p>CHR0N.OS carries stable-beta posture. Operator Identity and the completed card lanes carry shipping posture.</p></article>
+        <article className="room-note"><span>02</span><h3>Building or inquiry</h3><p>Mnem.OS and Tal.OS remain in development. Forge remains a human-scoped commercial inquiry lane.</p></article>
+        <article className="room-note"><span>03</span><h3>Architecture only</h3><p>Concept and research systems stay labeled. Private controls, source, telemetry, and operator state remain outside the public room.</p></article>
+      </div>
+    ),
+  };
+
   return (
     <PageShell>
       <HoverEditor model="content">
-        <SectionHero
-          eyebrow={content.systems.hero.eyebrow}
-          title={content.systems.hero.title}
-          lead={content.systems.hero.lead}
-        />
+        <RoomShell eyebrow="Systems / Public Directory" title="Systems" summary={content.systems.hero.lead} status="MATURITY-LABELED PUBLIC MAP" tone="map" stations={[{ id: 'directory', label: 'Directory' }, { id: 'active', label: 'Active' }, { id: 'lanes', label: 'Lanes' }, { id: 'maturity', label: 'Maturity' }]} panels={panels} defaultStation="directory" className="systems-room-shell" />
       </HoverEditor>
-
-      <section className="section section-alt">
-        <HoverEditor model="content">
-          <div className="shell">
-            <div className="sp-label">{content.systems.active.title}</div>
-          </div>
-        </HoverEditor>
-        <div className="shell">
-          <div className="sp-grid-2">
-            {primary.map((sys) => {
-              return (
-                <article key={sys.id} className="sp-system-card">
-                  <div className="sp-sys-head">
-                    <img src={sys.icon} alt="" />
-                    <div>
-                      <h3>{sys.name}</h3>
-                      <div className="sp-status">{sys.statusLabel}</div>
-                    </div>
-                  </div>
-                  <p>{sys.description}</p>
-                  {sys.chips && (
-                    <div className="sp-chips">
-                      {sys.chips.map(c => <span key={c} className="sp-chip">{c}</span>)}
-                    </div>
-                  )}
-                  {sys.link && (
-                    <div className="sp-actions">
-                      {sys.link.startsWith('http')
-                        ? <a href={sys.link} className="btn btn-gold" target="_blank" rel="noopener noreferrer">Open {sys.name}</a>
-                        : <Link to={sys.link} className="btn btn-gold">{sys.linkLabel}</Link>
-                      }
-                    </div>
-                  )}
-                </article>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      <section className="section">
-        <HoverEditor model="content">
-          <div className="shell">
-            <div className="sp-label">{content.systems.lanes.title}</div>
-          </div>
-        </HoverEditor>
-        <div className="shell">
-          <div className="sp-grid-3">
-            {secondary.map((sys) => {
-              return (
-                <article key={sys.id} className="sp-lane-card">
-                  <div className="sp-sys-head">
-                    <img src={sys.icon} alt="" />
-                    <div>
-                      <h3>{sys.name}</h3>
-                      <div className="sp-status">{sys.statusLabel}</div>
-                    </div>
-                  </div>
-                  <p>{sys.description}</p>
-                </article>
-              );
-            })}
-          </div>
-        </div>
-      </section>
 
       {/* Dev-only inline systems manager */}
       {isDev && (
-        <section className="section" style={{ paddingTop: 0 }}>
+        <section className="section dev-room-manager">
           <div className="shell">
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
               <span style={{ fontSize: '11px', fontWeight: 800, color: '#ffc72c', textTransform: 'uppercase', letterSpacing: '0.15em', fontFamily: 'var(--font-display)' }}>Systems Manager</span>
@@ -310,5 +259,16 @@ export default function SystemsPage() {
         </section>
       )}
     </PageShell>
+  );
+}
+
+function SystemCard({ system, compact = false }) {
+  return (
+    <article className={compact ? 'sp-lane-card' : 'sp-system-card'}>
+      <div className="sp-sys-head"><img src={system.icon} alt="" /><div><h3>{system.name}</h3><div className="sp-status">{system.statusLabel}</div></div></div>
+      <p>{system.description}</p>
+      {!compact && system.chips && <div className="sp-chips">{system.chips.map((chip) => <span key={chip} className="sp-chip">{chip}</span>)}</div>}
+      {system.link && <div className="sp-actions">{system.link.startsWith('http') ? <a href={system.link} className="btn btn-gold" target="_blank" rel="noopener noreferrer">Open {system.name}</a> : <Link to={system.link} className="btn btn-gold">{system.linkLabel}</Link>}</div>}
+    </article>
   );
 }

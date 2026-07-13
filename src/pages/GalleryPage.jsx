@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import PageShell from '../components/layout/PageShell';
-import SectionHero from '../components/ui/SectionHero';
+import RoomShell from '../components/portal/RoomShell';
 import './SubPage.css';
+import './GalleryPage.css';
 
 import HoverEditor from '../components/ui/HoverEditor';
 import galleryAssets from '../data/gallery.json';
@@ -232,93 +233,46 @@ export default function GalleryPage() {
 
   const filteredAssets = filter === 'All' ? assets : assets.filter(a => a.type === filter);
 
+  const panels = {
+    featured: (
+      <div className="gallery-room-featured">
+        <MediaFrame media={content.gallery.operatorHero.image} alt="Hyperion operator visual" className="gallery-operator-media" />
+        <div className="gallery-room-caption"><span className="sp-label">Completed asset</span><h2>{content.gallery.operatorHero.title}</h2><p>{content.gallery.operatorHero.desc}</p></div>
+      </div>
+    ),
+    browse: (
+      <div className="gallery-room-browser">
+        <div className="gallery-room-filter" role="group" aria-label="Filter gallery assets">
+          {['All', 'Portraits', 'Cards', 'References'].map((value) => <button key={value} type="button" className={filter === value ? 'is-active' : ''} onClick={() => setFilter(value)}>{value}</button>)}
+        </div>
+        <div className="gallery-asset-grid">
+          {filteredAssets.map((asset, index) => (
+            <article key={`${asset.label}-${index}`} className={`gallery-asset-card${asset.reference ? ' reference' : ''}`}>
+              <MediaFrame media={asset.src || asset} alt={asset.label} />
+              <div className="gallery-asset-overlay" />
+              <div className="gallery-asset-label"><strong>{asset.label}</strong><span>{asset.desc}</span></div>
+            </article>
+          ))}
+        </div>
+      </div>
+    ),
+    proof: (
+      <div className="gallery-room-proof"><div className="sp-media-strip"><MediaFrame media={content.gallery.mediaStrip.image1} alt="Wide Hyperion brand plate" /><MediaFrame media={content.gallery.mediaStrip.image2} alt="Circular Hyperion avatar asset" /></div><div className="room-panel-copy"><h2>Public-safe artifacts only.</h2><p>Images in this room are approved public assets. Internal screenshots, client state, and private product surfaces stay outside the gallery.</p></div></div>
+    ),
+    next: (
+      <div className="room-panel-grid"><div className="room-panel-copy"><h2>Follow the artifact to the work.</h2><p>Build proof lives in the Archive. Fabrication requests route through the Forge.</p><div className="room-action-row"><Link to="/build-archive" className="btn btn-gold">Open Build Archive</Link><Link to="/forge" className="btn btn-ghost">Enter the Forge</Link></div></div></div>
+    ),
+  };
+
   return (
     <PageShell>
       <HoverEditor model="content">
-        <SectionHero
-          eyebrow={content.gallery.hero.eyebrow}
-          title={content.gallery.hero.title}
-          lead={content.gallery.hero.lead}
-        >
-          <Link to="/build-archive" className="btn btn-gold">Open Trading Card Archive</Link>
-          <Link to="/forge" className="btn btn-ghost">Enter the Forge</Link>
-        </SectionHero>
+        <RoomShell eyebrow="Public Record / Gallery" title="Gallery" summary={content.gallery.hero.lead} status="PUBLIC ARCHIVE" tone="map" stations={[{ id: 'featured', label: 'Featured' }, { id: 'browse', label: 'Browse' }, { id: 'proof', label: 'Proof' }, { id: 'next', label: 'Next' }]} panels={panels} defaultStation="featured" className="gallery-room-shell" />
       </HoverEditor>
-
-      {/* ── Operator Hero ── */}
-      <HoverEditor model="content">
-        <section className="gallery-operator-hero">
-          <MediaFrame media={content.gallery.operatorHero.image} alt="Δeus χ wide Hyperion operator visual" className="gallery-operator-media" />
-          <div className="gallery-operator-overlay" />
-          <div className="shell gallery-operator-content">
-            <div className="sp-label">Completed asset</div>
-            <h2 style={{ maxWidth: '560px', fontFamily: 'var(--font-display)', fontSize: 'clamp(28px,4vw,48px)', fontWeight: 800 }}>{content.gallery.operatorHero.title}</h2>
-            <p style={{ maxWidth: '520px', color: 'var(--text-soft)', lineHeight: 1.75, marginTop: '12px' }}>{content.gallery.operatorHero.desc}</p>
-          </div>
-        </section>
-      </HoverEditor>
-
-      {/* ── Media Strip ── */}
-      <HoverEditor model="content">
-        <section className="section section-alt">
-          <div className="shell">
-            <div className="sp-media-strip">
-              <MediaFrame media={content.gallery.mediaStrip.image1} alt="Wide Hyperion Δeus χ brand plate" />
-              <MediaFrame media={content.gallery.mediaStrip.image2} alt="Circular Δeus χ avatar asset" />
-            </div>
-          </div>
-        </section>
-      </HoverEditor>
-
-      {/* ── Asset Grid ── */}
-      <section className="section">
-        <div className="shell">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '24px', flexWrap: 'wrap', gap: '16px' }}>
-            <div className="sp-label" style={{ marginBottom: 0 }}>Asset Gallery</div>
-            <div style={{ display: 'flex', gap: '8px' }}>
-              {['All', 'Portraits', 'Cards', 'References'].map(f => (
-                <button 
-                  key={f} 
-                  onClick={() => setFilter(f)}
-                  style={{
-                    background: filter === f ? 'var(--gold-glow)' : 'transparent',
-                    border: `1px solid ${filter === f ? 'var(--border-gold)' : 'var(--border-soft)'}`,
-                    color: filter === f ? 'var(--gold)' : 'var(--text-dim)',
-                    padding: '6px 12px',
-                    borderRadius: '100px',
-                    fontSize: '11px',
-                    fontFamily: 'var(--font-display)',
-                    textTransform: 'uppercase',
-                    letterSpacing: '0.08em',
-                    cursor: 'pointer',
-                    transition: 'all 0.16s ease'
-                  }}
-                >
-                  {f}
-                </button>
-              ))}
-            </div>
-          </div>
-          <div className="gallery-asset-grid">
-            {filteredAssets.map((a, i) => {
-              return (
-                <article key={i} className={`gallery-asset-card${a.reference ? ' reference' : ''}`}>
-                  <MediaFrame media={a.src || a} alt={a.label} />
-                  <div className="gallery-asset-overlay" />
-                  <div className="gallery-asset-label">
-                    <strong>{a.label}</strong>
-                    <span>{a.desc}</span>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
-        </div>
-      </section>
 
       {/* Dev-only inline gallery manager */}
       {isDev && (
-        <section className="section" style={{ paddingTop: 0 }}>
+        <section className="section dev-room-manager">
           <div className="shell">
             <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '20px' }}>
               <span style={{ fontSize: '11px', fontWeight: 800, color: '#ffc72c', textTransform: 'uppercase', letterSpacing: '0.15em', fontFamily: 'var(--font-display)' }}>Gallery Manager</span>
