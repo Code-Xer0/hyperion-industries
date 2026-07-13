@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.hyperion-industries.dev/command/intake-decision-card.v1.json",
+  "title": "Founder Command Intake Decision Card v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["card_id", "intake_id", "title", "lane", "summary", "source_links", "claim_refs", "projection_health", "proposed_actions", "decision_state", "created_at", "trace_id"],
+  "properties": {
+    "card_id": { "type": "string", "pattern": "^cmd_[A-Za-z0-9_-]{12,64}$" },
+    "intake_id": { "type": "string" },
+    "trace_id": { "type": "string" },
+    "created_at": { "type": "string", "format": "date-time" },
+    "title": { "type": "string", "maxLength": 180 },
+    "lane": { "enum": ["forge", "pandora", "continuity", "identity", "support", "relationship", "general", "security_review"] },
+    "summary": { "type": "string", "maxLength": 2500 },
+    "client_ref": { "type": ["string", "null"] },
+    "account_ref": { "type": ["string", "null"] },
+    "diagnostic_class": { "type": ["string", "null"] },
+    "confidence": { "type": ["number", "null"], "minimum": 0, "maximum": 1 },
+    "source_links": { "type": "array", "minItems": 1, "items": { "type": "string" } },
+    "claim_refs": { "type": "array", "items": { "type": "string" } },
+    "missing_information": { "type": "array", "items": { "type": "string", "maxLength": 500 } },
+    "contradictions": { "type": "array", "items": { "type": "string", "maxLength": 500 } },
+    "projection_health": {
+      "type": "object",
+      "additionalProperties": { "enum": ["not_applicable", "pending", "healthy", "degraded", "failed", "stale"] }
+    },
+    "owner": { "type": ["string", "null"] },
+    "due_at": { "type": ["string", "null"], "format": "date-time" },
+    "proposed_actions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["action_id", "label", "what_changes", "why", "risk", "reversal", "gate"],
+        "properties": {
+          "action_id": { "type": "string" },
+          "label": { "type": "string", "maxLength": 120 },
+          "what_changes": { "type": "string", "maxLength": 1000 },
+          "why": { "type": "string", "maxLength": 1000 },
+          "risk": { "type": "string", "maxLength": 1000 },
+          "reversal": { "type": "string", "maxLength": 1000 },
+          "gate": { "enum": ["no_gate", "soft_gate", "hard_gate"] }
+        }
+      }
+    },
+    "decision_state": { "enum": ["pending", "approved", "rejected", "clarification_requested", "assigned", "archived", "escalated"] }
+  }
+}
+

@@ -1,0 +1,61 @@
+{
+  "form_id": "pandora-readiness",
+  "version": "1.0.0",
+  "ruleset_version": "pandora-1.0.0",
+  "title": "Find your local AI footprint",
+  "estimated_minutes": 9,
+  "sections": [
+    { "id": "signal", "label": "Signal", "question_ids": ["pandora.outcome", "pandora.scope", "pandora.location"] },
+    { "id": "workload", "label": "Workload", "question_ids": ["pandora.modalities", "pandora.model_size", "pandora.service_pattern", "pandora.concurrency"] },
+    { "id": "custody", "label": "Custody", "question_ids": ["pandora.privacy", "pandora.offline", "pandora.data_scale", "pandora.retention"] },
+    { "id": "body", "label": "Physical body", "question_ids": ["pandora.existing_hardware", "pandora.power", "pandora.cooling", "pandora.network", "pandora.space"] },
+    { "id": "operations", "label": "Operations", "question_ids": ["pandora.operator", "pandora.monitoring", "pandora.availability", "pandora.staging", "pandora.budget", "pandora.timeline"] },
+    { "id": "contact", "label": "Contact", "question_ids": ["contact.name", "contact.email", "contact.organization", "contact.preference"] }
+  ],
+  "questions": [
+    { "id": "pandora.outcome", "type": "long_text", "label": "What should local AI do that your current workflow cannot?", "required": true, "max_length": 2500 },
+    { "id": "pandora.scope", "type": "single_select", "label": "Who or what will it serve?", "required": true, "options": ["single_operator", "small_team", "department", "public_or_classroom", "product_service", "multiple_sites", "unknown"] },
+    { "id": "pandora.location", "type": "multi_select", "label": "Where must compute run?", "required": true, "options": ["desk", "office_server_room", "rack_datacenter", "field_edge", "classroom_community_site", "multiple_sites", "unknown"] },
+    { "id": "pandora.modalities", "type": "multi_select", "label": "Which AI workloads matter?", "required": true, "options": ["language", "vision", "audio", "multimodal", "search_rag", "agents_automation", "training_tuning", "unknown"] },
+    { "id": "pandora.model_size", "type": "single_select", "label": "What model footprint do you expect?", "required": true, "options": ["small_under_10b", "medium_10_to_30b", "large_30_to_70b", "very_large_over_70b", "multiple_models", "unknown"] },
+    { "id": "pandora.service_pattern", "type": "single_select", "label": "How will the workload run?", "required": true, "options": ["occasional_interactive", "daily_interactive", "scheduled_batch", "shared_service", "continuous_service", "training_cycles", "unknown"] },
+    { "id": "pandora.concurrency", "type": "single_select", "label": "How many simultaneous users or jobs?", "required": true, "options": ["one", "two_to_five", "six_to_twenty", "over_twenty", "bursty_unknown"] },
+    { "id": "pandora.privacy", "type": "multi_select", "label": "Which custody constraints apply?", "required": true, "options": ["general_privacy", "client_confidential", "regulated", "contract_no_cloud", "data_residency", "air_gapped", "no_special_constraint", "unknown"] },
+    { "id": "pandora.offline", "type": "single_select", "label": "Must it work without internet?", "required": true, "options": ["no", "degraded_ok", "core_functions_offline", "fully_offline", "unknown"] },
+    { "id": "pandora.data_scale", "type": "single_select", "label": "How much data must remain close to compute?", "required": true, "options": ["under_100gb", "100gb_to_1tb", "1_to_10tb", "10_to_100tb", "over_100tb", "unknown"] },
+    { "id": "pandora.retention", "type": "single_select", "label": "How long must source and derived data be retained?", "required": true, "options": ["ephemeral", "under_90_days", "one_year", "multi_year", "legal_hold_or_policy", "unknown"] },
+    { "id": "pandora.existing_hardware", "type": "long_text", "label": "What compute and storage already exist?", "required": false, "max_length": 3000 },
+    { "id": "pandora.power", "type": "single_select", "label": "What power is available?", "required": true, "options": ["standard_outlet", "dedicated_120v", "higher_capacity_known", "facility_review_available", "unknown"] },
+    { "id": "pandora.cooling", "type": "single_select", "label": "What cooling posture exists?", "required": true, "options": ["room_ambient_only", "managed_office_hvac", "server_room_cooling", "datacenter", "field_limited", "unknown"] },
+    { "id": "pandora.network", "type": "single_select", "label": "What network posture exists?", "required": true, "options": ["consumer_lan", "managed_lan", "high_speed_lan", "segmented_secure", "offline", "unknown"] },
+    { "id": "pandora.space", "type": "single_select", "label": "What physical envelope is available?", "required": true, "options": ["desktop", "tower_floor", "closet_or_shelf", "rack", "field_enclosure", "unknown"] },
+    { "id": "pandora.operator", "type": "single_select", "label": "Who will operate it?", "required": true, "options": ["nontechnical_user", "power_user", "it_generalist", "systems_engineer", "ml_engineer_team", "managed_by_hyperion", "unknown"] },
+    { "id": "pandora.monitoring", "type": "single_select", "label": "What monitoring and incident process exists?", "required": true, "options": ["none", "basic_manual", "central_monitoring", "defined_incident_process", "unknown"] },
+    { "id": "pandora.availability", "type": "single_select", "label": "How costly is downtime?", "required": true, "options": ["low", "business_hours", "important_daily", "service_critical", "safety_or_regulated"] },
+    { "id": "pandora.staging", "type": "single_select", "label": "How should deployment be staged?", "required": true, "options": ["discovery_first", "single_pilot", "phased_nodes", "full_scope_request", "unknown"] },
+    { "id": "pandora.budget", "type": "budget_posture", "label": "What investment boundary should shape the architecture?", "required": true, "allow_unknown": true },
+    { "id": "pandora.timeline", "type": "timeline_posture", "label": "Is there a real delivery or pilot deadline?", "required": true, "allow_unknown": true },
+    { "id": "contact.name", "type": "text", "label": "Your name", "required": true },
+    { "id": "contact.email", "type": "email", "label": "Email", "required": true },
+    { "id": "contact.organization", "type": "text", "label": "Organization", "required": false },
+    { "id": "contact.preference", "type": "single_select", "label": "How should we follow up?", "required": true, "options": ["email", "phone", "video_call"] }
+  ],
+  "scoring": {
+    "scale": { "min": 0, "max": 4 },
+    "dimensions": ["sovereignty_need", "workload_intensity", "concurrency", "data_gravity", "infrastructure_readiness", "operational_maturity", "deployment_breadth", "budget_staging_fit"],
+    "hard_overrides": [
+      { "code": "P0_OUTCOME_UNCLEAR", "when": { "pandora.outcome": "insufficient" }, "class": "P0" },
+      { "code": "P5_MULTI_SITE", "when_any": [{ "pandora.scope": "multiple_sites" }, { "pandora.location": "multiple_sites" }], "class": "P5" },
+      { "code": "PX_FACILITY_UNKNOWN_HIGH_LOAD", "when_all": [{ "pandora.model_size": ["large_30_to_70b", "very_large_over_70b", "multiple_models"] }, { "pandora.power": "unknown" }, { "pandora.cooling": "unknown" }], "class": "PX" },
+      { "code": "PX_SAFETY_POLICY", "when": { "pandora.availability": "safety_or_regulated" }, "class": "PX", "requires": "security_and_compliance_review" }
+    ],
+    "class_rules": [
+      { "class": "P4", "when_all": [{ "workload_intensity_gte": 3 }, { "pandora.modalities": "training_tuning" }] },
+      { "class": "P3", "when_any": [{ "concurrency_gte": 3 }, { "data_gravity_gte": 3 }, { "pandora.service_pattern": ["shared_service", "continuous_service"] }] },
+      { "class": "P2", "when_all": [{ "deployment_breadth_lte": 2 }, { "workload_intensity_gte": 2 }] },
+      { "class": "P1", "when_all": [{ "workload_intensity_lte": 2 }, { "deployment_breadth_lte": 2 }, { "pandora.staging": ["discovery_first", "single_pilot"] }] },
+      { "class": "P0", "default": true }
+    ]
+  }
+}
+

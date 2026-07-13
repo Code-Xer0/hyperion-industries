@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.hyperion-industries.dev/orders/order-intent.v1.json",
+  "title": "Hyperion Order Intent v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["order_intent_id", "intake_id", "submission_id", "lane", "requested_outcome", "quote_eligibility", "assessment_requirement", "requested_services", "blockers", "state", "created_at", "trace_id"],
+  "properties": {
+    "order_intent_id": { "type": "string", "pattern": "^ori_[A-Za-z0-9_-]{12,64}$" },
+    "intake_id": { "type": "string" },
+    "submission_id": { "type": "string" },
+    "trace_id": { "type": "string" },
+    "created_at": { "type": "string", "format": "date-time" },
+    "lane": { "enum": ["forge", "pandora", "continuity", "identity"] },
+    "contact_ref": { "type": ["string", "null"] },
+    "account_ref": { "type": ["string", "null"] },
+    "requested_outcome": { "type": "string", "maxLength": 2000 },
+    "profile_ref": { "type": ["string", "null"] },
+    "quote_eligibility": { "enum": ["not_ready", "needs_clarification", "assessment_first", "quote_possible", "fixed_sku_checkout"] },
+    "assessment_requirement": { "enum": ["none", "optional", "required"] },
+    "budget_posture": { "type": ["string", "null"], "maxLength": 500 },
+    "timeline_posture": { "type": ["string", "null"], "maxLength": 500 },
+    "requested_services": { "type": "array", "items": { "type": "string", "maxLength": 120 } },
+    "blockers": { "type": "array", "items": { "type": "string", "maxLength": 500 } },
+    "required_approvals": { "type": "array", "items": { "type": "string", "maxLength": 120 } },
+    "pricing_snapshot_ref": { "type": ["string", "null"] },
+    "owner": { "type": ["string", "null"] },
+    "state": { "enum": ["intent", "qualification", "assessment", "quote_draft", "quote_approved_internal", "quote_sent", "accepted", "checkout_pending", "paid", "procurement", "build_or_delivery", "qa", "client_acceptance", "support", "cancelled", "declined"] }
+  }
+}
+

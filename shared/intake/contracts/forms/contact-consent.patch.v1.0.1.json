@@ -1,0 +1,29 @@
+{
+  "patch_id": "hyperion-intake-contact-consent-1.0.1",
+  "version": "1.0.1",
+  "applies_to": [
+    "universal-router",
+    "forge-build-profile",
+    "pandora-readiness",
+    "continuity-assessment",
+    "operator-identity",
+    "support",
+    "relationship",
+    "general"
+  ],
+  "identity": {
+    "required": ["name", "email"],
+    "optional": ["organization"],
+    "conditional": {
+      "phone": "follow_up_preference == 'phone'",
+      "existing_client_reference": "lane == 'support' && existing_client == true"
+    },
+    "classification": "client_confidential"
+  },
+  "consents": {
+    "required": ["process_intake"],
+    "optional": ["automated_classification", "save_resume"],
+    "not_collected": ["marketing"]
+  },
+  "authority_boundary": "operator_review_only"
+}

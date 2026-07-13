@@ -1,0 +1,63 @@
+{
+  "form_id": "forge-build-profile",
+  "version": "1.0.0",
+  "ruleset_version": "forge-1.0.0",
+  "title": "Shape a system around the work",
+  "estimated_minutes": 8,
+  "sections": [
+    { "id": "signal", "label": "Signal", "question_ids": ["forge.outcome", "forge.scope", "forge.location"] },
+    { "id": "load", "label": "Load", "question_ids": ["forge.workloads", "forge.applications", "forge.ai_level", "forge.sustained_load", "forge.displays", "forge.data_scale"] },
+    { "id": "current", "label": "Current state", "question_ids": ["forge.current_path", "forge.current_specs", "forge.reuse_parts", "forge.current_failure"] },
+    { "id": "limits", "label": "Limits", "question_ids": ["forge.form_factor", "forge.mobility", "forge.acoustics", "forge.power", "forge.visual", "forge.budget", "forge.timeline"] },
+    { "id": "service", "label": "Handoff", "question_ids": ["forge.services", "forge.support", "forge.files"] },
+    { "id": "contact", "label": "Contact", "question_ids": ["contact.name", "contact.email", "contact.organization", "contact.preference"] }
+  ],
+  "questions": [
+    { "id": "forge.outcome", "type": "long_text", "label": "What must this machine make possible?", "required": true, "max_length": 2000, "data_classification": "client_confidential" },
+    { "id": "forge.scope", "type": "single_select", "label": "Who will use it?", "required": true, "options": ["single_operator", "shared_team", "public_or_classroom", "service_node"] },
+    { "id": "forge.location", "type": "single_select", "label": "Where will it live?", "required": true, "options": ["desk_home", "desk_office", "studio_lab", "field_mobile", "rack_server", "unknown"] },
+    { "id": "forge.workloads", "type": "multi_select", "label": "Which loads matter?", "required": true, "options": ["office_web", "software_development", "gaming", "streaming", "photo_design", "video_editing", "3d_rendering", "simulation_cad", "audio", "local_ai_inference", "ai_training_tuning", "data_analysis", "virtualization", "other"] },
+    { "id": "forge.applications", "type": "long_text", "label": "Name the applications, engines, games, models, or datasets that define success.", "required": false, "max_length": 2000 },
+    { "id": "forge.ai_level", "type": "single_select", "label": "How central is local AI?", "required": true, "options": ["none", "exploring", "regular_inference", "daily_service", "training_or_tuning", "unknown"] },
+    { "id": "forge.sustained_load", "type": "single_select", "label": "How long does the machine stay under heavy load?", "required": true, "options": ["rare_bursts", "hours_weekly", "hours_daily", "continuous", "unknown"] },
+    { "id": "forge.displays", "type": "object", "label": "Describe the display setup.", "required": false, "fields": ["count", "resolution", "refresh_rate", "special_requirements"] },
+    { "id": "forge.data_scale", "type": "single_select", "label": "How much active data must stay fast?", "required": true, "options": ["under_1tb", "1_to_4tb", "4_to_12tb", "over_12tb", "unknown"] },
+    { "id": "forge.current_path", "type": "single_select", "label": "Are we replacing or evolving a current system?", "required": true, "options": ["new_build", "replace", "upgrade", "repair_diagnose", "unknown"] },
+    { "id": "forge.current_specs", "type": "long_text", "label": "What is in the current system?", "required_if": { "forge.current_path": ["replace", "upgrade", "repair_diagnose"] }, "max_length": 3000 },
+    { "id": "forge.reuse_parts", "type": "multi_select", "label": "What should be reused?", "required_if": { "forge.current_path": ["upgrade", "repair_diagnose"] }, "options": ["cpu", "motherboard", "memory", "gpu", "storage", "power_supply", "case", "cooling", "peripherals", "nothing", "unknown"] },
+    { "id": "forge.current_failure", "type": "long_text", "label": "What currently breaks, slows down, or feels wrong?", "required": false, "max_length": 2500 },
+    { "id": "forge.form_factor", "type": "single_select", "label": "How constrained is size?", "required": true, "options": ["no_constraint", "standard_tower", "compact", "very_compact", "rack", "unknown"] },
+    { "id": "forge.mobility", "type": "single_select", "label": "Does it need to move?", "required": true, "options": ["fixed", "occasional_move", "frequent_move", "field_portable"] },
+    { "id": "forge.acoustics", "type": "single_select", "label": "How strict is the noise envelope?", "required": true, "options": ["flexible", "normal_office", "quiet_studio", "near_silent"] },
+    { "id": "forge.power", "type": "single_select", "label": "What power constraints exist?", "required": true, "options": ["standard_outlet", "limited_circuit", "ups_required", "facility_review_needed", "unknown"] },
+    { "id": "forge.visual", "type": "multi_select", "label": "What should the physical system communicate?", "required": false, "options": ["understated", "hyperion_cinematic", "client_brand", "rgb_controlled", "no_lighting", "display_or_mascot", "other"] },
+    { "id": "forge.budget", "type": "budget_posture", "label": "What budget boundary should shape the work?", "required": true, "allow_unknown": true },
+    { "id": "forge.timeline", "type": "timeline_posture", "label": "Is there a real deadline?", "required": true, "allow_unknown": true },
+    { "id": "forge.services", "type": "multi_select", "label": "What should Hyperion carry?", "required": true, "options": ["architecture", "parts_sourcing", "assembly", "os_setup", "data_migration", "application_setup", "delivery", "onsite_install", "training", "documentation", "benchmarking"] },
+    { "id": "forge.support", "type": "single_select", "label": "What support posture fits?", "required": true, "options": ["handoff_only", "warranty_only", "scheduled_support", "managed_support", "unknown"] },
+    { "id": "forge.files", "type": "file_upload", "label": "Add specs, photos, logs, or requirement documents.", "required": false, "max_files": 10, "max_total_mb": 50 },
+    { "id": "contact.name", "type": "text", "label": "Your name", "required": true, "max_length": 200 },
+    { "id": "contact.email", "type": "email", "label": "Email", "required": true },
+    { "id": "contact.organization", "type": "text", "label": "Organization", "required": false, "max_length": 240 },
+    { "id": "contact.preference", "type": "single_select", "label": "How should we follow up?", "required": true, "options": ["email", "phone", "video_call"] }
+  ],
+  "scoring": {
+    "scale": { "min": 0, "max": 4 },
+    "dimensions": ["compute", "graphics", "ai_acceleration", "memory", "storage_io", "mobility_size", "acoustic_thermal", "lifecycle_service"],
+    "hard_overrides": [
+      { "code": "FX_REUSE_UNKNOWN", "when_all": [{ "forge.current_path": "upgrade" }, { "forge.reuse_parts": "unknown" }], "class": "FX" },
+      { "code": "FX_RACK_OR_FLEET", "when_any": [{ "forge.location": "rack_server" }, { "forge.scope": "service_node" }], "class": "FX", "secondary_route": "pandora" },
+      { "code": "FX_THERMAL_CONFLICT", "when_all": [{ "forge.form_factor": "very_compact" }, { "forge.acoustics": "near_silent" }, { "forge.sustained_load": ["hours_daily", "continuous"] }], "class": "FX" },
+      { "code": "FX_UNKNOWN_WORKLOAD", "when_all": [{ "forge.applications": "empty" }, { "forge.ai_level": "unknown" }, { "forge.sustained_load": "unknown" }], "class": "FX" }
+    ],
+    "class_rules": [
+      { "class": "F4", "when_dimension_gte": { "mobility_size": 3 } },
+      { "class": "F3", "when_dimension_gte": { "ai_acceleration": 3 }, "unless": ["FX"] },
+      { "class": "F5", "when_at_least_dimensions_gte": { "count": 3, "score": 3 }, "unless": ["FX"] },
+      { "class": "F2", "when_any_dimension_gte": { "dimensions": ["graphics", "compute", "storage_io"], "score": 3 }, "unless": ["FX"] },
+      { "class": "F1", "default_if_new_build": true },
+      { "class": "F0", "when": { "forge.current_path": ["upgrade", "repair_diagnose"] }, "unless": ["FX"] }
+    ]
+  }
+}
+

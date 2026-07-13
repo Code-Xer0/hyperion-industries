@@ -1,0 +1,91 @@
+{
+  "version": "1.0.0",
+  "posture": "blueprint_requires_content_and_policy_approval",
+  "forms": [
+    {
+      "form_id": "continuity-assessment",
+      "title": "Trace where the thread breaks",
+      "estimated_minutes": 7,
+      "questions": [
+        { "id": "continuity.break", "type": "long_text", "label": "What repeatedly breaks, disappears, or has to be rediscovered?", "required": true },
+        { "id": "continuity.trigger", "type": "multi_select", "label": "When does it happen?", "required": true, "options": ["person_change", "device_change", "desk_or_site_move", "vendor_change", "handoff", "incident", "audit", "growth", "other"] },
+        { "id": "continuity.state", "type": "multi_select", "label": "What state must survive?", "required": true, "options": ["files", "decisions", "approvals", "device_profile", "support_history", "client_context", "process_steps", "evidence", "access", "other"] },
+        { "id": "continuity.truth_sources", "type": "long_text", "label": "Where do people currently look for the truth?", "required": true },
+        { "id": "continuity.frequency", "type": "single_select", "label": "How often does the break happen?", "required": true, "options": ["daily", "weekly", "monthly", "quarterly", "during_change", "rare_high_impact"] },
+        { "id": "continuity.impact", "type": "multi_select", "label": "What does it cost?", "required": true, "options": ["time", "downtime", "rework", "client_trust", "compliance_risk", "revenue", "staff_burden", "unknown"] },
+        { "id": "continuity.owner", "type": "long_text", "label": "Who owns the decisions and who carries the friction?", "required": true },
+        { "id": "continuity.target_workflow", "type": "long_text", "label": "Choose one narrow workflow we should assess first.", "required": true },
+        { "id": "continuity.constraints", "type": "multi_select", "label": "Which boundaries apply?", "required": true, "options": ["security_review", "regulated_data", "no_cloud", "client_approval", "union_or_hr", "legacy_tools", "budget", "deadline", "unknown"] },
+        { "id": "continuity.files", "type": "file_upload", "label": "Add a safe example, workflow, screenshot, or policy.", "required": false }
+      ],
+      "conversion": { "crm": "intake_activity", "order": "assessment_intent", "arg": "pain_point_proposal", "command": "decision_card" }
+    },
+    {
+      "form_id": "operator-identity",
+      "title": "Build an operator identity surface",
+      "estimated_minutes": 5,
+      "questions": [
+        { "id": "identity.scope", "type": "single_select", "label": "What is the identity surface for?", "required": true, "options": ["individual", "team", "event", "field_deployment", "organization"] },
+        { "id": "identity.quantity", "type": "integer", "label": "How many physical identities/cards?", "required": true, "minimum": 1 },
+        { "id": "identity.deadline", "type": "timeline_posture", "label": "Is there an event or launch deadline?", "required": true },
+        { "id": "identity.public_fields", "type": "multi_select", "label": "What should be public?", "required": true, "options": ["name", "role", "bio", "contact", "links", "portfolio", "credentials", "emergency_or_field_info", "other"] },
+        { "id": "identity.private_fields", "type": "multi_select", "label": "Does any information need gated access?", "required": false, "options": ["none", "team_only", "client_only", "role_based", "time_limited", "unknown"] },
+        { "id": "identity.brand", "type": "single_select", "label": "Which visual system should lead?", "required": true, "options": ["hyperion", "client_brand", "co_branded", "new_identity"] },
+        { "id": "identity.dynamic", "type": "multi_select", "label": "What should update after delivery?", "required": true, "options": ["nothing_static", "contact_content", "portfolio", "team_directory", "access_state", "analytics", "unknown"] },
+        { "id": "identity.integrations", "type": "multi_select", "label": "Any integrations?", "required": false, "options": ["none", "crm", "directory", "access_control", "calendar", "custom_api", "unknown"] },
+        { "id": "identity.assets", "type": "file_upload", "label": "Add approved logos, copy, photos, or brand guidance.", "required": false }
+      ],
+      "commerce_rule": "fixed_sku_only_when_quantity_design_and_fields_match_published_package_otherwise_quote"
+    },
+    {
+      "form_id": "support",
+      "title": "Restore a working state",
+      "estimated_minutes": 5,
+      "questions": [
+        { "id": "support.reference", "type": "text", "label": "Order, asset, deployment, or previous ticket reference", "required": false },
+        { "id": "support.impact", "type": "single_select", "label": "What is the current impact?", "required": true, "options": ["question", "degraded_one_user", "blocked_one_user", "multiple_users", "site_or_service_down", "security_or_data_loss"] },
+        { "id": "support.changed", "type": "long_text", "label": "What changed, and when?", "required": true },
+        { "id": "support.last_known_state", "type": "long_text", "label": "What was the last known working state?", "required": true },
+        { "id": "support.error", "type": "long_text", "label": "Copy the exact error or observed behavior.", "required": false },
+        { "id": "support.scope", "type": "long_text", "label": "Which people, systems, devices, or sites are affected?", "required": true },
+        { "id": "support.sensitivity", "type": "multi_select", "label": "Does this involve sensitive data or active security risk?", "required": true, "options": ["no", "client_confidential", "regulated", "suspected_compromise", "data_loss", "unknown"] },
+        { "id": "support.files", "type": "file_upload", "label": "Add safe logs, screenshots, or photos. Never upload credentials.", "required": false }
+      ],
+      "severity_rules": [
+        { "when": { "support.impact": "security_or_data_loss" }, "route": "security_review", "hard_gate": true },
+        { "when": { "support.impact": "site_or_service_down" }, "route": "urgent_manual_support" },
+        { "default": "standard_support_queue" }
+      ]
+    },
+    {
+      "form_id": "relationship",
+      "title": "Partner with Hyperion",
+      "estimated_minutes": 4,
+      "questions": [
+        { "id": "relationship.type", "type": "single_select", "label": "What kind of conversation is this?", "required": true, "options": ["strategic_partner", "capital", "grant_or_ecosystem", "media", "vendor", "speaking", "other"] },
+        { "id": "relationship.organization", "type": "text", "label": "Organization", "required": true },
+        { "id": "relationship.objective", "type": "long_text", "label": "What are you proposing or requesting?", "required": true },
+        { "id": "relationship.value_exchange", "type": "long_text", "label": "What does each side contribute or receive?", "required": false },
+        { "id": "relationship.timeline", "type": "timeline_posture", "label": "What timeline or deadline matters?", "required": true },
+        { "id": "relationship.decision_makers", "type": "long_text", "label": "Who owns the decision?", "required": false },
+        { "id": "relationship.terms", "type": "long_text", "label": "Name any required terms, restrictions, exclusivity, cloud, data, control, or branding conditions.", "required": false },
+        { "id": "relationship.materials", "type": "file_upload", "label": "Add a brief, program page, terms, or media request.", "required": false }
+      ],
+      "sovereignty_gate_terms": ["board_control", "mandatory_cloud", "vendor_lock_in", "exclusive_license", "public_securities_offer", "sensitive_diligence", "production_access"]
+    },
+    {
+      "form_id": "general",
+      "title": "Tell us what you are carrying",
+      "estimated_minutes": 3,
+      "questions": [
+        { "id": "general.outcome", "type": "long_text", "label": "What outcome are you trying to reach?", "required": true },
+        { "id": "general.current_state", "type": "long_text", "label": "What exists today?", "required": true },
+        { "id": "general.blocker", "type": "long_text", "label": "What is blocking or breaking?", "required": true },
+        { "id": "general.scope", "type": "single_select", "label": "Who or what is affected?", "required": true, "options": ["self", "team", "organization", "site", "multiple_sites", "unknown"] },
+        { "id": "general.next_step", "type": "single_select", "label": "What would help next?", "required": true, "options": ["recommendation", "assessment", "quote", "support", "conversation", "unknown"] }
+      ],
+      "route": "manual_or_agent_proposed_with_operator_review"
+    }
+  ]
+}
+

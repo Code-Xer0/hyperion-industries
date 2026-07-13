@@ -1,0 +1,26 @@
+{
+  "name": "@hyperion/operator-worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "corpus:generate": "node scripts/generate-corpus.mjs",
+    "corpus:check": "node scripts/generate-corpus.mjs --check",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "check": "npm run corpus:check && npm run typecheck && npm test",
+    "dev": "wrangler dev --config wrangler.toml"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20260713.1",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.10",
+    "wrangler": "^4.110.0"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "ajv": "^8.20.0"
+  }
+}
