@@ -5,6 +5,14 @@ compatibility_flags = ["nodejs_compat"]
 workers_dev = true
 preview_urls = false
 
+[observability]
+enabled = true
+head_sampling_rate = 1
+
+  [observability.logs]
+  invocation_logs = true
+  head_sampling_rate = 1
+
 [vars]
 SITE_ORIGIN = "https://hyperion-industries.dev"
 MCP_ORIGIN = "https://mcp.hyperion-industries.dev"
