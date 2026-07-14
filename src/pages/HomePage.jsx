@@ -148,7 +148,8 @@ export default function HomePage() {
         className="gate-city-room"
         backdrop={(
           <>
-            <video className="gate-film" src="/assets/city/gate-opener.mp4" autoPlay muted loop playsInline preload="metadata" />
+            <video className="gate-film" src="/assets/city/hyperion-city-mark.mp4" autoPlay muted loop playsInline preload="metadata" />
+            <video className="gate-brand-film" src="/assets/city/hyperion-logo-sequence.mp4" autoPlay muted loop playsInline preload="metadata" />
             <div className="gate-film-shade" />
             <HeroCanvas />
           </>

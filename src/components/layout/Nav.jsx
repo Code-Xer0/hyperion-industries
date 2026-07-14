@@ -305,7 +305,13 @@ export default function Nav() {
       <nav className="hi-nav" aria-label="Primary City transit">
         <Link to="/" className="nav-logo" title="Return to the City Gate">
           <img src={brandMark} alt="" className="nav-mark" />
-          <span className="nav-wordmark">Hyperion<span>Industries</span></span>
+          <img
+            src={isLightMode
+              ? '/assets/branding/hyperion/hyperion-wordmark-dark.svg'
+              : '/assets/branding/hyperion/hyperion-wordmark-light.svg'}
+            alt="Hyperion Industries"
+            className="nav-wordmark-logo"
+          />
         </Link>
 
         <div className="nav-location" aria-label="Current location">
@@ -408,6 +414,15 @@ export default function Nav() {
                   muted
                   loop
                   playsInline
+                />
+                <video
+                  className="city-launcher-brand-film"
+                  src="/assets/city/hyperion-logo-loop.mp4"
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  preload="metadata"
                 />
                 <div className="city-launcher-skyline" />
                 <div className="city-launcher-grid" />

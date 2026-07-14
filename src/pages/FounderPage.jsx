@@ -224,8 +224,16 @@ export default function FounderPage() {
 
         {/* ════════ HERO ════════ */}
         <section className="fp-hero fp-room-section" data-fp-room="profile">
-          <div className="hero-bg">
-            <img src={operator.heroImage || A('17.jpg')} alt={operator.heroImageAlt || 'The Hyperion Operator standing before a red-lit city of converging system data'} />
+          <div className="hero-bg" aria-hidden="true">
+            <video
+              src="/assets/founder/victor-operator-ambient.mp4"
+              poster={operator.heroImage || A('17.jpg')}
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="metadata"
+            />
           </div>
           <div className="hero-inner">
             <div className="hero-grid">
@@ -579,7 +587,17 @@ export default function FounderPage() {
             <div className="portrait-land hud">
               <span className="portrait-corner tl" /><span className="portrait-corner tr" />
               <span className="portrait-corner bl" /><span className="portrait-corner br" />
-              <img className="fp-portrait" src={A('17.jpg')} alt="Victor Amani — the Hyperion Operator" />
+              <video
+                className="fp-portrait"
+                src="/assets/founder/victor-skyline.mp4"
+                poster={A('17.jpg')}
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="metadata"
+                aria-hidden="true"
+              />
               <div className="portrait-land-overlay">
                 <div className="pl-meta">
                   <span className="pl-name">Victor Amani</span>
@@ -669,7 +687,16 @@ export default function FounderPage() {
                 <span className="sx-chip"><span className="led gold" /><span className="cv">Kairo builds the world</span></span>
               </div>
               <div className="hype-squad hud">
-                <img src="/assets/radio/hype-squad.png" alt="The HYPE squad: Operator, Kairo, Eva, and Lilith" />
+                <video
+                  src="/assets/radio/hype-squad-loop.mp4"
+                  poster="/assets/radio/hype-squad.png"
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  preload="metadata"
+                  aria-hidden="true"
+                />
                 <div className="hype-squad-copy">
                   <div className="eyebrow">H¥PE Squad</div>
                   <p>Four signals. One transmission.</p>
