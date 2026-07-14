@@ -53,6 +53,17 @@ export default function HomePage() {
     ),
     city: (
       <div className="gate-directory-room">
+        <div className="gate-directory-motion" aria-hidden="true">
+          <video
+            src="/assets/forge/media-v1/cards/hyperion-city-motion-card.mp4"
+            poster="/assets/forge/media-v1/posters/hyperion-city-motion-card.jpg"
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+          />
+        </div>
         <div className="gate-room-heading">
           <div>
             <span className="city-label">City Directory</span>

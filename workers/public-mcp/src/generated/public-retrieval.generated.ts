@@ -322,7 +322,7 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
       "maturity": "BY INQUIRY · COMMERCIAL LANE",
       "schemaType": "Service",
       "indexable": true,
-      "image": "https://hyperion-industries.dev/assets/builds/20240801_103114.jpg",
+      "image": "https://hyperion-industries.dev/assets/forge/media-v1/posters/hyperion-workstation-triptych-1280x720.jpg",
       "relatedRoutes": [
         "/pandora",
         "/identity",
@@ -858,5 +858,5 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
       }
     ]
   },
-  "sha256": "380d499ad783a13d97097e0470b1e2f3d352dbd3635d882aa29315159b7cce4c"
+  "sha256": "de60857f865467e15f1199a9804ac4a0800925b1fbfcf497a1b07c5c4654adae"
 } as const;

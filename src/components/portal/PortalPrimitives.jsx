@@ -108,6 +108,42 @@ function RelatedDistricts({ ids }) {
   );
 }
 
+function ForgeMotionShelf({ items }) {
+  if (!items?.length) return null;
+
+  return (
+    <section className="forge-motion-shelf" aria-label="Kuda lineage build media">
+      <div className="forge-motion-shelf-head">
+        <div>
+          <span className="portal-label">Build media archive</span>
+          <h3>Kuda lineage, in motion.</h3>
+        </div>
+        <p>Public build proof from the Forge archive. Select a card to play its clip.</p>
+      </div>
+      <div className="forge-motion-grid">
+        {items.map((item) => (
+          <article className="forge-motion-card" key={item.id}>
+            <video
+              src={item.src}
+              poster={item.poster}
+              controls
+              muted
+              loop
+              playsInline
+              preload="metadata"
+              aria-label={`${item.title}: ${item.description}`}
+            />
+            <div>
+              <span>{item.title}</span>
+              <p>{item.description}</p>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 export function DistrictLayout({ district }) {
   const stations = [
     { id: 'overview', label: 'Overview' },
@@ -131,7 +167,35 @@ export function DistrictLayout({ district }) {
         <DistrictDiagram district={district} />
       </div>
     ),
-    proof: (
+    proof: district.motion ? (
+      <div className="district-motion-room">
+        <div className="district-proof-room has-media">
+          <figure className={`district-media city-accent-${district.accent}`}>
+            <video
+              src={district.motion.hero.src}
+              poster={district.motion.hero.poster}
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="metadata"
+              aria-label={district.motion.hero.alt}
+            />
+            <figcaption>
+              <span>{district.motion.hero.label}</span>
+              <strong>{district.motion.hero.source}</strong>
+              <small>Capture demonstrates the labeled posture only.</small>
+            </figcaption>
+          </figure>
+          <div className="district-boundary">
+            <span className="portal-label">Public proof</span>
+            <h2>Evidence within the stated boundary.</h2>
+            <ul>{district.proof.map((item) => <li key={item}>{item}</li>)}</ul>
+          </div>
+        </div>
+        <ForgeMotionShelf items={district.motion.cards} />
+      </div>
+    ) : (
       <div className={`district-proof-room${district.media ? ' has-media' : ''}`}>
         {district.media ? (
           <figure className={`district-media city-accent-${district.accent}`}>

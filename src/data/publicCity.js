@@ -9,6 +9,60 @@ export const maturityLabels = {
   architecture: 'ARCHITECTURE · CONCEPT / RESEARCH',
 };
 
+const forgeMotion = {
+  hero: {
+    src: '/assets/forge/media-v1/hyperion-workstation-triptych-1280x720.mp4',
+    poster: '/assets/forge/media-v1/posters/hyperion-workstation-triptych-1280x720.jpg',
+    alt: 'Three-panel Hyperion Forge sequence showing workstation internals, an operator console, and a tuned workspace',
+    label: 'Kuda lineage · build sequence',
+    source: 'Hyperion Forge field media',
+  },
+  cards: [
+    {
+      id: 'core',
+      title: 'Core assembly',
+      description: 'Internal build detail and physical integration.',
+      src: '/assets/forge/media-v1/cards/hyperion-workstation-core-card.mp4',
+      poster: '/assets/forge/media-v1/posters/hyperion-workstation-core-card.jpg',
+    },
+    {
+      id: 'telemetry',
+      title: 'Signal and telemetry',
+      description: 'GPU and display instrumentation in the build environment.',
+      src: '/assets/forge/media-v1/cards/hyperion-gpu-telemetry-card.mp4',
+      poster: '/assets/forge/media-v1/posters/hyperion-gpu-telemetry-card.jpg',
+    },
+    {
+      id: 'console',
+      title: 'Operator console',
+      description: 'Desk and control-surface sweep.',
+      src: '/assets/forge/media-v1/cards/hyperion-operator-console-card.mp4',
+      poster: '/assets/forge/media-v1/posters/hyperion-operator-console-card.jpg',
+    },
+    {
+      id: 'workspace',
+      title: 'Workspace system',
+      description: 'Room-scale operator environment and peripherals.',
+      src: '/assets/forge/media-v1/cards/hyperion-workspace-systems-card.mp4',
+      poster: '/assets/forge/media-v1/posters/hyperion-workspace-systems-card.jpg',
+    },
+    {
+      id: 'custom',
+      title: 'Custom workstation',
+      description: 'Fabrication detail from the Kuda lineage.',
+      src: '/assets/forge/media-v1/cards/hyperion-custom-workstation-card.mp4',
+      poster: '/assets/forge/media-v1/posters/hyperion-custom-workstation-card.jpg',
+    },
+    {
+      id: 'environment',
+      title: 'Operator environment',
+      description: 'Display and peripheral surface in context.',
+      src: '/assets/forge/media-v1/cards/hyperion-operator-environment-card.mp4',
+      poster: '/assets/forge/media-v1/posters/hyperion-operator-environment-card.jpg',
+    },
+  ],
+};
+
 export const cityRoutes = [
   {
     id: 'chronos',
@@ -54,11 +108,12 @@ export const cityRoutes = [
     seoTitle: 'The Forge District | Hyperion Industries',
     seoDescription: 'Commercial inquiry lane for custom PCs, local AI machines, sim rigs, and workstations.',
     media: {
-      src: '/assets/builds/20240801_103114.jpg',
-      alt: 'Completed Hyperion custom computer build',
-      label: 'Physical build archive',
-      source: 'Hyperion Forge artifact',
+      src: '/assets/forge/media-v1/posters/hyperion-workstation-triptych-1280x720.jpg',
+      alt: 'Three-panel Hyperion Forge workstation sequence',
+      label: 'Kuda lineage · build proof',
+      source: 'Hyperion Forge field media',
     },
+    motion: forgeMotion,
     sections: [
       ['Build lanes', 'The Forge handles local-AI boxes, creative workstations, sim rigs, focused upgrades, and deployment machines.'],
       ['Human-scoped first', 'The public lane begins with the actual workload and constraints. Final parts, support, and price follow the machine, not a generic cart.'],
