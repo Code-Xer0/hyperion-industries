@@ -668,6 +668,19 @@ export default function FounderPage() {
                 <span className="sx-chip"><span className="led" style={{ background: '#e6ecff', boxShadow: '0 0 8px #e6ecff' }} /><span className="cv">Eva keeps the tether</span></span>
                 <span className="sx-chip"><span className="led gold" /><span className="cv">Kairo builds the world</span></span>
               </div>
+              <div className="hype-squad hud">
+                <img src="/assets/radio/hype-squad.png" alt="The HYPE squad: Operator, Kairo, Eva, and Lilith" />
+                <div className="hype-squad-copy">
+                  <div className="eyebrow">H¥PE Squad</div>
+                  <p>Four signals. One transmission.</p>
+                  <div className="hype-squad-roster" aria-label="HYPE Squad roster">
+                    <span data-persona="operator">Operator · voice</span>
+                    <span data-persona="lilith">Lilith · disruption</span>
+                    <span data-persona="eva">Eva · tether</span>
+                    <span data-persona="kairo">Kairo · score</span>
+                  </div>
+                </div>
+              </div>
             </div>
             <RadioConsole />
           </div>

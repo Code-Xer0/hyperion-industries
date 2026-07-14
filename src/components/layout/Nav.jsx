@@ -22,6 +22,7 @@ import {
 import { AnimatePresence, motion } from 'framer-motion';
 import { cityDestinations, cityFamilies, cityUtilities, getCityDestination } from '../../data/cityNavigation';
 import { useTheme } from '../../context/ThemeContext';
+import { pickKairoScore } from '../../data/scores';
 import StatusChip from '../portal/StatusChip';
 import './Nav.css';
 
@@ -53,6 +54,7 @@ export default function Nav() {
   const [activeFamilyId, setActiveFamilyId] = useState('systems');
   const [previewPath, setPreviewPath] = useState('/chronos');
   const [soundEnabled, setSoundEnabled] = useState(false);
+  const [scoreTrack] = useState(pickKairoScore);
   const inputRef = useRef(null);
   const launcherRef = useRef(null);
   const soundtrackRef = useRef(null);
@@ -187,6 +189,34 @@ export default function Nav() {
 
   useEffect(() => () => {
     feedbackContextRef.current?.close?.().catch(() => {});
+  }, []);
+
+  // The founder page can take over an already-playing score with its arrival
+  // track. This remains gesture-safe: the handoff only starts when the visitor
+  // has already enabled the global score.
+  useEffect(() => {
+    const onRadioArrival = (event) => {
+      const soundtrack = soundtrackRef.current;
+      if (!soundtrack || soundtrack.paused) return;
+
+      event.detail?.startRoadHome?.();
+      const initialVolume = soundtrack.volume || 0.28;
+      const startedAt = performance.now();
+      const fadeOut = (now) => {
+        const progress = Math.min(1, (now - startedAt) / 1100);
+        soundtrack.volume = initialVolume * (1 - progress);
+        if (progress < 1) {
+          requestAnimationFrame(fadeOut);
+          return;
+        }
+        soundtrack.pause();
+        soundtrack.currentTime = 0;
+        soundtrack.volume = initialVolume;
+      };
+      requestAnimationFrame(fadeOut);
+    };
+    window.addEventListener('hyperion:radio-arrival', onRadioArrival);
+    return () => window.removeEventListener('hyperion:radio-arrival', onRadioArrival);
   }, []);
 
   useEffect(() => {
@@ -341,7 +371,7 @@ export default function Nav() {
 
       <audio
         ref={soundtrackRef}
-        src="/assets/city/navigation/world-engine.mp3"
+        src={scoreTrack.audio}
         preload="none"
         loop
         onPlay={() => setSoundEnabled(true)}
@@ -397,8 +427,8 @@ export default function Nav() {
                     className="city-launcher-control"
                     onClick={toggleSoundtrack}
                     aria-pressed={soundEnabled}
-                    aria-label={soundEnabled ? 'Mute World Engine score' : 'Play World Engine score'}
-                    title={soundEnabled ? 'Mute World Engine score' : 'Play World Engine score'}
+                    aria-label={soundEnabled ? 'Mute Kairo score' : 'Play Kairo score'}
+                    title={soundEnabled ? 'Mute Kairo score' : 'Play Kairo score'}
                   >
                     {soundEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
                     <span>{soundEnabled ? 'Score active' : 'Score off'}</span>

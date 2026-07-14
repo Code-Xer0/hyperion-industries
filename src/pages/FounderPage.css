@@ -637,6 +637,7 @@ body:has(.founder-page) #singularity { display: none !important; }
 .founder-page .np-artist[data-persona="operator"] { color: var(--p-operator); }
 .founder-page .np-artist[data-persona="lilith"] { color: var(--p-lilith); }
 .founder-page .np-artist[data-persona="eva"] { color: var(--p-eva); }
+.founder-page .np-artist[data-persona="kairo"] { color: var(--p-kairo); }
 .founder-page .np-credit { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.1em;
   text-transform: uppercase; color: var(--text-muted); margin-top: 2px; }
 .founder-page .np-credit b { color: var(--p-kairo); font-weight: 500; }
@@ -669,9 +670,10 @@ body:has(.founder-page) #singularity { display: none !important; }
 .founder-page .trk:hover { background: var(--bg3); }
 .founder-page .trk.on { background: var(--accent-dim); border-color: var(--accent-border); }
 .founder-page .trk .trk-n { font-family: var(--font-mono); font-size: 12px; color: var(--text-muted); text-align: center; }
-.founder-page .trk[data-persona="operator"] .trk-n { color: var(--p-operator); }
-.founder-page .trk[data-persona="lilith"] .trk-n { color: var(--p-lilith); }
-.founder-page .trk[data-persona="eva"] .trk-n { color: var(--p-eva); }
+.founder-page .trk[data-persona="operator"] .trk-n, .founder-page .trk[data-persona="operator"] .trk-sub { color: var(--p-operator); }
+.founder-page .trk[data-persona="lilith"] .trk-n, .founder-page .trk[data-persona="lilith"] .trk-sub { color: var(--p-lilith); }
+.founder-page .trk[data-persona="eva"] .trk-n, .founder-page .trk[data-persona="eva"] .trk-sub { color: var(--p-eva); }
+.founder-page .trk[data-persona="kairo"] .trk-n, .founder-page .trk[data-persona="kairo"] .trk-sub { color: var(--p-kairo); }
 .founder-page .trk .trk-art { width: 52px; height: 52px; border-radius: var(--r-sm); overflow: hidden; border: 1px solid var(--border); background:#000; position: relative; }
 .founder-page .trk .trk-art img { width: 100%; height: 100%; object-fit: cover; }
 .founder-page .trk .trk-art .eq { position: absolute; inset: 0; display: none; align-items: center; justify-content: center; gap: 2px; background: rgba(0,0,0,0.55); }
@@ -693,11 +695,26 @@ body:has(.founder-page) #singularity { display: none !important; }
 .founder-page .rf-roster { display: inline-flex; align-items: center; gap: 16px; flex-wrap: wrap; }
 .founder-page .rf-m { display: inline-flex; align-items: center; gap: 7px; font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--silver); }
 .founder-page .rf-m i { width: 6px; height: 6px; border-radius: 50%; }
+.founder-page .rf-m[data-persona="operator"] { color: var(--p-operator); }
+.founder-page .rf-m[data-persona="lilith"] { color: var(--p-lilith); }
+.founder-page .rf-m[data-persona="eva"] { color: var(--p-eva); }
 .founder-page .rf-m[data-persona="operator"] i { background: var(--p-operator); box-shadow: 0 0 8px var(--p-operator); }
 .founder-page .rf-m[data-persona="lilith"] i { background: var(--p-lilith); box-shadow: 0 0 8px var(--p-lilith); }
 .founder-page .rf-m[data-persona="eva"] i { background: var(--p-eva); box-shadow: 0 0 8px var(--p-eva); }
 .founder-page .rf-m[data-persona="kairo"] { color: var(--p-kairo); }
 .founder-page .rf-m[data-persona="kairo"] i { background: var(--p-kairo); box-shadow: 0 0 8px var(--p-kairo); }
+
+.founder-page .hype-squad { margin-top: 28px; display: grid; grid-template-columns: minmax(160px, 0.7fr) 1fr; overflow: hidden; border: 1px solid var(--border2); border-radius: var(--r-xl); background: var(--bg3); }
+.founder-page .hype-squad > img { width: 100%; height: 176px; object-fit: cover; object-position: center; border-right: 1px solid var(--border); }
+.founder-page .hype-squad-copy { padding: 20px 22px; align-self: center; }
+.founder-page .hype-squad-copy p { margin: 7px 0 13px; font-size: 18px; font-weight: 600; color: var(--text); }
+.founder-page .hype-squad-roster { display: flex; flex-wrap: wrap; gap: 7px 12px; font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.07em; text-transform: uppercase; }
+.founder-page .hype-squad-roster span { display: inline-flex; align-items: center; gap: 6px; }
+.founder-page .hype-squad-roster span::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; box-shadow: 0 0 8px currentColor; }
+.founder-page .hype-squad-roster [data-persona="operator"] { color: var(--p-operator); }
+.founder-page .hype-squad-roster [data-persona="lilith"] { color: var(--p-lilith); }
+.founder-page .hype-squad-roster [data-persona="eva"] { color: var(--p-eva); }
+.founder-page .hype-squad-roster [data-persona="kairo"] { color: var(--p-kairo); }
 
 /* ════════ AMBIENT — card traces + float (founder page only) ════════ */
 .founder-page[data-cards="float"] .sx-card,
@@ -797,6 +814,8 @@ body:has(.founder-page) #singularity { display: none !important; }
   .founder-page .radio-body { grid-template-columns: 1fr; }
   .founder-page .radio-now { border-right: none; border-bottom: 1px solid var(--border); }
   .founder-page .radio-list { max-height: none; }
+  .founder-page .hype-squad { grid-template-columns: 1fr; }
+  .founder-page .hype-squad > img { height: 148px; border-right: none; border-bottom: 1px solid var(--border); }
   .founder-page .hero-aside { display: none !important; }
   .founder-page .hero-grid { grid-template-columns: 1fr; }
   .founder-page .split, .founder-page .split.rev, .founder-page .inq-layout, .founder-page .op-grid { grid-template-columns: 1fr; }

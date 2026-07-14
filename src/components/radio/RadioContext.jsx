@@ -143,6 +143,48 @@ export function RadioProvider({ tracks, children }) {
     persist();
   }, [list, hasReal, startPlayback, stopSim, persist]);
 
+  const startRoadHome = useCallback(() => {
+    const roadHomeIdx = list.findIndex((item) => item.id === 'road-home');
+    const a = audioRef.current;
+    if (roadHomeIdx < 0 || !a || !hasReal(roadHomeIdx)) return;
+
+    setIdx(roadHomeIdx); idxRef.current = roadHomeIdx;
+    simRef.current = 0; setCurTime(0);
+    stopSim();
+    a.pause();
+    a.src = list[roadHomeIdx].audio;
+    a.currentTime = 0;
+    a.volume = 0;
+    a.load();
+    setDur(list[roadHomeIdx].duration || 0);
+    setPlaying(true); playingRef.current = true;
+    logEvent('play', { t: list[roadHomeIdx].id, title: list[roadHomeIdx].title });
+    a.play().then(() => {
+      const targetVolume = vol;
+      const startedAt = performance.now();
+      const fadeIn = (now) => {
+        const progress = Math.min(1, (now - startedAt) / 1100);
+        a.volume = targetVolume * progress;
+        if (progress < 1) requestAnimationFrame(fadeIn);
+      };
+      requestAnimationFrame(fadeIn);
+      persist();
+    }).catch(() => {
+      setPlaying(false); playingRef.current = false;
+      a.volume = vol;
+    });
+  }, [hasReal, list, persist, stopSim, vol]);
+
+  // Request a crossfade only after both the Nav and the radio provider have
+  // mounted. The global score decides whether it is active, then calls the
+  // supplied handoff function synchronously.
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      window.dispatchEvent(new CustomEvent('hyperion:radio-arrival', { detail: { startRoadHome } }));
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, [startRoadHome]);
+
   const toggle = useCallback(() => { (playingRef.current ? pause : startPlayback)(); }, [pause, startPlayback]);
   const next = useCallback(() => { logEvent('skip', telOf(idxRef.current)); loadTrack(shuffleRef.current ? Math.floor(Math.random() * list.length) : idxRef.current + 1, true); }, [loadTrack, list.length]);
   const prev = useCallback(() => {
