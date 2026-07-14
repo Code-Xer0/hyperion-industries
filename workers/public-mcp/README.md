@@ -14,3 +14,5 @@ Run `npm run check` after the root `npm run build`, which regenerates `src/gener
 ## Soft-launch acceptance gate
 
 Registry publication remains operator-gated. Keep the server unlisted until seven consecutive days of recorded smoke runs show successful real-client connection, no critical custody or disclosure incident, error rate below two percent, stable rate limiting, and explicit approval of the final `server.json`. Cloudflare Workers Logs are enabled at full sampling during this bounded soft-launch window; custom log events contain request ID, tool, status, duration, and corpus revision only.
+
+The scheduled GitHub probe targets the separate workers.dev failure boundary because the zone perimeter challenges GitHub-hosted runner egress. The branded custom domain is validated independently with the official MCP Inspector and direct live smoke. Do not weaken the zone perimeter solely to make the scheduled runner appear browser-like.

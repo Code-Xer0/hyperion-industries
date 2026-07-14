@@ -25,5 +25,7 @@ jobs:
         with:
           node-version: 22
 
-      - name: Probe public MCP
+      - name: Probe MCP failure boundary
+        env:
+          HYPERION_MCP_ENDPOINT: https://hyperion-public-mcp.hyperion-industries-intake.workers.dev/mcp
         run: node scripts/smoke-public-mcp.mjs
