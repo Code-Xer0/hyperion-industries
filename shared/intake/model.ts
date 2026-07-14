@@ -3,8 +3,9 @@ import pandoraSource from './contracts/forms/pandora-readiness.form.json';
 import serviceSource from './contracts/forms/service-lanes.form-blueprints.json';
 import universalSource from './contracts/forms/universal-router.form.json';
 import contactPatch from './contracts/forms/contact-consent.patch.v1.0.1.json';
+import { INTAKE_PUBLIC_CONTRACT_VERSION } from './lane-seo.js';
 
-export const CONTRACT_VERSION = '1.0.1';
+export const CONTRACT_VERSION = INTAKE_PUBLIC_CONTRACT_VERSION;
 export const RULESET_VERSION = 'intake-rules.1.0.1';
 export const AGENT_CONTRACT_VERSION = 'proposal-only.1';
 export const CUSTODY_CONTRACT_VERSION = 'custody-control.1.0.1';

@@ -10,6 +10,12 @@ import {
   SEO_ROUTES,
   SITE_ORIGIN,
 } from '../src/data/seoRoutes.js';
+import {
+  assertSafePublicProjection,
+  buildPublicRetrievalManifest,
+  renderGeneratedManifestModule,
+  renderLlmsText,
+} from './public-retrieval.mjs';
 
 const scriptDir = path.dirname(fileURLToPath(import.meta.url));
 const defaultRoot = path.resolve(scriptDir, '..');
@@ -40,12 +46,46 @@ function newestCommitDate(rootDir, files) {
   }
 }
 
-function metadataFor(route) {
+function imageDimensions(rootDir, imagePath) {
+  if (!imagePath?.startsWith('/')) return null;
+  const file = path.join(rootDir, 'public', imagePath.slice(1));
+  if (!fs.existsSync(file)) return null;
+  const buffer = fs.readFileSync(file);
+  if (buffer.length >= 24 && buffer.toString('ascii', 1, 4) === 'PNG') {
+    return { width: buffer.readUInt32BE(16), height: buffer.readUInt32BE(20) };
+  }
+  if (buffer.length >= 10 && buffer.toString('ascii', 0, 3) === 'GIF') {
+    return { width: buffer.readUInt16LE(6), height: buffer.readUInt16LE(8) };
+  }
+  if (buffer.length >= 4 && buffer[0] === 0xff && buffer[1] === 0xd8) {
+    let offset = 2;
+    while (offset + 9 < buffer.length) {
+      if (buffer[offset] !== 0xff) { offset += 1; continue; }
+      const marker = buffer[offset + 1];
+      if (marker === undefined || marker === 0xd9 || marker === 0xda) break;
+      const length = buffer.readUInt16BE(offset + 2);
+      if (length < 2) break;
+      if ([0xc0, 0xc1, 0xc2, 0xc3, 0xc5, 0xc6, 0xc7, 0xc9, 0xca, 0xcb, 0xcd, 0xce, 0xcf].includes(marker)) {
+        return { width: buffer.readUInt16BE(offset + 7), height: buffer.readUInt16BE(offset + 5) };
+      }
+      offset += length + 2;
+    }
+  }
+  if (file.toLowerCase().endsWith('.svg')) {
+    const svg = buffer.toString('utf8');
+    const viewBox = svg.match(/viewBox=["']\s*[\d.-]+\s+[\d.-]+\s+([\d.]+)\s+([\d.]+)["']/i);
+    if (viewBox?.[1] && viewBox[2]) return { width: Number(viewBox[1]), height: Number(viewBox[2]) };
+  }
+  return null;
+}
+
+function metadataFor(route, rootDir) {
   const image = new URL(route.ogImage || DEFAULT_OG_IMAGE, SITE_ORIGIN).href;
+  const dimensions = imageDimensions(rootDir, route.ogImage || DEFAULT_OG_IMAGE);
   const robots = route.indexable
     ? 'index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1'
     : 'noindex,follow';
-  const schema = JSON.stringify(buildStructuredData(route)).replaceAll('</script', '<\\/script');
+  const schema = JSON.stringify(buildStructuredData({ ...route, ogImageWidth: dimensions?.width, ogImageHeight: dimensions?.height })).replaceAll('</script', '<\\/script');
 
   return `
     <title>${escapeHtml(route.title)}</title>
@@ -59,6 +99,7 @@ function metadataFor(route) {
     <meta property="og:url" content="${escapeHtml(route.canonical)}" />
     <meta property="og:image" content="${escapeHtml(image)}" />
     <meta property="og:image:alt" content="${escapeHtml(`${route.title} — Hyperion Industries`)}" />
+    ${dimensions ? `<meta property="og:image:width" content="${dimensions.width}" />\n    <meta property="og:image:height" content="${dimensions.height}" />` : ''}
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="${escapeHtml(route.title)}" />
     <meta name="twitter:description" content="${escapeHtml(route.description)}" />
@@ -76,29 +117,39 @@ function fallbackFor(route) {
   return `<div id="root"><main class="seo-route-fallback"><p class="seo-route-fallback__status">${escapeHtml(route.maturity)}</p><h1>${escapeHtml(route.title.replace(/\s*\|.*$/, ''))}</h1><p>${escapeHtml(route.summary)}</p>${links ? `<nav aria-label="Related Hyperion routes"><ul>${links}</ul></nav>` : ''}<p><a href="/contact">Discuss a limited scoped request</a></p></main></div>`;
 }
 
-function renderRouteShell(baseHtml, route) {
+function renderRouteShell(baseHtml, route, rootDir) {
   const clean = stripManagedHead(baseHtml);
   return clean
-    .replace('</head>', `${metadataFor(route)}\n  </head>`)
+    .replace('</head>', `${metadataFor(route, rootDir)}\n  </head>`)
     .replace('<div id="root"></div>', fallbackFor(route));
 }
 
 function writeSitemap(rootDir, outDir) {
   const entries = SEO_ROUTES.filter((route) => route.indexable).map((route) => {
     const lastmod = newestCommitDate(rootDir, route.sourceFiles || []);
-    return `  <url>\n    <loc>${escapeHtml(route.canonical)}</loc>${lastmod ? `\n    <lastmod>${lastmod}</lastmod>` : ''}\n  </url>`;
+    const ownedImage = route.ogImage && route.ogImage !== DEFAULT_OG_IMAGE
+      ? new URL(route.ogImage, SITE_ORIGIN).href
+      : null;
+    return `  <url>\n    <loc>${escapeHtml(route.canonical)}</loc>${lastmod ? `\n    <lastmod>${lastmod}</lastmod>` : ''}${ownedImage ? `\n    <image:image>\n      <image:loc>${escapeHtml(ownedImage)}</image:loc>\n    </image:image>` : ''}\n  </url>`;
   });
-  const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${entries.join('\n')}\n</urlset>\n`;
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n${entries.join('\n')}\n</urlset>\n`;
   fs.writeFileSync(path.join(outDir, 'sitemap.xml'), xml);
 }
 
-function writeRedirects(outDir) {
+function writeRedirects(rootDir, outDir) {
   const aliasLines = [...SEO_REDIRECTS].map(([from, to]) => `${from} ${to} 301`);
   const rewriteLines = SEO_ROUTES
     .filter((route) => !route.staticArtifact)
     .map((route) => route.path === '/' ? '/ /index.html 200' : `${route.path} ${route.path}/index.html 200`);
   fs.writeFileSync(path.join(outDir, '_redirects'), `${[...aliasLines, ...rewriteLines].join('\n')}\n`);
-  fs.writeFileSync(path.join(outDir, 'seo-route-manifest.json'), `${JSON.stringify({ routes: SEO_ROUTES, redirects: Object.fromEntries(SEO_REDIRECTS) }, null, 2)}\n`);
+  const manifest = assertSafePublicProjection(buildPublicRetrievalManifest({ rootDir }));
+  const publicJson = `${JSON.stringify(manifest, null, 2)}\n`;
+  fs.writeFileSync(path.join(outDir, 'seo-route-manifest.json'), publicJson);
+  fs.writeFileSync(path.join(outDir, 'public-retrieval-manifest.json'), publicJson);
+  fs.writeFileSync(path.join(outDir, 'llms.txt'), renderLlmsText(manifest));
+  const generatedWorkerPath = path.join(rootDir, 'workers', 'public-mcp', 'src', 'generated', 'public-retrieval.generated.ts');
+  fs.mkdirSync(path.dirname(generatedWorkerPath), { recursive: true });
+  fs.writeFileSync(generatedWorkerPath, renderGeneratedManifestModule(manifest));
 }
 
 function writeNotFound(outDir) {
@@ -117,11 +168,11 @@ export function generateSeoArtifacts({ rootDir = defaultRoot, outDir = path.join
       ? basePath
       : path.join(outDir, route.path.slice(1), 'index.html');
     fs.mkdirSync(path.dirname(destination), { recursive: true });
-    fs.writeFileSync(destination, renderRouteShell(baseHtml, route));
+    fs.writeFileSync(destination, renderRouteShell(baseHtml, route, rootDir));
   }
 
   writeSitemap(rootDir, outDir);
-  writeRedirects(outDir);
+  writeRedirects(rootDir, outDir);
   writeNotFound(outDir);
 }
 

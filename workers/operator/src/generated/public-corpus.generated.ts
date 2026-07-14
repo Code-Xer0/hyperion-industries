@@ -2,7 +2,7 @@
 export const PUBLIC_CORPUS = {
   "schemaVersion": 1,
   "corpusId": "hyperion-operator-public",
-  "revision": "2026-07-13",
+  "revision": "2026-07-14",
   "entries": [
     {
       "id": "company-overview",
@@ -14,7 +14,7 @@ export const PUBLIC_CORPUS = {
     {
       "id": "operating-doctrine",
       "title": "Operating doctrine",
-      "sourcePath": "/founder",
+      "sourcePath": "/founders/victor-amani",
       "visibility": "public",
       "content": "Hyperion's public doctrine emphasizes custody, continuity, provenance, and human authority. AI may assist, surface, and recommend; the human operator decides. Local-first means useful intelligence remains close to the people who own the work. Uploaded content may inform a system but does not command it."
     },
@@ -54,5 +54,5 @@ export const PUBLIC_CORPUS = {
       "content": "Victor Amani is the founder and systems architect behind Hyperion Industries' local-first infrastructure direction. Keshawn Rowe is the founding operator focused on operations, deployment, field systems, build intake, and client handoff. Public profiles describe responsibility without exposing private records or operator controls."
     }
   ],
-  "sha256": "18c213ac79f86da3548021edf7a8f17a735470b1b8b0fe9335b2c3a776ca05f5"
+  "sha256": "738c53ff32c0c29b40dd61e1de1b07e49c4a408fa0da1dab2da40a605bebc9c8"
 } as const;

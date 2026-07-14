@@ -1,3 +1,5 @@
+export const INTAKE_PUBLIC_CONTRACT_VERSION = '1.0.1';
+
 export const INTAKE_LANE_SEO = Object.freeze([
   {
     id: 'forge',

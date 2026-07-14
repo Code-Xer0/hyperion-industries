@@ -1,7 +1,9 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { gzipSync } from 'node:zlib';
 import { fileURLToPath } from 'node:url';
 import { SEO_REDIRECTS, SEO_ROUTES } from '../src/data/seoRoutes.js';
+import { assertSafePublicProjection, buildPublicRetrievalManifest } from './public-retrieval.mjs';
 
 const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const outDir = path.join(rootDir, 'dist');
@@ -41,6 +43,37 @@ const actualUrls = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => 
 const expectedUrls = SEO_ROUTES.filter((route) => route.indexable).map((route) => route.canonical).sort();
 if (JSON.stringify(actualUrls) !== JSON.stringify(expectedUrls)) fail('sitemap.xml does not exactly match the indexable canonical registry');
 if (sitemap.includes('<priority>')) fail('sitemap.xml contains manual priority values');
+if (!sitemap.includes('xmlns:image=')) fail('sitemap.xml is missing the image sitemap namespace');
+for (const route of SEO_ROUTES.filter((entry) => entry.indexable && entry.ogImage && !entry.ogImage.endsWith('hyperion-link-preview.jpeg'))) {
+  if (!sitemap.includes(`<loc>${route.canonical}</loc>`) || !sitemap.includes(new URL(route.ogImage, route.canonical).href)) {
+    fail(`${route.path}: route-owned image is missing from sitemap.xml`);
+  }
+}
+
+const publicManifestPath = path.join(outDir, 'seo-route-manifest.json');
+const retrievalManifestPath = path.join(outDir, 'public-retrieval-manifest.json');
+const publicManifestText = fs.readFileSync(publicManifestPath, 'utf8');
+const retrievalManifestText = fs.readFileSync(retrievalManifestPath, 'utf8');
+if (publicManifestText !== retrievalManifestText) fail('public retrieval manifests have drifted');
+const publicManifest = JSON.parse(publicManifestText);
+try { assertSafePublicProjection(publicManifest); } catch (error) { fail(error.message); }
+const expectedManifest = buildPublicRetrievalManifest({ rootDir });
+if (JSON.stringify(publicManifest) !== JSON.stringify(expectedManifest)) fail('public retrieval manifest does not match the canonical projection');
+if (!fs.readFileSync(path.join(outDir, 'llms.txt'), 'utf8').includes(publicManifest.sha256)) fail('llms.txt does not reference the current public manifest hash');
+
+const rootHtml = fs.readFileSync(path.join(outDir, 'index.html'), 'utf8');
+const initialScript = rootHtml.match(/<script[^>]+type="module"[^>]+src="([^"]+)"/)?.[1];
+const initialCss = rootHtml.match(/<link[^>]+rel="stylesheet"[^>]+href="([^"]+)"/)?.[1];
+const gzipKb = (file) => gzipSync(fs.readFileSync(file)).byteLength / 1024;
+if (!initialScript) fail('homepage initial JavaScript asset could not be resolved');
+else if (gzipKb(path.join(outDir, initialScript.replace(/^\//, ''))) > 140) fail('homepage initial JavaScript exceeds 140 KB gzip');
+if (!initialCss) fail('homepage shared CSS asset could not be resolved');
+else if (gzipKb(path.join(outDir, initialCss.replace(/^\//, ''))) > 35) fail('homepage shared CSS exceeds 35 KB gzip');
+for (const asset of fs.readdirSync(path.join(outDir, 'assets')).filter((name) => name.endsWith('.js'))) {
+  const publicPath = `/assets/${asset}`;
+  if (publicPath === initialScript) continue;
+  if (gzipKb(path.join(outDir, 'assets', asset)) > 80) fail(`${asset}: asynchronous JavaScript exceeds 80 KB gzip`);
+}
 
 const notFound = fs.readFileSync(path.join(outDir, '404.html'), 'utf8');
 if (!notFound.includes('noindex,nofollow')) fail('404.html is not noindex,nofollow');

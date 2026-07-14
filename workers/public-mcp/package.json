@@ -1,0 +1,25 @@
+{
+  "name": "@hyperion/public-mcp-worker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "check": "npm run typecheck && npm test",
+    "dev": "wrangler dev --config wrangler.toml",
+    "deploy": "wrangler deploy --config wrangler.toml"
+  },
+  "dependencies": {
+    "ajv": "^8.20.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^5.20260713.1",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.10",
+    "wrangler": "^4.110.0"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

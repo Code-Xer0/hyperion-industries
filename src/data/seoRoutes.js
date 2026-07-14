@@ -33,6 +33,7 @@ const fixedRoutes = [
     summary: 'Completed physical systems and operator-centered workstation evidence from the Hyperion Forge.',
     maturity: 'PUBLIC ARCHIVE',
     schemaType: 'CollectionPage',
+    ogImage: '/assets/builds/20230803_133211.jpg',
     sourceFiles: ['src/pages/BuildArchivePage.jsx', 'src/data/showcase.json'],
     relatedPaths: ['/forge', '/gallery', '/intake/forge'],
   },
@@ -43,6 +44,7 @@ const fixedRoutes = [
     summary: 'A public record of selected Hyperion systems, builds, visual language, and operator environments.',
     maturity: 'PUBLIC ARCHIVE',
     schemaType: 'CollectionPage',
+    ogImage: '/assets/operators/deus-x-portrait-complete.png',
     sourceFiles: ['src/pages/GalleryPage.jsx', 'src/data/gallery.json'],
     relatedPaths: ['/build-archive', '/identity', '/founders'],
   },
@@ -77,6 +79,16 @@ const fixedRoutes = [
     schemaType: 'ContactPage',
     sourceFiles: ['src/pages/ContactPage.jsx'],
     relatedPaths: ['/intake', '/forge', '/chronos'],
+  },
+  {
+    path: '/mcp',
+    title: 'Public Retrieval MCP | Hyperion Industries',
+    description: 'Connect AI clients to Hyperion\'s public, corpus-bound retrieval server and governed intake tools without exposing private source or operator systems.',
+    summary: 'An unlisted soft-launch MCP for deterministic public retrieval and operator-reviewed intake.',
+    maturity: 'SOFT LAUNCH · UNLISTED PUBLIC MCP',
+    schemaType: 'WebPage',
+    sourceFiles: ['src/pages/McpPage.jsx', 'scripts/public-retrieval.mjs', 'workers/public-mcp/src/index.ts'],
+    relatedPaths: ['/systems', '/intake', '/contact'],
   },
   {
     path: '/newsletter',
@@ -249,13 +261,23 @@ const organization = {
   '@type': 'Organization',
   '@id': `${SITE_ORIGIN}/#organization`,
   name: 'Hyperion Industries',
+  legalName: 'Hyperion Industries LLC',
+  alternateName: 'Hyperion Industries LLC',
   url: `${SITE_ORIGIN}/`,
+  email: 'hello@hyperion-industries.dev',
+  logo: {
+    '@type': 'ImageObject',
+    url: `${SITE_ORIGIN}/assets/branding/hyperion/Hyblkvert.png`,
+    contentUrl: `${SITE_ORIGIN}/assets/branding/hyperion/Hyblkvert.png`,
+    caption: 'Hyperion Industries logo',
+  },
   description: 'Minneapolis-based local-first intelligent infrastructure, systems architecture, custom compute, identity, continuity, and scoped contracting.',
   founder: { '@id': `${SITE_ORIGIN}/founders/victor-amani#person` },
   areaServed: {
     '@type': 'AdministrativeArea',
     name: 'Minneapolis–Saint Paul metropolitan area',
   },
+  sameAs: ['https://www.linkedin.com/company/hyperion-industries-llc/'],
 };
 
 const person = {
@@ -299,13 +321,33 @@ export function buildStructuredData(route) {
     about: { '@id': `${SITE_ORIGIN}/#organization` },
     breadcrumb: route.path === '/' ? undefined : { '@id': `${route.canonical}#breadcrumb` },
   };
-  const graph = [organization, person, {
-    '@type': 'WebSite',
-    '@id': `${SITE_ORIGIN}/#website`,
-    name: 'Hyperion Industries',
-    url: `${SITE_ORIGIN}/`,
-    publisher: { '@id': `${SITE_ORIGIN}/#organization` },
-  }, page];
+  const graph = [page];
+
+  if (route.path === '/') {
+    graph.unshift(organization, person, {
+      '@type': 'WebSite',
+      '@id': `${SITE_ORIGIN}/#website`,
+      name: 'Hyperion Industries',
+      url: `${SITE_ORIGIN}/`,
+      publisher: { '@id': `${SITE_ORIGIN}/#organization` },
+    });
+  } else if (route.path === '/founders/victor-amani') {
+    graph.unshift(person);
+  }
+
+  if (route.ogImage) {
+    graph.push({
+      '@type': 'ImageObject',
+      '@id': `${route.canonical}#primaryimage`,
+      contentUrl: new URL(route.ogImage, SITE_ORIGIN).href,
+      url: new URL(route.ogImage, SITE_ORIGIN).href,
+      caption: `${route.title.replace(/\s*\|.*$/, '')} — Hyperion Industries`,
+      representativeOfPage: true,
+      width: route.ogImageWidth || undefined,
+      height: route.ogImageHeight || undefined,
+    });
+    page.primaryImageOfPage = { '@id': `${route.canonical}#primaryimage` };
+  }
 
   if (route.schemaType === 'SoftwareApplication') {
     graph.push({

@@ -2,35 +2,37 @@ import { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useParams } from 'react-router-dom';
 import Nav from './components/layout/Nav';
 import HomePage from './pages/HomePage';
-import FoundersPage from './pages/FoundersPage';
-import FounderPage from './pages/FounderPage';
-import DistrictPage from './pages/DistrictPage';
-import CardStudioPage from './pages/CardStudioPage';
-import NotFoundPage from './pages/NotFoundPage';
+const FoundersPage = lazy(() => import('./pages/FoundersPage'));
+const FounderPage = lazy(() => import('./pages/FounderPage'));
+const DistrictPage = lazy(() => import('./pages/DistrictPage'));
+const CardStudioPage = lazy(() => import('./pages/CardStudioPage'));
+const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
+const McpPage = lazy(() => import('./pages/McpPage'));
 
 // Operator-only surfaces: DEV-gated lazy imports so the production bundle
 // contains neither the code nor the route — no source/route leakage.
 const RadioStatsPage = import.meta.env.DEV ? lazy(() => import('./pages/RadioStatsPage')) : () => null;
 const IntakePage = lazy(() => import('./features/intake/IntakePage'));
-import SystemsPage from './pages/SystemsPage';
-import BuildArchivePage from './pages/BuildArchivePage';
-import GalleryPage from './pages/GalleryPage';
-import DevDiaryPage from './pages/DevDiaryPage';
-import ContactPage from './pages/ContactPage';
-import NewsletterPage from './pages/NewsletterPage';
-import StorePage from './pages/StorePage';
+const SystemsPage = lazy(() => import('./pages/SystemsPage'));
+const BuildArchivePage = lazy(() => import('./pages/BuildArchivePage'));
+const GalleryPage = lazy(() => import('./pages/GalleryPage'));
+const DevDiaryPage = lazy(() => import('./pages/DevDiaryPage'));
+const ContactPage = lazy(() => import('./pages/ContactPage'));
+const NewsletterPage = lazy(() => import('./pages/NewsletterPage'));
+const StorePage = lazy(() => import('./pages/StorePage'));
 const EditorPage = import.meta.env.DEV ? lazy(() => import('./pages/EditorPage')) : () => null;
 import { HelmetProvider } from 'react-helmet-async';
-import AmbientCityLayer from './components/ui/AmbientCityLayer';
+const AmbientCityLayer = lazy(() => import('./components/ui/AmbientCityLayer'));
 import { EditorProvider, useEditor } from './context/EditorContext';
 import { ThemeProvider } from './context/ThemeContext';
 import EditorModal from './components/ui/EditorModal';
-import OperatorResident from './components/operator/OperatorResident';
+const OperatorResident = lazy(() => import('./components/operator/OperatorResident'));
 import SeoRouteHead from './components/seo/SeoRouteHead';
 import operators from './data/operators.json';
-import { isLaneId } from '../shared/intake/model';
+import { INTAKE_LANE_SEO } from '../shared/intake/lane-seo';
 
 const PUBLIC_FOUNDER_SLUGS = new Set(operators.map((operator) => operator.slug));
+const PUBLIC_INTAKE_LANES = new Set(INTAKE_LANE_SEO.map((lane) => lane.id));
 
 function EditModeToggle() {
   const { isEditMode, setIsEditMode } = useEditor();
@@ -78,7 +80,7 @@ function FounderRoute() {
 
 function IntakeLaneRoute() {
   const { lane } = useParams();
-  return isLaneId(lane) ? <IntakePage /> : <NotFoundPage />;
+  return PUBLIC_INTAKE_LANES.has(lane) ? <IntakePage /> : <NotFoundPage />;
 }
 
 export default function App() {
@@ -89,7 +91,7 @@ export default function App() {
       <ThemeProvider>
         <EditorProvider>
           <BrowserRouter>
-            <AmbientCityLayer />
+            <Suspense fallback={null}><AmbientCityLayer /></Suspense>
             <Nav />
             <Suspense fallback={null}>
             <Routes>
@@ -122,13 +124,14 @@ export default function App() {
               {isDev && <Route path="/editor" element={<EditorPage />} />}
               <Route path="/dev-diary" element={<DevDiaryPage />} />
               <Route path="/contact" element={<ContactPage />} />
+              <Route path="/mcp" element={<McpPage />} />
               <Route path="/newsletter" element={<NewsletterPage />} />
               <Route path="/store" element={<StorePage />} />
               <Route path="*" element={<NotFoundPage />} />
             </Routes>
             </Suspense>
             <SeoRouteHead />
-            <OperatorResident />
+            <Suspense fallback={null}><OperatorResident /></Suspense>
             {isDev && <EditModeToggle />}
             {isDev && <EditorModal />}
           </BrowserRouter>

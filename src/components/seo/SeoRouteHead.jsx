@@ -40,6 +40,8 @@ export default function SeoRouteHead() {
       <meta property="og:url" content={route.canonical} />
       <meta property="og:image" content={image} />
       <meta property="og:image:alt" content={`${route.title} — Hyperion Industries`} />
+      {route.ogImageWidth && <meta property="og:image:width" content={String(route.ogImageWidth)} />}
+      {route.ogImageHeight && <meta property="og:image:height" content={String(route.ogImageHeight)} />}
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={route.title} />
       <meta name="twitter:description" content={route.description} />

@@ -1,0 +1,63 @@
+name = "hyperion-public-mcp"
+main = "src/index.ts"
+compatibility_date = "2026-07-14"
+compatibility_flags = ["nodejs_compat"]
+workers_dev = true
+preview_urls = false
+
+[vars]
+SITE_ORIGIN = "https://hyperion-industries.dev"
+MCP_ORIGIN = "https://mcp.hyperion-industries.dev"
+
+[[routes]]
+pattern = "mcp.hyperion-industries.dev"
+custom_domain = true
+
+[[services]]
+binding = "OPERATOR_SERVICE"
+service = "hyperion-operator"
+
+[[ratelimits]]
+name = "DISCOVERY_RATE_LIMITER"
+namespace_id = "42001"
+  [ratelimits.simple]
+  limit = 120
+  period = 60
+
+[[ratelimits]]
+name = "SEARCH_RATE_LIMITER"
+namespace_id = "42002"
+  [ratelimits.simple]
+  limit = 30
+  period = 60
+
+[[ratelimits]]
+name = "EVALUATE_RATE_LIMITER"
+namespace_id = "42003"
+  [ratelimits.simple]
+  limit = 12
+  period = 60
+
+[[ratelimits]]
+name = "PREPARE_RATE_LIMITER"
+namespace_id = "42004"
+  [ratelimits.simple]
+  limit = 5
+  period = 60
+
+[[ratelimits]]
+name = "SUBMIT_RATE_LIMITER"
+namespace_id = "42005"
+  [ratelimits.simple]
+  limit = 3
+  period = 60
+
+[[ratelimits]]
+name = "RESUME_RATE_LIMITER"
+namespace_id = "42006"
+  [ratelimits.simple]
+  limit = 3
+  period = 60
+
+# Add MCP_CONFIRMATION_SECRET with:
+# npx wrangler secret put MCP_CONFIRMATION_SECRET --config wrangler.toml

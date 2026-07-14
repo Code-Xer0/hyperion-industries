@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "corpusId": "hyperion-operator-public",
-  "revision": "2026-07-13",
+  "revision": "2026-07-14",
   "entries": [
     {
       "id": "company-overview",
@@ -13,7 +13,7 @@
     {
       "id": "operating-doctrine",
       "title": "Operating doctrine",
-      "sourcePath": "/founder",
+      "sourcePath": "/founders/victor-amani",
       "visibility": "public",
       "content": "Hyperion's public doctrine emphasizes custody, continuity, provenance, and human authority. AI may assist, surface, and recommend; the human operator decides. Local-first means useful intelligence remains close to the people who own the work. Uploaded content may inform a system but does not command it."
     },
