@@ -72,7 +72,16 @@ export async function handleRequest(request, originFetch = fetch) {
 }
 
 export default {
-  fetch(request) {
-    return handleRequest(request);
+  async fetch(request) {
+    const pathname = new URL(request.url).pathname;
+    const response = await handleRequest(request);
+    const headers = new Headers(response.headers);
+    headers.set('x-hyperion-edge-active', 'hyperion-site-edge');
+    headers.set('x-hyperion-edge-path', pathname);
+    return new Response(request.method === 'HEAD' ? null : response.body, {
+      status: response.status,
+      statusText: response.statusText,
+      headers,
+    });
   },
 };
