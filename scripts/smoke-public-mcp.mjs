@@ -1,5 +1,9 @@
 const endpoint = process.env.HYPERION_MCP_ENDPOINT || 'https://mcp.hyperion-industries.dev/mcp';
 const healthUrl = new URL('/health', endpoint).href;
+const probeHeaders = {
+  accept: 'application/json',
+  'user-agent': 'Hyperion-Public-MCP-Soft-Launch-Monitor/1.0 (+https://hyperion-industries.dev/mcp)',
+};
 
 async function expectJson(response, label) {
   if (!response.ok) throw new Error(`${label} failed with HTTP ${response.status}`);
@@ -12,7 +16,7 @@ async function rpc(id, method, params = {}) {
   const started = performance.now();
   const response = await fetch(endpoint, {
     method: 'POST',
-    headers: { 'content-type': 'application/json' },
+    headers: { ...probeHeaders, 'content-type': 'application/json' },
     body: JSON.stringify({ jsonrpc: '2.0', id, method, params }),
     signal: AbortSignal.timeout(15_000),
   });
@@ -22,7 +26,7 @@ async function rpc(id, method, params = {}) {
 }
 
 const healthStarted = performance.now();
-const health = await expectJson(await fetch(healthUrl, { signal: AbortSignal.timeout(15_000) }), 'health');
+const health = await expectJson(await fetch(healthUrl, { headers: probeHeaders, signal: AbortSignal.timeout(15_000) }), 'health');
 const initialize = await rpc(1, 'initialize', { protocolVersion: '2025-06-18', capabilities: {}, clientInfo: { name: 'hyperion-scheduled-smoke', version: '1.0' } });
 const resources = await rpc(2, 'resources/list');
 const tools = await rpc(3, 'tools/list');
