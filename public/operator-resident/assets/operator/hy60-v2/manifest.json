@@ -1,0 +1,135 @@
+{
+  "schema": "hyperion.operator.runtime_asset_pack.v2",
+  "version": 2,
+  "generatorVersion": 1,
+  "sourcePack": "hyperion-operator-hy60-v1",
+  "id": "hyperion-operator-hy60-v2",
+  "displayName": "Hyperion Operator HY60 Resident V2",
+  "generatedAt": "2026-06-28T02:34:44.898Z",
+  "frame": {
+    "width": 192,
+    "height": 208,
+    "fps": 60,
+    "framesPerAnimation": 60,
+    "frameDurationMs": 16.666666666666668,
+    "padding": 2,
+    "pivot": {
+      "x": 0.5,
+      "y": 0.88
+    },
+    "alpha": true,
+    "format": "RGBA WebP"
+  },
+  "outputs": {
+    "sheetIndex": "web-sheets/index.json",
+    "animationMap": "animation-map.json",
+    "generatedTypes": "src/generated/operatorAnimations.ts",
+    "generatedDocs": "docs/generated"
+  },
+  "counts": {
+    "animations": 66,
+    "frames": 3960,
+    "atlasPages": 0,
+    "transitions": 11
+  },
+  "quarantinedAnimations": [
+    "error_glitch",
+    "sleep",
+    "wake",
+    "reboot"
+  ],
+  "codexEventMap": {
+    "session.start": {
+      "animation": "idle_breathe_posture_locked",
+      "transition_in": "sleep_to_wake",
+      "priority": 10
+    },
+    "prompt.submit": {
+      "animation": "think_micro",
+      "transition_in": "idle_to_scan",
+      "priority": 30
+    },
+    "tool.pre.shell": {
+      "animation": "tool_executing",
+      "transition_in": "scan_to_command",
+      "priority": 50
+    },
+    "tool.pre.edit": {
+      "animation": "typing",
+      "transition_in": "scan_to_command",
+      "priority": 50
+    },
+    "tool.pre.read": {
+      "animation": "inspect",
+      "transition_in": "scan_to_command",
+      "priority": 45
+    },
+    "tool.post.success": {
+      "animation": "review_breathe",
+      "transition_in": "command_to_review",
+      "priority": 45
+    },
+    "tool.post.failed": {
+      "animation": "failed_recover_breathe",
+      "transition_in": "fail_to_recover",
+      "priority": 80
+    },
+    "permission.request": {
+      "animation": "approval_wait",
+      "transition_in": "alert_to_waiting",
+      "priority": 90
+    },
+    "policy.deny": {
+      "animation": "blocked_policy",
+      "transition_in": "policy_deny_to_recover",
+      "priority": 100
+    },
+    "memory.write": {
+      "animation": "memory_write",
+      "transition_in": "review_to_execute",
+      "priority": 40
+    },
+    "compact.pre": {
+      "animation": "memory_compact",
+      "transition_in": "think_to_review",
+      "priority": 70
+    },
+    "subagent.start": {
+      "animation": "handoff_to_subagent",
+      "transition_in": "scan_to_command",
+      "priority": 65
+    },
+    "nest.sync": {
+      "animation": "nest_sync",
+      "transition_in": "wait_to_processing",
+      "priority": 30
+    },
+    "turn.stop.success": {
+      "animation": "success_breathe",
+      "transition_in": "execute_to_success",
+      "priority": 70
+    },
+    "turn.stop.idle": {
+      "animation": "idle_breathe_posture_locked",
+      "transition_in": null,
+      "priority": 10
+    }
+  },
+  "aliases": {
+    "running-right": "running_right",
+    "running-left": "running_left",
+    "running": "task_running",
+    "wave": "waving",
+    "jump": "jumping"
+  },
+  "runtime": {
+    "loading": "lazy_per_animation",
+    "maxResidentAnimations": 4,
+    "fallbackAnimation": "idle_breathe_posture_locked"
+  },
+  "notes": [
+    "Each animation is an independently fetched padded WebP sheet.",
+    "The resident runtime keeps at most four animation sheets in its LRU cache.",
+    "Missing or failed sheets resolve to idle_breathe_posture_locked without loading the legacy atlas pack."
+  ]
+}

@@ -1,10 +1,12 @@
 import { lazy, Suspense, useEffect } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useParams } from 'react-router-dom';
 import Nav from './components/layout/Nav';
 import HomePage from './pages/HomePage';
 import FoundersPage from './pages/FoundersPage';
 import FounderPage from './pages/FounderPage';
 import DistrictPage from './pages/DistrictPage';
+import CardStudioPage from './pages/CardStudioPage';
+import NotFoundPage from './pages/NotFoundPage';
 
 // Operator-only surfaces: DEV-gated lazy imports so the production bundle
 // contains neither the code nor the route — no source/route leakage.
@@ -23,6 +25,12 @@ import AmbientCityLayer from './components/ui/AmbientCityLayer';
 import { EditorProvider, useEditor } from './context/EditorContext';
 import { ThemeProvider } from './context/ThemeContext';
 import EditorModal from './components/ui/EditorModal';
+import OperatorResident from './components/operator/OperatorResident';
+import SeoRouteHead from './components/seo/SeoRouteHead';
+import operators from './data/operators.json';
+import { isLaneId } from '../shared/intake/model';
+
+const PUBLIC_FOUNDER_SLUGS = new Set(operators.map((operator) => operator.slug));
 
 function EditModeToggle() {
   const { isEditMode, setIsEditMode } = useEditor();
@@ -63,6 +71,16 @@ function StaticRedirect({ to }) {
   return null;
 }
 
+function FounderRoute() {
+  const { slug } = useParams();
+  return PUBLIC_FOUNDER_SLUGS.has(slug) ? <FounderPage /> : <NotFoundPage />;
+}
+
+function IntakeLaneRoute() {
+  const { lane } = useParams();
+  return isLaneId(lane) ? <IntakePage /> : <NotFoundPage />;
+}
+
 export default function App() {
   const isDev = import.meta.env.DEV;
 
@@ -77,12 +95,12 @@ export default function App() {
             <Routes>
               <Route path="/" element={<HomePage />} />
               <Route path="/founders" element={<FoundersPage />} />
-              <Route path="/founders/:slug" element={<FounderPage />} />
+              <Route path="/founders/:slug" element={<FounderRoute />} />
               {isDev && <Route path="/radio-stats" element={<RadioStatsPage />} />}
               <Route path="/systems" element={<SystemsPage />} />
               <Route path="/intake" element={<IntakePage />} />
               <Route path="/intake/resume" element={<IntakePage resumeMode />} />
-              <Route path="/intake/:lane" element={<IntakePage />} />
+              <Route path="/intake/:lane" element={<IntakeLaneRoute />} />
               <Route path="/chronos" element={<DistrictPage districtId="chronos" />} />
               <Route path="/forge" element={<DistrictPage districtId="forge" />} />
               <Route path="/pandora" element={<DistrictPage districtId="pandora" />} />
@@ -96,16 +114,21 @@ export default function App() {
               <Route path="/alignment" element={<DistrictPage districtId="alignment" />} />
               <Route path="/build-archive" element={<BuildArchivePage />} />
               <Route path="/gallery" element={<GalleryPage />} />
-              <Route path="/card-studio/studio.html" element={<StaticRedirect to="/assets/card-studio/studio.html" />} />
-              <Route path="/card-studio" element={<StaticRedirect to="/assets/card-studio/studio.html" />} />
-              <Route path="/dxcard/*" element={<StaticRedirect to="/dxcard/index.html" />} />
+              <Route path="/card-studio" element={<CardStudioPage />} />
+              <Route path="/card-studio/studio.html" element={<StaticRedirect to="/card-studio" />} />
+              <Route path="/studio/card-studio" element={<StaticRedirect to="/card-studio" />} />
+              <Route path="/dxcard" element={<StaticRedirect to="/dxcard/index.html" />} />
+              <Route path="/dxcard/index.html" element={<StaticRedirect to="/dxcard" />} />
               {isDev && <Route path="/editor" element={<EditorPage />} />}
               <Route path="/dev-diary" element={<DevDiaryPage />} />
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/newsletter" element={<NewsletterPage />} />
               <Route path="/store" element={<StorePage />} />
+              <Route path="*" element={<NotFoundPage />} />
             </Routes>
             </Suspense>
+            <SeoRouteHead />
+            <OperatorResident />
             {isDev && <EditModeToggle />}
             {isDev && <EditorModal />}
           </BrowserRouter>

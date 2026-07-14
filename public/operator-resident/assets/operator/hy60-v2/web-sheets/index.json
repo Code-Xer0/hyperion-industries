@@ -1,0 +1,1345 @@
+{
+  "schema": "hyperion.operator.animation_sheet_index.v1",
+  "packVersion": 2,
+  "fallbackAnimation": "idle_breathe_posture_locked",
+  "maxResidentAnimations": 4,
+  "animations": {
+    "idle": {
+      "animation": "idle",
+      "image": "web-sheets/idle.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "running_right": {
+      "animation": "running_right",
+      "image": "web-sheets/running_right.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "running_left": {
+      "animation": "running_left",
+      "image": "web-sheets/running_left.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "waving": {
+      "animation": "waving",
+      "image": "web-sheets/waving.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "jumping": {
+      "animation": "jumping",
+      "image": "web-sheets/jumping.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "failed": {
+      "animation": "failed",
+      "image": "web-sheets/failed.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "waiting": {
+      "animation": "waiting",
+      "image": "web-sheets/waiting.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "task_running": {
+      "animation": "task_running",
+      "image": "web-sheets/task_running.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "review": {
+      "animation": "review",
+      "image": "web-sheets/review.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "idle_breathe": {
+      "animation": "idle_breathe",
+      "image": "web-sheets/idle_breathe.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "idle_blink": {
+      "animation": "idle_blink",
+      "image": "web-sheets/idle_blink.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "idle_scan": {
+      "animation": "idle_scan",
+      "image": "web-sheets/idle_scan.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "think": {
+      "animation": "think",
+      "image": "web-sheets/think.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "typing": {
+      "animation": "typing",
+      "image": "web-sheets/typing.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "processing": {
+      "animation": "processing",
+      "image": "web-sheets/processing.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "alert": {
+      "animation": "alert",
+      "image": "web-sheets/alert.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "success": {
+      "animation": "success",
+      "image": "web-sheets/success.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "error_glitch": {
+      "animation": "error_glitch",
+      "image": "web-sheets/error_glitch.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "sleep": {
+      "animation": "sleep",
+      "image": "web-sheets/sleep.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "wake": {
+      "animation": "wake",
+      "image": "web-sheets/wake.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "reboot": {
+      "animation": "reboot",
+      "image": "web-sheets/reboot.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "salute": {
+      "animation": "salute",
+      "image": "web-sheets/salute.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "yes_nod": {
+      "animation": "yes_nod",
+      "image": "web-sheets/yes_nod.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "no_shake": {
+      "animation": "no_shake",
+      "image": "web-sheets/no_shake.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "hover": {
+      "animation": "hover",
+      "image": "web-sheets/hover.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "teleport_in": {
+      "animation": "teleport_in",
+      "image": "web-sheets/teleport_in.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "teleport_out": {
+      "animation": "teleport_out",
+      "image": "web-sheets/teleport_out.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "sprint_right": {
+      "animation": "sprint_right",
+      "image": "web-sheets/sprint_right.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "sprint_left": {
+      "animation": "sprint_left",
+      "image": "web-sheets/sprint_left.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "celebrate": {
+      "animation": "celebrate",
+      "image": "web-sheets/celebrate.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "landing": {
+      "animation": "landing",
+      "image": "web-sheets/landing.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "shield": {
+      "animation": "shield",
+      "image": "web-sheets/shield.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "inspect": {
+      "animation": "inspect",
+      "image": "web-sheets/inspect.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "authority_request": {
+      "animation": "authority_request",
+      "image": "web-sheets/authority_request.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "blocked_policy": {
+      "animation": "blocked_policy",
+      "image": "web-sheets/blocked_policy.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "contradiction_detected": {
+      "animation": "contradiction_detected",
+      "image": "web-sheets/contradiction_detected.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "memory_write": {
+      "animation": "memory_write",
+      "image": "web-sheets/memory_write.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "memory_compact": {
+      "animation": "memory_compact",
+      "image": "web-sheets/memory_compact.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "handoff_to_subagent": {
+      "animation": "handoff_to_subagent",
+      "image": "web-sheets/handoff_to_subagent.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "tool_executing": {
+      "animation": "tool_executing",
+      "image": "web-sheets/tool_executing.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "approval_wait": {
+      "animation": "approval_wait",
+      "image": "web-sheets/approval_wait.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "degraded_recover": {
+      "animation": "degraded_recover",
+      "image": "web-sheets/degraded_recover.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "offline_sleep": {
+      "animation": "offline_sleep",
+      "image": "web-sheets/offline_sleep.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "nest_sync": {
+      "animation": "nest_sync",
+      "image": "web-sheets/nest_sync.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "idle_to_scan": {
+      "animation": "idle_to_scan",
+      "image": "web-sheets/idle_to_scan.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "scan_to_command": {
+      "animation": "scan_to_command",
+      "image": "web-sheets/scan_to_command.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "command_to_review": {
+      "animation": "command_to_review",
+      "image": "web-sheets/command_to_review.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "review_to_execute": {
+      "animation": "review_to_execute",
+      "image": "web-sheets/review_to_execute.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "execute_to_success": {
+      "animation": "execute_to_success",
+      "image": "web-sheets/execute_to_success.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "fail_to_recover": {
+      "animation": "fail_to_recover",
+      "image": "web-sheets/fail_to_recover.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "alert_to_waiting": {
+      "animation": "alert_to_waiting",
+      "image": "web-sheets/alert_to_waiting.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "wait_to_processing": {
+      "animation": "wait_to_processing",
+      "image": "web-sheets/wait_to_processing.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "think_to_review": {
+      "animation": "think_to_review",
+      "image": "web-sheets/think_to_review.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "policy_deny_to_recover": {
+      "animation": "policy_deny_to_recover",
+      "image": "web-sheets/policy_deny_to_recover.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "sleep_to_wake": {
+      "animation": "sleep_to_wake",
+      "image": "web-sheets/sleep_to_wake.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "idle_breathe_posture_locked": {
+      "animation": "idle_breathe_posture_locked",
+      "image": "web-sheets/idle_breathe_posture_locked.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "idle_blink_layered": {
+      "animation": "idle_blink_layered",
+      "image": "web-sheets/idle_blink_layered.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "idle_scan_micro": {
+      "animation": "idle_scan_micro",
+      "image": "web-sheets/idle_scan_micro.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "think_micro": {
+      "animation": "think_micro",
+      "image": "web-sheets/think_micro.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "waiting_breathe": {
+      "animation": "waiting_breathe",
+      "image": "web-sheets/waiting_breathe.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "review_breathe": {
+      "animation": "review_breathe",
+      "image": "web-sheets/review_breathe.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "alert_breathe": {
+      "animation": "alert_breathe",
+      "image": "web-sheets/alert_breathe.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "success_breathe": {
+      "animation": "success_breathe",
+      "image": "web-sheets/success_breathe.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "failed_recover_breathe": {
+      "animation": "failed_recover_breathe",
+      "image": "web-sheets/failed_recover_breathe.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "hover_breathe": {
+      "animation": "hover_breathe",
+      "image": "web-sheets/hover_breathe.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    },
+    "shield_breathe": {
+      "animation": "shield_breathe",
+      "image": "web-sheets/shield_breathe.webp",
+      "frameCount": 60,
+      "frameWidth": 192,
+      "frameHeight": 208,
+      "columns": 10,
+      "rows": 6,
+      "padding": 2,
+      "cellWidth": 196,
+      "cellHeight": 212,
+      "fps": 60,
+      "pivot": {
+        "x": 0.5,
+        "y": 0.88
+      }
+    }
+  },
+  "prefetch": {
+    "idle": [
+      "idle_breathe_posture_locked"
+    ],
+    "running_right": [
+      "idle_breathe_posture_locked"
+    ],
+    "running_left": [
+      "idle_breathe_posture_locked"
+    ],
+    "waving": [
+      "idle_breathe_posture_locked"
+    ],
+    "jumping": [
+      "idle_breathe_posture_locked"
+    ],
+    "failed": [
+      "idle_breathe_posture_locked"
+    ],
+    "waiting": [
+      "idle_breathe_posture_locked"
+    ],
+    "task_running": [
+      "idle_breathe_posture_locked"
+    ],
+    "review": [
+      "idle_breathe_posture_locked"
+    ],
+    "idle_breathe": [
+      "idle_breathe_posture_locked"
+    ],
+    "idle_blink": [
+      "idle_breathe_posture_locked"
+    ],
+    "idle_scan": [
+      "idle_breathe_posture_locked"
+    ],
+    "think": [
+      "idle_breathe_posture_locked"
+    ],
+    "typing": [
+      "idle_breathe_posture_locked",
+      "scan_to_command"
+    ],
+    "processing": [
+      "idle_breathe_posture_locked"
+    ],
+    "alert": [
+      "idle_breathe_posture_locked"
+    ],
+    "success": [
+      "idle_breathe_posture_locked"
+    ],
+    "error_glitch": [
+      "idle_breathe_posture_locked"
+    ],
+    "sleep": [
+      "idle_breathe_posture_locked"
+    ],
+    "wake": [
+      "idle_breathe_posture_locked"
+    ],
+    "reboot": [
+      "idle_breathe_posture_locked"
+    ],
+    "salute": [
+      "idle_breathe_posture_locked"
+    ],
+    "yes_nod": [
+      "idle_breathe_posture_locked"
+    ],
+    "no_shake": [
+      "idle_breathe_posture_locked"
+    ],
+    "hover": [
+      "idle_breathe_posture_locked"
+    ],
+    "teleport_in": [
+      "idle_breathe_posture_locked"
+    ],
+    "teleport_out": [
+      "idle_breathe_posture_locked"
+    ],
+    "sprint_right": [
+      "idle_breathe_posture_locked"
+    ],
+    "sprint_left": [
+      "idle_breathe_posture_locked"
+    ],
+    "celebrate": [
+      "idle_breathe_posture_locked"
+    ],
+    "landing": [
+      "idle_breathe_posture_locked"
+    ],
+    "shield": [
+      "idle_breathe_posture_locked"
+    ],
+    "inspect": [
+      "idle_breathe_posture_locked",
+      "scan_to_command"
+    ],
+    "authority_request": [
+      "idle_breathe_posture_locked"
+    ],
+    "blocked_policy": [
+      "idle_breathe_posture_locked",
+      "policy_deny_to_recover"
+    ],
+    "contradiction_detected": [
+      "idle_breathe_posture_locked"
+    ],
+    "memory_write": [
+      "idle_breathe_posture_locked",
+      "review_to_execute"
+    ],
+    "memory_compact": [
+      "idle_breathe_posture_locked",
+      "think_to_review"
+    ],
+    "handoff_to_subagent": [
+      "idle_breathe_posture_locked",
+      "scan_to_command"
+    ],
+    "tool_executing": [
+      "idle_breathe_posture_locked",
+      "scan_to_command"
+    ],
+    "approval_wait": [
+      "idle_breathe_posture_locked",
+      "alert_to_waiting"
+    ],
+    "degraded_recover": [
+      "idle_breathe_posture_locked"
+    ],
+    "offline_sleep": [
+      "idle_breathe_posture_locked"
+    ],
+    "nest_sync": [
+      "idle_breathe_posture_locked",
+      "wait_to_processing"
+    ],
+    "idle_to_scan": [
+      "idle_breathe_posture_locked"
+    ],
+    "scan_to_command": [
+      "idle_breathe_posture_locked"
+    ],
+    "command_to_review": [
+      "idle_breathe_posture_locked"
+    ],
+    "review_to_execute": [
+      "idle_breathe_posture_locked"
+    ],
+    "execute_to_success": [
+      "idle_breathe_posture_locked"
+    ],
+    "fail_to_recover": [
+      "idle_breathe_posture_locked"
+    ],
+    "alert_to_waiting": [
+      "idle_breathe_posture_locked"
+    ],
+    "wait_to_processing": [
+      "idle_breathe_posture_locked"
+    ],
+    "think_to_review": [
+      "idle_breathe_posture_locked"
+    ],
+    "policy_deny_to_recover": [
+      "idle_breathe_posture_locked"
+    ],
+    "sleep_to_wake": [
+      "idle_breathe_posture_locked"
+    ],
+    "idle_breathe_posture_locked": [
+      "think_micro",
+      "inspect",
+      "waiting_breathe"
+    ],
+    "idle_blink_layered": [
+      "idle_breathe_posture_locked"
+    ],
+    "idle_scan_micro": [
+      "idle_breathe_posture_locked"
+    ],
+    "think_micro": [
+      "idle_breathe_posture_locked",
+      "idle_to_scan"
+    ],
+    "waiting_breathe": [
+      "idle_breathe_posture_locked"
+    ],
+    "review_breathe": [
+      "idle_breathe_posture_locked",
+      "command_to_review"
+    ],
+    "alert_breathe": [
+      "idle_breathe_posture_locked"
+    ],
+    "success_breathe": [
+      "idle_breathe_posture_locked",
+      "execute_to_success"
+    ],
+    "failed_recover_breathe": [
+      "idle_breathe_posture_locked",
+      "fail_to_recover"
+    ],
+    "hover_breathe": [
+      "idle_breathe_posture_locked"
+    ],
+    "shield_breathe": [
+      "idle_breathe_posture_locked"
+    ]
+  }
+}

@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Helmet } from 'react-helmet-async';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
   ArrowLeft,
@@ -558,10 +557,6 @@ export default function IntakePage({ resumeMode = false }) {
     );
   };
 
-  const title = resumeMode ? 'Resume Intake' : laneDefinition ? `${laneDefinition.name} Intake` : 'Site Intake';
-  useEffect(() => {
-    document.title = `${title} | Hyperion Industries`;
-  }, [title]);
   const stepDescription = [
     'Open the right public lane.', 'Add only the contact detail needed for follow-up.', 'State the outcome in your own language.',
     'Make constraints and unknowns visible.', 'Inspect the rule evidence and proposed route.', 'Correct the signal before it becomes immutable.',
@@ -570,7 +565,6 @@ export default function IntakePage({ resumeMode = false }) {
 
   return (
     <main className="intake-page" data-effects={effects}>
-      <Helmet><meta name="description" content="Send a structured signal to Hyperion for manual operator review." /><link rel="canonical" href={`https://hyperion-industries.dev${lane ? `/intake/${lane}` : '/intake'}`} /></Helmet>
       <div className="intake-shell">
         <aside className={`intake-operator-panel is-${laneDefinition?.accent || 'cyan'}`}>
           <div className="intake-brand-line"><span>HYPERION // INTAKE OS</span><small>PUBLIC EDGE · v{CONTRACT_VERSION}</small></div>

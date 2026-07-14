@@ -271,19 +271,6 @@ function localCmsPlugin() {
   }
 }
 
-// GitHub Pages serves 404.html for unknown paths — copying the SPA shell there
-// makes deep links (/founders/victor-amani, etc.) resolve client-side.
-function spaFallbackPlugin() {
-  return {
-    name: 'spa-404-fallback',
-    apply: 'build',
-    closeBundle() {
-      const idx = path.resolve(__dirname, 'dist/index.html');
-      if (fs.existsSync(idx)) fs.copyFileSync(idx, path.resolve(__dirname, 'dist/404.html'));
-    },
-  };
-}
-
 // https://vite.dev/config/
 export default defineConfig({
   server: {
@@ -295,7 +282,6 @@ export default defineConfig({
   plugins: [
     { enforce: 'pre', ...mdx() },
     react(),
-    localCmsPlugin(),
-    spaFallbackPlugin()
+    localCmsPlugin()
   ],
 })

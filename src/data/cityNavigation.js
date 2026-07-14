@@ -56,7 +56,7 @@ export const cityFamilies = [
     routes: [
       route('/identity', 'Operator Identity Embassy', 'identity', { keywords: ['nfc', 'cards', 'shipping'] }),
       route('/card-studio', 'Card Studio', 'identity', { status: 'SHIPPING', tone: 'shipping', keywords: ['business card', 'studio'] }),
-      route('/dxcard/', 'Operator Card', 'identity', { status: 'SHIPPING', tone: 'shipping', keywords: ['dx card', 'profile'] }),
+      route('/dxcard', 'Operator Card', 'identity', { status: 'SHIPPING', tone: 'shipping', keywords: ['dx card', 'profile'] }),
     ],
   },
   {

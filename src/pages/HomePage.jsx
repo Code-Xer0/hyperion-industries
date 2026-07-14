@@ -34,9 +34,11 @@ export default function HomePage() {
     signal: (
       <div className="gate-signal-room">
         <div className="gate-copy">
-          <p className="gate-kicker">Hyperion Industries · Public City Gate</p>
+          <p className="gate-kicker">Hyperion Industries · Soft Launch · Limited Requests</p>
           <h2>Infrastructure that remembers who holds authority.</h2>
           <p className="gate-lead">Local-first software, custom hardware, identity, and continuity systems for people who intend to keep control of the work.</p>
+          <p>Victor Amani is the professional name of Kushinda Furaha Zeleke, founder and systems architect of Hyperion Industries in Minneapolis.</p>
+          <p>Contracting time and project requests are currently limited. Every engagement begins with a scope and fit discussion.</p>
           <div className="room-action-row">
             <Link to="/intake" className="btn btn-gold"><Radio size={15} aria-hidden="true" />Start a signal</Link>
             <Link to="/#city" className="btn btn-ghost">Open City Map</Link>
@@ -137,8 +139,8 @@ export default function HomePage() {
       <RoomShell
         eyebrow="Hyperion City / Gate"
         title="City Gate"
-        summary="A public edge for systems, infrastructure, identity, proof, and serious inquiry."
-        status="PUBLIC EDGE · OPERATOR HELD"
+        summary="A public edge for systems, infrastructure, identity, proof, and limited scoped inquiry."
+        status="PUBLIC EDGE · SOFT LAUNCH"
         tone="live"
         stations={stations}
         panels={panels}
