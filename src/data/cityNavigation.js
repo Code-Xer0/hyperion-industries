@@ -1,6 +1,19 @@
 import { cityRoutes } from './publicCity';
+import cityMotion from './cityMotion.json';
 
 const districtByPath = new Map(cityRoutes.map((district) => [district.path, district]));
+
+const imagePreview = (src, alt, objectPosition = 'center', source = 'Hyperion public route artwork') => (
+  src ? {
+    type: 'image',
+    src,
+    poster: src,
+    alt,
+    objectPosition,
+    source,
+    truthClass: 'atmosphere',
+  } : null
+);
 
 const route = (path, label, family, options = {}) => {
   const district = districtByPath.get(path);
@@ -14,6 +27,11 @@ const route = (path, label, family, options = {}) => {
     keywords: options.keywords ?? [],
     previewImage: options.previewImage ?? district?.image ?? null,
     previewPosition: options.previewPosition ?? 'center',
+    previewMedia: options.previewMedia ?? imagePreview(
+      options.previewImage ?? district?.image,
+      options.previewAlt ?? `${label} public route artwork`,
+      options.previewPosition ?? 'center',
+    ),
     mark: options.mark ?? null,
     markAlt: options.markAlt ?? '',
     markPlacement: options.markPlacement ?? 'left',
@@ -27,6 +45,7 @@ export const cityFamilies = [
     id: 'systems',
     label: 'Systems',
     description: 'Archive, memory, and the public software estate.',
+    previewMedia: cityMotion.assets.systems,
     ambient: { primary: '33, 214, 232', secondary: '124, 231, 255', intensity: 0.92 },
     routes: [
       route('/systems', 'Systems Directory', 'systems', { status: 'PUBLIC-SAFE MAP', keywords: ['directory', 'products'] }),
@@ -39,9 +58,13 @@ export const cityFamilies = [
     id: 'infrastructure',
     label: 'Infrastructure',
     description: 'Fabrication, compute, control, and lifecycle doctrine.',
+    previewMedia: cityMotion.assets.infrastructure,
     ambient: { primary: '255, 199, 44', secondary: '255, 119, 42', intensity: 0.94 },
     routes: [
-      route('/forge', 'The Forge', 'infrastructure', { keywords: ['build', 'workstation', 'commercial'] }),
+      route('/forge', 'The Forge', 'infrastructure', {
+        keywords: ['build', 'workstation', 'commercial'],
+        previewMedia: cityMotion.assets.infrastructure,
+      }),
       route('/pandora', 'Pandora Rackworks', 'infrastructure', { keywords: ['hardware', 'rack', 'poc'] }),
       route('/talos', 'Tal.OS Control Tower', 'infrastructure', { keywords: ['talos', 'control plane', 'governance'] }),
       route('/succession', 'Lifecycle Succession', 'infrastructure', { keywords: ['gpu', 'migration', 'doctrine'] }),
@@ -52,6 +75,7 @@ export const cityFamilies = [
     id: 'identity',
     label: 'Identity',
     description: 'Physical identity, NFC, and public operator surfaces.',
+    previewMedia: cityMotion.assets.identity,
     ambient: { primary: '255, 75, 69', secondary: '33, 214, 232', intensity: 0.9 },
     routes: [
       route('/identity', 'Operator Identity Embassy', 'identity', { keywords: ['nfc', 'cards', 'shipping'] }),
@@ -63,6 +87,7 @@ export const cityFamilies = [
     id: 'record',
     label: 'Public Record',
     description: 'Proof, artifacts, notes, and approved operator profiles.',
+    previewMedia: cityMotion.assets.record,
     ambient: { primary: '156, 108, 255', secondary: '255, 199, 44', intensity: 0.84 },
     routes: [
       route('/build-archive', 'Build Archive', 'record', { status: 'PUBLIC ARCHIVE', keywords: ['forge', 'proof', 'builds'] }),
@@ -74,6 +99,7 @@ export const cityFamilies = [
     id: 'alignment',
     label: 'Alignment',
     description: 'Commercial fit, inquiry routing, and public utility lanes.',
+    previewMedia: cityMotion.assets.alignment,
     ambient: { primary: '114, 221, 177', secondary: '255, 199, 44', intensity: 0.82 },
     routes: [
       route('/alignment', 'Alignment Hall', 'alignment', { keywords: ['partners', 'grants', 'customers'] }),
@@ -87,6 +113,7 @@ export const cityFamilies = [
     label: 'Operators',
     description: 'The public founders roster and approved operator dossiers.',
     previewImage: '/assets/operators/founders-cross-signal.jpeg',
+    previewMedia: cityMotion.assets.operators,
     ambient: { primary: '255, 46, 46', secondary: '90, 160, 255', intensity: 1 },
     routes: [
       route('/founders', 'Meet the Founders', 'operators', {
@@ -99,6 +126,15 @@ export const cityFamilies = [
         keywords: ['victor', 'amani', 'deus', 'founder', 'systems architect'],
         previewImage: '/assets/operators/victor-transmission.gif',
         previewPosition: 'center',
+        previewMedia: {
+          type: 'image',
+          src: '/assets/operators/victor-transmission.gif',
+          poster: '/assets/operators/victor-transmission.gif',
+          alt: 'Victor Amani public operator transmission',
+          objectPosition: 'center',
+          source: 'Approved public founder media',
+          truthClass: 'approved_public_media',
+        },
         mark: '/assets/operators/victor-operator-mark.png',
         markAlt: 'Victor Amani Hyperion operator mark',
         markPlacement: 'right',
@@ -109,6 +145,15 @@ export const cityFamilies = [
         keywords: ['keshawn', 'rowe', 'founder', 'operations'],
         previewImage: '/assets/operators/keshawn-rowe-dossier.jpeg',
         previewPosition: 'center 30%',
+        previewMedia: {
+          type: 'image',
+          src: '/assets/operators/keshawn-rowe-dossier.jpeg',
+          poster: '/assets/operators/keshawn-rowe-dossier.jpeg',
+          alt: 'Keshawn Rowe public profile dossier',
+          objectPosition: 'center 30%',
+          source: 'Approved public founder media',
+          truthClass: 'approved_public_media',
+        },
         mark: '/assets/operators/keshawn-wraith-mark.jpeg',
         markAlt: 'WRAITH — Ghostly & Lethal',
       }),
@@ -117,6 +162,7 @@ export const cityFamilies = [
 ];
 
 export const cityDestinations = cityFamilies.flatMap((family) => family.routes);
+export const cityMotionManifest = cityMotion;
 
 export const cityUtilities = [
   { label: 'Gate', path: '/' },

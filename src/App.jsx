@@ -25,6 +25,7 @@ import { HelmetProvider } from 'react-helmet-async';
 const AmbientCityLayer = lazy(() => import('./components/ui/AmbientCityLayer'));
 import { EditorProvider, useEditor } from './context/EditorContext';
 import { ThemeProvider } from './context/ThemeContext';
+import { OperatorPilotProvider, useOperatorPilot } from './context/OperatorPilotContext';
 import EditorModal from './components/ui/EditorModal';
 const OperatorResident = lazy(() => import('./components/operator/OperatorResident'));
 import SeoRouteHead from './components/seo/SeoRouteHead';
@@ -83,14 +84,21 @@ function IntakeLaneRoute() {
   return PUBLIC_INTAKE_LANES.has(lane) ? <IntakePage /> : <NotFoundPage />;
 }
 
+function OperatorPilotMount() {
+  const { available, enabled } = useOperatorPilot();
+  if (!available || !enabled) return null;
+  return <Suspense fallback={null}><OperatorResident /></Suspense>;
+}
+
 export default function App() {
   const isDev = import.meta.env.DEV;
 
   return (
     <HelmetProvider>
       <ThemeProvider>
-        <EditorProvider>
-          <BrowserRouter>
+        <OperatorPilotProvider>
+          <EditorProvider>
+            <BrowserRouter>
             <Suspense fallback={null}><AmbientCityLayer /></Suspense>
             <Nav />
             <Suspense fallback={null}>
@@ -131,11 +139,12 @@ export default function App() {
             </Routes>
             </Suspense>
             <SeoRouteHead />
-            <Suspense fallback={null}><OperatorResident /></Suspense>
+            <OperatorPilotMount />
             {isDev && <EditModeToggle />}
             {isDev && <EditorModal />}
-          </BrowserRouter>
-        </EditorProvider>
+            </BrowserRouter>
+          </EditorProvider>
+        </OperatorPilotProvider>
       </ThemeProvider>
     </HelmetProvider>
   );

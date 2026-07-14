@@ -1,0 +1,83 @@
+{
+  "schema": "hyperion.city_motion_manifest.v1",
+  "version": "2026-07-14.1",
+  "assets": {
+    "gate": {
+      "type": "video",
+      "src": "/assets/city/gate-opener.mp4",
+      "poster": "/assets/city/navigation/hyperion-signal.jpg",
+      "alt": "A cinematic approach through the public Hyperion City gate",
+      "objectPosition": "center",
+      "source": "Hyperion City current gate film",
+      "truthClass": "atmosphere",
+      "status": "interim_video",
+      "commissionedTarget": "/assets/city/districts/gate-loop-v2.mp4"
+    },
+    "systems": {
+      "type": "image",
+      "src": "/assets/city/navigation/city-transit.jpg",
+      "poster": "/assets/city/navigation/city-transit.jpg",
+      "alt": "Public Hyperion City transit lines behind the Systems district",
+      "objectPosition": "center",
+      "source": "Hyperion City transit artwork",
+      "truthClass": "atmosphere",
+      "status": "pending_commission",
+      "commissionedTarget": "/assets/city/districts/systems-loop-v1.mp4"
+    },
+    "infrastructure": {
+      "type": "video",
+      "src": "/assets/forge/media-v1/cards/hyperion-city-motion-card.mp4",
+      "poster": "/assets/forge/media-v1/posters/hyperion-city-motion-card.jpg",
+      "alt": "Hyperion Forge city motion and workstation infrastructure",
+      "objectPosition": "center",
+      "source": "Hyperion Forge field media",
+      "truthClass": "product_capture",
+      "status": "interim_video",
+      "commissionedTarget": "/assets/city/districts/infrastructure-loop-v1.mp4"
+    },
+    "identity": {
+      "type": "image",
+      "src": "/assets/city/proof/card-studio-smoke.png",
+      "poster": "/assets/city/proof/card-studio-smoke.png",
+      "alt": "Hyperion Card Studio shipping lane",
+      "objectPosition": "center",
+      "source": "Card Studio route smoke",
+      "truthClass": "product_capture",
+      "status": "pending_commission",
+      "commissionedTarget": "/assets/city/districts/identity-loop-v1.mp4"
+    },
+    "record": {
+      "type": "image",
+      "src": "/assets/city/navigation/city-transit.jpg",
+      "poster": "/assets/city/navigation/city-transit.jpg",
+      "alt": "Public archive lines in the Hyperion City record district",
+      "objectPosition": "center",
+      "source": "Hyperion City transit artwork",
+      "truthClass": "atmosphere",
+      "status": "pending_commission",
+      "commissionedTarget": "/assets/city/districts/record-loop-v1.mp4"
+    },
+    "alignment": {
+      "type": "image",
+      "src": "/assets/city/navigation/hyperion-signal.jpg",
+      "poster": "/assets/city/navigation/hyperion-signal.jpg",
+      "alt": "Hyperion public signal converging at the Alignment district",
+      "objectPosition": "center",
+      "source": "Hyperion City signal artwork",
+      "truthClass": "atmosphere",
+      "status": "pending_commission",
+      "commissionedTarget": "/assets/city/districts/alignment-loop-v1.mp4"
+    },
+    "operators": {
+      "type": "image",
+      "src": "/assets/operators/founders-cross-signal.jpeg",
+      "poster": "/assets/operators/founders-cross-signal.jpeg",
+      "alt": "Approved cross-founder artwork for the Hyperion Operators district",
+      "objectPosition": "center",
+      "source": "Approved Hyperion founders artwork",
+      "truthClass": "approved_public_media",
+      "status": "pending_commission",
+      "commissionedTarget": "/assets/city/districts/operators-loop-v1.mp4"
+    }
+  }
+}

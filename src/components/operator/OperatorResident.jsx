@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ExternalLink, MessageSquareText, Send, ShieldCheck, X } from 'lucide-react';
+import { ExternalLink, MessageSquareText, Navigation, Power, Send, ShieldCheck, X } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { readOperatorStatus, streamOperatorChat, submitOperatorInquiry } from './operatorApi';
+import { useOperatorPilot } from '../../context/OperatorPilotContext';
+import { readOperatorStatus, streamOperatorChat } from './operatorApi';
 import './OperatorResident.css';
 
 const SCRIPT_SRC = '/operator-resident/hyperion-operator.iife.js';
@@ -9,63 +10,62 @@ const ASSET_BASE = '/operator-resident/assets/operator/hy60-v2';
 const FALLBACK_FRAMES = [0, 1, 2, 3].map(
   (frame) => `/assets/city/operator/operator-wave-${String(frame).padStart(4, '0')}.webp`,
 );
-const RESIDENT_ENABLED = import.meta.env.VITE_OPERATOR_RESIDENT_ENABLED !== 'false';
-const CHAT_ENABLED = import.meta.env.VITE_OPERATOR_CHAT_ENABLED === 'true';
+const CHAT_BUILD_ENABLED = import.meta.env.VITE_OPERATOR_CHAT_ENABLED === 'true';
+const ROAM_ENABLED = import.meta.env.VITE_OPERATOR_ROAM_ENABLED === 'true';
 const API_BASE = import.meta.env.VITE_OPERATOR_API_BASE || '/api/operator';
 const PUBLIC_LINKS = [
   { label: 'Systems', path: '/systems' },
   { label: 'Build lanes', path: '/forge' },
-  { label: 'Contact', path: '/contact' },
+  { label: 'Meet the founders', path: '/founders' },
 ];
-const EMPTY_INQUIRY = {
-  name: '',
-  email: '',
-  organization: '',
-  inquiryType: 'contact',
-  timeline: '',
-  budget: '',
-  message: '',
-  website: '',
-  consent: false,
-};
 
 export default function OperatorResident() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { setEnabled } = useOperatorPilot();
   const operatorRef = useRef(null);
   const moveTimerRef = useRef(null);
   const streamAbortRef = useRef(null);
   const positionedRef = useRef(false);
+  const positionRef = useRef(initialPosition());
   const [runtime, setRuntime] = useState('loading');
   const [fallbackFrame, setFallbackFrame] = useState(0);
   const [chatOpen, setChatOpen] = useState(false);
-  const [chatStatus, setChatStatus] = useState(CHAT_ENABLED ? 'checking' : 'preview');
+  const [worker, setWorker] = useState({ state: 'checking', status: null });
   const [messages, setMessages] = useState([]);
   const [sources, setSources] = useState([]);
   const [prompt, setPrompt] = useState('');
   const [streaming, setStreaming] = useState(false);
-  const [inquiryMode, setInquiryMode] = useState('closed');
-  const [inquiry, setInquiry] = useState(EMPTY_INQUIRY);
-  const [inquiryResult, setInquiryResult] = useState(null);
-  const [position, setPosition] = useState({ x: window.innerWidth - 178, y: window.innerHeight - 224, facing: 'left' });
+  const [position, setPositionState] = useState(positionRef.current);
   const [mobile, setMobile] = useState(() => window.matchMedia('(max-width: 720px)').matches);
-  const [reducedMotion, setReducedMotion] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-  const [dataSaver, setDataSaver] = useState(() => Boolean(navigator.connection?.saveData));
   const [lowFrameRate, setLowFrameRate] = useState(false);
   const [pageHidden, setPageHidden] = useState(document.hidden);
   const [hostInteractionBlocked, setHostInteractionBlocked] = useState(false);
 
   const routeContext = `${location.pathname}${location.hash}`;
-  const suspended = chatOpen || mobile || reducedMotion || dataSaver || lowFrameRate || pageHidden || hostInteractionBlocked;
-  const showFallback = runtime !== 'ready' || reducedMotion;
+  const intakePath = useMemo(() => intakePathFor(location.pathname), [location.pathname]);
+  const chatReady = CHAT_BUILD_ENABLED && worker.status?.capabilities?.chat === 'ready';
+  const suspended = chatOpen || mobile || lowFrameRate || pageHidden || hostInteractionBlocked || runtime === 'fallback';
+
+  const setPosition = useCallback((next) => {
+    positionRef.current = next;
+    setPositionState(next);
+  }, []);
 
   useEffect(() => {
-    if (!RESIDENT_ENABLED) return undefined;
     let canceled = false;
     loadOperatorRuntime()
       .then(() => { if (!canceled) setRuntime('ready'); })
       .catch(() => { if (!canceled) setRuntime('fallback'); });
     return () => { canceled = true; };
+  }, []);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    readOperatorStatus(API_BASE, controller.signal)
+      .then((status) => setWorker({ state: status.status === 'ready' ? 'ready' : 'degraded', status }))
+      .catch(() => setWorker({ state: 'offline', status: null }));
+    return () => controller.abort();
   }, []);
 
   useEffect(() => {
@@ -85,7 +85,12 @@ export default function OperatorResident() {
     const observer = new MutationObserver(evaluate);
     document.addEventListener('focusin', evaluate);
     document.addEventListener('focusout', evaluate);
-    observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['open', 'hidden', 'aria-hidden'] });
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['open', 'hidden', 'aria-hidden'],
+    });
     evaluate();
     return () => {
       observer.disconnect();
@@ -95,31 +100,23 @@ export default function OperatorResident() {
   }, []);
 
   useEffect(() => {
-    if (!showFallback || document.hidden) return undefined;
-    const timer = window.setInterval(() => setFallbackFrame((frame) => (frame + 1) % FALLBACK_FRAMES.length), 220);
+    if (runtime !== 'loading' || pageHidden) return undefined;
+    const timer = window.setInterval(
+      () => setFallbackFrame((frame) => (frame + 1) % FALLBACK_FRAMES.length),
+      220,
+    );
     return () => window.clearInterval(timer);
-  }, [showFallback]);
+  }, [pageHidden, runtime]);
 
   useEffect(() => {
     const mobileQuery = window.matchMedia('(max-width: 720px)');
-    const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const onPolicy = () => {
-      setMobile(mobileQuery.matches);
-      setReducedMotion(motionQuery.matches);
-      setDataSaver(Boolean(navigator.connection?.saveData));
-    };
+    const onPolicy = () => setMobile(mobileQuery.matches);
     mobileQuery.addEventListener('change', onPolicy);
-    motionQuery.addEventListener('change', onPolicy);
-    navigator.connection?.addEventListener?.('change', onPolicy);
-    return () => {
-      mobileQuery.removeEventListener('change', onPolicy);
-      motionQuery.removeEventListener('change', onPolicy);
-      navigator.connection?.removeEventListener?.('change', onPolicy);
-    };
+    return () => mobileQuery.removeEventListener('change', onPolicy);
   }, []);
 
   useEffect(() => {
-    document.documentElement.classList.toggle('operator-mobile-resident-active', RESIDENT_ENABLED && mobile);
+    document.documentElement.classList.toggle('operator-mobile-resident-active', mobile);
     return () => document.documentElement.classList.remove('operator-mobile-resident-active');
   }, [mobile]);
 
@@ -150,17 +147,16 @@ export default function OperatorResident() {
       resident: {
         anchor: { x: 0.5, y: 0.92 },
         prefetch: ['idle_breathe_posture_locked'],
-        reducedMotion: 'static',
         mobile: 'allow',
         pauseWhenDocumentHidden: true,
         tapToOpen: true,
-        chatEndpoint: CHAT_ENABLED ? `${API_BASE}/chat` : null,
+        chatEndpoint: chatReady ? `${API_BASE}/chat` : null,
       },
     });
     const open = () => setChatOpen(true);
     node.addEventListener('operator-chat-open-request', open);
     return () => node.removeEventListener('operator-chat-open-request', open);
-  }, [mobile, runtime]);
+  }, [chatReady, mobile, runtime]);
 
   const play = useCallback((primary, fallback = 'idle_breathe_posture_locked') => {
     const node = operatorRef.current;
@@ -175,41 +171,40 @@ export default function OperatorResident() {
   const moveToAnchor = useCallback((anchor, reason = 'room navigation') => {
     if (!anchor) return;
     const next = anchorPosition(anchor, mobile);
-    const current = position;
+    const current = positionRef.current;
     const movingRight = next.x >= current.x;
-    if (!reducedMotion) {
-      void operatorRef.current?.prefetch?.([
-        movingRight ? 'running_right' : 'running_left',
-        'waving',
-        'idle_breathe_posture_locked',
-      ]);
-      play('city_depart', 'waving');
-      window.setTimeout(() => play(movingRight ? 'city_walk_right' : 'city_walk_left', movingRight ? 'running_right' : 'running_left'), 180);
-    }
+    void operatorRef.current?.prefetch?.([
+      movingRight ? 'running_right' : 'running_left',
+      'waving',
+      'idle_breathe_posture_locked',
+    ]);
+    play('city_depart', 'waving');
+    window.setTimeout(
+      () => play(movingRight ? 'city_walk_right' : 'city_walk_left', movingRight ? 'running_right' : 'running_left'),
+      180,
+    );
     setPosition({ ...next, facing: movingRight ? 'right' : 'left', reason });
-    window.setTimeout(() => play('city_arrive', 'idle_breathe_posture_locked'), reducedMotion ? 0 : 960);
-  }, [mobile, play, position, reducedMotion]);
+    window.setTimeout(() => play('city_arrive', 'idle_breathe_posture_locked'), 960);
+  }, [mobile, play, setPosition]);
 
   useEffect(() => {
-    if (!RESIDENT_ENABLED) return undefined;
     const settle = window.setTimeout(() => {
-      const anchors = findSafeAnchors();
-      const anchor = anchors[0] || null;
+      const anchor = findSafeAnchors()[0] || null;
       if (anchor && !positionedRef.current) {
         positionedRef.current = true;
         setPosition({ ...anchorPosition(anchor, mobile), facing: 'right', reason: `initial route ${routeContext}` });
-      } else {
+      } else if (anchor) {
         moveToAnchor(anchor, `route ${routeContext}`);
       }
       operatorRef.current?.syncRoute?.(routeContext);
     }, 180);
     return () => window.clearTimeout(settle);
-  }, [mobile, moveToAnchor, routeContext]);
+  }, [mobile, moveToAnchor, routeContext, setPosition]);
 
   useEffect(() => {
     window.clearTimeout(moveTimerRef.current);
-    if (!RESIDENT_ENABLED || suspended) {
-      operatorRef.current?.pause?.(chatOpen || pageHidden);
+    if (suspended || !ROAM_ENABLED) {
+      operatorRef.current?.pause?.(chatOpen || pageHidden || lowFrameRate || hostInteractionBlocked || runtime === 'fallback');
       return undefined;
     }
     operatorRef.current?.pause?.(false);
@@ -223,29 +218,19 @@ export default function OperatorResident() {
     };
     schedule();
     return () => window.clearTimeout(moveTimerRef.current);
-  }, [chatOpen, moveToAnchor, pageHidden, suspended]);
-
-  useEffect(() => {
-    if (!chatOpen || !CHAT_ENABLED) return undefined;
-    const controller = new AbortController();
-    readOperatorStatus(API_BASE, controller.signal)
-      .then((status) => setChatStatus(status.status === 'ready' ? 'ready' : 'degraded'))
-      .catch(() => setChatStatus('offline'));
-    return () => controller.abort();
-  }, [chatOpen]);
+  }, [chatOpen, hostInteractionBlocked, lowFrameRate, moveToAnchor, pageHidden, runtime, suspended]);
 
   useEffect(() => () => streamAbortRef.current?.abort(), []);
 
   const sendMessage = async (event) => {
     event.preventDefault();
     const content = prompt.trim();
-    if (!content || streaming || !CHAT_ENABLED) return;
+    if (!content || streaming || !chatReady) return;
     const history = buildChatHistory(messages, content);
     setMessages([...history, { role: 'assistant', content: '' }]);
     setPrompt('');
     setSources([]);
     setStreaming(true);
-    setChatStatus('streaming');
     play('chat_think', 'think_micro');
     const controller = new AbortController();
     streamAbortRef.current = controller;
@@ -262,16 +247,14 @@ export default function OperatorResident() {
             )));
           }
           if (name === 'sources') setSources(Array.isArray(data.sources) ? data.sources : []);
-          if (name === 'done') setChatStatus('ready');
           if (name === 'error') throw new Error(data.code || 'Operator stream failed.');
         },
       });
     } catch (error) {
       if (error.name !== 'AbortError') {
-        setChatStatus('degraded');
         setMessages((current) => current.map((message, index) => (
           index === current.length - 1 && !message.content
-            ? { ...message, content: 'Live chat is unavailable. I can still route you through the public site or prepare an inquiry for review.' }
+            ? { ...message, content: 'Live chat is unavailable. Guided routes and Intake OS remain available.' }
             : message
         )));
         play('inquiry_deferred', 'alert_breathe');
@@ -283,53 +266,22 @@ export default function OperatorResident() {
     }
   };
 
-  const updateInquiry = (event) => {
-    const { name, value, type, checked } = event.target;
-    setInquiry((current) => ({ ...current, [name]: type === 'checkbox' ? checked : value }));
-  };
-
-  const reviewInquiry = (event) => {
-    event.preventDefault();
-    setInquiryMode('review');
-    play('inquiry_review', 'review_breathe');
-  };
-
-  const submitInquiry = async () => {
-    if (!CHAT_ENABLED || inquiryMode !== 'review') return;
-    setInquiryMode('submitting');
-    setInquiryResult(null);
-    try {
-      const result = await submitOperatorInquiry({
-        apiBase: API_BASE,
-        inquiry: { ...inquiry, sourcePath: location.pathname },
-      });
-      setInquiryResult(result);
-      setInquiryMode('complete');
-      play('inquiry_submitted', 'success');
-    } catch (error) {
-      setInquiryResult({ status: 'rejected', message: error.message });
-      setInquiryMode('review');
-      play('inquiry_deferred', 'failed_recover_breathe');
-    }
-  };
-
-  const statusLabel = useMemo(() => {
-    if (!CHAT_ENABLED) return 'chat preview';
-    if (chatStatus === 'ready') return 'public corpus online';
-    if (chatStatus === 'streaming') return 'responding';
-    return chatStatus;
-  }, [chatStatus]);
-
-  if (!RESIDENT_ENABLED) return null;
+  const statusLabel = worker.state === 'checking'
+    ? 'checking public worker'
+    : chatReady
+      ? 'public corpus online'
+      : worker.state === 'offline'
+        ? 'guided mode · worker offline'
+        : 'guided mode · experimental';
 
   return (
-    <aside className={`operator-resident ${mobile ? 'is-mobile' : ''} ${chatOpen ? 'is-chat-open' : ''}`} aria-label="Hyperion Operator public assistant">
+    <aside className={`operator-resident ${mobile ? 'is-mobile' : ''} ${chatOpen ? 'is-chat-open' : ''}`} aria-label="Hyperion Operator experimental public guide">
       <div
         className="operator-resident-stage"
         style={{ '--operator-x': `${position.x}px`, '--operator-y': `${position.y}px` }}
         data-facing={position.facing}
       >
-        {runtime === 'ready' && !reducedMotion ? (
+        {runtime === 'ready' ? (
           <hyperion-operator
             ref={operatorRef}
             asset-base={ASSET_BASE}
@@ -339,16 +291,16 @@ export default function OperatorResident() {
             scale={mobile ? '0.46' : '0.82'}
             anchor="0.5,0.92"
             tap-to-open="true"
-            aria-label="Open Hyperion public inquiry assistant"
+            aria-label="Open experimental Hyperion Operator guide"
           />
         ) : (
-          <button className="operator-resident-fallback" type="button" onClick={() => setChatOpen(true)} aria-label="Open Hyperion public inquiry assistant">
-            <img src={FALLBACK_FRAMES[reducedMotion ? 0 : fallbackFrame]} alt="" draggable="false" />
+          <button className="operator-resident-fallback" type="button" onClick={() => setChatOpen(true)} aria-label="Open experimental Hyperion Operator guide">
+            <img src={FALLBACK_FRAMES[runtime === 'fallback' ? 0 : fallbackFrame]} alt="" draggable="false" />
           </button>
         )}
         <button className="operator-inquiry-signal" type="button" onClick={() => setChatOpen(true)}>
           <MessageSquareText size={14} aria-hidden="true" />
-          <span>Public inquiry</span>
+          <span>Guided mode</span>
         </button>
       </div>
 
@@ -356,184 +308,120 @@ export default function OperatorResident() {
         <section className="operator-console" role="dialog" aria-modal="false" aria-labelledby="operator-console-title">
           <header>
             <div>
-              <span className="operator-console-kicker">OPERATOR / CITY RESIDENT</span>
-              <h2 id="operator-console-title">Public inquiry channel</h2>
+              <span className="operator-console-kicker">OPERATOR PILOT / EXPERIMENTAL</span>
+              <h2 id="operator-console-title">Guided public route</h2>
             </div>
-            <button type="button" className="operator-icon-button" onClick={() => setChatOpen(false)} aria-label="Close public inquiry channel">
+            <button type="button" className="operator-icon-button" onClick={() => setChatOpen(false)} aria-label="Close Operator guide">
               <X size={17} aria-hidden="true" />
             </button>
           </header>
 
           <div className="operator-console-status">
-            <span data-state={chatStatus}>{statusLabel}</span>
+            <span data-state={chatReady ? 'ready' : worker.state}>{statusLabel}</span>
             <code>{routeContext}</code>
           </div>
 
-          {inquiryMode === 'closed' ? (
-            <>
-              <div className="operator-message-log" aria-live="polite">
-                {!messages.length && (
-                  <div className="operator-system-message">
-                    <ShieldCheck size={16} aria-hidden="true" />
-                    <p>{CHAT_ENABLED
-                      ? 'Ask about public Hyperion systems, build lanes, operators, or contact routes. This channel has no private-system or tool access.'
-                      : 'The resident is live in preview mode. Model chat remains disabled until the public Worker is deployed.'}</p>
-                  </div>
-                )}
-                {messages.map((message, index) => (
-                  <article key={`${message.role}-${index}`} data-role={message.role}>
-                    <span>{message.role === 'user' ? 'Visitor' : 'Operator'}</span>
-                    <p>{message.content || '...'}</p>
-                  </article>
-                ))}
+          <div className="operator-message-log" aria-live="polite">
+            {!messages.length && (
+              <div className="operator-system-message">
+                <ShieldCheck size={16} aria-hidden="true" />
+                <p>{chatReady
+                  ? 'Ask about public Hyperion systems, build lanes, operators, or routes. This pilot has no private-system or tool access.'
+                  : 'Live chat is not currently configured. This pilot can guide you through public routes and open the matching Intake OS lane.'}</p>
               </div>
+            )}
+            {messages.map((message, index) => (
+              <article key={`${message.role}-${index}`} data-role={message.role}>
+                <span>{message.role === 'user' ? 'Visitor' : 'Operator'}</span>
+                <p>{message.content || '...'}</p>
+              </article>
+            ))}
+          </div>
 
-              {!!sources.length && (
-                <div className="operator-sources" aria-label="Public sources">
-                  {sources.slice(0, 4).map((source) => (
-                    <a key={source.id} href={source.href} target="_blank" rel="noreferrer">
-                      {source.title}<ExternalLink size={11} aria-hidden="true" />
-                    </a>
-                  ))}
-                </div>
-              )}
-
-              <div className="operator-route-links" aria-label="Public route fallback">
-                {PUBLIC_LINKS.map((link) => (
-                  <button key={link.path} type="button" onClick={() => { navigate(link.path); setChatOpen(false); }}>
-                    {link.label}
-                  </button>
-                ))}
-              </div>
-
-              <form className="operator-prompt" onSubmit={sendMessage}>
-                <label htmlFor="operator-prompt">Public question</label>
-                <div>
-                  <textarea
-                    id="operator-prompt"
-                    value={prompt}
-                    onChange={(event) => setPrompt(event.target.value.slice(0, 1500))}
-                    placeholder={CHAT_ENABLED ? 'Ask about a public Hyperion route...' : 'Chat activates after the Worker is live.'}
-                    disabled={!CHAT_ENABLED || streaming}
-                    rows={2}
-                  />
-                  <button type="submit" className="operator-icon-button" disabled={!CHAT_ENABLED || streaming || !prompt.trim()} aria-label="Send public question">
-                    <Send size={16} aria-hidden="true" />
-                  </button>
-                </div>
-              </form>
-
-              <button className="operator-command" type="button" onClick={() => { setInquiryMode('edit'); play('inquiry_offer', 'waving'); }}>
-                Prepare a reviewed inquiry
-              </button>
-            </>
-          ) : (
-            <InquiryCard
-              mode={inquiryMode}
-              inquiry={inquiry}
-              result={inquiryResult}
-              enabled={CHAT_ENABLED}
-              onChange={updateInquiry}
-              onReview={reviewInquiry}
-              onSubmit={submitInquiry}
-              onEdit={() => setInquiryMode('edit')}
-              onBack={() => setInquiryMode('closed')}
-            />
+          {!!sources.length && (
+            <div className="operator-sources" aria-label="Public sources">
+              {sources.slice(0, 4).map((source) => (
+                <a key={source.id} href={source.href} target="_blank" rel="noreferrer">
+                  {source.title}<ExternalLink size={11} aria-hidden="true" />
+                </a>
+              ))}
+            </div>
           )}
+
+          <div className="operator-route-links" aria-label="Guided public routes">
+            {PUBLIC_LINKS.map((link) => (
+              <button key={link.path} type="button" onClick={() => { navigate(link.path); setChatOpen(false); }}>
+                {link.label}
+              </button>
+            ))}
+          </div>
+
+          {chatReady && (
+            <form className="operator-prompt" onSubmit={sendMessage}>
+              <label htmlFor="operator-prompt">Public question</label>
+              <div>
+                <textarea
+                  id="operator-prompt"
+                  value={prompt}
+                  onChange={(event) => setPrompt(event.target.value.slice(0, 1500))}
+                  placeholder="Ask about a public Hyperion route..."
+                  disabled={streaming}
+                  rows={2}
+                />
+                <button type="submit" className="operator-icon-button" disabled={streaming || !prompt.trim()} aria-label="Send public question">
+                  <Send size={16} aria-hidden="true" />
+                </button>
+              </div>
+            </form>
+          )}
+
+          <div className="operator-pilot-actions">
+            <button className="operator-command" type="button" onClick={() => { navigate(intakePath); setChatOpen(false); }}>
+              <Navigation size={14} aria-hidden="true" />
+              Open matching intake
+            </button>
+            <button type="button" className="operator-pilot-disable" onClick={() => setEnabled(false)}>
+              <Power size={14} aria-hidden="true" />
+              Turn pilot off
+            </button>
+          </div>
         </section>
       )}
     </aside>
   );
 }
 
-function InquiryCard({ mode, inquiry, result, enabled, onChange, onReview, onSubmit, onEdit, onBack }) {
-  if (mode === 'complete') {
-    return (
-      <div className="operator-inquiry-result">
-        <span>{result?.status || 'submitted'}</span>
-        <h3>Inquiry recorded</h3>
-        <p>{result?.notification === 'notification_pending'
-          ? 'The inquiry is stored. Mail notification is pending and has not been represented as complete.'
-          : 'The reviewed inquiry was accepted by the public intake channel.'}</p>
-        <button className="operator-command" type="button" onClick={onBack}>Return to chat</button>
-      </div>
-    );
-  }
+function initialPosition() {
+  return { x: window.innerWidth - 178, y: window.innerHeight - 224, facing: 'left' };
+}
 
-  if (mode === 'review' || mode === 'submitting') {
-    return (
-      <div className="operator-inquiry-review">
-        <span>Explicit review required</span>
-        <dl>
-          <dt>Name</dt><dd>{inquiry.name}</dd>
-          <dt>Email</dt><dd>{inquiry.email}</dd>
-          <dt>Category</dt><dd>{inquiry.inquiryType.replaceAll('_', ' ')}</dd>
-          <dt>Timeline</dt><dd>{inquiry.timeline || 'Not provided'}</dd>
-          <dt>Budget</dt><dd>{inquiry.budget || 'Not provided'}</dd>
-          <dt>Summary</dt><dd>{inquiry.message}</dd>
-        </dl>
-        {result?.message && <p className="operator-form-error">{result.message}</p>}
-        <div className="operator-review-actions">
-          <button type="button" onClick={() => onBack()}>Cancel</button>
-          <button type="button" onClick={onEdit}>Edit</button>
-          <button className="operator-command" type="button" onClick={onSubmit} disabled={!enabled || mode === 'submitting'}>
-            {mode === 'submitting' ? 'Submitting...' : 'Confirm and submit'}
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <form className="operator-inquiry-form" onSubmit={onReview}>
-      <div className="operator-form-heading">
-        <span>Draft only</span>
-        <p>Nothing is submitted until the next review screen is confirmed.</p>
-      </div>
-      <div className="operator-field-grid">
-        <label>Name<input name="name" value={inquiry.name} onChange={onChange} maxLength={120} required /></label>
-        <label>Email<input name="email" type="email" value={inquiry.email} onChange={onChange} maxLength={254} required /></label>
-        <label>Organization<input name="organization" value={inquiry.organization} onChange={onChange} maxLength={160} /></label>
-        <label>Category<select name="inquiryType" value={inquiry.inquiryType} onChange={onChange}>
-          <option value="contact">General contact</option>
-          <option value="field_work">Field work</option>
-          <option value="card_studio_order">Card Studio</option>
-          <option value="beta_access">Beta access</option>
-          <option value="demo_request">Demo request</option>
-          <option value="chronos_beta_issue">CHR0N.OS beta issue</option>
-          <option value="partnership_funding">Partnership or funding</option>
-        </select></label>
-        <label>Timeline<input name="timeline" value={inquiry.timeline} onChange={onChange} maxLength={120} /></label>
-        <label>Budget<input name="budget" value={inquiry.budget} onChange={onChange} maxLength={120} /></label>
-      </div>
-      <label>Summary<textarea name="message" value={inquiry.message} onChange={onChange} minLength={10} maxLength={6000} rows={5} required /></label>
-      <label className="operator-consent"><input name="consent" type="checkbox" checked={inquiry.consent} onChange={onChange} required /> I consent to Hyperion contacting me about this inquiry.</label>
-      <label className="operator-honeypot" aria-hidden="true">Website<input name="website" value={inquiry.website} onChange={onChange} tabIndex={-1} autoComplete="off" /></label>
-      <div className="operator-review-actions">
-        <button type="button" onClick={onBack}>Cancel</button>
-        <button className="operator-command" type="submit">Review inquiry</button>
-      </div>
-    </form>
-  );
+function intakePathFor(pathname) {
+  if (pathname === '/forge') return '/intake/forge';
+  if (['/pandora', '/talos', '/succession', '/pandora-lite'].includes(pathname)) return '/intake/pandora';
+  if (['/identity', '/card-studio', '/dxcard'].some((path) => pathname.startsWith(path))) return '/intake/operator-identity';
+  if (['/chronos', '/mnemos', '/software-estate'].includes(pathname)) return '/intake/continuity';
+  if (pathname === '/alignment') return '/intake/relationships';
+  return '/intake/general';
 }
 
 function loadOperatorRuntime() {
   if (customElements.get('hyperion-operator')) return Promise.resolve();
-  const existing = document.querySelector(`script[src="${SCRIPT_SRC}"]`);
-  if (existing) {
-    return new Promise((resolve, reject) => {
-      existing.addEventListener('load', resolve, { once: true });
-      existing.addEventListener('error', reject, { once: true });
-    });
-  }
-  return new Promise((resolve, reject) => {
-    const script = document.createElement('script');
-    script.src = SCRIPT_SRC;
-    script.async = true;
-    script.addEventListener('load', resolve, { once: true });
+  const ready = new Promise((resolve, reject) => {
+    const existing = document.querySelector(`script[src="${SCRIPT_SRC}"]`);
+    const script = existing || document.createElement('script');
+    const onLoad = () => customElements.whenDefined('hyperion-operator').then(resolve, reject);
+    script.addEventListener('load', onLoad, { once: true });
     script.addEventListener('error', reject, { once: true });
-    document.head.append(script);
+    if (!existing) {
+      script.src = SCRIPT_SRC;
+      script.async = true;
+      document.head.append(script);
+    }
   });
+  const timeout = new Promise((_, reject) => {
+    window.setTimeout(() => reject(new Error('Operator runtime load timed out.')), 6500);
+  });
+  return Promise.race([ready, timeout]);
 }
 
 function findSafeAnchors() {
@@ -543,13 +431,8 @@ function findSafeAnchors() {
 }
 
 function wouldOccludeReadableContent(anchor) {
-  const position = anchorPosition(anchor, false);
-  const candidate = {
-    left: position.x,
-    top: position.y,
-    right: position.x + 176,
-    bottom: position.y + 208,
-  };
+  const next = anchorPosition(anchor, false);
+  const candidate = { left: next.x, top: next.y, right: next.x + 176, bottom: next.y + 208 };
   const readable = document.querySelectorAll('a, button, input, textarea, select, label, h1, h2, h3, h4, p, li, dt, dd, blockquote, article, [role="tab"], [role="button"]');
   return [...readable].some((element) => {
     if (element.closest('.operator-resident')) return false;

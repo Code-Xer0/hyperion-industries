@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   Archive,
   ArrowUpRight,
+  Bot,
   ChevronRight,
   Command,
   Cpu,
@@ -20,10 +21,18 @@ import {
   X,
 } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { cityDestinations, cityFamilies, cityUtilities, getCityDestination } from '../../data/cityNavigation';
+import {
+  cityDestinations,
+  cityFamilies,
+  cityMotionManifest,
+  cityUtilities,
+  getCityDestination,
+} from '../../data/cityNavigation';
 import { useTheme } from '../../context/ThemeContext';
+import { useOperatorPilot } from '../../context/OperatorPilotContext';
 import { pickKairoScore } from '../../data/scores';
 import StatusChip from '../portal/StatusChip';
+import CityPreviewMedia from './CityPreviewMedia';
 import './Nav.css';
 
 const searchableText = (destination) => [
@@ -48,6 +57,7 @@ export default function Nav() {
   const location = useLocation();
   const navigate = useNavigate();
   const { isLightMode, brandMark, toggleTheme } = useTheme();
+  const operatorPilot = useOperatorPilot();
   const [launcherOpen, setLauncherOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [activeIndex, setActiveIndex] = useState(0);
@@ -65,12 +75,9 @@ export default function Nav() {
   const activeFamily = cityFamilies.find((family) => family.id === activeFamilyId) || cityFamilies[0];
   const previewDestination = cityDestinations.find((destination) => destination.path === previewPath)
     || activeFamily.routes[0];
-  const previewImage = previewDestination.previewImage
-    || activeFamily.previewImage
-    || '/assets/city/navigation/city-transit.jpg';
-  const previewPosition = previewDestination.previewImage
-    ? previewDestination.previewPosition
-    : 'center';
+  const previewMedia = previewDestination.previewMedia
+    || activeFamily.previewMedia
+    || cityMotionManifest.assets.systems;
 
   const filtered = useMemo(() => {
     const needle = query.trim().toLowerCase();
@@ -305,13 +312,10 @@ export default function Nav() {
       <nav className="hi-nav" aria-label="Primary City transit">
         <Link to="/" className="nav-logo" title="Return to the City Gate">
           <img src={brandMark} alt="" className="nav-mark" />
-          <img
-            src={isLightMode
-              ? '/assets/branding/hyperion/hyperion-wordmark-dark.svg'
-              : '/assets/branding/hyperion/hyperion-wordmark-light.svg'}
-            alt="Hyperion Industries"
-            className="nav-wordmark-logo"
-          />
+          <span className="nav-wordmark-logo" aria-label="Hyperion Industries">
+            <strong>Hyperion</strong>
+            <small>Industries</small>
+          </span>
         </Link>
 
         <div className="nav-location" aria-label="Current location">
@@ -348,6 +352,19 @@ export default function Nav() {
         </div>
 
         <div className="nav-controls">
+          {operatorPilot.available && (
+            <button
+              type="button"
+              onClick={operatorPilot.toggle}
+              className="nav-score-button nav-operator-pilot"
+              aria-pressed={operatorPilot.enabled}
+              aria-label={operatorPilot.enabled ? 'Turn Operator Pilot off' : 'Turn experimental Operator Pilot on'}
+              title={operatorPilot.enabled ? 'Turn Operator Pilot off' : 'Turn experimental Operator Pilot on'}
+            >
+              <Bot size={16} aria-hidden="true" />
+              <span className="nav-score-copy"><strong>Operator</strong><small>{operatorPilot.enabled ? 'Pilot on' : 'Pilot off'}</small></span>
+            </button>
+          )}
           <button
             type="button"
             onClick={toggleSoundtrack}
@@ -407,23 +424,17 @@ export default function Nav() {
               transition={{ duration: 0.24, ease: [0.2, 0, 0, 1] }}
             >
               <div className="city-launcher-scene" aria-hidden="true">
-                <video
-                  src="/assets/city/gate-opener.mp4"
-                  poster="/assets/city/navigation/hyperion-signal.jpg"
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                />
-                <video
-                  className="city-launcher-brand-film"
-                  src="/assets/city/hyperion-logo-loop.mp4"
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  preload="metadata"
-                />
+                {previewMedia.type !== 'video' && (
+                  <video
+                    src={cityMotionManifest.assets.gate.src}
+                    poster={cityMotionManifest.assets.gate.poster}
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    preload="metadata"
+                  />
+                )}
                 <div className="city-launcher-skyline" />
                 <div className="city-launcher-grid" />
               </div>
@@ -437,6 +448,19 @@ export default function Nav() {
                   </div>
                 </div>
                 <div className="city-launcher-controls">
+                  {operatorPilot.available && (
+                    <button
+                      type="button"
+                      className="city-launcher-control"
+                      onClick={operatorPilot.toggle}
+                      aria-pressed={operatorPilot.enabled}
+                      aria-label={operatorPilot.enabled ? 'Turn Operator Pilot off' : 'Turn experimental Operator Pilot on'}
+                      title={operatorPilot.enabled ? 'Turn Operator Pilot off' : 'Turn experimental Operator Pilot on'}
+                    >
+                      <Bot size={18} aria-hidden="true" />
+                      <span>{operatorPilot.enabled ? 'Operator on' : 'Operator pilot'}</span>
+                    </button>
+                  )}
                   <button
                     type="button"
                     className="city-launcher-control"
@@ -543,11 +567,9 @@ export default function Nav() {
                         </div>
 
                         <div className="city-route-preview">
-                          <img
-                            key={`${previewDestination.path}-${previewImage}`}
-                            src={previewImage}
-                            alt=""
-                            style={{ objectPosition: previewPosition }}
+                          <CityPreviewMedia
+                            key={`${previewDestination.path}-${previewMedia.src}`}
+                            media={previewMedia}
                           />
                           <div className="city-route-preview-scrim" />
                           {previewDestination.mark && (
