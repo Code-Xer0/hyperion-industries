@@ -14,6 +14,9 @@ Configure the template bindings as follows:
 | `INQUIRY_EMAIL` | Fixed-destination notification binding |
 | `OPENROUTER_API_KEY` | Wrangler secret, never a plain variable |
 | `FOUNDER_COMMAND_PULL_TOKEN_SHA256` | Wrangler secret containing only the pull-token SHA-256 digest |
+| `FOUNDER_COMMAND_PULL_KEY_ID` | Non-secret current key version identifier |
+| `FOUNDER_COMMAND_PULL_PREVIOUS_TOKEN_SHA256` | Optional previous digest during a bounded rotation overlap |
+| `FOUNDER_COMMAND_PULL_PREVIOUS_UNTIL` | ISO-8601 deadline after which the previous digest fails closed |
 | `OPENROUTER_MODEL` | Server-only model override |
 | `SITE_ORIGIN` | Canonical HTTPS origin used by strict POST checks |
 | `INQUIRY_NOTIFY_TO` | Verified notification destination |
@@ -31,6 +34,8 @@ OpenRouter SSE is parsed inside the Worker and is never passed through. The publ
 Apply all migrations in order before enabling intake. `0002_operator_inquiry_budget.sql` adds the optional bounded budget field without rewriting the initial migration. Each submitted row receives an `expires_at` value exactly 90 days after receipt. Expired rows are deleted in the same D1 batch as each new insert and by the daily scheduled handler. The expiry index keeps the scheduled delete bounded.
 
 Inquiry records contain submitted contact data by design. Worker logs do not: the logger accepts only request IDs, routes, status/reason codes, durations, counts, byte sizes, model name, notification state, and purge counts. Upstream error bodies and exception messages are never consumed into logs.
+
+The intake operator feed is delivery-only. Acknowledgments are per outbox record and require the source revision hash plus the local receipt ID. `conflict_quarantined` can never be acknowledged as accepted business truth. Service tokens are hashed before constant-time comparison; logs include only the non-secret key ID and whether the current or previous rotation slot matched.
 
 ## Public corpus updates
 

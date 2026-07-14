@@ -68,8 +68,8 @@ export function createWorker(overrides: Partial<RuntimeDependencies> = {}): Oper
         else if (url.pathname === "/api/operator/status") response = handleStatus(env);
         else if (url.pathname === "/api/operator/chat") response = await handleChat(request, env, requestId, deps);
         else if (url.pathname === "/api/operator/inquiries") response = await handleInquiry(request, env, requestId, deps);
-        else if (url.pathname === "/api/intake/operator/status") response = await handleOperatorStatus(request, env);
-        else if (url.pathname === "/api/intake/operator/feed") response = await handleOperatorFeed(request, env);
+        else if (url.pathname === "/api/intake/operator/status") response = await handleOperatorStatus(request, env, deps);
+        else if (url.pathname === "/api/intake/operator/feed") response = await handleOperatorFeed(request, env, deps);
         else if (url.pathname === "/api/intake/operator/ack") response = await handleOperatorAck(request, env, deps);
         else if (url.pathname === "/api/intake/status") response = handleIntakeStatus(env);
         else if (url.pathname === "/api/intake/evaluate") response = await handleIntakeEvaluate(request);

@@ -19,7 +19,7 @@ export default function ContactPage() {
   const panels = {
     route: (
       <div className="room-panel-grid">
-        <div className="room-panel-copy"><h2>Bring the problem. We will route the lane.</h2><p>{content.contact.instructions.desc}</p><div className="room-action-row"><MailAction href="mailto:hello@hyperion-industries.dev">Email Hyperion</MailAction></div></div>
+        <div className="room-panel-copy"><h2>Bring the problem. We will route the lane.</h2><p>Hyperion is preparing for soft launch and accepting a limited number of requests and contracting engagements. Availability is confirmed only after a scope and fit discussion.</p><p>{content.contact.instructions.desc}</p><div className="room-action-row"><MailAction href="mailto:hello@hyperion-industries.dev">Email Hyperion</MailAction></div></div>
         <div className="signal-route-list">
           <button type="button" onClick={() => { window.location.hash = 'forge'; }}><strong>Build or workstation</strong><span>Forge inquiry</span></button>
           <button type="button" onClick={() => { window.location.hash = 'chronos'; }}><strong>Archive or recovery</strong><span>CHR0N.OS public lane</span></button>
@@ -34,7 +34,7 @@ export default function ContactPage() {
     alignment: <SignalPanel title="Start with fit and evidence." text="Aligned funders, grant programs, strategic partners, and early customers can begin with the problem, available role, and expected next step." href="mailto:hello@hyperion-industries.dev?subject=Hyperion%20Alignment%20Inquiry" action="Open Alignment Signal" />,
   };
 
-  return <PageShell><RoomShell eyebrow="Alignment / Contact Signal" title="Contact Signal" summary={content.contact.hero.lead} status="PUBLIC SIGNAL" tone="inquiry" stations={stations} panels={panels} defaultStation="route" /></PageShell>;
+  return <PageShell><RoomShell eyebrow="Alignment / Contact Signal" title="Contact Signal" summary={`${content.contact.hero.lead} Limited requests are reviewed by appointment after scope discussion.`} status="PUBLIC SIGNAL · LIMITED AVAILABILITY" tone="inquiry" stations={stations} panels={panels} defaultStation="route" /></PageShell>;
 }
 
 function SignalPanel({ title, text, href, action }) {

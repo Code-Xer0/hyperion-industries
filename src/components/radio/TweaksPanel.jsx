@@ -20,9 +20,8 @@ export default function TweaksPanel({ tweaks, onChange }) {
   const drawerRef = useRef(null);
   const tabRef = useRef(null);
 
-  // one-time clue bounce shortly after the page mounts (skipped for reduced motion)
+  // One-time clue bounce shortly after the page mounts.
   useEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const t1 = setTimeout(() => setHint(true), 1600);
     const t2 = setTimeout(() => setHint(false), 4400);
     return () => { clearTimeout(t1); clearTimeout(t2); };

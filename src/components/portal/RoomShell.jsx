@@ -81,9 +81,15 @@ export default function RoomShell({
               <strong>{station.label}</strong>
             </button>
           ))}
+          <span className="room-operator-anchor room-operator-anchor-rail" data-operator-anchor data-position="rail" data-facing="right" data-station={active} data-safe-radius="76" data-intent="guard" aria-hidden="true" />
         </div>
 
         <div className="room-panel-stage">
+          <div className="room-operator-anchors" aria-hidden="true">
+            <span className="room-operator-anchor" data-operator-anchor data-position="west" data-facing="right" data-station={active} data-safe-radius="88" data-intent="present" />
+            <span className="room-operator-anchor" data-operator-anchor data-position="center" data-facing="front" data-station={active} data-safe-radius="80" data-intent="inspect" />
+            <span className="room-operator-anchor" data-operator-anchor data-position="east" data-facing="left" data-station={active} data-safe-radius="88" data-intent="present" />
+          </div>
           <AnimatePresence mode="wait" initial={false} custom={direction}>
             <motion.div
               key={active}

@@ -49,6 +49,7 @@ CREATE TABLE IF NOT EXISTS intake_submissions (
   consents_json TEXT NOT NULL,
   client_context_json TEXT NOT NULL,
   client_reviewed INTEGER NOT NULL CHECK (client_reviewed = 1),
+  payload_hash TEXT NOT NULL,
   idempotency_key_hash TEXT NOT NULL UNIQUE,
   receipt_json TEXT NOT NULL,
   retention_basis TEXT,
@@ -61,10 +62,18 @@ CREATE INDEX IF NOT EXISTS idx_intake_submissions_expiry ON intake_submissions(e
 
 CREATE TABLE IF NOT EXISTS intake_routing_decisions (
   decision_id TEXT PRIMARY KEY,
+  proposal_id TEXT NOT NULL UNIQUE,
   intake_id TEXT NOT NULL,
   submission_id TEXT NOT NULL UNIQUE,
   ruleset_version TEXT NOT NULL,
+  policy_version TEXT NOT NULL,
   agent_contract_version TEXT NOT NULL,
+  input_revision_hash TEXT NOT NULL,
+  minimized_projection_hash TEXT NOT NULL,
+  analyzer_kind TEXT NOT NULL CHECK (analyzer_kind IN ('deterministic', 'nest')),
+  analyzer_id TEXT NOT NULL,
+  analyzer_version TEXT NOT NULL,
+  proposal_state TEXT NOT NULL CHECK (proposal_state IN ('active', 'stale', 'approved', 'expired', 'cancelled')),
   primary_route TEXT NOT NULL,
   classification TEXT NOT NULL,
   decision_json TEXT NOT NULL,
@@ -77,12 +86,18 @@ CREATE TABLE IF NOT EXISTS intake_outbox (
   outbox_id TEXT PRIMARY KEY,
   intake_id TEXT NOT NULL,
   submission_id TEXT NOT NULL UNIQUE,
+  proposal_id TEXT NOT NULL,
+  revision_hash TEXT NOT NULL,
   event_type TEXT NOT NULL,
   state TEXT NOT NULL CHECK (state IN ('held_for_review', 'approved', 'dispatched', 'failed', 'cancelled')),
   attempts INTEGER NOT NULL DEFAULT 0,
+  acknowledged_at TEXT,
+  acknowledgment_outcome TEXT CHECK (acknowledgment_outcome IS NULL OR acknowledgment_outcome IN ('received', 'duplicate', 'conflict_quarantined', 'rejected')),
+  local_receipt_id TEXT,
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL,
-  FOREIGN KEY (submission_id) REFERENCES intake_submissions(submission_id)
+  FOREIGN KEY (submission_id) REFERENCES intake_submissions(submission_id),
+  FOREIGN KEY (proposal_id) REFERENCES intake_routing_decisions(proposal_id)
 );
 
 CREATE INDEX IF NOT EXISTS idx_intake_outbox_state ON intake_outbox(state, created_at);
@@ -98,3 +113,16 @@ CREATE TABLE IF NOT EXISTS intake_audit_events (
 );
 
 CREATE INDEX IF NOT EXISTS idx_intake_audit_intake ON intake_audit_events(intake_id, created_at);
+
+CREATE TABLE IF NOT EXISTS intake_revision_conflicts (
+  conflict_id TEXT PRIMARY KEY,
+  intake_id TEXT NOT NULL,
+  submission_id TEXT NOT NULL,
+  existing_hash TEXT NOT NULL,
+  received_hash TEXT NOT NULL,
+  state TEXT NOT NULL CHECK (state = 'quarantined'),
+  request_id TEXT,
+  created_at TEXT NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_intake_conflicts_submission ON intake_revision_conflicts(submission_id, created_at);

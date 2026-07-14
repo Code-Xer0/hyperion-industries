@@ -24,6 +24,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Node
         uses: actions/setup-node@v4
@@ -36,6 +38,9 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      - name: Verify public SEO state
+        run: npm run seo:verify
 
       - name: Setup Pages
         uses: actions/configure-pages@v4

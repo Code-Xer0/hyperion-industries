@@ -7,6 +7,7 @@ import contactPatch from './contracts/forms/contact-consent.patch.v1.0.1.json';
 export const CONTRACT_VERSION = '1.0.1';
 export const RULESET_VERSION = 'intake-rules.1.0.1';
 export const AGENT_CONTRACT_VERSION = 'proposal-only.1';
+export const CUSTODY_CONTRACT_VERSION = 'custody-control.1.0.1';
 export const AUTHORITY_BOUNDARY = 'operator_review_only';
 
 export const SOURCE_CONTRACTS = Object.freeze({
@@ -220,6 +221,7 @@ export function evaluateRoute(input: { lane?: unknown; answers?: AnswerMap; auto
   const base = {
     ruleset_version: RULESET_VERSION,
     agent_contract_version: AGENT_CONTRACT_VERSION,
+    custody_contract_version: CUSTODY_CONTRACT_VERSION,
     authority_boundary: AUTHORITY_BOUNDARY,
   } as const;
 

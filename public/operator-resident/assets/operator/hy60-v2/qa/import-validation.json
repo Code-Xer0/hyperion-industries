@@ -1,0 +1,15 @@
+{
+  "ok": true,
+  "generatedAt": "2026-06-28T02:34:44.930Z",
+  "animations": 66,
+  "frames": 3960,
+  "pages": 11,
+  "fps": 60,
+  "framesPerAnimation": 60,
+  "frameSize": {
+    "w": 192,
+    "h": 208
+  },
+  "padding": 2,
+  "errors": []
+}

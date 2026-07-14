@@ -1,0 +1,9 @@
+name = "hyperion-site-edge"
+main = "src/index.js"
+compatibility_date = "2026-07-13"
+compatibility_flags = ["global_fetch_private_origin"]
+workers_dev = false
+
+[[routes]]
+pattern = "hyperion-industries.dev/*"
+zone_name = "hyperion-industries.dev"

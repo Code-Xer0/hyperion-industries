@@ -35,6 +35,7 @@ export function handleStatus(env: Env): Response {
   const operatorFeedReady = Boolean(
     env.DB &&
       env.INTAKE_OPERATOR_RATE_LIMITER &&
+      /^[A-Za-z0-9._-]{3,80}$/.test(env.FOUNDER_COMMAND_PULL_KEY_ID?.trim() ?? "") &&
       /^[a-f0-9]{64}$/i.test(env.FOUNDER_COMMAND_PULL_TOKEN_SHA256?.trim() ?? ""),
   );
 

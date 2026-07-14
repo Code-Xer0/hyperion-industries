@@ -1,0 +1,11 @@
+{
+  "schema": "hyperion.operator.embed.install/2",
+  "version": "2.0.0",
+  "sourcePack": "hyperion-operator-hy60-v2",
+  "source": "D:\\Lab\\Git\\Hyperion-Operator-Lane\\artifacts\\embed",
+  "installedAt": "2026-07-13T12:13:24.459Z",
+  "entry": "hyperion-operator.iife.js",
+  "esmEntry": "hyperion-operator.esm.js",
+  "assetBase": "assets/operator/hy60-v2",
+  "boundary": "render-only; host events are local display telemetry"
+}

@@ -1,0 +1,122 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hyperion-industries.dev/contracts/intake/custody-control/1.0.1",
+  "title": "Hyperion Intake Custody Control Contract",
+  "oneOf": [
+    { "$ref": "#/$defs/outbox_acknowledgment" },
+    { "$ref": "#/$defs/approval_receipt" },
+    { "$ref": "#/$defs/review_patch" },
+    { "$ref": "#/$defs/sync_lease" },
+    { "$ref": "#/$defs/proposal_provenance" },
+    { "$ref": "#/$defs/service_token_rotation" }
+  ],
+  "$defs": {
+    "hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "identifier": { "type": "string", "pattern": "^[A-Za-z0-9_-]{8,160}$" },
+    "outbox_acknowledgment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "outbox_id", "revision_hash", "local_receipt_id", "outcome", "accepted_business_truth", "acknowledged_at"],
+      "properties": {
+        "kind": { "const": "outbox_acknowledgment" },
+        "outbox_id": { "$ref": "#/$defs/identifier" },
+        "revision_hash": { "$ref": "#/$defs/hash" },
+        "local_receipt_id": { "$ref": "#/$defs/identifier" },
+        "outcome": { "enum": ["received", "duplicate", "conflict_quarantined", "rejected"] },
+        "accepted_business_truth": { "type": "boolean" },
+        "acknowledged_at": { "type": "string", "minLength": 20, "maxLength": 40 }
+      },
+      "allOf": [
+        {
+          "if": { "properties": { "outcome": { "const": "conflict_quarantined" } }, "required": ["outcome"] },
+          "then": { "properties": { "accepted_business_truth": { "const": false } } }
+        }
+      ]
+    },
+    "approval_receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "approval_receipt_id", "intake_id", "revision_hash", "proposal_id", "target_domain", "proposed_changes_hash", "binding_hash", "issued_at", "expires_at", "one_time"],
+      "properties": {
+        "kind": { "const": "approval_receipt" },
+        "approval_receipt_id": { "$ref": "#/$defs/identifier" },
+        "intake_id": { "$ref": "#/$defs/identifier" },
+        "revision_hash": { "$ref": "#/$defs/hash" },
+        "proposal_id": { "$ref": "#/$defs/identifier" },
+        "target_domain": { "type": "string", "minLength": 2, "maxLength": 80 },
+        "proposed_changes_hash": { "$ref": "#/$defs/hash" },
+        "binding_hash": { "$ref": "#/$defs/hash" },
+        "issued_at": { "type": "string", "minLength": 20, "maxLength": 40 },
+        "expires_at": { "type": "string", "minLength": 20, "maxLength": 40 },
+        "consumed_at": { "type": ["string", "null"], "minLength": 20, "maxLength": 40 },
+        "one_time": { "const": true }
+      }
+    },
+    "review_patch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "intake_id", "changes"],
+      "properties": {
+        "kind": { "const": "review_patch" },
+        "intake_id": { "$ref": "#/$defs/identifier" },
+        "changes": {
+          "type": "object",
+          "additionalProperties": false,
+          "minProperties": 1,
+          "properties": {
+            "owner_id": { "type": ["string", "null"], "maxLength": 160 },
+            "due_at": { "type": ["string", "null"], "maxLength": 40 },
+            "custody_note": { "type": ["string", "null"], "maxLength": 4000 },
+            "review_state": { "enum": ["received", "triage", "needs_information", "ready_for_preview", "closed_no_action"] },
+            "tags": { "type": "array", "maxItems": 20, "uniqueItems": true, "items": { "type": "string", "minLength": 1, "maxLength": 64 } }
+          }
+        }
+      }
+    },
+    "sync_lease": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "lease_id", "cursor_owner", "reason", "acquired_at", "expires_at", "bounded_record_limit"],
+      "properties": {
+        "kind": { "const": "sync_lease" },
+        "lease_id": { "$ref": "#/$defs/identifier" },
+        "cursor_owner": { "$ref": "#/$defs/identifier" },
+        "reason": { "enum": ["startup", "poll", "manual", "wake", "network_restored"] },
+        "acquired_at": { "type": "string", "minLength": 20, "maxLength": 40 },
+        "expires_at": { "type": "string", "minLength": 20, "maxLength": 40 },
+        "bounded_record_limit": { "type": "integer", "minimum": 1, "maximum": 500 }
+      }
+    },
+    "proposal_provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "proposal_id", "input_revision_hash", "policy_version", "analyzer_kind", "analyzer_id", "analyzer_version", "minimized_projection_hash", "created_at", "state"],
+      "properties": {
+        "kind": { "const": "proposal_provenance" },
+        "proposal_id": { "$ref": "#/$defs/identifier" },
+        "input_revision_hash": { "$ref": "#/$defs/hash" },
+        "policy_version": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "analyzer_kind": { "enum": ["deterministic", "nest"] },
+        "analyzer_id": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "analyzer_version": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "minimized_projection_hash": { "$ref": "#/$defs/hash" },
+        "created_at": { "type": "string", "minLength": 20, "maxLength": 40 },
+        "state": { "enum": ["active", "stale", "approved", "expired", "cancelled"] },
+        "stale_reason": { "type": ["string", "null"], "maxLength": 240 }
+      }
+    },
+    "service_token_rotation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "key_id", "current_hash", "previous_hash", "overlap_until"],
+      "properties": {
+        "kind": { "const": "service_token_rotation" },
+        "key_id": { "$ref": "#/$defs/identifier" },
+        "current_hash": { "$ref": "#/$defs/hash" },
+        "previous_hash": { "oneOf": [{ "$ref": "#/$defs/hash" }, { "type": "null" }] },
+        "overlap_until": { "type": ["string", "null"], "maxLength": 40 },
+        "hash_algorithm": { "const": "SHA-256" }
+      }
+    }
+  }
+}

@@ -332,9 +332,9 @@ export default function Nav() {
           >
             {isLightMode ? <Moon size={17} /> : <Sun size={17} />}
           </button>
-          <Link to="/contact" className="nav-signal-button">
+          <Link to="/intake" className="nav-signal-button">
             <Send size={15} aria-hidden="true" />
-            <span>Send Signal</span>
+            <span>Start a signal</span>
           </Link>
         </div>
       </nav>
@@ -507,7 +507,7 @@ export default function Nav() {
                           <div className="city-route-preview-scrim" />
                           {previewDestination.mark && (
                             <img
-                              className="city-route-preview-mark"
+                              className={`city-route-preview-mark is-${previewDestination.markPlacement || 'left'}`}
                               src={previewDestination.mark}
                               alt={previewDestination.markAlt}
                             />

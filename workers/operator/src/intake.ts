@@ -426,9 +426,42 @@ export async function handleSubmission(
     throw new HttpError(400, "schema_rejected", `Submission failed schema validation: ${details.join("; ")}`);
   }
   validateContactPatch(submission);
+  const now = deps.now();
+  const payloadHash = await hashText(canonicalJson(submission));
+  const existingSubmission = await db.prepare(
+    "SELECT payload_hash, receipt_json FROM intake_submissions WHERE submission_id = ? LIMIT 1",
+  ).bind(submission.submission_id).first<ExistingSubmissionRow>();
+  if (existingSubmission) {
+    if (existingSubmission.payload_hash === payloadHash) {
+      return jsonResponse({ ok: true, receipt: JSON.parse(existingSubmission.receipt_json), duplicate: true }, 200);
+    }
+    const conflictId = id("col", deps);
+    const auditId = id("aud", deps);
+    try {
+      await db.batch([
+        db.prepare(
+          `INSERT INTO intake_revision_conflicts
+           (conflict_id, intake_id, submission_id, existing_hash, received_hash, state, request_id, created_at)
+           VALUES (?, ?, ?, ?, ?, 'quarantined', ?, ?)`,
+        ).bind(
+          conflictId, submission.intake_id, submission.submission_id, existingSubmission.payload_hash,
+          payloadHash, requestId, now.toISOString(),
+        ),
+        db.prepare(
+          `INSERT INTO intake_audit_events
+           (audit_id, intake_id, submission_id, event_type, actor_class, request_id, created_at)
+           VALUES (?, ?, ?, 'revision_collision_quarantined', 'system', ?, ?)`,
+        ).bind(auditId, submission.intake_id, submission.submission_id, requestId, now.toISOString()),
+      ]);
+    } catch {
+      throw new HttpError(503, "revision_collision_storage_unavailable", "The conflicting revision could not be quarantined.");
+    }
+    throw new HttpError(409, "revision_collision_quarantined", "A conflicting revision was durably quarantined for operator review.");
+  }
   const lane = routeForForm(submission.form_id);
   const automated = submission.consents.find((item) => item.consent_id === "automated_classification")?.granted !== false;
-  const decision = evaluateRoute({ lane, answers: answersToMap(submission.answers), automatedClassification: automated });
+  const answerProjection = answersToMap(submission.answers);
+  const decision = evaluateRoute({ lane, answers: answerProjection, automatedClassification: automated });
   if (submission.revision > 1) {
     const prior = await db.prepare(
       "SELECT submission_id FROM intake_submissions WHERE submission_id = ? AND intake_id = ? LIMIT 1",
@@ -436,11 +469,12 @@ export async function handleSubmission(
     if (!prior) throw new HttpError(409, "superseded_submission_not_found", "The superseded submission could not be verified.");
   }
 
-  const now = deps.now();
   const expires = new Date(now.getTime() + INTAKE_PUBLIC_COPY_DAYS * DAY_MS).toISOString();
   const decisionId = id("dec", deps);
+  const proposalId = id("prp", deps);
   const outboxId = id("out", deps);
   const auditId = id("aud", deps);
+  const minimizedProjectionHash = await hashText(canonicalJson({ lane, answers: answerProjection }));
   const receipt = {
     receipt_id: id("rcp", deps),
     intake_id: submission.intake_id,
@@ -450,6 +484,7 @@ export async function handleSubmission(
     primary_route: decision.primary_route,
     classification: decision.classification,
     revision: submission.revision,
+    revision_hash: payloadHash,
     received_at: now.toISOString(),
   };
 
@@ -458,29 +493,35 @@ export async function handleSubmission(
       `INSERT INTO intake_submissions
        (submission_id, intake_id, session_id, revision, supersedes_submission_id, form_id, form_version,
         submitted_at, received_at, trace_id, identity_json, answers_json, consents_json, client_context_json,
-        client_reviewed, idempotency_key_hash, receipt_json, retention_basis, expires_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, NULL, ?)`,
+        client_reviewed, payload_hash, idempotency_key_hash, receipt_json, retention_basis, expires_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?, ?, ?, NULL, ?)`,
     ).bind(
       submission.submission_id, submission.intake_id, submission.session_id, submission.revision,
       submission.supersedes_submission_id ?? null, submission.form_id, submission.form_version,
       submission.submitted_at, now.toISOString(), submission.trace_id, JSON.stringify(submission.identity ?? {}),
       JSON.stringify(submission.answers), JSON.stringify(submission.consents), JSON.stringify(submission.client_context ?? {}),
-      idempotencyHash, JSON.stringify(receipt), expires,
+      payloadHash, idempotencyHash, JSON.stringify(receipt), expires,
     ),
     db.prepare(
       `INSERT INTO intake_routing_decisions
-       (decision_id, intake_id, submission_id, ruleset_version, agent_contract_version, primary_route,
-        classification, decision_json, client_reviewed, created_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, ?)`,
+       (decision_id, proposal_id, intake_id, submission_id, ruleset_version, policy_version,
+        agent_contract_version, input_revision_hash, minimized_projection_hash, analyzer_kind,
+        analyzer_id, analyzer_version, proposal_state, primary_route, classification, decision_json,
+        client_reviewed, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'deterministic', 'hyperion-intake-router', ?, 'active', ?, ?, ?, 1, ?)`,
     ).bind(
-      decisionId, submission.intake_id, submission.submission_id, decision.ruleset_version,
+      decisionId, proposalId, submission.intake_id, submission.submission_id, decision.ruleset_version,
+      decision.ruleset_version, decision.agent_contract_version, payloadHash, minimizedProjectionHash,
       decision.agent_contract_version, decision.primary_route, decision.classification, JSON.stringify(decision), now.toISOString(),
     ),
     db.prepare(
       `INSERT INTO intake_outbox
-       (outbox_id, intake_id, submission_id, event_type, state, attempts, created_at, updated_at)
-       VALUES (?, ?, ?, 'intake.received.v1', 'held_for_review', 0, ?, ?)`,
-    ).bind(outboxId, submission.intake_id, submission.submission_id, now.toISOString(), now.toISOString()),
+       (outbox_id, intake_id, submission_id, proposal_id, revision_hash, event_type, state, attempts, created_at, updated_at)
+       VALUES (?, ?, ?, ?, ?, 'intake.received.v1', 'held_for_review', 0, ?, ?)`,
+    ).bind(
+      outboxId, submission.intake_id, submission.submission_id, proposalId, payloadHash,
+      now.toISOString(), now.toISOString(),
+    ),
     db.prepare(
       `INSERT INTO intake_audit_events
        (audit_id, intake_id, submission_id, event_type, actor_class, request_id, created_at)
@@ -508,6 +549,8 @@ export async function purgeExpiredIntake(db: D1Database, now: Date): Promise<Int
     db.prepare("DELETE FROM intake_magic_link_grants WHERE expires_at <= ? OR consumed_at IS NOT NULL").bind(at),
     db.prepare("DELETE FROM intake_drafts WHERE expires_at <= ?").bind(at),
     db.prepare("DELETE FROM intake_audit_events WHERE submission_id IN (SELECT submission_id FROM intake_submissions WHERE expires_at <= ? AND retention_basis IS NULL)").bind(at),
+    db.prepare("DELETE FROM intake_consumer_receipts WHERE submission_id IN (SELECT submission_id FROM intake_submissions WHERE expires_at <= ? AND retention_basis IS NULL)").bind(at),
+    db.prepare("DELETE FROM intake_revision_conflicts WHERE submission_id IN (SELECT submission_id FROM intake_submissions WHERE expires_at <= ? AND retention_basis IS NULL)").bind(at),
     db.prepare("DELETE FROM intake_outbox WHERE submission_id IN (SELECT submission_id FROM intake_submissions WHERE expires_at <= ? AND retention_basis IS NULL)").bind(at),
     db.prepare("DELETE FROM intake_routing_decisions WHERE submission_id IN (SELECT submission_id FROM intake_submissions WHERE expires_at <= ? AND retention_basis IS NULL)").bind(at),
     db.prepare("DELETE FROM intake_submissions WHERE expires_at <= ? AND retention_basis IS NULL").bind(at),
@@ -515,7 +558,7 @@ export async function purgeExpiredIntake(db: D1Database, now: Date): Promise<Int
   return {
     grants: results[0]?.meta.changes ?? 0,
     drafts: results[1]?.meta.changes ?? 0,
-    submissions: results[5]?.meta.changes ?? 0,
+    submissions: results[7]?.meta.changes ?? 0,
   };
 }
 

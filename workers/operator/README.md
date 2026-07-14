@@ -74,11 +74,16 @@ Tests mock OpenRouter, D1, rate-limit bindings, and email. Live chat in `wrangle
 
 ## Founder Command intake feed
 
-The service-authenticated `/api/intake/operator/*` routes expose held-for-review intake revisions to the local Founder Command adapter. A delivery acknowledgement writes only `intake_consumer_receipts`; it never changes the source `intake_outbox` state or authorizes domain work.
+The source-complete, deployment-gated `/api/intake/operator/*` routes expose held-for-review intake revisions to the local Founder Command adapter. Each delivery acknowledgement names the exact outbox ID, revision hash, payload hash, local receipt ID, and outcome. It writes only `intake_consumer_receipts`; it never changes the source `intake_outbox` state or authorizes domain work.
 
-Store the raw pull token only in Founder Command's Windows Credential Manager. Store only its lowercase SHA-256 digest in the Worker secret `FOUNDER_COMMAND_PULL_TOKEN_SHA256`.
+Store the raw pull token only in Founder Command's Windows Credential Manager. Store only its lowercase SHA-256 digest in the Worker secret `FOUNDER_COMMAND_PULL_TOKEN_SHA256`. Rotation uses a non-secret `FOUNDER_COMMAND_PULL_KEY_ID`, an optional previous hash, and a bounded overlap deadline. Comparisons are constant-time and logs identify only the key ID/version.
+
+The downstream preview/apply, strict review PATCH, single-flight synchronization lease, and promotion authority contracts are defined in `docs/intake-os/CUSTODY_CHAIN_V1.md`. They are not activated by this Worker release.
+
 - `migrations/0001_operator_inquiries.sql`: initial structured D1 schema
 - `migrations/0002_operator_inquiry_budget.sql`: forward migration for optional budget
+- `migrations/0003_intake_os_v1.sql`: immutable public intake, proposal provenance, outbox, collision, and audit records
+- `migrations/0004_intake_operator_feed.sql`: per-consumer delivery receipts without business-outbox mutation
 - `corpus/public-corpus.source.json`: reviewed public allowlist
 - `corpus/public-corpus.schema.json`: corpus contract
 - `src/generated/public-corpus.generated.ts`: deterministic compiled corpus

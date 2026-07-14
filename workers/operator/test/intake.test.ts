@@ -138,13 +138,33 @@ describe("intake evaluation and submission", () => {
       baseEnv({ DB: db.binding() }), executionContext().ctx,
     );
     expect(response.status).toBe(201);
-    const body = await response.json() as { receipt: { status: string }; duplicate: boolean };
+    const body = await response.json() as { receipt: { status: string; revision_hash: string }; duplicate: boolean };
     expect(body.receipt.status).toBe("received for operator review");
+    expect(body.receipt.revision_hash).toMatch(/^[a-f0-9]{64}$/);
     expect(body.duplicate).toBe(false);
     expect(db.batches[0]).toHaveLength(4);
     expect(db.batches[0]?.some((statement) => statement.sql.includes("'held_for_review'"))).toBe(true);
     const submissionInsert = db.batches[0]?.find((statement) => statement.sql.includes("INSERT INTO intake_submissions"));
     expect(JSON.stringify(submissionInsert?.values)).not.toContain('"data_classification":"public"');
+    const proposalInsert = db.batches[0]?.find((statement) => statement.sql.includes("INSERT INTO intake_routing_decisions"));
+    expect(proposalInsert?.sql).toContain("minimized_projection_hash");
+    expect(proposalInsert?.sql).toContain("'active'");
+    const outboxInsert = db.batches[0]?.find((statement) => statement.sql.includes("INSERT INTO intake_outbox"));
+    expect(outboxInsert?.sql).toContain("revision_hash");
+  });
+
+  it("durably quarantines a same-ID different-hash revision collision", async () => {
+    const existing = { payload_hash: "a".repeat(64), receipt_json: JSON.stringify({ receipt_id: "rcp_existing" }) };
+    const db = new MockD1().queueFirst(null, existing);
+    const response = await worker().fetch(
+      postJson("/api/intake/submissions", validSubmission("general"), { "idempotency-key": "collision-key-123456789" }),
+      baseEnv({ DB: db.binding() }), executionContext().ctx,
+    );
+    expect(response.status).toBe(409);
+    expect(await response.json()).toMatchObject({ error: { code: "revision_collision_quarantined" } });
+    expect(db.batches[0]).toHaveLength(2);
+    expect(db.batches[0]?.[0]?.sql).toContain("INSERT INTO intake_revision_conflicts");
+    expect(db.batches[0]?.[1]?.sql).toContain("revision_collision_quarantined");
   });
 
   it("returns the original receipt for a duplicate idempotency key", async () => {
@@ -291,7 +311,7 @@ describe("intake retention", () => {
     const db = new MockD1();
     const result = await purgeExpiredIntake(db.binding(), fixedNow);
     expect(result).toEqual({ grants: 1, drafts: 1, submissions: 1 });
-    expect(db.batches[0]).toHaveLength(6);
-    expect(db.batches[0]?.[5]?.sql).toContain("retention_basis IS NULL");
+    expect(db.batches[0]).toHaveLength(8);
+    expect(db.batches[0]?.[7]?.sql).toContain("retention_basis IS NULL");
   });
 });

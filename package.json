@@ -5,8 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && node scripts/generate-seo-artifacts.mjs",
     "lint": "eslint .",
+    "seo:generate": "node scripts/generate-seo-artifacts.mjs",
+    "seo:verify": "node scripts/verify-seo.mjs",
+    "seo:edge-test": "node --test workers/site-edge/test/routing.test.mjs",
     "substrate:audit": "node scripts/audit-portal.mjs",
     "preview": "vite preview"
   },

@@ -18,6 +18,7 @@ const ALLOWED_METADATA_KEYS = new Set([
   "classification",
   "primary_route",
   "outbox_state",
+  "auth_key_version",
 ]);
 
 type MetadataValue = string | number | boolean | null | undefined;
