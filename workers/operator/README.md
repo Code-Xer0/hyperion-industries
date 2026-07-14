@@ -56,6 +56,8 @@ Allowed inquiry types are `contact`, `field_work`, `card_studio_order`, `beta_ac
 
 Successful submission plus notification returns HTTP `201` with `status: "submitted"`, `notification: "notified"`, and `partial: false`. If D1 persistence succeeds but email is unavailable, times out, fails, or cannot be confirmed, the endpoint returns HTTP `202` with `status: "submitted"`, `notification: "notification_pending"`, and `partial: true`. Honeypot submissions return `204` and are neither persisted nor emailed.
 
+Forge inquiries are routed by source and category. `field_work`, `card_studio_order`, `/forge`, and `/intake/forge` notify Keshawn as the primary owner and copy Victor. Other public inquiries notify Victor. `Reply-To` is the submitted contact address. The production binding allowlists only the two verified destinations.
+
 ## Local verification
 
 No secrets or Cloudflare account are required:
@@ -79,6 +81,8 @@ The source-complete, deployment-gated `/api/intake/operator/*` routes expose hel
 Store the raw pull token only in Founder Command's Windows Credential Manager. Store only its lowercase SHA-256 digest in the Worker secret `FOUNDER_COMMAND_PULL_TOKEN_SHA256`. Rotation uses a non-secret `FOUNDER_COMMAND_PULL_KEY_ID`, an optional previous hash, and a bounded overlap deadline. Comparisons are constant-time and logs identify only the key ID/version.
 
 The downstream preview/apply, strict review PATCH, single-flight synchronization lease, and promotion authority contracts are defined in `docs/intake-os/CUSTODY_CHAIN_V1.md`. They are not activated by this Worker release.
+
+Forge submissions additionally send a bounded contact/routing notification to Keshawn and copy Victor after the four-record intake transaction commits. Full answers stay in the governed operator feed. Notification failure never rolls back or misrepresents the durable intake receipt; the response reports `notification_pending`.
 
 - `migrations/0001_operator_inquiries.sql`: initial structured D1 schema
 - `migrations/0002_operator_inquiry_budget.sql`: forward migration for optional budget

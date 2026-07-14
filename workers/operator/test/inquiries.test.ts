@@ -64,6 +64,32 @@ describe("POST /api/operator/inquiries", () => {
     expect(db.statements.some((statement) => statement.sql.includes("notification_status = 'sent'"))).toBe(true);
   });
 
+  it("routes Forge inquiries to Keshawn and copies Victor", async () => {
+    const db = new MockD1();
+    const send = vi.fn(async (_message: unknown) => ({ messageId: "forge-message" }));
+    const worker = createWorker({ now: () => NOW, randomUUID: () => "inquiry-forge-001" });
+    const { ctx } = executionContext();
+    const response = await worker.fetch(
+      postJson("/api/operator/inquiries", inquiryBody({
+        inquiryType: "field_work",
+        sourcePath: "/forge",
+        email: "builder@example.com",
+      })),
+      baseEnv({ DB: db.binding(), INQUIRY_EMAIL: { send } }),
+      ctx,
+    );
+
+    expect(response.status).toBe(201);
+    expect(send).toHaveBeenCalledOnce();
+    expect(send.mock.calls[0]?.[0]).toMatchObject({
+      to: "keshawn@example.net",
+      cc: "victor@example.com",
+      from: "operator@hyperion-industries.dev",
+      replyTo: "builder@example.com",
+      subject: "Forge inquiry: field_work",
+    });
+  });
+
   it("returns honest partial success when notification delivery fails", async () => {
     const db = new MockD1();
     const worker = createWorker({ now: () => NOW, randomUUID: () => "inquiry-002" });

@@ -1,6 +1,5 @@
 import {
   DEFAULT_CONSENT_VERSION,
-  INQUIRY_EMAIL_TIMEOUT_MS,
   INQUIRY_MAX_BODY_BYTES,
   INQUIRY_RETENTION_DAYS,
 } from "./constants";
@@ -14,6 +13,7 @@ import {
   requireObject,
 } from "./http";
 import { logMetadata } from "./log";
+import { sendEmailWithTimeout } from "./notification";
 import type { Env, RuntimeDependencies } from "./types";
 
 const INQUIRY_TYPES = [
@@ -148,20 +148,13 @@ function notificationText(input: InquiryInput, id: string, consentVersion: strin
   ].join("\n");
 }
 
-async function withTimeout<T>(promise: Promise<T>, deps: RuntimeDependencies): Promise<T> {
-  let timeoutHandle: number | undefined;
-  const timeout = new Promise<never>((_, reject) => {
-    timeoutHandle = deps.setTimer(() => {
-      const error = new Error("timeout");
-      error.name = "TimeoutError";
-      reject(error);
-    }, INQUIRY_EMAIL_TIMEOUT_MS);
-  });
-  try {
-    return await Promise.race([promise, timeout]);
-  } finally {
-    if (timeoutHandle !== undefined) deps.clearTimer(timeoutHandle);
-  }
+function isForgeInquiry(input: InquiryInput): boolean {
+  return input.inquiryType === "field_work" ||
+    input.inquiryType === "card_studio_order" ||
+    input.sourcePath === "/forge" ||
+    input.sourcePath.startsWith("/forge/") ||
+    input.sourcePath === "/intake/forge" ||
+    input.sourcePath.startsWith("/intake/forge/");
 }
 
 async function markNotificationPending(
@@ -265,9 +258,12 @@ export async function handleInquiry(
     throw new HttpError(503, "inquiry_storage_unavailable", "Inquiry storage is unavailable.");
   }
 
-  const notifyTo = env.INQUIRY_NOTIFY_TO?.trim();
+  const forgeInquiry = isForgeInquiry(input);
+  const notifyTo = (forgeInquiry ? env.FORGE_NOTIFY_TO : env.INQUIRY_NOTIFY_TO)?.trim();
+  const notifyCc = forgeInquiry ? env.FORGE_NOTIFY_CC?.trim() : undefined;
   const fromEmail = env.INQUIRY_FROM_EMAIL?.trim();
-  if (!env.INQUIRY_EMAIL || !isEmailAddress(notifyTo) || !isEmailAddress(fromEmail)) {
+  if (!env.INQUIRY_EMAIL || !isEmailAddress(notifyTo) || !isEmailAddress(fromEmail) ||
+      (forgeInquiry && !isEmailAddress(notifyCc))) {
     try {
       await markNotificationPending(env.DB, id, "notification_not_configured", false);
     } catch {
@@ -287,13 +283,15 @@ export async function handleInquiry(
   }
 
   try {
-    await withTimeout(
-      env.INQUIRY_EMAIL.send({
+    await sendEmailWithTimeout(
+      env.INQUIRY_EMAIL,
+      {
         to: notifyTo,
         from: fromEmail,
-        subject: `Hyperion inquiry: ${input.inquiryType}`,
+        subject: `${forgeInquiry ? "Forge" : "Hyperion"} inquiry: ${input.inquiryType}`,
         text: notificationText(input, id, consentVersion, createdAtIso),
-      }),
+        ...(forgeInquiry ? { cc: notifyCc as string, replyTo: input.email } : { replyTo: input.email }),
+      },
       deps,
     );
   } catch (error) {

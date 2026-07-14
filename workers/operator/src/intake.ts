@@ -29,6 +29,7 @@ import {
   requireObject,
 } from "./http";
 import { logMetadata } from "./log";
+import { sendEmailWithTimeout } from "./notification";
 import type { Env, RuntimeDependencies } from "./types";
 
 const ajv = new Ajv2020({ allErrors: true, strict: false });
@@ -159,6 +160,27 @@ function routeForForm(formId: string): LaneId {
   if (formId === "continuity-assessment") return "continuity";
   if (formId === "relationship") return "relationships";
   return isLaneId(formId) ? formId : "general";
+}
+
+function forgeSubmissionNotificationText(
+  submission: SubmissionShape,
+  receipt: { reference: string; classification: string; primary_route: string; received_at: string },
+): string {
+  return [
+    "New Hyperion Forge intake",
+    "",
+    `Reference: ${receipt.reference}`,
+    `Received: ${receipt.received_at}`,
+    `Contact: ${submission.identity?.contact_name ?? "Not provided"}`,
+    `Email: ${submission.identity?.email ?? "Not provided"}`,
+    `Organization: ${submission.identity?.organization ?? "Not provided"}`,
+    `Classification: ${receipt.classification}`,
+    `Route: ${receipt.primary_route}`,
+    `Form: ${submission.form_id}`,
+    "",
+    "The full client-reviewed intake remains in the governed operator feed.",
+    "This notification does not accept the engagement or authorize work.",
+  ].join("\n");
 }
 
 function answersToMap(answers: SubmissionShape["answers"]): AnswerMap {
@@ -536,11 +558,37 @@ export async function handleSubmission(
     if (racedDuplicate) return jsonResponse({ ok: true, receipt: JSON.parse(racedDuplicate.receipt_json), duplicate: true }, 200);
     throw new HttpError(503, "submission_storage_unavailable", "The submission could not be stored atomically.");
   }
+
+  let notification: "not_applicable" | "notified" | "notification_pending" = "not_applicable";
+  if (lane === "forge") {
+    const notifyTo = env.FORGE_NOTIFY_TO?.trim();
+    const notifyCc = env.FORGE_NOTIFY_CC?.trim();
+    const fromEmail = env.INQUIRY_FROM_EMAIL?.trim();
+    const replyEmail = submission.identity?.email ?? undefined;
+    if (env.INQUIRY_EMAIL && isEmailAddress(notifyTo) && isEmailAddress(notifyCc) && isEmailAddress(fromEmail)) {
+      try {
+        await sendEmailWithTimeout(env.INQUIRY_EMAIL, {
+          to: notifyTo,
+          cc: notifyCc,
+          from: fromEmail,
+          ...(isEmailAddress(replyEmail) ? { replyTo: replyEmail } : {}),
+          subject: `Forge intake received: ${receipt.reference}`,
+          text: forgeSubmissionNotificationText(submission, receipt),
+        }, deps);
+        notification = "notified";
+      } catch {
+        notification = "notification_pending";
+      }
+    } else {
+      notification = "notification_pending";
+    }
+  }
   logMetadata("intake_submitted", {
     request_id: requestId, route: "/api/intake/submissions", status: 201,
     classification: decision.classification, primary_route: decision.primary_route, outbox_state: "held_for_review",
+    notification,
   });
-  return jsonResponse({ ok: true, receipt, duplicate: false }, 201);
+  return jsonResponse({ ok: true, receipt, duplicate: false, notification }, 201);
 }
 
 export async function purgeExpiredIntake(db: D1Database, now: Date): Promise<IntakePurgeResult> {

@@ -133,15 +133,24 @@ describe("intake evaluation and submission", () => {
 
   it("atomically stores the submission, decision, receipt, audit, and held outbox", async () => {
     const db = new MockD1().queueFirst(null);
+    const send = vi.fn(async (_message: unknown) => ({ messageId: "forge-intake-message" }));
     const response = await worker().fetch(
       postJson("/api/intake/submissions", validSubmission("forge-build-profile", laneFixtures[0][1]), { "idempotency-key": "submit-forge-123456789" }),
-      baseEnv({ DB: db.binding() }), executionContext().ctx,
+      baseEnv({ DB: db.binding(), INQUIRY_EMAIL: { send } }), executionContext().ctx,
     );
     expect(response.status).toBe(201);
-    const body = await response.json() as { receipt: { status: string; revision_hash: string }; duplicate: boolean };
+    const body = await response.json() as { receipt: { status: string; revision_hash: string }; duplicate: boolean; notification: string };
     expect(body.receipt.status).toBe("received for operator review");
     expect(body.receipt.revision_hash).toMatch(/^[a-f0-9]{64}$/);
     expect(body.duplicate).toBe(false);
+    expect(body.notification).toBe("notified");
+    expect(send).toHaveBeenCalledOnce();
+    expect(send.mock.calls[0]?.[0]).toMatchObject({
+      to: "keshawn@example.net",
+      cc: "victor@example.com",
+      replyTo: "client@example.com",
+      subject: expect.stringMatching(/^Forge intake received: /),
+    });
     expect(db.batches[0]).toHaveLength(4);
     expect(db.batches[0]?.some((statement) => statement.sql.includes("'held_for_review'"))).toBe(true);
     const submissionInsert = db.batches[0]?.find((statement) => statement.sql.includes("INSERT INTO intake_submissions"));

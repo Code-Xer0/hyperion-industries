@@ -29,7 +29,9 @@ describe("GET /api/operator/status", () => {
       baseEnv({
         DB: db.binding(),
         INQUIRY_EMAIL: { send: vi.fn(async () => ({})) },
-        INQUIRY_NOTIFY_TO: "hello@hyperion-industries.dev",
+        INQUIRY_NOTIFY_TO: "victor@example.com",
+        FORGE_NOTIFY_TO: "keshawn@example.net",
+        FORGE_NOTIFY_CC: "victor@example.com",
         INQUIRY_FROM_EMAIL: "operator@hyperion-industries.dev",
       }),
       ctx,

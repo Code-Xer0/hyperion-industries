@@ -12,7 +12,8 @@
     "seo:edge-test": "node --test workers/site-edge/test/routing.test.mjs",
     "mcp:check": "npm run check --prefix workers/public-mcp",
     "operator:check": "npm run check --prefix workers/operator",
-    "check": "npm run lint && npm run build && npm run seo:verify && npm run seo:edge-test && npm run operator:check && npm run mcp:check",
+    "forge-mail:check": "npm run check --prefix workers/forge-mail-router",
+    "check": "npm run lint && npm run build && npm run seo:verify && npm run seo:edge-test && npm run operator:check && npm run forge-mail:check && npm run mcp:check",
     "substrate:audit": "node scripts/audit-portal.mjs",
     "preview": "vite preview"
   },
