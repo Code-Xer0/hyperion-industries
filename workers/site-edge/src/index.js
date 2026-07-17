@@ -1,6 +1,8 @@
 import { SEO_REDIRECTS, SEO_ROUTE_BY_PATH } from '../../../src/data/seoRoutes.js';
 
 const PASS_THROUGH_PREFIXES = ['/api/', '/assets/', '/.well-known/'];
+const LEGACY_INTAKE_ORIGIN = 'https://hyperion-operator.hyperion-industries-intake.workers.dev';
+const LEGACY_INTAKE_BUNDLE = /^\/assets\/IntakePage-[A-Za-z0-9_-]+\.js$/;
 const INTAKE_CSP = [
   "default-src 'self'",
   "base-uri 'self'",
@@ -30,6 +32,26 @@ function secureIntakeResponse(response, pathname) {
   headers.set('permissions-policy', 'camera=(), microphone=(), geolocation=(), payment=()');
   headers.set('referrer-policy', 'no-referrer');
   return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
+}
+
+async function normalizeLegacyIntakeAsset(response, pathname, method) {
+  if (method !== 'GET' || !response.ok || !LEGACY_INTAKE_BUNDLE.test(pathname)) return response;
+  if (!(response.headers.get('content-type') || '').includes('javascript')) return response;
+
+  const source = await response.text();
+  if (!source.includes(LEGACY_INTAKE_ORIGIN)) {
+    return new Response(source, response);
+  }
+
+  const headers = new Headers(response.headers);
+  headers.delete('content-length');
+  headers.set('cache-control', 'no-store');
+  headers.set('x-hyperion-intake-adapter', 'same-origin');
+  return new Response(source.replaceAll(LEGACY_INTAKE_ORIGIN, ''), {
     status: response.status,
     statusText: response.statusText,
     headers,
@@ -96,7 +118,7 @@ export async function handleRequest(request, originFetch = fetch) {
 
   if (PASS_THROUGH_PREFIXES.some((prefix) => pathname.startsWith(prefix)) || /\.[a-z0-9]{1,12}$/i.test(pathname)) {
     const response = await originFetch(request);
-    if (response.status !== 404) return response;
+    if (response.status !== 404) return normalizeLegacyIntakeAsset(response, pathname, request.method);
     const headers = new Headers(response.headers);
     headers.set('x-robots-tag', 'noindex, nofollow');
     return new Response(response.body, { status: 404, statusText: 'Not Found', headers });

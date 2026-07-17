@@ -88,3 +88,36 @@ test('non-intake public routes retain their existing analytics posture', async (
   const response = await handleRequest(new Request('https://hyperion-industries.dev/chronos'), originFetch);
   assert.equal(response.headers.get('content-security-policy'), null);
 });
+
+test('legacy hashed intake bundles are narrowly normalized to same-origin APIs', async () => {
+  const legacyOrigin = 'https://hyperion-operator.hyperion-industries-intake.workers.dev';
+  const legacyFetch = async () => new Response(
+    `const API_ORIGIN="${legacyOrigin}";fetch(\`${'${API_ORIGIN}'}/api/intake/evaluate\`);`,
+    { headers: { 'content-type': 'text/javascript', 'content-length': '128' } },
+  );
+  const response = await handleRequest(
+    new Request('https://hyperion-industries.dev/assets/IntakePage-legacy123.js'),
+    legacyFetch,
+  );
+  const source = await response.text();
+
+  assert.doesNotMatch(source, /workers\.dev/);
+  assert.match(source, /api\/intake\/evaluate/);
+  assert.equal(response.headers.get('x-hyperion-intake-adapter'), 'same-origin');
+  assert.equal(response.headers.get('cache-control'), 'no-store');
+  assert.equal(response.headers.get('content-length'), null);
+});
+
+test('unrelated JavaScript assets are not rewritten', async () => {
+  const legacyOrigin = 'https://hyperion-operator.hyperion-industries-intake.workers.dev';
+  const legacyFetch = async () => new Response(`const endpoint="${legacyOrigin}";`, {
+    headers: { 'content-type': 'text/javascript' },
+  });
+  const response = await handleRequest(
+    new Request('https://hyperion-industries.dev/assets/CityMap-legacy123.js'),
+    legacyFetch,
+  );
+
+  assert.match(await response.text(), /workers\.dev/);
+  assert.equal(response.headers.get('x-hyperion-intake-adapter'), null);
+});
