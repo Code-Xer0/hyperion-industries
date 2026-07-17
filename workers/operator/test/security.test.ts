@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { createWorker } from "../src/index";
-import { baseEnv, executionContext, postJson } from "./helpers";
+import { baseEnv, executionContext, MockD1, postJson } from "./helpers";
+
+const OPERATOR_TOKEN = "founder-command-test-token-with-enough-entropy";
+const OPERATOR_TOKEN_HASH = "33c6b5ba9e338f8c71a066f95ac989d89e6e7e90bb7cfa3b51e5dab17b2d90e0";
 
 describe("HTTP boundary", () => {
   it("rejects cross-origin and originless POST requests", async () => {
@@ -21,27 +24,46 @@ describe("HTTP boundary", () => {
     expect((await worker.fetch(originless, baseEnv(), ctx)).status).toBe(403);
   });
 
-  it("accepts state changes through the configured first-party API origin", async () => {
+  it("accepts branded same-origin state changes without CORS headers", async () => {
     const worker = createWorker();
     const { ctx } = executionContext();
-    const request = new Request("https://hyperion-operator.hyperion-industries-intake.workers.dev/api/intake/evaluate", {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-        origin: "https://hyperion-industries.dev",
-        "sec-fetch-site": "cross-site",
-      },
-      body: JSON.stringify({
+    const request = postJson(
+      "/api/intake/evaluate",
+      {
         lane: "general",
         answers: { need: "A governed intake route" },
         automated_classification: false,
-      }),
-    });
+      },
+    );
 
     const response = await worker.fetch(request, baseEnv(), ctx);
 
     expect(response.status).toBe(200);
-    expect(response.headers.get("access-control-allow-origin")).toBe("https://hyperion-industries.dev");
+    expect(response.headers.get("access-control-allow-origin")).toBeNull();
+  });
+
+  it("keeps bearer-authenticated operator routes exempt from browser-origin checks", async () => {
+    const request = new Request("https://hyperion-industries.dev/api/intake/operator/ack", {
+      method: "POST",
+      headers: {
+        authorization: `Bearer ${OPERATOR_TOKEN}`,
+        "content-type": "application/json",
+        "x-hyprm-consumer": "founder-command-desktop",
+      },
+      body: JSON.stringify({ deliveries: [] }),
+    });
+    const response = await createWorker().fetch(
+      request,
+      baseEnv({
+        DB: new MockD1().binding(),
+        FOUNDER_COMMAND_PULL_KEY_ID: "fc-intake-test",
+        FOUNDER_COMMAND_PULL_TOKEN_SHA256: OPERATOR_TOKEN_HASH,
+      }),
+      executionContext().ctx,
+    );
+
+    expect(response.status).toBe(400);
+    expect(await response.json()).toMatchObject({ error: { code: "invalid_acknowledgement" } });
   });
 
   it("rejects oversized bodies before parsing", async () => {

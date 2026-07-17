@@ -23,6 +23,12 @@ export function handleStatus(env: Env): Response {
       isEmailAddress(env.INQUIRY_NOTIFY_TO?.trim()) &&
       isEmailAddress(env.INQUIRY_FROM_EMAIL?.trim()),
   );
+  const forgeNotificationReady = Boolean(
+    env.INQUIRY_EMAIL &&
+      isEmailAddress(env.FORGE_NOTIFY_TO?.trim()) &&
+      isEmailAddress(env.FORGE_NOTIFY_CC?.trim()) &&
+      isEmailAddress(env.INQUIRY_FROM_EMAIL?.trim()),
+  );
   const intake = publicContractManifest();
   const intakeStorageReady = Boolean(env.DB && env.INTAKE_SUBMISSION_RATE_LIMITER && origin.valid);
   const resumeReady = Boolean(
@@ -41,12 +47,13 @@ export function handleStatus(env: Env): Response {
 
   return jsonResponse({
     service: SERVICE_NAME,
-    status: chatReady && inquiryStorageReady && notificationReady ? "ready" : "degraded",
+    status: chatReady && inquiryStorageReady && notificationReady && forgeNotificationReady ? "ready" : "degraded",
     model: model.model,
     capabilities: {
       chat: chatReady ? "ready" : "configuration_required",
       inquiry_storage: inquiryStorageReady ? "ready" : "configuration_required",
       inquiry_notification: notificationReady ? "ready" : "configuration_required",
+      forge_inquiry_notification: forgeNotificationReady ? "ready" : "configuration_required",
       intake_storage: intakeStorageReady ? "ready" : "configuration_required",
       intake_resume: resumeReady ? "ready" : "configuration_required",
       intake_operator_feed: operatorFeedReady ? "ready" : "configuration_required",

@@ -56,6 +56,8 @@ Allowed inquiry types are `contact`, `field_work`, `card_studio_order`, `beta_ac
 
 Successful submission plus notification returns HTTP `201` with `status: "submitted"`, `notification: "notified"`, and `partial: false`. If D1 persistence succeeds but email is unavailable, times out, fails, or cannot be confirmed, the endpoint returns HTTP `202` with `status: "submitted"`, `notification: "notification_pending"`, and `partial: true`. Honeypot submissions return `204` and are neither persisted nor emailed.
 
+Forge inquiries are routed by source and category. `field_work`, `card_studio_order`, `/forge`, and `/intake/forge` notify the primary Forge owner and send an operator copy. Other public inquiries notify the general inquiry owner. `Reply-To` is the submitted contact address. Runtime destination selection comes only from production secrets, and each destination must be Cloudflare-verified.
+
 ## Local verification
 
 No secrets or Cloudflare account are required:
@@ -70,15 +72,17 @@ Tests mock OpenRouter, D1, rate-limit bindings, and email. Live chat in `wrangle
 
 ## Files
 
-- `wrangler.toml`: binding and cron template with a zero D1 placeholder; no secret values
+- `wrangler.toml`: production same-origin routes, real D1/rate-limit/email bindings, and non-secret variables; no secret values
 
 ## Founder Command intake feed
 
-The source-complete, deployment-gated `/api/intake/operator/*` routes expose held-for-review intake revisions to the local Founder Command adapter. Each delivery acknowledgement names the exact outbox ID, revision hash, payload hash, local receipt ID, and outcome. It writes only `intake_consumer_receipts`; it never changes the source `intake_outbox` state or authorizes domain work.
+The source-complete, deployment-gated `/api/intake/operator/*` routes expose held-for-review intake revisions to the local Founder Command adapter. Each delivery acknowledgement names the exact outbox ID, revision hash, payload hash, local receipt ID, and outcome. Consumer receipts are append-only: exact replays are idempotent and changed replays conflict without an update. The route never changes the source `intake_outbox` state or authorizes domain work.
 
 Store the raw pull token only in Founder Command's Windows Credential Manager. Store only its lowercase SHA-256 digest in the Worker secret `FOUNDER_COMMAND_PULL_TOKEN_SHA256`. Rotation uses a non-secret `FOUNDER_COMMAND_PULL_KEY_ID`, an optional previous hash, and a bounded overlap deadline. Comparisons are constant-time and logs identify only the key ID/version.
 
 The downstream preview/apply, strict review PATCH, single-flight synchronization lease, and promotion authority contracts are defined in `docs/intake-os/CUSTODY_CHAIN_V1.md`. They are not activated by this Worker release.
+
+Forge submissions additionally send a bounded contact/routing notification after the four-record intake transaction commits. Full answers stay in the governed operator feed. Notification failure never rolls back or misrepresents the durable intake receipt; the response reports `notification_pending`.
 
 - `migrations/0001_operator_inquiries.sql`: initial structured D1 schema
 - `migrations/0002_operator_inquiry_budget.sql`: forward migration for optional budget

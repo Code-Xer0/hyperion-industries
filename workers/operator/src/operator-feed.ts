@@ -57,6 +57,14 @@ interface AckItem {
   accepted_business_truth: boolean;
 }
 
+interface ConsumerReceiptRow {
+  revision_hash: string;
+  payload_hash: string;
+  local_receipt_id: string;
+  outcome: AckItem["outcome"];
+  accepted_business_truth: number;
+}
+
 interface OperatorAuthorization {
   consumerId: string;
   keyId: string;
@@ -296,6 +304,14 @@ function parseAckItem(value: unknown): AckItem {
   };
 }
 
+function receiptMatches(existing: ConsumerReceiptRow, delivery: AckItem): boolean {
+  return constantTimeEqual(existing.revision_hash, delivery.revision_hash) &&
+    constantTimeEqual(existing.payload_hash, delivery.payload_hash) &&
+    existing.local_receipt_id === delivery.local_receipt_id &&
+    existing.outcome === delivery.outcome &&
+    Number(existing.accepted_business_truth) === (delivery.accepted_business_truth ? 1 : 0);
+}
+
 export async function handleOperatorAck(request: Request, env: Env, deps: RuntimeDependencies): Promise<Response> {
   const authorization = await authorize(request, env, deps.now());
   const { consumerId } = authorization;
@@ -309,6 +325,18 @@ export async function handleOperatorAck(request: Request, env: Env, deps: Runtim
   const at = deps.now().toISOString();
   const statements: D1PreparedStatement[] = [];
   for (const delivery of deliveries) {
+    const existingReceipt = await db.prepare(
+      `SELECT revision_hash, payload_hash, local_receipt_id, outcome, accepted_business_truth
+         FROM intake_consumer_receipts
+        WHERE consumer_id = ? AND outbox_id = ? LIMIT 1`,
+    ).bind(consumerId, delivery.outbox_id).first<ConsumerReceiptRow>();
+    if (existingReceipt) {
+      if (!receiptMatches(existingReceipt, delivery)) {
+        throw new HttpError(409, "acknowledgement_conflict", "Delivery acknowledgement is immutable and does not match the stored receipt.");
+      }
+      continue;
+    }
+
     const row = await db.prepare(
       `SELECT o.outbox_id, o.intake_id, o.submission_id, o.proposal_id, o.revision_hash,
               o.event_type, o.state AS outbox_state, o.created_at,
@@ -333,11 +361,7 @@ export async function handleOperatorAck(request: Request, env: Env, deps: Runtim
         `INSERT INTO intake_consumer_receipts
          (consumer_id, outbox_id, submission_id, revision_hash, payload_hash, local_receipt_id,
           outcome, accepted_business_truth, first_seen_at, acknowledged_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-         ON CONFLICT(consumer_id, outbox_id) DO UPDATE SET
-           revision_hash = excluded.revision_hash, payload_hash = excluded.payload_hash,
-           local_receipt_id = excluded.local_receipt_id, outcome = excluded.outcome,
-           accepted_business_truth = excluded.accepted_business_truth, acknowledged_at = excluded.acknowledged_at`,
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       ).bind(
         consumerId, delivery.outbox_id, row.submission_id, delivery.revision_hash, delivery.payload_hash,
         delivery.local_receipt_id, delivery.outcome, delivery.accepted_business_truth ? 1 : 0, at, at,
@@ -349,7 +373,7 @@ export async function handleOperatorAck(request: Request, env: Env, deps: Runtim
       ).bind(`aud_${deps.randomUUID().replaceAll("-", "")}`, row.intake_id, row.submission_id, consumerId, at),
     );
   }
-  await db.batch(statements);
+  if (statements.length) await db.batch(statements);
   return jsonResponse({
     acknowledged: deliveries.map((delivery) => ({
       outbox_id: delivery.outbox_id,

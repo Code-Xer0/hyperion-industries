@@ -2,21 +2,26 @@ export interface RateLimitBinding {
   limit(options: { key: string }): Promise<{ success: boolean }>;
 }
 
+export interface EmailMessage {
+  to: string | string[];
+  from: string;
+  subject: string;
+  text: string;
+  cc?: string | string[];
+  replyTo?: string;
+}
+
 export interface EmailBinding {
-  send(message: {
-    to: string;
-    from: string;
-    subject: string;
-    text: string;
-  }): Promise<unknown>;
+  send(message: EmailMessage): Promise<unknown>;
 }
 
 export interface Env {
   OPENROUTER_API_KEY?: string;
   OPENROUTER_MODEL?: string;
   SITE_ORIGIN?: string;
-  INTAKE_API_ORIGIN?: string;
   INQUIRY_NOTIFY_TO?: string;
+  FORGE_NOTIFY_TO?: string;
+  FORGE_NOTIFY_CC?: string;
   INQUIRY_FROM_EMAIL?: string;
   INQUIRY_CONSENT_VERSION?: string;
   CHAT_RATE_LIMITER?: RateLimitBinding;

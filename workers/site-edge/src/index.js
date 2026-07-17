@@ -1,6 +1,40 @@
 import { SEO_REDIRECTS, SEO_ROUTE_BY_PATH } from '../../../src/data/seoRoutes.js';
 
 const PASS_THROUGH_PREFIXES = ['/api/', '/assets/', '/.well-known/'];
+const INTAKE_CSP = [
+  "default-src 'self'",
+  "base-uri 'self'",
+  "object-src 'none'",
+  "frame-ancestors 'none'",
+  "form-action 'self'",
+  "script-src 'self'",
+  "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+  "font-src 'self' https://fonts.gstatic.com",
+  "img-src 'self' data:",
+  "connect-src 'self'",
+  "media-src 'self'",
+  "frame-src 'none'",
+  "worker-src 'self'",
+  "manifest-src 'self'",
+  'upgrade-insecure-requests',
+].join('; ');
+
+export function isIntakePath(pathname) {
+  return pathname === '/intake' || pathname.startsWith('/intake/');
+}
+
+function secureIntakeResponse(response, pathname) {
+  if (!isIntakePath(pathname)) return response;
+  const headers = new Headers(response.headers);
+  headers.set('content-security-policy', INTAKE_CSP);
+  headers.set('permissions-policy', 'camera=(), microphone=(), geolocation=(), payment=()');
+  headers.set('referrer-policy', 'no-referrer');
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
+}
 
 function redirectTo(requestUrl, pathname) {
   const target = new URL(requestUrl);
@@ -53,11 +87,11 @@ export async function handleRequest(request, originFetch = fetch) {
     const response = await originRequest(request, originPath, originFetch);
     const headers = new Headers(response.headers);
     headers.set('x-hyperion-canonical-route', pathname);
-    return new Response(request.method === 'HEAD' ? null : response.body, {
+    return secureIntakeResponse(new Response(request.method === 'HEAD' ? null : response.body, {
       status: response.status,
       statusText: response.statusText,
       headers,
-    });
+    }), pathname);
   }
 
   if (PASS_THROUGH_PREFIXES.some((prefix) => pathname.startsWith(prefix)) || /\.[a-z0-9]{1,12}$/i.test(pathname)) {

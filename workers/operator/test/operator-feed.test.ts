@@ -130,7 +130,7 @@ describe("Founder Command operator intake feed", () => {
       ctx,
     );
     const feed = await feedResponse.json<{ items: Array<{ payload_hash: string }> }>();
-    db.queueFirst(feedRow);
+    db.queueFirst(null, feedRow);
     const response = await worker.fetch(
       postJson("/api/intake/operator/ack", {
         deliveries: [{
@@ -149,8 +149,79 @@ describe("Founder Command operator intake feed", () => {
     expect(response.status).toBe(200);
     expect(body.acknowledged).toEqual([{ outbox_id: feedRow.outbox_id, revision_hash: feedRow.revision_hash, local_receipt_id: "local_12345678", outcome: "received" }]);
     expect(body.outbox_mutated).toBe(false);
-    expect(db.batches[0]?.some((statement) => statement.sql.includes("ON CONFLICT(consumer_id, outbox_id)"))).toBe(true);
+    expect(db.batches[0]?.some((statement) => statement.sql.includes("INSERT INTO intake_consumer_receipts"))).toBe(true);
+    expect(db.statements.every((statement) => !/UPDATE\s+intake_consumer_receipts/i.test(statement.sql))).toBe(true);
     expect(db.statements.every((statement) => !/UPDATE\s+intake_outbox/i.test(statement.sql))).toBe(true);
+  });
+
+  it("returns idempotent success for an exact acknowledgement replay without writing", async () => {
+    const storedReceipt = {
+      revision_hash: feedRow.revision_hash,
+      payload_hash: "c".repeat(64),
+      local_receipt_id: "local_12345678",
+      outcome: "received",
+      accepted_business_truth: 0,
+    };
+    const db = new MockD1().queueFirst(storedReceipt);
+    const response = await createWorker().fetch(
+      postJson("/api/intake/operator/ack", {
+        deliveries: [{
+          outbox_id: feedRow.outbox_id,
+          revision_hash: storedReceipt.revision_hash,
+          payload_hash: storedReceipt.payload_hash,
+          local_receipt_id: storedReceipt.local_receipt_id,
+          outcome: storedReceipt.outcome,
+          accepted_business_truth: false,
+        }],
+      }, AUTH_HEADERS),
+      operatorEnv(db),
+      executionContext().ctx,
+    );
+
+    expect(response.status).toBe(200);
+    expect(await response.json()).toMatchObject({
+      acknowledged: [{ outbox_id: feedRow.outbox_id, local_receipt_id: "local_12345678", outcome: "received" }],
+      outbox_mutated: false,
+    });
+    expect(db.batch).not.toHaveBeenCalled();
+    expect(db.statements.every((statement) => !/UPDATE\s+intake_consumer_receipts/i.test(statement.sql))).toBe(true);
+  });
+
+  it("rejects any mutation of an existing acknowledgement without updating it", async () => {
+    const storedReceipt = {
+      revision_hash: feedRow.revision_hash,
+      payload_hash: "c".repeat(64),
+      local_receipt_id: "local_12345678",
+      outcome: "received",
+      accepted_business_truth: 0,
+    };
+    const mutations = [
+      { local_receipt_id: "local_changed123" },
+      { outcome: "rejected" },
+      { payload_hash: "d".repeat(64) },
+      { accepted_business_truth: true },
+    ];
+
+    for (const mutation of mutations) {
+      const db = new MockD1().queueFirst(storedReceipt);
+      const response = await createWorker().fetch(
+        postJson("/api/intake/operator/ack", {
+          deliveries: [{
+            outbox_id: feedRow.outbox_id,
+            ...storedReceipt,
+            accepted_business_truth: false,
+            ...mutation,
+          }],
+        }, AUTH_HEADERS),
+        operatorEnv(db),
+        executionContext().ctx,
+      );
+
+      expect(response.status).toBe(409);
+      expect(await response.json()).toMatchObject({ error: { code: "acknowledgement_conflict" } });
+      expect(db.batch).not.toHaveBeenCalled();
+      expect(db.statements.every((statement) => !/UPDATE\s+intake_consumer_receipts/i.test(statement.sql))).toBe(true);
+    }
   });
 
   it("rejects a quarantined conflict that claims accepted business truth", async () => {

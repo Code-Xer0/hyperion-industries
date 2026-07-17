@@ -29,15 +29,24 @@ describe("GET /api/operator/status", () => {
       baseEnv({
         DB: db.binding(),
         INQUIRY_EMAIL: { send: vi.fn(async () => ({})) },
-        INQUIRY_NOTIFY_TO: "hello@hyperion-industries.dev",
+        INQUIRY_NOTIFY_TO: "victor@example.com",
+        FORGE_NOTIFY_TO: "keshawn@example.net",
+        FORGE_NOTIFY_CC: "victor@example.com",
         INQUIRY_FROM_EMAIL: "operator@hyperion-industries.dev",
       }),
       ctx,
     );
-    const body = await response.json<{ status: string; model: string; privacy: Record<string, string> }>();
+    const body = await response.json<{
+      status: string;
+      model: string;
+      capabilities: Record<string, string>;
+      privacy: Record<string, string>;
+    }>();
 
     expect(body.status).toBe("ready");
     expect(body.model).toBe("openai/gpt-5.2");
+    expect(body.capabilities.forge_inquiry_notification).toBe("ready");
+    expect(response.headers.get("access-control-allow-origin")).toBeNull();
     expect(body.privacy).toMatchObject({
       corpus: "compiled_public_allowlist_only",
       provider_data_collection: "deny",
@@ -47,43 +56,6 @@ describe("GET /api/operator/status", () => {
     });
   });
 
-  it("returns credentialed CORS headers only for the configured first-party API domain", async () => {
-    const worker = createWorker({ randomUUID: () => "cors-status" });
-    const { ctx } = executionContext();
-    const response = await worker.fetch(
-      new Request("https://hyperion-operator.hyperion-industries-intake.workers.dev/api/operator/status", {
-        headers: { origin: "https://hyperion-industries.dev" },
-      }),
-      baseEnv(),
-      ctx,
-    );
-
-    expect(response.status).toBe(200);
-    expect(response.headers.get("access-control-allow-origin")).toBe("https://hyperion-industries.dev");
-    expect(response.headers.get("access-control-allow-credentials")).toBe("true");
-    expect(response.headers.get("vary")).toContain("Origin");
-  });
-
-  it("accepts a bounded first-party CORS preflight", async () => {
-    const worker = createWorker({ randomUUID: () => "cors-preflight" });
-    const { ctx } = executionContext();
-    const response = await worker.fetch(
-      new Request("https://hyperion-operator.hyperion-industries-intake.workers.dev/api/intake/submissions", {
-        method: "OPTIONS",
-        headers: {
-          origin: "https://hyperion-industries.dev",
-          "access-control-request-method": "POST",
-          "access-control-request-headers": "content-type, idempotency-key",
-        },
-      }),
-      baseEnv(),
-      ctx,
-    );
-
-    expect(response.status).toBe(204);
-    expect(response.headers.get("access-control-allow-origin")).toBe("https://hyperion-industries.dev");
-    expect(response.headers.get("access-control-allow-headers")).toBe("content-type, idempotency-key");
-  });
 });
 
 describe("edge pass-through", () => {

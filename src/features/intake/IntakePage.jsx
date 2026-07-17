@@ -19,14 +19,15 @@ import {
   LANES,
   LANE_IDS,
 } from '../../../shared/intake/model';
+import {
+  clearIntakeProgress,
+  createIntakeProgressRecord,
+  readIntakeProgress,
+  writeIntakeProgress,
+} from './localProgress';
 import './IntakePage.css';
 
 const STEPS = ['Aperture', 'Handshake', 'Signal', 'Load / Limits', 'Fit', 'Review', 'Dispatch'];
-const LOCAL_PREFIX = 'hyperion-intake-v1';
-const LOCAL_RETENTION_MS = 14 * 24 * 60 * 60 * 1000;
-const API_ORIGIN = import.meta.env.PROD
-  ? 'https://hyperion-operator.hyperion-industries-intake.workers.dev'
-  : '';
 const FORM_IDS = {
   forge: 'forge-build-profile',
   pandora: 'pandora-readiness',
@@ -44,32 +45,18 @@ const makeId = (prefix) => {
 };
 
 const initialEffects = () => globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 'reduced' : 'full';
-const localKey = (lane) => `${LOCAL_PREFIX}:${lane}`;
 const answerTime = () => new Date().toISOString();
 
-function readLocalDraft(lane) {
-  try {
-    const value = JSON.parse(localStorage.getItem(localKey(lane)) || 'null');
-    if (!value || value.expires_at <= Date.now()) {
-      localStorage.removeItem(localKey(lane));
-      return null;
-    }
-    return value;
-  } catch {
-    return null;
-  }
-}
-
-function findLocalDraft(draftId) {
+function findLocalProgress(draftId) {
   for (const lane of LANE_IDS) {
-    const draft = readLocalDraft(lane);
-    if (draft?.draft_id === draftId) return draft;
+    const progress = readIntakeProgress(lane);
+    if (progress?.draft_id === draftId) return progress;
   }
   return null;
 }
 
 async function api(path, options = {}) {
-  const response = await fetch(`${API_ORIGIN}${path}`, {
+  const response = await fetch(path, {
     ...options,
     credentials: 'include',
     headers: { 'content-type': 'application/json', ...(options.headers || {}) },
@@ -212,7 +199,7 @@ export default function IntakePage({ resumeMode = false }) {
   const [decision, setDecision] = useState(null);
   const [decisionSource, setDecisionSource] = useState(null);
   const [errors, setErrors] = useState([]);
-  const [serviceNote, setServiceNote] = useState('Local autosave active · expires after 14 days');
+  const [serviceNote, setServiceNote] = useState('Sensitive details stay in this session until cloud resume is active');
   const [resumeStatus, setResumeStatus] = useState('idle');
   const [cloudEnabled, setCloudEnabled] = useState(false);
   const [receipt, setReceipt] = useState(null);
@@ -235,27 +222,22 @@ export default function IntakePage({ resumeMode = false }) {
   useEffect(() => {
     if (!lane || restoreKey.current === lane) return;
     restoreKey.current = lane;
-    const draft = readLocalDraft(lane);
-    if (!draft) return;
-    ids.current = { ...ids.current, ...draft.ids, draft: draft.draft_id || draft.ids?.draft || ids.current.draft };
-    setAnswers(draft.answers || {});
-    setIdentity((value) => ({ ...value, ...(draft.identity || {}) }));
-    setConsents((value) => ({ ...value, ...(draft.consents || {}) }));
-    setEffects(draft.effects || initialEffects());
-    setStep(Math.min(Number(draft.step) || 0, 5));
-    setRevision(Number(draft.revision) || 1);
-    setSupersedes(draft.supersedes || null);
-    setServiceNote('Local draft recovered · expires 14 days after the latest change');
+    const progress = readIntakeProgress(lane);
+    if (!progress) return;
+    ids.current = { ...ids.current, ...progress.ids, draft: progress.draft_id || progress.ids?.draft || ids.current.draft };
+    setEffects(progress.effects || initialEffects());
+    setStep(Math.min(Number(progress.step) || 0, 5));
+    setRevision(Number(progress.revision) || 1);
+    setSupersedes(progress.supersedes || null);
+    setServiceNote('Progress recovered; identity and answers were not stored on this device');
   }, [lane]);
 
   useEffect(() => {
     if (!lane) return;
-    const payload = {
-      lane, answers, identity, consents, effects, step, revision, supersedes,
-      ids: ids.current, draft_id: ids.current.draft, saved_at: Date.now(), expires_at: Date.now() + LOCAL_RETENTION_MS,
-    };
-    try { localStorage.setItem(localKey(lane), JSON.stringify(payload)); } catch { /* Browser storage can be disabled. */ }
-  }, [answers, consents, effects, identity, lane, revision, step, supersedes]);
+    writeIntakeProgress(lane, createIntakeProgressRecord({
+      lane, effects, step, revision, supersedes, ids: ids.current,
+    }));
+  }, [effects, lane, revision, step, supersedes]);
 
   useEffect(() => {
     if (!cloudEnabled || !lane) return undefined;
@@ -273,7 +255,7 @@ export default function IntakePage({ resumeMode = false }) {
       } catch (error) {
         setServiceNote(error.code === 'draft_conflict'
           ? 'Cloud save paused: this draft changed elsewhere. Reload from the latest resume link.'
-          : 'Cloud save unavailable; the 14-day local draft remains active.');
+          : 'Cloud save unavailable; keep this page open and retry.');
       }
     }, 900);
     return () => window.clearTimeout(timer);
@@ -307,12 +289,13 @@ export default function IntakePage({ resumeMode = false }) {
           }
         } catch (error) {
           if (error.status !== 404) throw error;
-          const local = findLocalDraft(result.draft_id);
+          const local = findLocalProgress(result.draft_id);
           if (local) {
             setLane(local.lane);
-            setAnswers(local.answers || {});
-            setIdentity((value) => ({ ...value, ...(local.identity || {}) }));
-            setConsents((value) => ({ ...value, ...(local.consents || {}) }));
+            setEffects(local.effects || initialEffects());
+            setStep(Math.min(Number(local.step) || 0, 5));
+            setRevision(Number(local.revision) || 1);
+            setSupersedes(local.supersedes || null);
           } else {
             setLane('general');
           }
@@ -456,9 +439,9 @@ export default function IntakePage({ resumeMode = false }) {
         method: 'POST', headers: { 'idempotency-key': ids.current.idempotency }, body: JSON.stringify(payload),
       });
       setReceipt(result.receipt);
-      if (lane) localStorage.removeItem(localKey(lane));
+      if (lane) clearIntakeProgress(lane);
     } catch (error) {
-      setErrors([error.message || 'The signal was not received. Your local draft is still available.']);
+      setErrors([error.message || 'The signal was not received. Your entries remain in this open session.']);
       requestAnimationFrame(() => errorRef.current?.focus());
     } finally {
       setSubmitting(false);
@@ -488,7 +471,7 @@ export default function IntakePage({ resumeMode = false }) {
         <div className="intake-resume-state">
           <KeyRound size={30} aria-hidden="true" />
           <h2>{resumeStatus === 'exchanging' ? 'Redeeming your one-time link…' : 'This resume link is missing, expired, or already used.'}</h2>
-          <p>The link itself contains no answers. Return to Intake to continue from a 14-day local draft or request another link.</p>
+          <p>The link itself contains no answers. A Worker-held draft is restored when available; otherwise restart the intake or request another link.</p>
           <Link className="intake-button is-primary" to="/intake">Open Intake</Link>
         </div>
       );

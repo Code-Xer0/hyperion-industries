@@ -28,21 +28,13 @@ export function errorResponse(error: HttpError): Response {
   );
 }
 
-export function finalizeResponse(response: Response, requestId: string, corsOrigin?: string): Response {
+export function finalizeResponse(response: Response, requestId: string): Response {
   const headers = new Headers(response.headers);
   headers.set("cache-control", headers.get("cache-control") ?? "no-store");
   headers.set("referrer-policy", "no-referrer");
   headers.set("x-content-type-options", "nosniff");
   headers.set("x-frame-options", "DENY");
   headers.set("x-request-id", requestId);
-  if (corsOrigin) {
-    headers.set("access-control-allow-origin", corsOrigin);
-    headers.set("access-control-allow-credentials", "true");
-    headers.append("vary", "Origin");
-  } else {
-    headers.delete("access-control-allow-origin");
-    headers.delete("access-control-allow-credentials");
-  }
   return new Response(response.body, {
     status: response.status,
     statusText: response.statusText,
@@ -142,31 +134,19 @@ export function originConfiguration(env: Env): { valid: boolean; configured: boo
 
 export function enforceSameOrigin(request: Request, env: Env): void {
   const site = configuredOrigin(env.SITE_ORIGIN);
-  const api = configuredOrigin(env.INTAKE_API_ORIGIN);
-  if (!site.valid || !api.valid) {
+  if (!site.valid || !site.origin) {
     throw new HttpError(503, "origin_configuration_invalid", "Same-origin protection is not configured correctly.");
   }
 
   const requestOrigin = new URL(request.url).origin;
-  const expectedOrigin = site.origin ?? requestOrigin;
   const suppliedOrigin = request.headers.get("origin");
   const fetchSite = request.headers.get("sec-fetch-site")?.toLowerCase();
-  const direct = requestOrigin === expectedOrigin && suppliedOrigin === expectedOrigin
+  const sameOrigin = requestOrigin === site.origin && suppliedOrigin === site.origin
     && (!fetchSite || fetchSite === "same-origin");
-  const firstPartyApi = Boolean(api.origin) && requestOrigin === api.origin && suppliedOrigin === expectedOrigin
-    && (!fetchSite || fetchSite === "same-site" || fetchSite === "cross-site");
 
-  if (!direct && !firstPartyApi) {
+  if (!sameOrigin) {
     throw new HttpError(403, "same_origin_required", "This endpoint accepts same-origin browser requests only.");
   }
-}
-
-export function browserCorsOrigin(request: Request, env: Env): string | undefined {
-  const site = configuredOrigin(env.SITE_ORIGIN);
-  const api = configuredOrigin(env.INTAKE_API_ORIGIN);
-  if (!site.valid || !api.valid || !site.origin || !api.origin) return undefined;
-  const requestOrigin = new URL(request.url).origin;
-  return requestOrigin === api.origin && request.headers.get("origin") === site.origin ? site.origin : undefined;
 }
 
 async function anonymousRateKey(request: Request, scope: string): Promise<string> {
