@@ -15,6 +15,7 @@ dist-ssr
 output/
 public/assets/card-studio/.thumbnail
 workers/operator/.wrangler/
+workers/operator/.dev.vars
 
 # Editor directories and files
 .vscode/*

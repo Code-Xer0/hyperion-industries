@@ -291,7 +291,7 @@ function parseAckItem(value: unknown): AckItem {
   const acceptedBusinessTruth = item.accepted_business_truth;
   if (!OUTBOX_PATTERN.test(outboxId) || !HASH_PATTERN.test(revisionHash) || !HASH_PATTERN.test(payloadHash) ||
     !RECEIPT_PATTERN.test(localReceiptId) || !["received", "duplicate", "conflict_quarantined", "rejected"].includes(outcome) ||
-    typeof acceptedBusinessTruth !== "boolean" || (outcome === "conflict_quarantined" && acceptedBusinessTruth)) {
+    acceptedBusinessTruth !== false) {
     throw new HttpError(400, "invalid_acknowledgement", "Delivery acknowledgement is invalid.");
   }
   return {
@@ -300,7 +300,7 @@ function parseAckItem(value: unknown): AckItem {
     payload_hash: payloadHash,
     local_receipt_id: localReceiptId,
     outcome: outcome as AckItem["outcome"],
-    accepted_business_truth: acceptedBusinessTruth,
+    accepted_business_truth: false,
   };
 }
 
@@ -364,7 +364,7 @@ export async function handleOperatorAck(request: Request, env: Env, deps: Runtim
          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       ).bind(
         consumerId, delivery.outbox_id, row.submission_id, delivery.revision_hash, delivery.payload_hash,
-        delivery.local_receipt_id, delivery.outcome, delivery.accepted_business_truth ? 1 : 0, at, at,
+        delivery.local_receipt_id, delivery.outcome, 0, at, at,
       ),
       db.prepare(
         `INSERT INTO intake_audit_events

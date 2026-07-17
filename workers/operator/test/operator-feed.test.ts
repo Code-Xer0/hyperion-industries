@@ -199,7 +199,6 @@ describe("Founder Command operator intake feed", () => {
       { local_receipt_id: "local_changed123" },
       { outcome: "rejected" },
       { payload_hash: "d".repeat(64) },
-      { accepted_business_truth: true },
     ];
 
     for (const mutation of mutations) {
@@ -224,7 +223,7 @@ describe("Founder Command operator intake feed", () => {
     }
   });
 
-  it("rejects a quarantined conflict that claims accepted business truth", async () => {
+  it("rejects every delivery acknowledgement that claims accepted business truth", async () => {
     const db = new MockD1();
     const response = await createWorker().fetch(
       postJson("/api/intake/operator/ack", {
@@ -233,7 +232,7 @@ describe("Founder Command operator intake feed", () => {
           revision_hash: feedRow.revision_hash,
           payload_hash: "c".repeat(64),
           local_receipt_id: "local_12345678",
-          outcome: "conflict_quarantined",
+          outcome: "received",
           accepted_business_truth: true,
         }],
       }, AUTH_HEADERS),
