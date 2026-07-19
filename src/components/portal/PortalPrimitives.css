@@ -249,6 +249,23 @@
 .forge-motion-card > div { padding: 12px 14px 14px; border-top: 1px solid var(--glass-edge); }
 .forge-motion-card span { color: var(--gold); font-family: var(--font-display); font-size: 8px; font-weight: 700; text-transform: uppercase; }
 .forge-motion-card p { margin: 7px 0 0; color: var(--text-muted); font-size: 11px; line-height: 1.55; }
+.forge-city-navigation { position: relative; z-index: 1; margin-top: clamp(28px, 5vw, 52px); padding-top: clamp(22px, 4vw, 38px); border-top: 1px solid var(--glass-edge); }
+.forge-city-navigation-head { display: flex; align-items: end; justify-content: space-between; gap: 28px; margin-bottom: 18px; }
+.forge-city-navigation-head h3 { margin: 9px 0 0; color: var(--text); font-size: clamp(28px, 4vw, 46px); line-height: 0.95; }
+.forge-city-navigation-head p { max-width: 440px; margin: 12px 0 0; color: var(--text-muted); font-size: 12px; line-height: 1.6; }
+.forge-city-stills { display: flex; gap: 8px; }
+.forge-city-stills figure { width: min(168px, 16vw); margin: 0; overflow: hidden; border: 1px solid color-mix(in srgb, var(--gold) 32%, var(--glass-edge)); background: var(--room-card-bg); }
+.forge-city-stills img { display: block; width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+.forge-city-stills figcaption { padding: 7px 8px; color: var(--gold); font-family: var(--font-display); font-size: 6px; text-transform: uppercase; }
+.forge-city-media-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.forge-city-media-card { position: relative; min-height: 240px; overflow: hidden; border: 1px solid var(--glass-edge); background: #050608; color: inherit; text-decoration: none; transition: transform 0.28s var(--ease-out), border-color 0.28s ease; }
+.forge-city-media-card:hover, .forge-city-media-card:focus-visible { transform: translateY(-4px); border-color: color-mix(in srgb, var(--gold) 54%, transparent); }
+.forge-city-media-card video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: saturate(0.82) contrast(1.08); transition: transform 0.7s var(--ease-out), filter 0.28s ease; }
+.forge-city-media-card:hover video, .forge-city-media-card:focus-visible video { transform: scale(1.055); filter: saturate(1) contrast(1.12); }
+.forge-city-media-card::after { position: absolute; inset: 0; background: linear-gradient(0deg, rgba(2, 4, 7, 0.9), rgba(2, 4, 7, 0.06) 68%); content: ''; }
+.forge-city-media-card > div { position: absolute; z-index: 1; right: 14px; bottom: 14px; left: 14px; }
+.forge-city-media-card span { color: var(--gold); font-family: var(--font-display); font-size: 8px; font-weight: 700; text-transform: uppercase; }
+.forge-city-media-card p { margin: 6px 0 0; color: #e9e4d9; font-size: 11px; line-height: 1.45; }
 .district-next-room .related-districts { margin-bottom: 24px; }
 .district-next-room .city-district-card { min-height: 190px; }
 .district-next-room .city-district-card h3 { margin-top: 26px; }
@@ -263,6 +280,7 @@
   .district-room-grid { grid-template-columns: 1fr; }
   .district-proof-room { grid-template-columns: 1fr; }
   .forge-motion-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .forge-city-media-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 700px) {
@@ -287,5 +305,8 @@
   .forge-motion-shelf-head { align-items: flex-start; flex-direction: column; }
   .forge-motion-shelf-head p { text-align: left; }
   .forge-motion-grid { grid-template-columns: 1fr; }
+  .forge-city-navigation-head { align-items: flex-start; flex-direction: column; }
+  .forge-city-stills figure { width: min(184px, 42vw); }
+  .forge-city-media-grid { grid-template-columns: 1fr; }
   .city-legend { justify-content: flex-start; }
 }

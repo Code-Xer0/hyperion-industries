@@ -276,6 +276,8 @@ export default function Nav() {
       return;
     }
 
+    soundtrack.preload = 'auto';
+    if (soundtrack.readyState < 3) soundtrack.load();
     soundtrack.volume = 0.28;
     try {
       await getFeedbackContext()?.resume?.();
@@ -284,6 +286,13 @@ export default function Nav() {
     } catch {
       setSoundEnabled(false);
     }
+  };
+
+  const warmScore = () => {
+    const soundtrack = soundtrackRef.current;
+    if (!soundtrack || soundtrack.readyState >= 3) return;
+    soundtrack.preload = 'auto';
+    soundtrack.load();
   };
 
   const routeLink = (destination, index = -1, cinematic = false) => (
@@ -368,6 +377,9 @@ export default function Nav() {
           <button
             type="button"
             onClick={toggleSoundtrack}
+            onPointerEnter={warmScore}
+            onPointerDown={warmScore}
+            onFocus={warmScore}
             className="nav-score-button"
             aria-pressed={soundEnabled}
             aria-label={soundEnabled ? 'Turn City score off' : 'Turn City score on'}
@@ -395,7 +407,7 @@ export default function Nav() {
       <audio
         ref={soundtrackRef}
         src={scoreTrack.audio}
-        preload="none"
+        preload="metadata"
         loop
         onPlay={() => setSoundEnabled(true)}
         onPause={() => setSoundEnabled(false)}
@@ -572,6 +584,13 @@ export default function Nav() {
                             media={previewMedia}
                           />
                           <div className="city-route-preview-scrim" />
+                          {previewDestination.previewStills?.length ? (
+                            <div className="city-route-preview-stills" aria-label="Kuda Forge build stills">
+                              {previewDestination.previewStills.map((still) => (
+                                <img key={still.src} src={still.src} alt={still.alt} loading="lazy" decoding="async" />
+                              ))}
+                            </div>
+                          ) : null}
                           {previewDestination.mark && (
                             <img
                               className={`city-route-preview-mark is-${previewDestination.markPlacement || 'left'}`}

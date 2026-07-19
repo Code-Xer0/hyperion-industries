@@ -9,7 +9,7 @@ export const maturityLabels = {
   architecture: 'ARCHITECTURE · CONCEPT / RESEARCH',
 };
 
-const forgeMotion = {
+export const forgeMotion = {
   hero: {
     src: '/assets/forge/media-v1/hyperion-workstation-triptych-1280x720.mp4',
     poster: '/assets/forge/media-v1/posters/hyperion-workstation-triptych-1280x720.jpg',
@@ -59,6 +59,18 @@ const forgeMotion = {
       description: 'Display and peripheral surface in context.',
       src: '/assets/forge/media-v1/cards/hyperion-operator-environment-card.mp4',
       poster: '/assets/forge/media-v1/posters/hyperion-operator-environment-card.jpg',
+    },
+  ],
+  stills: [
+    {
+      src: '/assets/forge/media-v1/stills/kuda-white-build-blue.jpg',
+      alt: 'White Kuda workstation build with blue-lit fans and a GeForce graphics card',
+      label: 'Kuda field still · blue state',
+    },
+    {
+      src: '/assets/forge/media-v1/stills/kuda-white-build-lime.jpg',
+      alt: 'White Kuda workstation build with lime-lit fans and illuminated memory',
+      label: 'Kuda field still · lime state',
     },
   ],
 };

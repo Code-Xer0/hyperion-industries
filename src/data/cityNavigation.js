@@ -15,6 +15,27 @@ const imagePreview = (src, alt, objectPosition = 'center', source = 'Hyperion pu
   } : null
 );
 
+const forgeVideo = (id, alt, objectPosition = 'center') => ({
+  type: 'video',
+  src: `/assets/forge/media-v1/cards/hyperion-${id}-card.mp4`,
+  poster: `/assets/forge/media-v1/posters/hyperion-${id}-card.jpg`,
+  alt,
+  objectPosition,
+  source: 'Hyperion Forge field media',
+  truthClass: 'product_capture',
+});
+
+const forgeNavigationStills = [
+  {
+    src: '/assets/forge/media-v1/stills/kuda-white-build-blue.jpg',
+    alt: 'White Kuda workstation build with blue-lit fans',
+  },
+  {
+    src: '/assets/forge/media-v1/stills/kuda-white-build-lime.jpg',
+    alt: 'White Kuda workstation build with lime-lit fans',
+  },
+];
+
 const route = (path, label, family, options = {}) => {
   const district = districtByPath.get(path);
 
@@ -35,6 +56,7 @@ const route = (path, label, family, options = {}) => {
     mark: options.mark ?? null,
     markAlt: options.markAlt ?? '',
     markPlacement: options.markPlacement ?? 'left',
+    previewStills: options.previewStills ?? [],
     external: options.external ?? false,
     utility: options.utility ?? false,
   };
@@ -63,12 +85,13 @@ export const cityFamilies = [
     routes: [
       route('/forge', 'The Forge', 'infrastructure', {
         keywords: ['build', 'workstation', 'commercial'],
-        previewMedia: cityMotion.assets.infrastructure,
+        previewMedia: forgeVideo('workstation-core', 'Kuda workstation core assembly'),
+        previewStills: forgeNavigationStills,
       }),
-      route('/pandora', 'Pandora Rackworks', 'infrastructure', { keywords: ['hardware', 'rack', 'poc'] }),
-      route('/talos', 'Tal.OS Control Tower', 'infrastructure', { keywords: ['talos', 'control plane', 'governance'] }),
-      route('/succession', 'Lifecycle Succession', 'infrastructure', { keywords: ['gpu', 'migration', 'doctrine'] }),
-      route('/pandora-lite', 'Pandora Lite', 'infrastructure', { keywords: ['civic', 'concept', 'second life'] }),
+      route('/pandora', 'Pandora Rackworks', 'infrastructure', { keywords: ['hardware', 'rack', 'poc'], previewMedia: forgeVideo('gpu-telemetry', 'GPU telemetry inside a Hyperion Forge build') }),
+      route('/talos', 'Tal.OS Control Tower', 'infrastructure', { keywords: ['talos', 'control plane', 'governance'], previewMedia: forgeVideo('operator-console', 'Hyperion operator console and control surfaces') }),
+      route('/succession', 'Lifecycle Succession', 'infrastructure', { keywords: ['gpu', 'migration', 'doctrine'], previewMedia: forgeVideo('workspace-systems', 'Hyperion workspace systems in the Forge environment') }),
+      route('/pandora-lite', 'Pandora Lite', 'infrastructure', { keywords: ['civic', 'concept', 'second life'], previewMedia: forgeVideo('custom-workstation', 'Custom Hyperion workstation build detail') }),
     ],
   },
   {

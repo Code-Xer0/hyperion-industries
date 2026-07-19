@@ -6,8 +6,8 @@ import HeroCanvas from '../components/ui/HeroCanvas';
 import OperatorMascot from '../components/portal/OperatorMascot';
 import OperatorCard from '../components/cards/OperatorCard';
 import RoomShell from '../components/portal/RoomShell';
-import { CityMap, MaturityLegend, ProofLane, StatusRail } from '../components/portal/PortalPrimitives';
-import { cityRoutes, getFeaturedDistricts, getStatusRailDistricts } from '../data/publicCity';
+import { CityMap, ForgeBuildNavigation, MaturityLegend, ProofLane, StatusRail } from '../components/portal/PortalPrimitives';
+import { cityRoutes, getDistrict, getFeaturedDistricts, getStatusRailDistricts } from '../data/publicCity';
 import operators from '../data/operators.json';
 import './HomePage.css';
 
@@ -29,6 +29,7 @@ export default function HomePage() {
   const featured = getFeaturedDistricts();
   const statusRail = getStatusRailDistricts();
   const mapDistricts = cityRoutes.filter((district) => district.id !== 'alignment');
+  const forge = getDistrict('forge');
 
   const panels = {
     signal: (
@@ -53,17 +54,6 @@ export default function HomePage() {
     ),
     city: (
       <div className="gate-directory-room">
-        <div className="gate-directory-motion" aria-hidden="true">
-          <video
-            src="/assets/forge/media-v1/cards/hyperion-city-motion-card.mp4"
-            poster="/assets/forge/media-v1/posters/hyperion-city-motion-card.jpg"
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="metadata"
-          />
-        </div>
         <div className="gate-room-heading">
           <div>
             <span className="city-label">City Directory</span>
@@ -72,6 +62,7 @@ export default function HomePage() {
           <MaturityLegend />
         </div>
         <CityMap districts={mapDistricts} />
+        <ForgeBuildNavigation motion={forge?.motion} />
       </div>
     ),
     proof: (

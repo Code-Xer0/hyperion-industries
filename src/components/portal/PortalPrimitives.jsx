@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { cityRoutes, getDistrict } from '../../data/publicCity';
 import RoomShell from './RoomShell';
@@ -139,6 +140,97 @@ function ForgeMotionShelf({ items }) {
             </div>
           </article>
         ))}
+      </div>
+    </section>
+  );
+}
+
+function ForgeNavigationVideoCard({ item }) {
+  const videoRef = useRef(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return undefined;
+
+    const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)');
+    let visible = false;
+    const syncPlayback = () => {
+      if (!visible || document.hidden || reducedMotion?.matches) {
+        video.pause();
+        return;
+      }
+      video.play().catch(() => {});
+    };
+    document.addEventListener('visibilitychange', syncPlayback);
+    reducedMotion?.addEventListener?.('change', syncPlayback);
+    if (!('IntersectionObserver' in window)) {
+      visible = true;
+      syncPlayback();
+      return () => {
+        document.removeEventListener('visibilitychange', syncPlayback);
+        reducedMotion?.removeEventListener?.('change', syncPlayback);
+        video.pause();
+      };
+    }
+
+    const observer = new IntersectionObserver(([entry]) => {
+      visible = Boolean(entry?.isIntersecting);
+      syncPlayback();
+    }, { threshold: 0.2 });
+
+    observer.observe(video);
+    return () => {
+      observer.disconnect();
+      document.removeEventListener('visibilitychange', syncPlayback);
+      reducedMotion?.removeEventListener?.('change', syncPlayback);
+      video.pause();
+    };
+  }, []);
+
+  return (
+    <Link to="/forge" className="forge-city-media-card" aria-label={`Open Forge: ${item.title}`}>
+      <video
+        ref={videoRef}
+        src={item.src}
+        poster={item.poster}
+        muted
+        loop
+        playsInline
+        preload="metadata"
+        aria-hidden="true"
+      />
+      <div>
+        <span>{item.title}</span>
+        <p>{item.description}</p>
+      </div>
+    </Link>
+  );
+}
+
+export function ForgeBuildNavigation({ motion }) {
+  if (!motion?.cards?.length) return null;
+
+  return (
+    <section className="forge-city-navigation" aria-label="Forge build navigation">
+      <header className="forge-city-navigation-head">
+        <div>
+          <span className="city-label">Forge build navigation</span>
+          <h3>Choose a build signal.</h3>
+          <p>Each route carries its own moving build proof.</p>
+        </div>
+        {motion.stills?.length ? (
+          <div className="forge-city-stills" aria-label="Kuda field stills">
+            {motion.stills.map((still) => (
+              <figure key={still.src}>
+                <img src={still.src} alt={still.alt} loading="lazy" decoding="async" />
+                <figcaption>{still.label}</figcaption>
+              </figure>
+            ))}
+          </div>
+        ) : null}
+      </header>
+      <div className="forge-city-media-grid">
+        {motion.cards.map((item) => <ForgeNavigationVideoCard key={item.id} item={item} />)}
       </div>
     </section>
   );

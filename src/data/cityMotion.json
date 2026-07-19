@@ -26,9 +26,9 @@
     },
     "infrastructure": {
       "type": "video",
-      "src": "/assets/forge/media-v1/cards/hyperion-city-motion-card.mp4",
-      "poster": "/assets/forge/media-v1/posters/hyperion-city-motion-card.jpg",
-      "alt": "Hyperion Forge city motion and workstation infrastructure",
+      "src": "/assets/forge/media-v1/cards/hyperion-operator-environment-card.mp4",
+      "poster": "/assets/forge/media-v1/posters/hyperion-operator-environment-card.jpg",
+      "alt": "Hyperion Forge operator environment and workstation infrastructure",
       "objectPosition": "center",
       "source": "Hyperion Forge field media",
       "truthClass": "product_capture",

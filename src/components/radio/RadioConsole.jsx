@@ -36,7 +36,7 @@ function CoverArt({ track }) {
 export default function RadioConsole() {
   const {
     tracks, idx, track, playing, shuffle, repeat, vol, curTime, dur, progress, isReal,
-    toggle, next, prev, select, seekTo, setVolume, toggleShuffle, toggleRepeat,
+    toggle, next, prev, select, seekTo, setVolume, toggleShuffle, toggleRepeat, warmTrack,
   } = useRadio();
 
   // drive the tracklist EQ animation state on the page root
@@ -142,6 +142,9 @@ export default function RadioConsole() {
               <HoverEditor key={t.id || i} model="radio" index={i}>
                 <div className={`trk${i === idx ? ' on' : ''}`} data-persona={t.persona} role="button" tabIndex={0}
                   onClick={() => select(i)}
+                  onPointerEnter={() => warmTrack(i)}
+                  onPointerDown={() => warmTrack(i)}
+                  onFocus={() => warmTrack(i)}
                   onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); select(i); } }}>
                   <span className="trk-n">{String(i + 1).padStart(2, '0')}</span>
                   <span className="trk-art">

@@ -32,9 +32,6 @@
 .gate-room-heading > p { max-width: 480px; margin: 0; color: var(--text-muted); font-size: 12px; line-height: 1.6; }
 
 .gate-directory-room { position: relative; overflow: hidden; }
-.gate-directory-motion { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; opacity: 0.16; }
-.gate-directory-motion::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, var(--room-panel-bg), transparent 72%); }
-.gate-directory-motion video { width: 100%; height: 100%; object-fit: cover; filter: saturate(0.75) contrast(1.14); }
 .gate-directory-room .gate-room-heading,
 .gate-directory-room .city-map-grid { position: relative; z-index: 1; }
 .gate-directory-room .city-map-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }

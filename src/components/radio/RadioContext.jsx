@@ -14,8 +14,13 @@ export function useRadio() { return useContext(RadioContext); }
 const LS_KEY = 'hyperion_radio';
 const SIM_MS = 200;
 
+function canWarmAudio() {
+  const connection = typeof navigator === 'undefined' ? null : navigator.connection;
+  return !connection?.saveData && !/(^|-)2g/.test(connection?.effectiveType || '');
+}
+
 export function RadioProvider({ tracks, children }) {
-  const list = tracks && tracks.length ? tracks : [];
+  const list = useMemo(() => (tracks?.length ? tracks : []), [tracks]);
 
   const audioRef = useRef(null);
   if (audioRef.current === null && typeof Audio !== 'undefined') {
@@ -44,7 +49,7 @@ export function RadioProvider({ tracks, children }) {
   shuffleRef.current = shuffle;
   repeatRef.current = repeat;
 
-  const telOf = (i) => { const t = list[i]; return t ? { t: t.id, title: t.title } : {}; };
+  const telOf = useCallback((i) => { const t = list[i]; return t ? { t: t.id, title: t.title } : {}; }, [list]);
 
   const hasReal = useCallback((i) => !!list[i]?.audio, [list]);
 
@@ -82,7 +87,7 @@ export function RadioProvider({ tracks, children }) {
     const nextIdx = shuffleRef.current ? Math.floor(Math.random() * list.length) : idxRef.current + 1;
     loadTrack(nextIdx, true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [list.length, stopSim]);
+  }, [list.length, stopSim, telOf]);
 
   const startSim = useCallback(() => {
     stopSim();
@@ -109,6 +114,24 @@ export function RadioProvider({ tracks, children }) {
     }
   }, [list, hasReal]);
 
+  const intentWarmRef = useRef(null);
+  const warmTrack = useCallback((i) => {
+    const nextTrack = list[i];
+    if (!nextTrack?.audio || !canWarmAudio()) return;
+
+    let warmer = intentWarmRef.current;
+    if (!warmer && typeof Audio !== 'undefined') {
+      warmer = new Audio();
+      warmer.preload = 'auto';
+      warmer.muted = true;
+      intentWarmRef.current = warmer;
+    }
+    if (warmer && !(warmer.src || '').endsWith(nextTrack.audio)) {
+      warmer.src = nextTrack.audio;
+      warmer.load();
+    }
+  }, [list]);
+
   // Warm the CURRENT track as soon as the surface mounts (preload=auto starts
   // buffering immediately), so the first Play is near-instant instead of
   // waiting on a cold fetch.
@@ -120,7 +143,7 @@ export function RadioProvider({ tracks, children }) {
     if (hasReal(idxRef.current)) { ensureSrc(); audioRef.current?.play().catch(() => {}); }
     else { startSim(); }
     persist();
-  }, [hasReal, ensureSrc, startSim, persist]);
+  }, [hasReal, ensureSrc, startSim, persist, telOf]);
 
   const pause = useCallback(() => {
     setPlaying(false); playingRef.current = false;
@@ -152,10 +175,12 @@ export function RadioProvider({ tracks, children }) {
     simRef.current = 0; setCurTime(0);
     stopSim();
     a.pause();
-    a.src = list[roadHomeIdx].audio;
+    if (!(a.src || '').endsWith(list[roadHomeIdx].audio)) {
+      a.src = list[roadHomeIdx].audio;
+      a.load();
+    }
     a.currentTime = 0;
     a.volume = 0;
-    a.load();
     setDur(list[roadHomeIdx].duration || 0);
     setPlaying(true); playingRef.current = true;
     logEvent('play', { t: list[roadHomeIdx].id, title: list[roadHomeIdx].title });
@@ -186,7 +211,7 @@ export function RadioProvider({ tracks, children }) {
   }, [startRoadHome]);
 
   const toggle = useCallback(() => { (playingRef.current ? pause : startPlayback)(); }, [pause, startPlayback]);
-  const next = useCallback(() => { logEvent('skip', telOf(idxRef.current)); loadTrack(shuffleRef.current ? Math.floor(Math.random() * list.length) : idxRef.current + 1, true); }, [loadTrack, list.length]);
+  const next = useCallback(() => { logEvent('skip', telOf(idxRef.current)); loadTrack(shuffleRef.current ? Math.floor(Math.random() * list.length) : idxRef.current + 1, true); }, [loadTrack, list.length, telOf]);
   const prev = useCallback(() => {
     if (simRef.current > 3 || (hasReal(idxRef.current) && (audioRef.current?.currentTime || 0) > 3)) {
       simRef.current = 0; setCurTime(0);
@@ -206,7 +231,7 @@ export function RadioProvider({ tracks, children }) {
     simRef.current = t; setCurTime(t);
     if (hasReal(idxRef.current) && audioRef.current) audioRef.current.currentTime = t;
     persist();
-  }, [hasReal, ensureSrc, list, persist]);
+  }, [hasReal, ensureSrc, list, persist, telOf]);
 
   const setVolume = useCallback((v) => { setVol(v); if (audioRef.current) audioRef.current.volume = v; persist(); }, [persist]);
   const toggleShuffle = useCallback(() => setShuffle((s) => !s), []);
@@ -259,6 +284,7 @@ export function RadioProvider({ tracks, children }) {
     stopSim();
     try { audioRef.current?.pause(); } catch { /* noop */ }
     try { prefetchRef.current?.removeAttribute('src'); prefetchRef.current = null; } catch { /* noop */ }
+    try { intentWarmRef.current?.removeAttribute('src'); intentWarmRef.current = null; } catch { /* noop */ }
   }, [stopSim]);
 
   const track = list[idx] || null;
@@ -267,8 +293,8 @@ export function RadioProvider({ tracks, children }) {
   const value = useMemo(() => ({
     tracks: list, idx, track, playing, shuffle, repeat, vol, curTime, dur, progress,
     isReal: hasReal(idx),
-    toggle, play: startPlayback, pause, next, prev, select, seekTo, setVolume, toggleShuffle, toggleRepeat,
-  }), [list, idx, track, playing, shuffle, repeat, vol, curTime, dur, progress, hasReal, toggle, startPlayback, pause, next, prev, select, seekTo, setVolume, toggleShuffle, toggleRepeat]);
+    toggle, play: startPlayback, pause, next, prev, select, seekTo, setVolume, toggleShuffle, toggleRepeat, warmTrack,
+  }), [list, idx, track, playing, shuffle, repeat, vol, curTime, dur, progress, hasReal, toggle, startPlayback, pause, next, prev, select, seekTo, setVolume, toggleShuffle, toggleRepeat, warmTrack]);
 
   return <RadioContext.Provider value={value}>{children}</RadioContext.Provider>;
 }

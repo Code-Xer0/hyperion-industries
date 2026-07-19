@@ -521,6 +521,8 @@
 .city-route-chamber:hover .city-route-preview-media > img,
 .city-route-chamber:hover .city-route-preview-media > video { filter: saturate(1) contrast(1.1); transform: scale(1.04); }
 .city-route-preview-scrim { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(2, 4, 7, 0.48), rgba(2, 4, 7, 0.08) 55%, rgba(2, 4, 7, 0.32)), linear-gradient(0deg, rgba(2, 4, 7, 0.96), transparent 62%); }
+.city-route-preview-stills { position: absolute; z-index: 4; top: 58px; left: 30px; display: flex; gap: 7px; }
+.city-route-preview-stills img { width: clamp(64px, 8vw, 112px); aspect-ratio: 4 / 3; object-fit: cover; border: 1px solid color-mix(in srgb, var(--district-accent) 52%, transparent); background: #020407; box-shadow: 0 10px 24px rgba(0,0,0,0.4); }
 .city-route-preview-mark { position: absolute; z-index: 2; top: 28px; left: 30px; width: min(184px, 31%); aspect-ratio: 3 / 2; object-fit: cover; border: 1px solid color-mix(in srgb, var(--district-accent) 42%, transparent); background: #000; box-shadow: 0 16px 44px rgba(0,0,0,0.56), 0 0 26px color-mix(in srgb, var(--district-accent) 14%, transparent); animation: city-mark-arrive 700ms var(--motion-ease-cinematic) both; }
 .city-route-preview-mark.is-right {
   top: 32px;
