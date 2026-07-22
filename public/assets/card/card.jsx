@@ -150,7 +150,7 @@ function Portrait() {
             id="operator-portrait"
             shape="circle"
             placeholder="ΔEUS χ"
-            src="/assets/operators/deus-x-portrait-complete.png"
+            src="/assets/operators/victor-amani-focus.webp"
           ></image-slot>
         </div>
       </div>
