@@ -14,7 +14,8 @@ Refresh the public `/dxcard` experience from the supplied Victor Amani Operator 
 
 ## Implemented
 
-- Published the supplied Victor `FOCUS` animation as the live card portrait source and matched the supplied crop state.
+- Published the supplied Victor `FOCUS` animation as the live card portrait source.
+- Reset the inherited portrait crop to a centered `x: 0, y: 0` frame after live review showed the previous vertical offset clipping the animation.
 - Re-encoded the 30.3 MB / 223-frame GIF as a 1.7 MB / 112-frame animated WebP for the public route while preserving the full 9.29-second loop. The original download remains untouched.
 - Optimized public animation SHA-256: `A72DAE03F326E48BF04B197A0E9F4DF3739B88B3D77958F726D56B7BFBC40179`.
 - Updated Victor's direct channel to the address in the supplied profile.
