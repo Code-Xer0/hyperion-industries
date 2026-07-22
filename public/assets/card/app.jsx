@@ -12,6 +12,7 @@ const FALLBACK_CONFIG = {
   accent:   "#ff2a36",
   motion:   "on",
   serial:   "HYP-Δ-0001",
+  index:    "I",
   name:     "VICTOR AMANI",
   alias:    "Δeus χ",
   role:     "FOUNDER · SYSTEMS ARCHITECT",
@@ -27,9 +28,9 @@ const FALLBACK_CONFIG = {
     titlePost:      "contact with reality.",
     body:           "Hyperion develops resilient infrastructure, continuity systems, and adaptive operational tooling — designed to remain functional under pressure, change, and uncertainty.",
     website:        "hyperion-industries.dev",
-    email:          "va@hyperion-industries.dev",
+    email:          "deusx@hyperion.industries",
   },
-  email:   "va@hyperion-industries.dev",
+  email:   "deusx@hyperion.industries",
   phone:   "+1 (612) 314-9992",
   website: "hyperion-industries.dev",
   links: {
@@ -49,10 +50,34 @@ function applyAccent(accent) {
   const g = parseInt(hex.slice(2, 4), 16);
   const b = parseInt(hex.slice(4, 6), 16);
   root.style.setProperty("--accent",       accent);
+  root.style.setProperty("--accent-rgb",   `${r}, ${g}, ${b}`);
   root.style.setProperty("--accent-soft",  `rgba(${r},${g},${b},0.18)`);
   root.style.setProperty("--accent-faint", `rgba(${r},${g},${b},0.06)`);
   root.style.setProperty("--accent-line",  `rgba(${r},${g},${b},0.55)`);
   root.style.setProperty("--accent-glow",  `rgba(${r},${g},${b},0.35)`);
+}
+
+function StageMarks({ serial, index = "I" }) {
+  return (
+    <div className="stage-marks" aria-hidden="true">
+      <div className="tl">
+        <div className="hot">HYP · OPERATOR REGISTRY</div>
+        <span>NODE / {index} · FORGE DISTRICT</span>
+      </div>
+      <div className="tr">
+        <div className="hot">CARD ID · {serial}</div>
+        <span>REV 2026.07</span>
+      </div>
+      <div className="bl">
+        <span>UPLINK NOMINAL</span>
+        <div className="hot">↳ READING</div>
+      </div>
+      <div className="br">
+        <span>HANDSHAKE · OK</span>
+        <div className="hot">∆ — SIGNED</div>
+      </div>
+    </div>
+  );
 }
 
 function buildData(c) {
@@ -125,6 +150,7 @@ function App() {
   return (
     <div className="stage">
       <SignalField enabled={config.motion === "on"} />
+      <StageMarks serial={config.serial} index={config.index} />
       <OperatorCard data={buildData(config)} motion={config.motion} />
     </div>
   );
