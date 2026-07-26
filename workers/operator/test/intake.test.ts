@@ -105,6 +105,41 @@ describe("intake evaluation and submission", () => {
     }
   });
 
+  it("classifies configurator briefs without treating them as a quote or order", async () => {
+    const common = {
+      "forge.outcome": "Run a private local workload",
+      "forge.local_first": "yes",
+      "forge.budget": "4000_6500",
+      "forge.timeline": "quarter",
+    };
+    const cases = [
+      ["desktop", "forge", "F1"],
+      ["creator", "forge", "F1"],
+      ["local_ai", "forge", "F2"],
+      ["upgrade_repair", "forge", "F0"],
+      ["sim_rig", "forge", "F2"],
+    ] as const;
+    for (const [systemType, route, classification] of cases) {
+      const response = await worker().fetch(postJson("/api/intake/evaluate", {
+        lane: "forge", answers: { ...common, "forge.system_type": systemType },
+      }), baseEnv(), executionContext().ctx);
+      expect(await response.json()).toMatchObject({ decision: { primary_route: route, classification, authority_boundary: "operator_review_only" } });
+    }
+
+    const deployment = await worker().fetch(postJson("/api/intake/evaluate", {
+      lane: "forge",
+      answers: {
+        ...common,
+        "forge.system_type": "deployment",
+        "forge.outcome": "Host a controlled local service",
+        site_control: "yes",
+        power_network_readiness: "documented",
+        onsite_sponsor: "yes",
+      },
+    }), baseEnv(), executionContext().ctx);
+    expect(await deployment.json()).toMatchObject({ decision: { primary_route: "pandora", classification: "P3" } });
+  });
+
   it("skips diagnostics when automated classification is declined", async () => {
     const response = await worker().fetch(
       postJson("/api/intake/evaluate", { lane: "forge", answers: { desired_outcome: "Build" }, automated_classification: false }),
@@ -151,6 +186,25 @@ describe("intake evaluation and submission", () => {
     expect(proposalInsert?.sql).toContain("'active'");
     const outboxInsert = db.batches[0]?.find((statement) => statement.sql.includes("INSERT INTO intake_outbox"));
     expect(outboxInsert?.sql).toContain("revision_hash");
+  });
+
+  it("routes the Forge configurator form to the durable Forge review queue", async () => {
+    const db = new MockD1().queueFirst(null);
+    const response = await worker().fetch(
+      postJson("/api/intake/submissions", validSubmission("forge-configurator", {
+        "forge.system_type": "desktop",
+        "forge.outcome": "Play and create locally",
+        "forge.local_first": "yes",
+        "forge.budget": "2500_4000",
+        "forge.timeline": "flexible",
+      }), { "idempotency-key": "submit-forge-configurator-123456" }),
+      baseEnv({ DB: db.binding() }), executionContext().ctx,
+    );
+    expect(response.status).toBe(201);
+    const decisionInsert = db.batches[0]?.find((statement) => statement.sql.includes("INSERT INTO intake_routing_decisions"));
+    expect(JSON.stringify(decisionInsert?.values)).toContain('"forge"');
+    expect(JSON.stringify(decisionInsert?.values)).toContain("not a quote");
+    expect(JSON.stringify(decisionInsert?.values)).not.toContain('price_commit');
   });
 
   it("durably quarantines a same-ID different-hash revision collision", async () => {

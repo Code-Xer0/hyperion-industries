@@ -17,7 +17,7 @@
     "supersedes_submission_id": { "type": ["string", "null"] },
     "form_id": {
       "type": "string",
-      "enum": ["universal-router", "forge-build-profile", "pandora-readiness", "continuity-assessment", "operator-identity", "support", "relationship", "general"]
+      "enum": ["universal-router", "forge-build-profile", "forge-configurator", "pandora-readiness", "continuity-assessment", "operator-identity", "support", "relationship", "general"]
     },
     "form_version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
     "locale": { "type": "string", "default": "en-US" },

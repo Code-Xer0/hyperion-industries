@@ -1,0 +1,229 @@
+.forge-catalog-page {
+  --forge-text: #f5f5f2;
+  --forge-text-soft: #c9c9c3;
+  --forge-text-muted: #8b8e91;
+  --forge-border: #34383d;
+  min-height: 100vh;
+  padding: 92px clamp(16px, 4vw, 62px) 72px;
+  color: var(--forge-text);
+  background:
+    radial-gradient(circle at 76% 10%, rgba(33, 214, 232, .09), transparent 28rem),
+    radial-gradient(circle at 20% 18%, rgba(255, 199, 44, .08), transparent 30rem),
+    linear-gradient(180deg, rgba(4, 5, 6, .96), rgba(8, 10, 12, .98));
+}
+
+.forge-catalog-page::before {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  content: "";
+  opacity: .15;
+  background-image:
+    linear-gradient(rgba(255,255,255,.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: linear-gradient(to bottom, black, transparent 78%);
+}
+
+.forge-catalog-hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(210px, 320px);
+  gap: 40px;
+  max-width: 1280px;
+  min-height: 430px;
+  margin: 0 auto;
+  padding: clamp(30px, 6vw, 76px);
+  overflow: hidden;
+  border: 1px solid rgba(255, 199, 44, .2);
+  border-radius: 28px;
+  background:
+    linear-gradient(112deg, rgba(8, 10, 12, .96) 45%, rgba(14, 19, 21, .76)),
+    url('/assets/forge/media-v1/posters/hyperion-workstation-triptych-1280x720.jpg') center / cover;
+  box-shadow: 0 32px 110px rgba(0, 0, 0, .46);
+}
+
+.forge-catalog-hero::after {
+  position: absolute;
+  inset: auto -12% -72% 38%;
+  width: 700px;
+  aspect-ratio: 1;
+  content: "";
+  border: 1px solid rgba(33, 214, 232, .18);
+  border-radius: 50%;
+  box-shadow: 0 0 0 58px rgba(33, 214, 232, .025), 0 0 0 116px rgba(255, 199, 44, .02);
+}
+
+.forge-catalog-hero-copy { position: relative; z-index: 2; max-width: 780px; }
+.forge-catalog-hero-copy > p:first-child {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--gold);
+  font: 700 .72rem/1.4 var(--font-display);
+  letter-spacing: .16em;
+}
+.forge-catalog-hero h1 {
+  max-width: 760px;
+  margin: 18px 0;
+  font: 600 clamp(2.8rem, 7vw, 6.6rem)/.9 var(--font-display);
+  letter-spacing: -.055em;
+}
+.forge-catalog-hero h1 em { color: var(--cyan); font-style: normal; }
+.forge-catalog-intro { max-width: 680px; color: var(--forge-text-soft); font-size: clamp(.95rem, 1.4vw, 1.08rem); line-height: 1.72; }
+.forge-catalog-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 30px; }
+.forge-catalog-actions a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 12px 17px;
+  color: var(--forge-text);
+  border: 1px solid var(--forge-border);
+  border-radius: 7px;
+  font: 700 .72rem/1 var(--font-display);
+  letter-spacing: .08em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+.forge-catalog-actions a.is-primary { color: #080808; border-color: var(--gold); background: var(--gold); }
+
+.forge-catalog-hero-telemetry {
+  position: relative;
+  z-index: 2;
+  align-self: end;
+  display: grid;
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 14px;
+  background: rgba(4, 7, 8, .82);
+  backdrop-filter: blur(14px);
+}
+.forge-catalog-hero-telemetry div { display: flex; justify-content: space-between; gap: 16px; padding: 15px; border-bottom: 1px solid rgba(255,255,255,.07); }
+.forge-catalog-hero-telemetry div:last-child { border: 0; }
+.forge-catalog-hero-telemetry span { color: var(--forge-text-muted); font: 600 .65rem/1.3 var(--font-display); letter-spacing: .1em; text-transform: uppercase; }
+.forge-catalog-hero-telemetry strong { color: var(--cyan); font: 700 .75rem/1.3 var(--font-display); text-transform: uppercase; }
+
+.forge-catalog-orbit { position: absolute; top: 26px; right: 30px; z-index: 2; width: 52px; aspect-ratio: 1; border: 1px solid rgba(255,255,255,.13); border-radius: 50%; }
+.forge-catalog-orbit span { position: absolute; inset: 8px; border: 1px solid rgba(33,214,232,.35); border-radius: 50%; }
+.forge-catalog-orbit span:nth-child(2) { inset: 17px; background: var(--cyan); box-shadow: 0 0 18px var(--cyan); }
+.forge-catalog-orbit span:nth-child(3) { inset: -4px 22px; border-color: var(--gold); animation: forge-catalog-orbit 5s linear infinite; }
+
+.forge-catalog-control {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 28px;
+  max-width: 1280px;
+  margin: 54px auto 22px;
+}
+.forge-catalog-source { max-width: 560px; }
+.forge-catalog-source > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--gold);
+  font: 700 .68rem/1 var(--font-display);
+  letter-spacing: .11em;
+  text-transform: uppercase;
+}
+.forge-catalog-source > span::before { width: 7px; height: 7px; content: ""; border-radius: 50%; background: #e2a63b; box-shadow: 0 0 10px #e2a63b; }
+.forge-catalog-source > span.is-live::before { background: #63e2b4; box-shadow: 0 0 10px #63e2b4; }
+.forge-catalog-source p { margin-top: 9px; color: var(--forge-text-muted); font-size: .78rem; line-height: 1.55; }
+.forge-catalog-filters { display: grid; justify-items: end; gap: 9px; }
+.forge-catalog-filters > span { display: flex; align-items: center; gap: 7px; color: var(--forge-text-muted); font: 700 .65rem/1 var(--font-display); letter-spacing: .1em; text-transform: uppercase; }
+.forge-catalog-filters > div { display: flex; flex-wrap: wrap; justify-content: end; gap: 6px; }
+.forge-catalog-filters button {
+  padding: 8px 11px;
+  color: var(--forge-text-muted);
+  border: 1px solid var(--forge-border);
+  border-radius: 99px;
+  background: rgba(255,255,255,.025);
+  font: 600 .66rem/1 var(--font-display);
+  text-transform: capitalize;
+  cursor: pointer;
+}
+.forge-catalog-filters button:hover,
+.forge-catalog-filters button:focus-visible,
+.forge-catalog-filters button.is-active { color: #080808; border-color: var(--gold); outline: none; background: var(--gold); }
+
+.forge-product-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; max-width: 1280px; margin: 0 auto; }
+.forge-product-card {
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 20px;
+  background: linear-gradient(145deg, rgba(20,22,24,.94), rgba(9,11,12,.96));
+  box-shadow: 0 20px 60px rgba(0,0,0,.25);
+  transition: transform .25s var(--ease-out), border-color .25s;
+}
+.forge-product-card:hover { transform: translateY(-4px); border-color: rgba(255,199,44,.42); }
+.forge-product-card:last-child:nth-child(odd) { grid-column: 1 / -1; }
+.forge-product-media { position: relative; height: clamp(230px, 31vw, 390px); overflow: hidden; background: #0b0d0e; }
+.forge-product-media img { width: 100%; height: 100%; object-fit: cover; filter: saturate(.86) contrast(1.04); transition: transform .7s var(--ease-out); }
+.forge-product-card:hover .forge-product-media img { transform: scale(1.025); }
+.forge-product-media-shade { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,.04) 45%, rgba(5,6,7,.78)); }
+.forge-product-index { position: absolute; top: 16px; right: 16px; color: rgba(255,255,255,.5); font: 700 .68rem/1 var(--font-display); letter-spacing: .15em; }
+.forge-product-badges { position: absolute; bottom: 15px; left: 15px; display: flex; flex-wrap: wrap; gap: 6px; }
+.forge-product-badges span { padding: 6px 8px; color: var(--gold); border: 1px solid rgba(255,199,44,.38); border-radius: 4px; background: rgba(6,7,8,.8); font: 700 .58rem/1 var(--font-display); letter-spacing: .08em; }
+.forge-product-body { padding: clamp(20px, 3vw, 32px); }
+.forge-product-eyebrow { color: var(--cyan); font: 700 .65rem/1.3 var(--font-display); letter-spacing: .13em; }
+.forge-product-body h2 { margin: 9px 0 12px; font: 600 clamp(1.6rem, 3vw, 2.55rem)/1 var(--font-display); letter-spacing: -.025em; }
+.forge-product-summary { color: var(--forge-text-soft); line-height: 1.66; }
+.forge-product-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 19px 0; }
+.forge-product-tags span { padding: 6px 9px; color: var(--forge-text-muted); border: 1px solid var(--forge-border); border-radius: 99px; font-size: .68rem; }
+.forge-product-highlights { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 0; padding: 0; list-style: none; }
+.forge-product-highlights li { display: flex; align-items: center; gap: 7px; color: var(--forge-text-soft); font-size: .72rem; line-height: 1.35; }
+.forge-product-highlights svg { flex: none; color: var(--gold); }
+.forge-product-card-foot { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-top: 24px; padding-top: 18px; border-top: 1px solid rgba(255,255,255,.08); }
+.forge-product-card-foot > span { display: flex; align-items: center; gap: 7px; color: var(--forge-text-muted); font-size: .66rem; }
+.forge-product-card-foot > span svg { color: #63e2b4; }
+.forge-product-card-foot a { display: inline-flex; align-items: center; gap: 8px; color: var(--gold); font: 700 .68rem/1 var(--font-display); letter-spacing: .06em; text-decoration: none; text-transform: uppercase; }
+.forge-catalog-media-fallback { display: grid; width: 100%; height: 100%; place-items: center; align-content: center; gap: 12px; color: var(--forge-text-muted); background: radial-gradient(circle, rgba(33,214,232,.08), transparent 55%); font: 700 .65rem/1 var(--font-display); letter-spacing: .1em; text-transform: uppercase; }
+.forge-catalog-media-fallback svg { width: 54px; height: 54px; color: var(--cyan); opacity: .55; }
+
+.forge-catalog-boundary {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(250px, .8fr);
+  gap: 30px;
+  max-width: 1280px;
+  margin: 56px auto 0;
+  padding: clamp(24px, 4vw, 42px);
+  border: 1px solid rgba(33,214,232,.2);
+  border-radius: 20px;
+  background: rgba(9, 13, 15, .78);
+}
+.forge-catalog-boundary svg { color: var(--cyan); }
+.forge-catalog-boundary span { display: block; margin-top: 14px; color: var(--cyan); font: 700 .65rem/1 var(--font-display); letter-spacing: .12em; text-transform: uppercase; }
+.forge-catalog-boundary h2 { max-width: 500px; margin-top: 8px; font: 600 clamp(1.35rem, 2.5vw, 2rem)/1.1 var(--font-display); }
+.forge-catalog-boundary > p { color: var(--forge-text-soft); font-size: .83rem; line-height: 1.7; }
+.forge-catalog-boundary ul { display: grid; gap: 10px; margin: 0; padding-left: 18px; color: var(--forge-text-muted); font-size: .75rem; line-height: 1.5; }
+
+@keyframes forge-catalog-orbit { to { transform: rotate(360deg); } }
+
+@media (max-width: 880px) {
+  .forge-catalog-hero { grid-template-columns: 1fr; min-height: 0; }
+  .forge-catalog-hero-telemetry { max-width: 420px; }
+  .forge-catalog-control { align-items: stretch; flex-direction: column; }
+  .forge-catalog-filters { justify-items: start; }
+  .forge-catalog-filters > div { justify-content: start; }
+  .forge-product-grid { grid-template-columns: 1fr; }
+  .forge-product-card:last-child:nth-child(odd) { grid-column: auto; }
+  .forge-catalog-boundary { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 560px) {
+  .forge-catalog-page { padding: 78px 12px 48px; }
+  .forge-catalog-hero { padding: 25px 20px; border-radius: 18px; }
+  .forge-catalog-hero h1 { font-size: 2.75rem; }
+  .forge-catalog-actions { flex-direction: column; }
+  .forge-catalog-actions a { width: 100%; }
+  .forge-product-media { height: 250px; }
+  .forge-product-highlights { grid-template-columns: 1fr; }
+  .forge-product-card-foot { align-items: flex-start; flex-direction: column; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .forge-catalog-orbit span:nth-child(3) { animation: none; }
+  .forge-product-card, .forge-product-media img { transition: none; }
+}

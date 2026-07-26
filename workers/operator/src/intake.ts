@@ -155,6 +155,7 @@ function cleanString(value: unknown, maximum: number): string | null {
 
 function routeForForm(formId: string): LaneId {
   if (formId === "forge-build-profile") return "forge";
+  if (formId === "forge-configurator") return "forge";
   if (formId === "pandora-readiness") return "pandora";
   if (formId === "continuity-assessment") return "continuity";
   if (formId === "relationship") return "relationships";

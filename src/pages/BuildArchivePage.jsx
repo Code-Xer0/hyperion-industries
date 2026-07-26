@@ -307,7 +307,7 @@ export default function BuildArchivePage() {
       <div className="room-panel-grid"><div className="room-panel-copy"><span className="sp-label">Public build record</span><h2>{content.buildarchive.footer.title}</h2><p>{content.buildarchive.footer.desc}</p></div><div className="room-note-grid archive-posture-notes"><article className="room-note"><span>01</span><h3>Artifact</h3><p>Completed builds remain visible as proof of fabrication and handoff.</p></article><article className="room-note"><span>02</span><h3>Boundary</h3><p>Client records, private specifications, and internal work state remain excluded.</p></article></div></div>
     ),
     inquiry: (
-      <div className="room-panel-grid"><div className="room-panel-copy"><h2>Build around the workload.</h2><p>Share what the machine has to do, where it will live, the timing, and the support reality.</p><div className="room-action-row"><Link to="/forge" className="btn btn-ghost">Enter the Forge</Link><a href="mailto:forge@hyperion-industries.dev?subject=Build%20Inquiry" className="btn btn-gold">Start Inquiry</a></div></div></div>
+      <div className="room-panel-grid"><div className="room-panel-copy"><h2>Build around the workload.</h2><p>Share what the machine has to do, where it will live, the timing, and the support reality.</p><div className="room-action-row"><Link to="/forge" className="btn btn-ghost">Enter the Forge</Link><Link to="/forge/configurator" className="btn btn-gold">Configure a Build</Link></div></div></div>
     ),
   };
 

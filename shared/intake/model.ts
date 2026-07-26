@@ -1,4 +1,5 @@
 import forgeSource from './contracts/forms/forge-build-profile.form.json';
+import forgeConfiguratorSource from './contracts/forms/forge-configurator.form.json';
 import pandoraSource from './contracts/forms/pandora-readiness.form.json';
 import serviceSource from './contracts/forms/service-lanes.form-blueprints.json';
 import universalSource from './contracts/forms/universal-router.form.json';
@@ -13,6 +14,7 @@ export const AUTHORITY_BOUNDARY = 'operator_review_only';
 
 export const SOURCE_CONTRACTS = Object.freeze({
   forge: forgeSource,
+  forgeConfigurator: forgeConfiguratorSource,
   pandora: pandoraSource,
   services: serviceSource,
   universal: universalSource,
@@ -252,6 +254,45 @@ export function evaluateRoute(input: { lane?: unknown; answers?: AnswerMap; auto
   }
 
   if (requested === 'forge') {
+    const systemType = observed(answers, 'forge.system_type');
+    if (systemType !== 'not provided') {
+      const missing = ['forge.outcome', 'forge.system_type', 'forge.local_first', 'forge.budget', 'forge.timeline']
+        .filter((key) => !answers[key] || answers[key] === 'unknown');
+      const thermalConflict = answers['forge.form_factor'] === 'very_compact'
+        && answers['forge.acoustics'] === 'near_silent'
+        && answers['forge.sustained_load'] === 'continuous';
+      if (systemType === 'deployment') {
+        const readiness = observed(answers, 'power_network_readiness');
+        const site = observed(answers, 'site_control');
+        const sponsor = observed(answers, 'onsite_sponsor');
+        const classification = [readiness, site, sponsor].includes('unknown') || missing.length ? 'PX'
+          : readiness === 'not_ready' || site === 'no' ? 'P0'
+          : readiness === 'documented' && site === 'yes' && sponsor === 'yes' ? 'P3' : 'P1';
+        return {
+          ...base, primary_route: 'pandora', classification, review_priority: 'standard', diagnostics_skipped: false,
+          client_summary: 'This Forge deployment brief is proposed for Pandora-style readiness review. It is not deployment approval or a hardware commitment.',
+          evidence: [
+            evidence('FG-01', 'Requested system lane', systemType, 'Routes deployment and rack work through readiness review.'),
+            evidence('FG-02', 'Site control', site, 'Site control is required before deployment scope can advance.'),
+            evidence('FG-03', 'Power and network', readiness, classification === 'PX' ? 'Material unknowns require clarification.' : 'Records the initial infrastructure posture.'),
+          ],
+        };
+      }
+      const classification = missing.length || thermalConflict ? 'FX'
+        : ['local_ai', 'sim_rig'].includes(systemType) ? 'F2'
+        : systemType === 'upgrade_repair' ? 'F0' : 'F1';
+      return {
+        ...base, primary_route: 'forge', classification, review_priority: 'standard', diagnostics_skipped: false,
+        client_summary: classification === 'FX'
+          ? 'This Forge brief contains material unknowns or a physical constraint conflict. An operator will clarify it before any system is proposed.'
+          : `This is a ${systemType.replace(/_/g, ' ')} discovery brief for operator review. It is not a quote, compatibility verdict, or build commitment.`,
+        evidence: [
+          evidence('FG-01', 'Requested system lane', systemType, 'Sets the appropriate Forge review path.'),
+          evidence('FG-02', 'Custody posture', observed(answers, 'forge.local_first'), 'Records whether local-first operation is a stated requirement.'),
+          evidence('FG-03', 'Material unknowns', missing.join(', ') || (thermalConflict ? 'thermal constraint conflict' : 'none'), missing.length || thermalConflict ? 'Forces operator clarification.' : 'No forced clarification gate applied.'),
+        ],
+      };
+    }
     const missing = ['desired_outcome', 'build_surface', 'local_first', 'constraints'].filter((key) => !answers[key] || answers[key] === 'unknown');
     const classification = missing.length ? 'FX' : observed(answers, 'integration_count') === '3+' || observed(answers, 'build_surface') === 'hybrid' ? 'F2' : 'F1';
     return {
@@ -309,6 +350,7 @@ export function publicContractManifest() {
     source_form_versions: {
       universal: String((universalSource as { version?: unknown }).version ?? '1.0.0'),
       forge: String((forgeSource as { version?: unknown }).version ?? '1.0.0'),
+      forge_configurator: String((forgeConfiguratorSource as { version?: unknown }).version ?? '1.0.0'),
       pandora: String((pandoraSource as { version?: unknown }).version ?? '1.0.0'),
       services: String((serviceSource as { version?: unknown }).version ?? '1.0.0'),
       contact_patch: CONTRACT_VERSION,

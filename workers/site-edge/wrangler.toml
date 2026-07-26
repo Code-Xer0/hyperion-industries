@@ -4,6 +4,10 @@ compatibility_date = "2026-07-13"
 compatibility_flags = ["global_fetch_private_origin"]
 workers_dev = false
 
+# Airtable is an optional presentation overlay. Configure AIRTABLE_BASE_ID,
+# AIRTABLE_TABLE_ID, and optionally AIRTABLE_VIEW_ID as Worker variables.
+# Store AIRTABLE_PAT only with `wrangler secret put AIRTABLE_PAT`; never commit it.
+
 [[routes]]
 pattern = "hyperion-industries.dev/*"
 zone_name = "hyperion-industries.dev"

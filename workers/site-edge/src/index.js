@@ -1,4 +1,5 @@
 import { SEO_REDIRECTS, SEO_ROUTE_BY_PATH } from '../../../src/data/seoRoutes.js';
+import { handleForgeProducts } from './forge-products.js';
 
 const PASS_THROUGH_PREFIXES = ['/api/', '/assets/', '/.well-known/'];
 
@@ -33,9 +34,13 @@ async function notFound(request, originFetch) {
   });
 }
 
-export async function handleRequest(request, originFetch = fetch) {
+export async function handleRequest(request, originFetch = fetch, env = {}, externalFetch = fetch) {
   const url = new URL(request.url);
   const pathname = url.pathname;
+
+  if (pathname === '/api/forge/products') {
+    return handleForgeProducts(request, env, externalFetch);
+  }
 
   if (!['GET', 'HEAD'].includes(request.method)) return originFetch(request);
 
@@ -72,9 +77,9 @@ export async function handleRequest(request, originFetch = fetch) {
 }
 
 export default {
-  async fetch(request) {
+  async fetch(request, env) {
     const pathname = new URL(request.url).pathname;
-    const response = await handleRequest(request);
+    const response = await handleRequest(request, fetch, env, fetch);
     const headers = new Headers(response.headers);
     headers.set('x-hyperion-edge-active', 'hyperion-site-edge');
     headers.set('x-hyperion-edge-path', pathname);

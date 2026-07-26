@@ -106,7 +106,24 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
       "relatedRoutes": [
         "/forge",
         "/gallery",
-        "/intake/forge"
+        "/forge/catalog"
+      ]
+    },
+    {
+      "id": "forge--catalog",
+      "path": "/forge/catalog",
+      "canonicalUrl": "https://hyperion-industries.dev/forge/catalog",
+      "title": "Forge Systems Catalog | Hyperion Industries",
+      "description": "Explore Hyperion Forge gaming, creator, local-AI, compact, and custom-loop system lanes before operator review.",
+      "summary": "Five source-opaque system patterns from HypOM, presented as inquiry lanes rather than shelf inventory or instant quotes.",
+      "maturity": "PUBLIC CATALOG · REVIEW REQUIRED",
+      "schemaType": "CollectionPage",
+      "indexable": true,
+      "image": "https://hyperion-industries.dev/assets/forge/media-v1/posters/hyperion-workstation-triptych-1280x720.jpg",
+      "relatedRoutes": [
+        "/forge",
+        "/forge/configurator",
+        "/build-archive"
       ]
     },
     {
@@ -483,6 +500,24 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
       ]
     },
     {
+      "id": "forge--configurator",
+      "path": "/forge/configurator",
+      "canonicalUrl": "https://hyperion-industries.dev/forge/configurator",
+      "title": "Forge Configurator | Hyperion Industries",
+      "description": "Shape a custom workstation, local-AI system, sim rig, repair path, or deployment brief for Hyperion operator review.",
+      "summary": "A guided Forge build brief with explicit review, pricing, and authority boundaries.",
+      "maturity": "COMMERCIAL LANE · REVIEW REQUIRED",
+      "schemaType": "Service",
+      "indexable": true,
+      "image": "https://hyperion-industries.dev/assets/branding/hyperion/hyperion-link-preview.jpeg",
+      "relatedRoutes": [
+        "/forge",
+        "/forge/catalog",
+        "/build-archive",
+        "/contact"
+      ]
+    },
+    {
       "id": "intake",
       "path": "/intake",
       "canonicalUrl": "https://hyperion-industries.dev/intake",
@@ -763,6 +798,10 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
       "to": "/dxcard"
     },
     {
+      "from": "/intake/forge",
+      "to": "/forge/configurator"
+    },
+    {
       "from": "/systems.html",
       "to": "/systems"
     },
@@ -858,5 +897,5 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
       }
     ]
   },
-  "sha256": "de60857f865467e15f1199a9804ac4a0800925b1fbfcf497a1b07c5c4654adae"
+  "sha256": "481d04b34c6fc50a60571d46da8fc9352e6c75a3597759cad1e1ec5d3a1b4baa"
 } as const;

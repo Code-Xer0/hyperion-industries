@@ -13,6 +13,8 @@ const McpPage = lazy(() => import('./pages/McpPage'));
 // contains neither the code nor the route — no source/route leakage.
 const RadioStatsPage = import.meta.env.DEV ? lazy(() => import('./pages/RadioStatsPage')) : () => null;
 const IntakePage = lazy(() => import('./features/intake/IntakePage'));
+const ForgeConfiguratorPage = lazy(() => import('./features/forge-configurator/ForgeConfiguratorPage'));
+const ForgeCatalogPage = lazy(() => import('./features/forge-catalog/ForgeCatalogPage'));
 const SystemsPage = lazy(() => import('./pages/SystemsPage'));
 const BuildArchivePage = lazy(() => import('./pages/BuildArchivePage'));
 const GalleryPage = lazy(() => import('./pages/GalleryPage'));
@@ -81,6 +83,7 @@ function FounderRoute() {
 
 function IntakeLaneRoute() {
   const { lane } = useParams();
+  if (lane === 'forge') return <StaticRedirect to="/forge/configurator" />;
   return PUBLIC_INTAKE_LANES.has(lane) ? <IntakePage /> : <NotFoundPage />;
 }
 
@@ -111,6 +114,8 @@ export default function App() {
               <Route path="/intake" element={<IntakePage />} />
               <Route path="/intake/resume" element={<IntakePage resumeMode />} />
               <Route path="/intake/:lane" element={<IntakeLaneRoute />} />
+              <Route path="/forge/catalog" element={<ForgeCatalogPage />} />
+              <Route path="/forge/configurator" element={<ForgeConfiguratorPage />} />
               <Route path="/chronos" element={<DistrictPage districtId="chronos" />} />
               <Route path="/forge" element={<DistrictPage districtId="forge" />} />
               <Route path="/pandora" element={<DistrictPage districtId="pandora" />} />

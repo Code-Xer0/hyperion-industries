@@ -35,7 +35,18 @@ const fixedRoutes = [
     schemaType: 'CollectionPage',
     ogImage: '/assets/builds/20230803_133211.jpg',
     sourceFiles: ['src/pages/BuildArchivePage.jsx', 'src/data/showcase.json'],
-    relatedPaths: ['/forge', '/gallery', '/intake/forge'],
+    relatedPaths: ['/forge', '/gallery', '/forge/catalog'],
+  },
+  {
+    path: '/forge/catalog',
+    title: 'Forge Systems Catalog | Hyperion Industries',
+    description: 'Explore Hyperion Forge gaming, creator, local-AI, compact, and custom-loop system lanes before operator review.',
+    summary: 'Five source-opaque system patterns from HypOM, presented as inquiry lanes rather than shelf inventory or instant quotes.',
+    maturity: 'PUBLIC CATALOG · REVIEW REQUIRED',
+    schemaType: 'CollectionPage',
+    ogImage: '/assets/forge/media-v1/posters/hyperion-workstation-triptych-1280x720.jpg',
+    sourceFiles: ['src/features/forge-catalog/ForgeCatalogPage.jsx', 'src/data/forgeProductViews.js'],
+    relatedPaths: ['/forge', '/forge/configurator', '/build-archive'],
   },
   {
     path: '/gallery',
@@ -186,6 +197,17 @@ const districtRoutes = cityRoutes.map((district) => ({
 }));
 
 const intakeRoutes = [
+  {
+    path: '/forge/configurator',
+    title: 'Forge Configurator | Hyperion Industries',
+    description: 'Shape a custom workstation, local-AI system, sim rig, repair path, or deployment brief for Hyperion operator review.',
+    summary: 'A guided Forge build brief with explicit review, pricing, and authority boundaries.',
+    maturity: 'COMMERCIAL LANE · REVIEW REQUIRED',
+    schemaType: 'Service',
+    sourceFiles: ['src/features/forge-configurator/ForgeConfiguratorPage.jsx', 'shared/intake/contracts/forms/forge-configurator.form.json'],
+    relatedPaths: ['/forge', '/forge/catalog', '/build-archive', '/contact'],
+    aliases: ['/intake/forge'],
+  },
   {
     path: '/intake',
     title: 'Hyperion Intake OS | Limited Requests and Scoped Contracting',

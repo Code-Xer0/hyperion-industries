@@ -1,4 +1,5 @@
 import { ArrowUpRight, Mail } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import PageShell from '../components/layout/PageShell';
 import RoomShell from '../components/portal/RoomShell';
 import content from '../data/content.json';
@@ -27,7 +28,7 @@ export default function ContactPage() {
         </div>
       </div>
     ),
-    forge: <SignalPanel title="Scope a Forge build." text="Share the workload, room, timeline, budget range, and what the machine must remain serviceable for." href="mailto:forge@hyperion-industries.dev?subject=Hyperion%20Forge%20Build%20Inquiry" action="Start Build Inquiry" />,
+    forge: <SignalPanel title="Scope a Forge build." text="Share the workload, room, timeline, budget range, and what the machine must remain serviceable for." to="/forge/configurator" action="Open Forge Configurator" />,
     chronos: (
       <div className="room-panel-grid"><div className="room-panel-copy"><h2>Enter the public archive lane.</h2><p>Downloads and the stable beta preview live on the public CHR0N.OS surface. Private archives and support context stay outside this site.</p><div className="room-action-row"><a href="https://chr0nos.app" target="_blank" rel="noopener noreferrer" className="btn btn-gold">Open CHR0N.OS <ArrowUpRight size={15} /></a><MailAction href="mailto:hello@hyperion-industries.dev?subject=CHR0N.OS%20Inquiry" secondary>Contact Support</MailAction></div></div></div>
     ),
@@ -37,6 +38,6 @@ export default function ContactPage() {
   return <PageShell><RoomShell eyebrow="Alignment / Contact Signal" title="Contact Signal" summary={`${content.contact.hero.lead} Limited requests are reviewed by appointment after scope discussion.`} status="PUBLIC SIGNAL · LIMITED AVAILABILITY" tone="inquiry" stations={stations} panels={panels} defaultStation="route" /></PageShell>;
 }
 
-function SignalPanel({ title, text, href, action }) {
-  return <div className="room-panel-grid"><div className="room-panel-copy"><h2>{title}</h2><p>{text}</p><div className="room-action-row"><MailAction href={href}>{action}</MailAction></div></div><div className="sp-panel"><span className="sp-label">Useful first signal</span><p>Problem · environment · timeline · budget posture · what must remain under your control.</p></div></div>;
+function SignalPanel({ title, text, href, to, action }) {
+  return <div className="room-panel-grid"><div className="room-panel-copy"><h2>{title}</h2><p>{text}</p><div className="room-action-row">{to ? <Link to={to} className="btn btn-gold">{action}</Link> : <MailAction href={href}>{action}</MailAction>}</div></div><div className="sp-panel"><span className="sp-label">Useful first signal</span><p>Problem · environment · timeline · budget posture · what must remain under your control.</p></div></div>;
 }

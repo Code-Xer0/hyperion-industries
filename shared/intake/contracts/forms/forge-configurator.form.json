@@ -1,0 +1,23 @@
+{
+  "form_id": "forge-configurator",
+  "version": "1.0.0",
+  "title": "Forge Configurator",
+  "maturity": "COMMERCIAL LANE · REVIEW REQUIRED",
+  "authority_boundary": "operator_review_only",
+  "branches": [
+    { "id": "desktop", "label": "Custom desktop", "description": "Gaming, general compute, and personal workstation systems." },
+    { "id": "creator", "label": "Creator workstation", "description": "Video, design, audio, 3D, simulation, and production loads." },
+    { "id": "local_ai", "label": "Local AI system", "description": "Private inference, model work, and local compute." },
+    { "id": "upgrade_repair", "label": "Upgrade or repair", "description": "Extend, diagnose, or recover an existing machine." },
+    { "id": "sim_rig", "label": "Sim rig", "description": "Driving, flight, VR, controls, displays, and room integration." },
+    { "id": "deployment", "label": "Deployment or rack", "description": "Multi-user, edge, rack, and site-readiness work." }
+  ],
+  "sections": [
+    { "id": "system", "label": "System" },
+    { "id": "workload", "label": "Workload" },
+    { "id": "limits", "label": "Limits" },
+    { "id": "handoff", "label": "Handoff" }
+  ],
+  "public_artifact_policy": "uploads_excluded",
+  "submission_state": "held_for_review"
+}
