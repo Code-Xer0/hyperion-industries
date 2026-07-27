@@ -21,6 +21,7 @@ import {
   useReducer,
   useState,
 } from 'react';
+import { CARD_CATALOG } from '../../../shared/card-studio/catalog.ts';
 import {
   CARD_STUDIO_STORAGE_KEY,
   CARD_TEMPLATES,
@@ -31,7 +32,7 @@ import {
   stableFingerprint,
   updateDocumentPath,
 } from './cardStudioModel.js';
-import { submitCardStudioBrief } from './cardStudioSubmission.js';
+import { getCardStudioOrderStatus, submitCardStudioBrief } from './cardStudioSubmission.js';
 import './CardStudioEditor.css';
 
 const CONTROL_SECTIONS = [
@@ -409,9 +410,19 @@ export default function CardStudioEditor() {
   const [overlays, setOverlays] = useState({ safe: true, bleed: false });
   const [savedAt, setSavedAt] = useState(null);
   const [consent, setConsent] = useState(false);
+  const [proofApproved, setProofApproved] = useState(false);
+  const [inviteToken, setInviteToken] = useState('');
+  const [productSku, setProductSku] = useState('card_pvc_standard');
+  const [quantity, setQuantity] = useState(1);
   const [submission, setSubmission] = useState({ state: 'idle', message: '' });
   const document = history.present;
   const preflight = useMemo(() => evaluateCardPreflight(document), [document]);
+  const selectedProduct = CARD_CATALOG.items.find((item) => item.sku === productSku) || CARD_CATALOG.items[0];
+  const inviteReady = inviteToken.trim().length >= 24;
+  const boundedQuantity = Math.max(
+    selectedProduct.minimum_quantity,
+    Math.min(selectedProduct.maximum_quantity, Number(quantity) || selectedProduct.minimum_quantity),
+  );
 
   const setField = useCallback((section, key, value) => {
     dispatch({ type: 'SET', section, key, value });
@@ -446,13 +457,19 @@ export default function CardStudioEditor() {
   }, []);
 
   const submitBrief = async () => {
-    if (!preflight.ready || !consent || submission.state === 'submitting') return;
+    if (!preflight.ready || !consent || !inviteReady || submission.state === 'submitting') return;
     setSubmission({ state: 'submitting', message: 'Staging the design brief for review…' });
     try {
-      const result = await submitCardStudioBrief(document, consent);
+      const result = await submitCardStudioBrief(document, {
+        consent,
+        proofApproved,
+        inviteToken,
+        productSku,
+        quantity: boundedQuantity,
+      });
       setSubmission({
         state: 'submitted',
-        message: `Brief staged for review${result.reference ? ` · ${result.reference}` : ''}. No checkout or payment was created.`,
+        message: `Brief staged for review${result.reference ? ` · ${result.reference}` : ''}. ${result.receipt?.eligibility === 'instant_checkout_eligible' ? 'Eligible for operator-released checkout; no checkout exists yet.' : 'Operator review is required; no checkout or payment was created.'}`,
       });
     } catch (error) {
       const staged = error.status === 404 || error.status === 501 || error.status === 503;
@@ -465,11 +482,29 @@ export default function CardStudioEditor() {
     }
   };
 
+  const refreshOrderStatus = async () => {
+    setSubmission((value) => ({ ...value, state: 'submitting', message: 'Refreshing the durable order projection…' }));
+    try {
+      const result = await getCardStudioOrderStatus();
+      const checkoutUrl = result.order?.checkout_projection?.checkout_url || '';
+      setSubmission({
+        state: 'submitted',
+        message: `Proposal status: ${String(result.order?.status || 'pending').replaceAll('_', ' ')}. ${checkoutUrl ? 'Operator-released checkout is ready.' : 'No checkout or payment has been created.'}`,
+        checkoutUrl,
+      });
+    } catch {
+      setSubmission({
+        state: 'error',
+        message: 'Order status is unavailable in this tab. The durable proposal remains in operator review.',
+      });
+    }
+  };
+
   return (
     <div className="hcs-editor">
       <section className="hcs-editor-header" aria-labelledby="card-studio-title">
         <div>
-          <p className="hcs-kicker">HYPERION IDENTITY FABRICATION · PUBLIC PREVIEW</p>
+          <p className="hcs-kicker">HYPERION IDENTITY FABRICATION · INVITE-ONLY PREVIEW</p>
           <h1 id="card-studio-title">Compose the signal.<br /><span>Keep authority visible.</span></h1>
           <p>
             Build a bounded operator-card brief with a production-aware proof. Your draft stays on this device until you explicitly stage it for review.
@@ -582,12 +617,57 @@ export default function CardStudioEditor() {
       <section className="hcs-submit-panel" aria-labelledby="submit-heading">
         <div>
           <p>04 · Operator handoff</p>
-          <h2 id="submit-heading">Stage a design brief</h2>
+          <h2 id="submit-heading">Stage the design and order intent</h2>
           <p>
-            This creates a review request only. It does not publish a profile, generate production artwork, program NFC, charge a card, reserve a price, or create checkout.
+            This creates an immutable review proposal. It does not publish a profile, generate production artwork, program NFC, charge a card, reserve a price, or create checkout.
           </p>
         </div>
         <div className="hcs-submit-actions">
+          <div className="hcs-order-fields">
+            <Field label="Product">
+              <select value={productSku} onChange={(event) => {
+                const nextSku = event.target.value;
+                const nextProduct = CARD_CATALOG.items.find((item) => item.sku === nextSku);
+                setProductSku(nextSku);
+                setQuantity(nextProduct?.minimum_quantity || 1);
+                setSubmission({ state: 'idle', message: '' });
+              }}>
+                {CARD_CATALOG.items.map((item) => (
+                  <option key={item.sku} value={item.sku}>
+                    {item.name}{item.unit_amount == null ? ' · REVIEW' : ` · $${(item.unit_amount / 100).toFixed(0)}`}
+                  </option>
+                ))}
+              </select>
+            </Field>
+            <Field label="Quantity" hint={`${selectedProduct.minimum_quantity}–${selectedProduct.maximum_quantity} in this lane`}>
+              <input
+                type="number"
+                min={selectedProduct.minimum_quantity}
+                max={selectedProduct.maximum_quantity}
+                value={quantity}
+                onChange={(event) => setQuantity(event.target.value)}
+                onBlur={() => setQuantity(boundedQuantity)}
+              />
+            </Field>
+            <Field label="Invitation code" hint="Invite-only soft launch. The code is sent only when you stage this proposal.">
+              <input
+                type="password"
+                autoComplete="one-time-code"
+                value={inviteToken}
+                onChange={(event) => setInviteToken(event.target.value)}
+                placeholder="Enter your Card Studio invite"
+              />
+            </Field>
+          </div>
+          <div className="hcs-commerce-posture" role="note">
+            <span>{selectedProduct.checkout_mode === 'fixed_checkout' ? 'FIXED-SKU LANE' : 'REVIEW LANE'}</span>
+            <strong>{selectedProduct.unit_amount == null ? 'CUSTOM ESTIMATE' : `$${(selectedProduct.unit_amount / 100).toFixed(2)} CATALOG ESTIMATE`}</strong>
+            <small>NOT A QUOTE · CHECKOUT REQUIRES OPERATOR RELEASE</small>
+          </div>
+          <label className="hcs-consent">
+            <input type="checkbox" checked={proofApproved} onChange={(event) => setProofApproved(event.target.checked)} />
+            <span>I reviewed the front, back, and digital proof and approve this revision for production review. This is not approval of a charge.</span>
+          </label>
           <label className="hcs-consent">
             <input type="checkbox" checked={consent} onChange={(event) => setConsent(event.target.checked)} />
             <span>I understand the selected visible fields are intended for a public identity surface and require operator review before publication.</span>
@@ -595,7 +675,7 @@ export default function CardStudioEditor() {
           <button
             className="hcs-submit-button"
             type="button"
-            disabled={!preflight.ready || !consent || submission.state === 'submitting'}
+            disabled={!preflight.ready || !consent || !inviteReady || submission.state === 'submitting'}
             onClick={submitBrief}
           >
             {submission.state === 'submitting' ? 'Staging brief…' : 'Stage for review'}
@@ -605,6 +685,16 @@ export default function CardStudioEditor() {
             <p className={`hcs-submit-message is-${submission.state}`} role={submission.state === 'error' ? 'alert' : 'status'}>
               {submission.message}
             </p>
+          )}
+          {submission.checkoutUrl && (
+            <a className="hcs-checkout-link" href={submission.checkoutUrl} rel="nofollow noopener">
+              Continue to secure Shopify checkout <ChevronRight size={14} />
+            </a>
+          )}
+          {submission.state === 'submitted' && (
+            <button className="hcs-status-button" type="button" onClick={refreshOrderStatus}>
+              Refresh proposal status
+            </button>
           )}
           <button className="hcs-reset-button" type="button" onClick={() => dispatch({ type: 'RESET' })}>
             Start a clean draft <ChevronRight size={14} />

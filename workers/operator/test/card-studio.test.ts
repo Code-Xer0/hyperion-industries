@@ -232,11 +232,12 @@ describe("Card Studio public order spine", () => {
 });
 
 describe("Card Studio operator decisions", () => {
-  function operatorEnv(db: MockD1) {
+  function operatorEnv(db: MockD1, overrides: Record<string, unknown> = {}) {
     return {
       ...cardEnv(db),
       FOUNDER_COMMAND_PULL_KEY_ID: "fc-card-test",
       FOUNDER_COMMAND_PULL_TOKEN_SHA256: TOKEN_HASH,
+      ...overrides,
     };
   }
 
@@ -308,5 +309,58 @@ describe("Card Studio operator decisions", () => {
       executionContext().ctx,
     );
     expect(response.status).toBe(401);
+  });
+
+  it("creates provider checkout only after the released projection is staged", async () => {
+    const db = new MockD1().queueFirst({
+      intent_id: "coi_abcdefghijkl",
+      product_sku: "card_pvc_standard",
+      quantity: 1,
+      order_status: "checkout_pending",
+      projection_id: "cop_abcdefghijkl",
+      projection_status: "staged",
+      provider_checkout_ref: null,
+      projection_json: JSON.stringify({ status: "staged" }),
+    }, null);
+    const providerFetch = vi.fn(async () => Response.json({
+      data: {
+        cartCreate: {
+          cart: {
+            id: "gid://shopify/Cart/test",
+            checkoutUrl: "https://hyperion-test.myshopify.com/checkouts/test",
+          },
+          userErrors: [],
+        },
+      },
+    }));
+    const checkoutWorker = createWorker({
+      randomUUID: () => UUID,
+      now: () => new Date("2026-07-27T12:00:00.000Z"),
+      fetcher: providerFetch,
+    });
+    const response = await checkoutWorker.fetch(
+      postJson("/api/card-studio/operator/checkout", { intent_id: "coi_abcdefghijkl" }, {
+        authorization: `Bearer ${TOKEN}`,
+        "x-hyprm-consumer": "founder-command-desktop",
+      }),
+      operatorEnv(db, {
+        CARD_STUDIO_SHOPIFY_STORE_DOMAIN: "hyperion-test.myshopify.com",
+        CARD_STUDIO_SHOPIFY_STOREFRONT_API_VERSION: "2026-07",
+        CARD_STUDIO_SHOPIFY_STOREFRONT_TOKEN: "storefront-token-with-entropy",
+        CARD_STUDIO_SHOPIFY_VARIANTS: JSON.stringify({
+          card_pvc_standard: "gid://shopify/ProductVariant/1234567890",
+        }),
+      }),
+      executionContext().ctx,
+    );
+    expect(response.status).toBe(201);
+    expect(await response.json()).toMatchObject({
+      provider_checkout_ref: "gid://shopify/Cart/test",
+      checkout_url: "https://hyperion-test.myshopify.com/checkouts/test",
+      source_outbox_mutated: false,
+    });
+    expect(providerFetch).toHaveBeenCalledOnce();
+    expect(db.statements.some((statement) => statement.sql.includes("card_studio_checkout_attempts"))).toBe(true);
+    expect(db.batches.at(-1)?.some((statement) => statement.sql.includes("card_studio_checkout_projections"))).toBe(true);
   });
 });

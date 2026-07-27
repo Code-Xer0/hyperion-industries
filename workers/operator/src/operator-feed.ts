@@ -172,7 +172,7 @@ async function envelope(row: FeedRow): Promise<Record<string, unknown>> {
   return { ...body, payload_hash: await sha256(JSON.stringify(stable(body))) };
 }
 
-async function cardEnvelope(row: CardFeedRow): Promise<Record<string, unknown>> {
+async function cardEnvelope(row: CardFeedRow, siteOrigin = ""): Promise<Record<string, unknown>> {
   const proposal = parseJson(row.proposal_json, {});
   const body: Record<string, unknown> = {
     source_kind: "card_studio",
@@ -195,6 +195,7 @@ async function cardEnvelope(row: CardFeedRow): Promise<Record<string, unknown>> 
       order_status: row.order_status,
       proposal_state: row.proposal_state,
       proposal,
+      source_link: /^https:\/\/[^/]+$/i.test(siteOrigin) ? `${siteOrigin}/card-studio` : "",
       binary_artifacts: [],
       artifact_policy: "opaque_references_only",
     },
@@ -296,7 +297,7 @@ export async function handleOperatorFeed(request: Request, env: Env, deps: Runti
   const rows = [...intakeRows, ...cardRows]
     .sort((left, right) => left.created_at.localeCompare(right.created_at) || left.outbox_id.localeCompare(right.outbox_id))
     .slice(0, requestedLimit);
-  const items = await Promise.all(rows.map((row) => "intake_id" in row ? envelope(row) : cardEnvelope(row)));
+  const items = await Promise.all(rows.map((row) => "intake_id" in row ? envelope(row) : cardEnvelope(row, env.SITE_ORIGIN)));
   const last = rows.at(-1);
   return jsonResponse({
     consumer_id: consumerId,
@@ -376,7 +377,7 @@ export async function handleOperatorAck(request: Request, env: Env, deps: Runtim
     if (!constantTimeEqual(sourceRow.revision_hash, delivery.revision_hash)) {
       throw new HttpError(409, "revision_hash_conflict", "Delivery revision hash does not match.");
     }
-    const expected = String((row ? await envelope(row) : await cardEnvelope(cardRow as CardFeedRow)).payload_hash);
+    const expected = String((row ? await envelope(row) : await cardEnvelope(cardRow as CardFeedRow, env.SITE_ORIGIN)).payload_hash);
     if (!constantTimeEqual(expected, delivery.payload_hash)) throw new HttpError(409, "payload_hash_conflict", "Delivery payload hash does not match.");
     if (row) {
       statements.push(

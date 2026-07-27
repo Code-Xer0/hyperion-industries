@@ -1,8 +1,10 @@
 import { handleChat } from "./chat";
 import {
   handleCardCatalog,
+  handleCardOperatorCheckout,
   handleCardOperatorDecision,
   handleCardOperatorStatus,
+  handleCardShopifyWebhook,
   handleOrderStatus,
   handleOrderSubmit,
   handleProjectCreate,
@@ -43,6 +45,8 @@ const ROUTES = new Map([
   ["/api/card-studio/uploads/sessions", "POST"],
   ["/api/card-studio/operator/status", "GET"],
   ["/api/card-studio/operator/decisions", "POST"],
+  ["/api/card-studio/operator/checkout", "POST"],
+  ["/api/card-studio/webhooks/shopify", "POST"],
 ]);
 
 const DRAFT_ROUTE = /^\/api\/intake\/drafts\/(drf_[A-Za-z0-9_-]{12,64})$/;
@@ -123,9 +127,10 @@ export function createWorker(overrides: Partial<RuntimeDependencies> = {}): Oper
           throw new HttpError(405, "method_not_allowed", "Method not allowed.", { allow: "GET" });
         }
 
+        const shopifyWebhookRoute = url.pathname === "/api/card-studio/webhooks/shopify";
         const operatorFeedRoute = url.pathname.startsWith("/api/intake/operator/")
           || url.pathname.startsWith("/api/card-studio/operator/");
-        if (["POST", "PUT", "DELETE"].includes(request.method) && !operatorFeedRoute) enforceSameOrigin(request, env);
+        if (["POST", "PUT", "DELETE"].includes(request.method) && !operatorFeedRoute && !shopifyWebhookRoute) enforceSameOrigin(request, env);
 
         if (draftMatch) response = await handleDraft(request, env, draftMatch[1] ?? "", deps);
         else if (cardProjectMatch) response = await handleProjectRead(request, env, cardProjectMatch[1] ?? "");
@@ -147,6 +152,8 @@ export function createWorker(overrides: Partial<RuntimeDependencies> = {}): Oper
         else if (url.pathname === "/api/card-studio/projects") response = await handleProjectCreate(request, env, deps);
         else if (url.pathname === "/api/card-studio/uploads/sessions") response = await handleUploadSession(request, env, deps);
         else if (url.pathname === "/api/card-studio/operator/status") response = await handleCardOperatorStatus(request, env, deps);
+        else if (url.pathname === "/api/card-studio/operator/checkout") response = await handleCardOperatorCheckout(request, env, requestId, deps);
+        else if (url.pathname === "/api/card-studio/webhooks/shopify") response = await handleCardShopifyWebhook(request, env, deps);
         else response = await handleCardOperatorDecision(request, env, requestId, deps);
       } catch (error) {
         if (error instanceof HttpError) {

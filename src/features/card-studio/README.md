@@ -1,18 +1,19 @@
 # Hyperion Card Studio native public preview
 
-`/card-studio` is the compiled React Card Studio surface. It provides a bounded design-document editor, eight guarded templates, front/back/digital proofs, deterministic preflight feedback, local draft recovery, and a future Worker submission adapter.
+`/card-studio` is the compiled React Card Studio surface. It provides a bounded design-document editor, eight guarded templates, front/back/digital proofs, deterministic preflight feedback, local draft recovery, and an invite-gated Worker submission adapter.
 
 Public posture:
 
-- `PUBLIC PREVIEW · ORDERING NOT LIVE`
+- `INVITE-ONLY PREVIEW`
 - every staged brief is `HELD FOR REVIEW`
 - every proof is `NOT A QUOTE`
+- eligible fixed-SKU briefs can be marked checkout-eligible, but only a revision-bound operator action can release checkout
 - no browser action publishes a profile, programs NFC, creates checkout, takes payment, or confirms fulfillment
 
-The adapter posts `card-studio-order/1` to `VITE_CARD_STUDIO_API_PATH` or `/api/card-studio/intents`. Until the Worker lane exists, a failed request leaves the local draft intact and reports that the review lane is staged.
+The adapter uses the durable `/api/card-studio` project → immutable revision → proposal sequence. It compiles the native editor state into `card-design-document/1` and `card-order-intent/1`, supplies an idempotency key, and preserves the local draft when any network stage fails.
 
 The previous browser-global runtime has been removed from the public copy tree. Legacy static entrypoints redirect to `/card-studio`, so production publishes only compiled application assets for this feature.
 
-Focused model tests live beside the model and run with:
+Focused model, contract adapter, and public-boundary tests live beside the model and run with:
 
-`node --test src/features/card-studio/cardStudioModel.test.js`
+`npm run card-studio:check`

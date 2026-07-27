@@ -164,10 +164,10 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
       "id": "card-studio",
       "path": "/card-studio",
       "canonicalUrl": "https://hyperion-industries.dev/card-studio",
-      "title": "Hyperion Card Studio Preview | Smart Operator Identity",
-      "description": "Compose a guarded operator-card design brief with live front, back, and digital proofs. All submissions remain operator reviewed and are not quotes.",
-      "summary": "A native public preview for card design briefs, deterministic proofs, and operator-reviewed identity handoff.",
-      "maturity": "PUBLIC PREVIEW · ORDERING NOT LIVE",
+      "title": "Hyperion Card Studio Invite Preview | Smart Operator Identity",
+      "description": "Compose a guarded operator-card design brief with live front, back, and digital proofs in Hyperion's invite-only soft-launch lane.",
+      "summary": "An invite-only native studio for deterministic card proofs and operator-reviewed identity handoff.",
+      "maturity": "INVITE-ONLY PREVIEW",
       "schemaType": "SoftwareApplication",
       "indexable": true,
       "image": "https://hyperion-industries.dev/assets/city/proof/card-studio-smoke.png",
@@ -707,11 +707,11 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
     },
     {
       "id": "card-studio",
-      "name": "Hyperion Card Studio Preview",
+      "name": "Hyperion Card Studio Invite Preview",
       "route": "/card-studio",
       "canonicalUrl": "https://hyperion-industries.dev/card-studio",
-      "summary": "A native public preview for card design briefs, deterministic proofs, and operator-reviewed identity handoff.",
-      "maturity": "PUBLIC PREVIEW · ORDERING NOT LIVE",
+      "summary": "An invite-only native studio for deterministic card proofs and operator-reviewed identity handoff.",
+      "maturity": "INVITE-ONLY PREVIEW",
       "availability": "Limited scoped requests are accepted after operator review.",
       "intakeLane": "operator-identity"
     }
@@ -897,5 +897,5 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
       }
     ]
   },
-  "sha256": "b74f6bdc9944ab23ef89e0ec5b9e4f50b89e207631eed887ced59e1b2dce2ea0"
+  "sha256": "5a3136c0bc21e870c8b66e530e2fe145895ee444427592daeb69b9a9f18810c4"
 } as const;

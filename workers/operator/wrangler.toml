@@ -87,6 +87,10 @@ namespace_id = "41006"
 # Add OPENROUTER_API_KEY with `wrangler secret put OPENROUTER_API_KEY`.
 # Add RESEND_API_KEY with `wrangler secret put RESEND_API_KEY`; never place it in this file.
 # Add FOUNDER_COMMAND_PULL_TOKEN_SHA256 with `wrangler secret put FOUNDER_COMMAND_PULL_TOKEN_SHA256`.
+# Add CARD_STUDIO_SHOPIFY_STOREFRONT_TOKEN with `wrangler secret put CARD_STUDIO_SHOPIFY_STOREFRONT_TOKEN`.
+# Add CARD_STUDIO_SHOPIFY_WEBHOOK_SECRET with `wrangler secret put CARD_STUDIO_SHOPIFY_WEBHOOK_SECRET`.
+# Configure CARD_STUDIO_SHOPIFY_STORE_DOMAIN, a pinned Storefront API version,
+# and CARD_STUDIO_SHOPIFY_VARIANTS only after catalog mappings are reviewed.
 # During rotation, add FOUNDER_COMMAND_PULL_PREVIOUS_TOKEN_SHA256 as a secret and set
 # FOUNDER_COMMAND_PULL_PREVIOUS_UNTIL to a bounded ISO-8601 overlap deadline.
 # The public app calls the verified Worker endpoint above. A branded custom

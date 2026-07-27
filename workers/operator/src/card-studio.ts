@@ -7,6 +7,7 @@ import orderCommandSchema from "../../../shared/card-studio/contracts/card-order
 import uploadSessionSchema from "../../../shared/card-studio/contracts/card-upload-session.v1.schema.json";
 import { enforceRateLimit, HttpError, jsonResponse, readJsonBody, rejectUnknownFields, requireObject } from "./http";
 import { authorizeOperator, constantTimeEqual, sha256 } from "./operator-auth";
+import { createShopifyCart, shopifyCheckoutReady, verifyShopifyWebhook } from "./shopify";
 import type { Env, RuntimeDependencies } from "./types";
 
 const BODY_LIMIT = 256 * 1024;
@@ -528,7 +529,7 @@ export async function handleOrderStatus(request: Request, env: Env, intentId: st
     `SELECT o.intent_id, o.project_id, o.revision_id, o.product_sku, o.quantity, o.catalog_version,
             o.eligibility, o.status, o.receipt_json, o.updated_at,
             p.proposal_id, p.state AS proposal_state,
-            c.projection_id, c.status AS checkout_status
+            c.projection_id, c.status AS checkout_status, c.provider_checkout_ref, c.projection_json
        FROM card_studio_order_intents o
        JOIN card_studio_design_proposals p ON p.intent_id = o.intent_id
        LEFT JOIN card_studio_checkout_projections c ON c.intent_id = o.intent_id
@@ -549,7 +550,13 @@ export async function handleOrderStatus(request: Request, env: Env, intentId: st
       status: row.status,
       proposal_id: row.proposal_id,
       proposal_state: row.proposal_state,
-      checkout_projection: row.projection_id ? { projection_id: row.projection_id, status: row.checkout_status } : null,
+      checkout_projection: row.projection_id ? {
+        projection_id: row.projection_id,
+        status: row.checkout_status,
+        checkout_url: row.checkout_status === "checkout_pending"
+          ? (parseJson<{ checkout_url?: string }>(String(row.projection_json ?? "{}")).checkout_url ?? null)
+          : null,
+      } : null,
       updated_at: row.updated_at,
     },
   });
@@ -653,7 +660,7 @@ export async function handleCardOperatorStatus(
     pending: Number(pending?.count ?? 0),
     authority: "operator_review_only",
     source_outbox_mutation_allowed: false,
-    shopify_network_enabled: false,
+    shopify_network_enabled: shopifyCheckoutReady(env),
   });
 }
 
@@ -747,4 +754,282 @@ export async function handleCardOperatorDecision(
     shopify_network_called: false,
     source_outbox_mutated: false,
   });
+}
+
+export async function handleCardOperatorCheckout(
+  request: Request,
+  env: Env,
+  requestId: string,
+  deps: RuntimeDependencies,
+): Promise<Response> {
+  const authorization = await authorizeOperator(request, env, deps.now());
+  const db = requireDb(env);
+  const body = requireObject(await readJsonBody(request, 8 * 1024));
+  rejectUnknownFields(body, ["intent_id"]);
+  const intentId = String(body.intent_id ?? "");
+  if (!INTENT_PATTERN.test(intentId)) throw new HttpError(400, "intent_id_invalid", "A valid Card Studio intent is required.");
+
+  const row = await db.prepare(
+    `SELECT o.intent_id, o.product_sku, o.quantity, o.status AS order_status,
+            c.projection_id, c.status AS projection_status, c.provider_checkout_ref, c.projection_json
+       FROM card_studio_order_intents o
+       JOIN card_studio_checkout_projections c ON c.intent_id = o.intent_id
+      WHERE o.intent_id = ? LIMIT 1`,
+  ).bind(intentId).first<{
+    intent_id: string;
+    product_sku: string;
+    quantity: number;
+    order_status: string;
+    projection_id: string;
+    projection_status: string;
+    provider_checkout_ref: string | null;
+    projection_json: string;
+  }>();
+  if (!row) throw new HttpError(404, "card_order_not_found", "Card Studio order was not found.");
+  if (row.projection_status === "checkout_pending" && row.provider_checkout_ref) {
+    const existing = parseJson<{ checkout_url?: string }>(row.projection_json);
+    return jsonResponse({
+      ok: true,
+      duplicate: true,
+      intent_id: intentId,
+      provider_checkout_ref: row.provider_checkout_ref,
+      checkout_url: existing.checkout_url ?? null,
+      operator: authorization.consumerId,
+    });
+  }
+  if (row.order_status !== "checkout_pending" || row.projection_status !== "staged") {
+    throw new HttpError(409, "checkout_not_released", "Founder Command must release an eligible proposal before provider checkout can be created.");
+  }
+
+  const existingAttempt = await db.prepare(
+    `SELECT attempt_id, state, provider_checkout_ref, checkout_url
+       FROM card_studio_checkout_attempts WHERE intent_id = ? LIMIT 1`,
+  ).bind(intentId).first<{
+    attempt_id: string;
+    state: string;
+    provider_checkout_ref: string | null;
+    checkout_url: string | null;
+  }>();
+  if (existingAttempt?.state === "applied" && existingAttempt.provider_checkout_ref) {
+    return jsonResponse({
+      ok: true,
+      duplicate: true,
+      intent_id: intentId,
+      provider_checkout_ref: existingAttempt.provider_checkout_ref,
+      checkout_url: existingAttempt.checkout_url,
+      operator: authorization.consumerId,
+    });
+  }
+  if (existingAttempt) {
+    throw new HttpError(409, "checkout_attempt_requires_reconciliation", "A prior provider attempt is unresolved; reconcile it before retrying.");
+  }
+
+  const now = deps.now().toISOString();
+  const attemptId = generatedId("cpa", deps);
+  const requestHash = await sha256(canonical({
+    intent_id: intentId,
+    product_sku: row.product_sku,
+    quantity: row.quantity,
+    projection_id: row.projection_id,
+  }));
+  await db.prepare(
+    `INSERT INTO card_studio_checkout_attempts
+     (attempt_id, intent_id, projection_id, state, request_hash, provider_checkout_ref,
+      checkout_url, error_code, created_at, updated_at)
+     VALUES (?, ?, ?, 'reserved', ?, NULL, NULL, NULL, ?, ?)`,
+  ).bind(attemptId, intentId, row.projection_id, requestHash, now, now).run();
+
+  let cart;
+  try {
+    cart = await createShopifyCart(env, deps, {
+      intentId,
+      productSku: row.product_sku,
+      quantity: Number(row.quantity),
+    });
+  } catch (error) {
+    const code = error instanceof HttpError ? error.code : "shopify_network_ambiguous";
+    if (code === "shopify_not_configured" || code === "shopify_variant_unmapped") {
+      await db.prepare("DELETE FROM card_studio_checkout_attempts WHERE attempt_id = ? AND state = 'reserved'")
+        .bind(attemptId).run();
+    } else {
+      await db.prepare(
+        `UPDATE card_studio_checkout_attempts
+            SET state = 'ambiguous', error_code = ?, updated_at = ?
+          WHERE attempt_id = ?`,
+      ).bind(code, deps.now().toISOString(), attemptId).run();
+    }
+    throw error;
+  }
+
+  const appliedAt = deps.now().toISOString();
+  const nextProjection = {
+    ...parseJson<Record<string, unknown>>(row.projection_json),
+    provider_checkout_ref: cart.cartId,
+    checkout_url: cart.checkoutUrl,
+    status: "checkout_pending",
+    updated_at: appliedAt,
+  };
+  await db.batch([
+    db.prepare(
+      `UPDATE card_studio_checkout_attempts
+          SET state = 'applied', provider_checkout_ref = ?, checkout_url = ?, updated_at = ?
+        WHERE attempt_id = ? AND state = 'reserved'`,
+    ).bind(cart.cartId, cart.checkoutUrl, appliedAt, attemptId),
+    db.prepare(
+      `UPDATE card_studio_checkout_projections
+          SET provider_checkout_ref = ?, status = 'checkout_pending', projection_json = ?, updated_at = ?
+        WHERE projection_id = ? AND status = 'staged'`,
+    ).bind(cart.cartId, JSON.stringify(nextProjection), appliedAt, row.projection_id),
+    db.prepare(
+      `INSERT INTO card_studio_audit_events
+       (audit_id, project_id, intent_id, proposal_id, event_type, actor_class, request_id, created_at)
+       VALUES (?, NULL, ?, NULL, 'shopify_checkout_created', 'service', ?, ?)`,
+    ).bind(generatedId("csaud", deps), intentId, requestId, appliedAt),
+  ]);
+  return jsonResponse({
+    ok: true,
+    duplicate: false,
+    intent_id: intentId,
+    provider_checkout_ref: cart.cartId,
+    checkout_url: cart.checkoutUrl,
+    operator: authorization.consumerId,
+    source_outbox_mutated: false,
+  }, 201);
+}
+
+function webhookIntentId(value: Record<string, unknown>): string | null {
+  const attributes = [
+    ...(Array.isArray(value.note_attributes) ? value.note_attributes : []),
+    ...(Array.isArray(value.custom_attributes) ? value.custom_attributes : []),
+  ];
+  for (const item of attributes) {
+    if (!item || typeof item !== "object") continue;
+    const record = item as Record<string, unknown>;
+    const key = String(record.name ?? record.key ?? "");
+    const candidate = String(record.value ?? "");
+    if (key === "hyperion_intent_id" && INTENT_PATTERN.test(candidate)) return candidate;
+  }
+  return null;
+}
+
+async function sha256Bytes(value: ArrayBuffer): Promise<string> {
+  const digest = await crypto.subtle.digest("SHA-256", value);
+  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+
+export async function handleCardShopifyWebhook(
+  request: Request,
+  env: Env,
+  deps: RuntimeDependencies,
+): Promise<Response> {
+  const db = requireDb(env);
+  const declared = Number(request.headers.get("content-length") || "0");
+  if (!Number.isFinite(declared) || declared > 512 * 1024) {
+    throw new HttpError(413, "webhook_too_large", "Shopify webhook exceeds the allowed size.");
+  }
+  const raw = await request.arrayBuffer();
+  if (raw.byteLength === 0 || raw.byteLength > 512 * 1024) {
+    throw new HttpError(413, "webhook_too_large", "Shopify webhook exceeds the allowed size.");
+  }
+  const signature = request.headers.get("x-shopify-hmac-sha256")?.trim() ?? "";
+  const secret = env.CARD_STUDIO_SHOPIFY_WEBHOOK_SECRET?.trim() ?? "";
+  if (!await verifyShopifyWebhook(raw, signature, secret)) {
+    throw new HttpError(401, "shopify_webhook_invalid", "Shopify webhook signature validation failed.");
+  }
+  const eventId = request.headers.get("x-shopify-webhook-id")?.trim() ?? "";
+  const topic = request.headers.get("x-shopify-topic")?.trim().toLowerCase() ?? "";
+  if (!/^[A-Za-z0-9_-]{8,128}$/.test(eventId) || !/^[a-z_]+\/[a-z_]+$/.test(topic)) {
+    throw new HttpError(400, "shopify_webhook_headers_invalid", "Shopify webhook headers are invalid.");
+  }
+  const bodyHash = await sha256Bytes(raw);
+  const prior = await db.prepare(
+    `SELECT body_sha256, state FROM card_studio_webhook_receipts
+      WHERE provider = 'shopify' AND event_id = ? LIMIT 1`,
+  ).bind(eventId).first<{ body_sha256: string; state: string }>();
+  if (prior) {
+    if (constantTimeEqual(prior.body_sha256, bodyHash)) {
+      return jsonResponse({ ok: true, duplicate: true, state: prior.state });
+    }
+    await db.prepare(
+      `UPDATE card_studio_webhook_receipts SET state = 'conflict_quarantined'
+        WHERE provider = 'shopify' AND event_id = ?`,
+    ).bind(eventId).run();
+    throw new HttpError(409, "shopify_webhook_conflict", "A conflicting Shopify event was quarantined.");
+  }
+
+  const now = deps.now().toISOString();
+  let payload: Record<string, unknown>;
+  try {
+    const decoded = JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(raw)) as unknown;
+    payload = requireObject(decoded);
+  } catch {
+    await db.prepare(
+      `INSERT INTO card_studio_webhook_receipts
+       (provider, event_id, topic, body_sha256, state, received_at, applied_at)
+       VALUES ('shopify', ?, ?, ?, 'rejected', ?, NULL)`,
+    ).bind(eventId, topic, bodyHash, now).run();
+    throw new HttpError(400, "shopify_webhook_json_invalid", "Shopify webhook payload is invalid.");
+  }
+  const intentId = webhookIntentId(payload);
+  const projection = intentId
+    ? await db.prepare(
+      `SELECT projection_id, intent_id FROM card_studio_checkout_projections
+        WHERE intent_id = ? LIMIT 1`,
+    ).bind(intentId).first<{ projection_id: string; intent_id: string }>()
+    : null;
+  if (!intentId || !projection) {
+    await db.prepare(
+      `INSERT INTO card_studio_webhook_receipts
+       (provider, event_id, topic, body_sha256, state, received_at, applied_at)
+       VALUES ('shopify', ?, ?, ?, 'rejected', ?, NULL)`,
+    ).bind(eventId, topic, bodyHash, now).run();
+    return jsonResponse({ ok: true, applied: false, reason: "unmatched_intent" });
+  }
+
+  const financial = String(payload.financial_status ?? "").toLowerCase();
+  const fulfillment = String(payload.fulfillment_status ?? "").toLowerCase();
+  const nextStatus = topic === "refunds/create" ? "refunded"
+    : topic === "orders/cancelled" ? "cancelled"
+      : topic === "fulfillments/create" || ["fulfilled", "partial"].includes(fulfillment) ? "shipped"
+        : ["paid", "partially_paid"].includes(financial) ? "paid"
+          : "checkout_pending";
+  const orderStatus = nextStatus === "shipped" ? "shipped"
+    : nextStatus === "paid" ? "paid"
+      : nextStatus === "refunded" ? "refunded"
+        : nextStatus === "cancelled" ? "cancelled"
+          : "checkout_pending";
+  const projectStatus = orderStatus === "shipped" ? "production"
+    : orderStatus === "paid" ? "paid"
+      : ["refunded", "cancelled"].includes(orderStatus) ? "cancelled"
+        : "checkout_pending";
+  const providerOrderRef = payload.admin_graphql_api_id
+    ? String(payload.admin_graphql_api_id)
+    : payload.id ? `gid://shopify/Order/${String(payload.id)}` : null;
+  await db.batch([
+    db.prepare(
+      `INSERT INTO card_studio_webhook_receipts
+       (provider, event_id, topic, body_sha256, state, received_at, applied_at)
+       VALUES ('shopify', ?, ?, ?, 'applied', ?, ?)`,
+    ).bind(eventId, topic, bodyHash, now, now),
+    db.prepare(
+      `UPDATE card_studio_checkout_projections
+          SET provider_order_ref = COALESCE(?, provider_order_ref), status = ?,
+              projection_json = json_set(projection_json, '$.status', ?, '$.provider_order_ref', ?, '$.updated_at', ?),
+              updated_at = ?
+        WHERE projection_id = ?`,
+    ).bind(providerOrderRef, nextStatus, nextStatus, providerOrderRef, now, now, projection.projection_id),
+    db.prepare(
+      "UPDATE card_studio_order_intents SET status = ?, updated_at = ? WHERE intent_id = ?",
+    ).bind(orderStatus, now, intentId),
+    db.prepare(
+      `UPDATE card_studio_projects SET status = ?, updated_at = ?
+        WHERE project_id = (SELECT project_id FROM card_studio_order_intents WHERE intent_id = ?)`,
+    ).bind(projectStatus, now, intentId),
+    db.prepare(
+      `INSERT INTO card_studio_audit_events
+       (audit_id, project_id, intent_id, proposal_id, event_type, actor_class, request_id, created_at)
+       VALUES (?, NULL, ?, NULL, ?, 'service', ?, ?)`,
+    ).bind(generatedId("csaud", deps), intentId, `shopify_${topic.replace("/", "_")}`, eventId, now),
+  ]);
+  return jsonResponse({ ok: true, applied: true, intent_id: intentId, status: nextStatus });
 }

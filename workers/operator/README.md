@@ -93,13 +93,17 @@ Card Studio v1 adds a compiled-only, invite-aware public contract lane:
 - `POST /api/card-studio/uploads/sessions`
 - authenticated `GET /api/card-studio/operator/status`
 - authenticated `POST /api/card-studio/operator/decisions`
+- authenticated `POST /api/card-studio/operator/checkout`
+- HMAC-verified `POST /api/card-studio/webhooks/shopify`
 
 Projects use an opaque one-time session token whose SHA-256 digest is stored in
 D1. Design revisions are immutable declarative JSON documents. Submitting an
 order intent atomically stores the intent, a minimized design proposal, a
 `held_for_review` outbox event, and a Shopify projection in `not_created`.
-Neither public submission nor an operator command performs a Shopify network
-call.
+Public submission never performs a Shopify network call. A revision-bound
+Founder Command decision first stages an eligible projection; a separate
+authenticated provider action creates the mapped Storefront cart. Review lanes
+cannot enter this path.
 
 The existing Founder Command feed at `/api/intake/operator/feed` also emits
 `source_kind: "card_studio"` envelopes. Those envelopes contain proposal JSON
@@ -116,6 +120,7 @@ upload metadata only; arbitrary binary bodies are rejected.
 - `migrations/0003_intake_os_v1.sql`: immutable public intake, proposal provenance, outbox, collision, and audit records
 - `migrations/0004_intake_operator_feed.sql`: per-consumer delivery receipts without business-outbox mutation
 - `migrations/0005_card_studio_v1.sql`: immutable Card Studio projects, revisions, proposals, delivery receipts, upload metadata, and commerce projections
+- `migrations/0006_card_studio_shopify_v1.sql`: reserved provider attempts and ambiguity quarantine for operator-released Shopify carts
 - `corpus/public-corpus.source.json`: reviewed public allowlist
 - `corpus/public-corpus.schema.json`: corpus contract
 - `src/generated/public-corpus.generated.ts`: deterministic compiled corpus
