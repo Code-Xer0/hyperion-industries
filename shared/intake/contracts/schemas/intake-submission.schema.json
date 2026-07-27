@@ -58,7 +58,30 @@
         "entry_url": { "type": ["string", "null"], "format": "uri" },
         "referrer_category": { "type": ["string", "null"], "maxLength": 80 },
         "effects_mode": { "enum": ["full", "reduced", "static"] },
-        "save_resume_used": { "type": "boolean" }
+        "save_resume_used": { "type": "boolean" },
+        "guide_mode": { "enum": ["full", "express"] },
+        "guide_bundle_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "question_graph_version": { "type": "string", "maxLength": 120 },
+        "guide_session_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+        "recommendation_reason_codes": {
+          "type": "array",
+          "maxItems": 20,
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{2,120}$" }
+        },
+        "unresolved_items": {
+          "type": "array",
+          "maxItems": 30,
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^[a-z0-9][a-z0-9._-]{2,120}$" }
+        },
+        "requested_counterfactuals": {
+          "type": "array",
+          "maxItems": 5,
+          "uniqueItems": true,
+          "items": { "enum": ["quieter", "smaller", "lower_cost", "upgrade_room", "performance_headroom"] }
+        },
+        "guide_requirements_projection": { "$ref": "#/$defs/guideRequirementsProjection" }
       }
     }
   },
@@ -73,6 +96,88 @@
         { "type": "array", "maxItems": 100, "items": { "type": ["string", "number", "integer", "boolean", "null"] } },
         { "type": "object", "maxProperties": 50, "additionalProperties": { "type": ["string", "number", "integer", "boolean", "null"] } }
       ]
+    },
+    "guideRequirementsProjection": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version", "source", "workload_profile", "operational_lane", "workload_refs",
+        "budget", "cooling_mode", "allowed_motherboard_form_factors", "fresh_offer_required",
+        "unknown_policy", "required_parts", "excluded_parts", "priorities", "inference",
+        "unresolved", "operator_notes", "requested_counterfactuals", "projection_hash"
+      ],
+      "properties": {
+        "schema_version": { "const": "forge-requirements/1" },
+        "source": { "const": "forge-guide-session/1" },
+        "workload_profile": { "type": ["string", "null"], "maxLength": 80 },
+        "operational_lane": { "type": ["string", "null"], "maxLength": 80 },
+        "workload_refs": { "type": "array", "maxItems": 30, "uniqueItems": true, "items": { "type": "string", "maxLength": 120 } },
+        "budget": {
+          "type": ["object", "null"],
+          "additionalProperties": false,
+          "required": ["currency", "parts_ceiling_minor"],
+          "properties": {
+            "currency": { "const": "USD" },
+            "parts_ceiling_minor": { "type": "integer", "minimum": 1, "maximum": 100000000 }
+          }
+        },
+        "cooling_mode": { "enum": ["any", "air", "aio", "custom_loop"] },
+        "allowed_motherboard_form_factors": { "type": "array", "maxItems": 8, "uniqueItems": true, "items": { "type": "string", "maxLength": 40 } },
+        "fresh_offer_required": { "type": "boolean" },
+        "unknown_policy": { "const": "review" },
+        "required_parts": { "type": "array", "maxItems": 30, "items": { "type": "string", "maxLength": 120 } },
+        "excluded_parts": { "type": "array", "maxItems": 30, "items": { "type": "string", "maxLength": 120 } },
+        "priorities": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["workload_fit", "cost", "power_headroom", "evidence", "serviceability", "compactness", "upgradeability", "acoustics"],
+          "properties": {
+            "workload_fit": { "type": "integer", "minimum": 0, "maximum": 5 },
+            "cost": { "type": "integer", "minimum": 0, "maximum": 5 },
+            "power_headroom": { "type": "integer", "minimum": 0, "maximum": 5 },
+            "evidence": { "type": "integer", "minimum": 0, "maximum": 5 },
+            "serviceability": { "type": "integer", "minimum": 0, "maximum": 5 },
+            "compactness": { "type": "integer", "minimum": 0, "maximum": 5 },
+            "upgradeability": { "type": "integer", "minimum": 0, "maximum": 5 },
+            "acoustics": { "type": "integer", "minimum": 0, "maximum": 5 }
+          }
+        },
+        "inference": {
+          "type": "array",
+          "maxItems": 30,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["field", "reason_code", "confidence_basis_points"],
+            "properties": {
+              "field": { "type": "string", "maxLength": 120 },
+              "reason_code": { "type": "string", "maxLength": 120 },
+              "confidence_basis_points": { "type": "integer", "minimum": 0, "maximum": 10000 }
+            }
+          }
+        },
+        "unresolved": {
+          "type": "array",
+          "maxItems": 30,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["field", "reason_code"],
+            "properties": {
+              "field": { "type": "string", "maxLength": 120 },
+              "reason_code": { "enum": ["visitor_skipped", "requires_clarification"] }
+            }
+          }
+        },
+        "operator_notes": { "type": "array", "maxItems": 20, "items": { "type": "string", "maxLength": 400 } },
+        "requested_counterfactuals": {
+          "type": "array",
+          "maxItems": 5,
+          "uniqueItems": true,
+          "items": { "enum": ["quieter", "smaller", "lower_cost", "upgrade_room", "performance_headroom"] }
+        },
+        "projection_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+      }
     },
     "answer": {
       "type": "object",

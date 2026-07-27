@@ -7,7 +7,7 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
     "endpoint": "https://mcp.hyperion-industries.dev/mcp",
     "documentation": "https://hyperion-industries.dev/mcp"
   },
-  "revision": "2026-07-14",
+  "revision": "2026-07-26",
   "company": {
     "id": "hyperion-industries",
     "name": "Hyperion Industries",
@@ -503,9 +503,9 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
       "id": "forge--configurator",
       "path": "/forge/configurator",
       "canonicalUrl": "https://hyperion-industries.dev/forge/configurator",
-      "title": "Forge Configurator | Hyperion Industries",
-      "description": "Shape a custom workstation, local-AI system, sim rig, repair path, or deployment brief for Hyperion operator review.",
-      "summary": "A guided Forge build brief with explicit review, pricing, and authority boundaries.",
+      "title": "Forge Concierge | Guided System Discovery | Hyperion Industries",
+      "description": "Take a source-backed, one-question-at-a-time route toward a workstation, gaming system, local-AI machine, sim rig, or upgrade brief.",
+      "summary": "A warm guided Forge itinerary with explicit unknowns, evidence drawers, system neighborhoods, and a held-review handoff.",
       "maturity": "COMMERCIAL LANE · REVIEW REQUIRED",
       "schemaType": "Service",
       "indexable": true,
@@ -844,7 +844,7 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
   ],
   "corpus": {
     "id": "hyperion-operator-public",
-    "revision": "2026-07-14",
+    "revision": "2026-07-26",
     "entries": [
       {
         "id": "company-overview",
@@ -865,7 +865,7 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
         "title": "The Forge",
         "route": "/forge",
         "visibility": "public",
-        "content": "The Forge is an inquiry-led lane for custom PCs, simulation rigs, local AI boxes, upgrades, and deployment-ready workstations. Machines are scoped around workload, room, budget, aesthetics, serviceability, and timeline. The public configurator is not live; build inquiries remain human-reviewed."
+        "content": "The Forge is an inquiry-led lane for custom PCs, simulation rigs, local AI boxes, upgrades, and deployment-ready workstations. The public Forge Concierge guides visitors one question at a time through workload, room, budget, service, and tradeoff posture, then holds the resulting brief for human review. Its product neighborhoods and counterfactual previews are not quotes, compatibility verdicts, inventory promises, configurations, or orders."
       },
       {
         "id": "card-studio",
@@ -897,5 +897,5 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
       }
     ]
   },
-  "sha256": "481d04b34c6fc50a60571d46da8fc9352e6c75a3597759cad1e1ec5d3a1b4baa"
+  "sha256": "a90593116483466a99457632ba0069d6f3ebdaf721915c5ef1aa092908a7cb88"
 } as const;

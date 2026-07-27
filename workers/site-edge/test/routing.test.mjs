@@ -1,5 +1,15 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import { FORGE_GUIDE_FALLBACK, isForgeGuideBundle } from '../../../src/data/forgeGuideBundle.js';
+import {
+  GUIDE_SKIPPED,
+  deriveRecommendations,
+  deriveRequirements,
+  mapGuideToIntake,
+  migrateLegacyDraft,
+  sha256Document,
+  visibleQuestions,
+} from '../../../src/features/forge-configurator/forgeGuideModel.js';
 import { handleRequest } from '../src/index.js';
 
 const originFetch = async (request) => new Response(`<title>${new URL(request.url).pathname}</title>`, {
@@ -176,4 +186,108 @@ test('Forge products reject state-changing methods and support bodyless HEAD', a
   );
   assert.equal(head.status, 200);
   assert.equal(await head.text(), '');
+});
+
+test('Forge guide serves a verified, source-opaque same-origin bundle', async () => {
+  const response = await handleRequest(
+    new Request('https://hyperion-industries.dev/api/forge/guide'),
+    originFetch,
+  );
+  const payload = await response.json();
+  assert.equal(response.status, 200);
+  assert.equal(payload.source_posture, 'bundled_verified');
+  assert.equal(payload.bundle.schema_version, 'forge-guide-bundle/1');
+  assert.equal(payload.bundle.graph.schema_version, 'forge-question-graph/1');
+  assert.equal(payload.bundle.graph.questions.length, 11);
+  assert.equal(payload.bundle.graph.express_question_ids.length, 3);
+  assert.equal(payload.bundle.sources.length, 15);
+  assert.match(payload.bundle.bundle_hash, /^[a-f0-9]{64}$/);
+  assert.equal(response.headers.get('x-content-type-options'), 'nosniff');
+  assert.doesNotMatch(JSON.stringify(payload), /airtable_pat|bearer|supplier|acquisition_plan|customer_reference|price_minor/i);
+});
+
+test('Forge guide rejects mutations and supports bodyless HEAD', async () => {
+  const post = await handleRequest(
+    new Request('https://hyperion-industries.dev/api/forge/guide', { method: 'POST' }),
+    originFetch,
+  );
+  assert.equal(post.status, 405);
+  assert.equal((await post.json()).error.code, 'method_not_allowed');
+
+  const head = await handleRequest(
+    new Request('https://hyperion-industries.dev/api/forge/guide', { method: 'HEAD' }),
+    originFetch,
+  );
+  assert.equal(head.status, 200);
+  assert.equal(await head.text(), '');
+});
+
+test('Forge guide validator rejects active links and remote product media', () => {
+  const activeLink = structuredClone(FORGE_GUIDE_FALLBACK);
+  activeLink.sources[0].source_url = 'javascript:alert(1)';
+  assert.equal(isForgeGuideBundle(activeLink), false);
+
+  const remoteMedia = structuredClone(FORGE_GUIDE_FALLBACK);
+  remoteMedia.product_views[0].media.path = 'https://tracker.example/forge.jpg';
+  assert.equal(isForgeGuideBundle(remoteMedia), false);
+});
+
+test('Forge guide paths and requirements projections stay deterministic and explicit', async () => {
+  const answers = {
+    destination: 'creator',
+    workloads: ['adobe-premiere', 'note:Unmatched codec workflow'],
+    output_target: ['display-4k'],
+    load_pattern: 'all_day',
+    privacy_posture: GUIDE_SKIPPED,
+    footprint: 'balanced',
+    acoustics: 'quiet',
+    budget: '2500_4000',
+    reuse: GUIDE_SKIPPED,
+    service: 'self_service',
+    timeline: 'month',
+  };
+  assert.equal(visibleQuestions(FORGE_GUIDE_FALLBACK, answers, 'express').length, 3);
+  assert.equal(visibleQuestions(FORGE_GUIDE_FALLBACK, answers, 'full').length, 11);
+
+  const first = deriveRequirements(FORGE_GUIDE_FALLBACK, answers, ['quieter']);
+  const second = deriveRequirements(FORGE_GUIDE_FALLBACK, answers, ['quieter']);
+  assert.deepEqual(first, second);
+  assert.equal(first.schema_version, 'forge-requirements/1');
+  assert.equal(first.workload_profile, 'creator');
+  assert.equal(first.budget.parts_ceiling_minor, 400000);
+  assert.equal(first.priorities.acoustics, 5);
+  assert.deepEqual(first.operator_notes, ['Unmatched codec workflow']);
+  assert.ok(first.unresolved.some((item) => item.field === 'privacy_posture' && item.reason_code === 'visitor_skipped'));
+  assert.equal(await sha256Document(first), await sha256Document(second));
+});
+
+test('counterfactuals alter public lane posture without creating engineering truth', () => {
+  const answers = { destination: 'gaming', footprint: 'balanced', acoustics: 'balanced' };
+  const base = deriveRecommendations(FORGE_GUIDE_FALLBACK, answers, []);
+  const small = deriveRecommendations(FORGE_GUIDE_FALLBACK, answers, ['smaller']);
+  const headroom = deriveRecommendations(FORGE_GUIDE_FALLBACK, answers, ['performance_headroom']);
+  assert.equal(base.items[0].lane, 'gaming');
+  assert.equal(small.items[0].lane, 'sff');
+  assert.equal(headroom.items[0].lane, 'custom-loop');
+  assert.ok(small.reason_codes.includes('counterfactual.smaller'));
+});
+
+test('legacy drafts migrate without treating free text as a capability fact', () => {
+  const migrated = migrateLegacyDraft({
+    expires_at: Date.now() + 10_000,
+    branch: 'local_ai',
+    answers: {
+      'forge.applications': 'Private experimental model',
+      'forge.budget': '4000_6500',
+      'forge.timeline': 'flexible',
+    },
+  });
+  assert.equal(migrated.migrated_from, 'local-storage-v1');
+  assert.equal(migrated.answers.destination, 'local_ai');
+  assert.equal(migrated.answers.budget, '4000_plus');
+  assert.deepEqual(migrated.answers.workloads, ['note:Private experimental model']);
+
+  const intake = mapGuideToIntake(migrated.answers);
+  assert.equal(intake['forge.system_type'], 'local_ai');
+  assert.equal(intake['forge.local_first'], 'unknown');
 });

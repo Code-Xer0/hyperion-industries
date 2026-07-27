@@ -190,14 +190,49 @@ describe("intake evaluation and submission", () => {
 
   it("routes the Forge configurator form to the durable Forge review queue", async () => {
     const db = new MockD1().queueFirst(null);
+    const submission = validSubmission("forge-configurator", {
+      "forge.system_type": "desktop",
+      "forge.outcome": "Play and create locally",
+      "forge.local_first": "yes",
+      "forge.budget": "2500_4000",
+      "forge.timeline": "flexible",
+    });
+    submission.form_version = "2.0.0";
+    submission.client_context = {
+      ...submission.client_context,
+      guide_mode: "express",
+      guide_bundle_hash: "a".repeat(64),
+      question_graph_version: "forge-concierge-2026.07-v1",
+      guide_session_hash: "b".repeat(64),
+      recommendation_reason_codes: ["destination.gaming", "counterfactual.smaller"],
+      unresolved_items: ["output_target"],
+      requested_counterfactuals: ["smaller"],
+      guide_requirements_projection: {
+        schema_version: "forge-requirements/1",
+        source: "forge-guide-session/1",
+        workload_profile: "gaming",
+        operational_lane: "fast_validated",
+        workload_refs: ["fortnite"],
+        budget: { currency: "USD", parts_ceiling_minor: 400000 },
+        cooling_mode: "any",
+        allowed_motherboard_form_factors: ["Micro-ATX", "ATX"],
+        fresh_offer_required: true,
+        unknown_policy: "review",
+        required_parts: [],
+        excluded_parts: [],
+        priorities: {
+          workload_fit: 5, cost: 4, power_headroom: 3, evidence: 5,
+          serviceability: 4, compactness: 5, upgradeability: 2, acoustics: 2,
+        },
+        inference: [{ field: "workload_profile", reason_code: "destination_mapping", confidence_basis_points: 9000 }],
+        unresolved: [{ field: "output_target", reason_code: "requires_clarification" }],
+        operator_notes: [],
+        requested_counterfactuals: ["smaller"],
+        projection_hash: "c".repeat(64),
+      },
+    };
     const response = await worker().fetch(
-      postJson("/api/intake/submissions", validSubmission("forge-configurator", {
-        "forge.system_type": "desktop",
-        "forge.outcome": "Play and create locally",
-        "forge.local_first": "yes",
-        "forge.budget": "2500_4000",
-        "forge.timeline": "flexible",
-      }), { "idempotency-key": "submit-forge-configurator-123456" }),
+      postJson("/api/intake/submissions", submission, { "idempotency-key": "submit-forge-configurator-123456" }),
       baseEnv({ DB: db.binding() }), executionContext().ctx,
     );
     expect(response.status).toBe(201);
@@ -205,6 +240,9 @@ describe("intake evaluation and submission", () => {
     expect(JSON.stringify(decisionInsert?.values)).toContain('"forge"');
     expect(JSON.stringify(decisionInsert?.values)).toContain("not a quote");
     expect(JSON.stringify(decisionInsert?.values)).not.toContain('price_commit');
+    const submissionInsert = db.batches[0]?.find((statement) => statement.sql.includes("INSERT INTO intake_submissions"));
+    expect(JSON.stringify(submissionInsert?.values)).toContain("forge-requirements/1");
+    expect(JSON.stringify(submissionInsert?.values)).not.toContain("parts_ceiling_minor\":400000,\"payment");
   });
 
   it("durably quarantines a same-ID different-hash revision collision", async () => {

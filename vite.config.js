@@ -5,6 +5,7 @@ import fs from 'fs'
 import path from 'path'
 import { exec } from 'child_process'
 import { fileURLToPath } from 'url'
+import { FORGE_GUIDE_FALLBACK } from './src/data/forgeGuideBundle.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -114,9 +115,32 @@ function aggregate(events) {
 }
 
 function localCmsPlugin() {
+  const guideMiddleware = (req, res, next) => {
+    if (req.url !== '/api/forge/guide') {
+      next();
+      return;
+    }
+    if (!['GET', 'HEAD'].includes(req.method)) {
+      res.statusCode = 405;
+      res.setHeader('Allow', 'GET, HEAD');
+      res.setHeader('Content-Type', 'application/json');
+      res.end(JSON.stringify({ error: { code: 'method_not_allowed', message: 'Forge guide supports GET and HEAD only.' } }));
+      return;
+    }
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('Cache-Control', 'no-store');
+    res.end(req.method === 'HEAD' ? undefined : JSON.stringify({
+      schema_version: 'forge-guide-edge-response/1',
+      source_posture: 'bundled_verified',
+      degraded_reason: null,
+      bundle: FORGE_GUIDE_FALLBACK,
+    }));
+  };
   return {
     name: 'local-cms',
     configureServer(server) {
+      server.middlewares.use(guideMiddleware);
       server.middlewares.use((req, res, next) => {
         // Handle CORS just in case, though it's same-origin typically
         res.setHeader('Access-Control-Allow-Origin', '*');
@@ -267,7 +291,10 @@ function localCmsPlugin() {
 
         next();
       });
-    }
+    },
+    configurePreviewServer(server) {
+      server.middlewares.use(guideMiddleware);
+    },
   }
 }
 

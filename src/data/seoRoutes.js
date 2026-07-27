@@ -199,9 +199,9 @@ const districtRoutes = cityRoutes.map((district) => ({
 const intakeRoutes = [
   {
     path: '/forge/configurator',
-    title: 'Forge Configurator | Hyperion Industries',
-    description: 'Shape a custom workstation, local-AI system, sim rig, repair path, or deployment brief for Hyperion operator review.',
-    summary: 'A guided Forge build brief with explicit review, pricing, and authority boundaries.',
+    title: 'Forge Concierge | Guided System Discovery | Hyperion Industries',
+    description: 'Take a source-backed, one-question-at-a-time route toward a workstation, gaming system, local-AI machine, sim rig, or upgrade brief.',
+    summary: 'A warm guided Forge itinerary with explicit unknowns, evidence drawers, system neighborhoods, and a held-review handoff.',
     maturity: 'COMMERCIAL LANE · REVIEW REQUIRED',
     schemaType: 'Service',
     sourceFiles: ['src/features/forge-configurator/ForgeConfiguratorPage.jsx', 'shared/intake/contracts/forms/forge-configurator.form.json'],

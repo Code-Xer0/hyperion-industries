@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "corpusId": "hyperion-operator-public",
-  "revision": "2026-07-14",
+  "revision": "2026-07-26",
   "entries": [
     {
       "id": "company-overview",
@@ -22,7 +22,7 @@
       "title": "The Forge",
       "sourcePath": "/forge",
       "visibility": "public",
-      "content": "The Forge is an inquiry-led lane for custom PCs, simulation rigs, local AI boxes, upgrades, and deployment-ready workstations. Machines are scoped around workload, room, budget, aesthetics, serviceability, and timeline. The public configurator is not live; build inquiries remain human-reviewed."
+      "content": "The Forge is an inquiry-led lane for custom PCs, simulation rigs, local AI boxes, upgrades, and deployment-ready workstations. The public Forge Concierge guides visitors one question at a time through workload, room, budget, service, and tradeoff posture, then holds the resulting brief for human review. Its product neighborhoods and counterfactual previews are not quotes, compatibility verdicts, inventory promises, configurations, or orders."
     },
     {
       "id": "card-studio",

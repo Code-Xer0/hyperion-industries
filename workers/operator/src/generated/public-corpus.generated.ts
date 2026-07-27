@@ -2,7 +2,7 @@
 export const PUBLIC_CORPUS = {
   "schemaVersion": 1,
   "corpusId": "hyperion-operator-public",
-  "revision": "2026-07-14",
+  "revision": "2026-07-26",
   "entries": [
     {
       "id": "company-overview",
@@ -23,7 +23,7 @@ export const PUBLIC_CORPUS = {
       "title": "The Forge",
       "sourcePath": "/forge",
       "visibility": "public",
-      "content": "The Forge is an inquiry-led lane for custom PCs, simulation rigs, local AI boxes, upgrades, and deployment-ready workstations. Machines are scoped around workload, room, budget, aesthetics, serviceability, and timeline. The public configurator is not live; build inquiries remain human-reviewed."
+      "content": "The Forge is an inquiry-led lane for custom PCs, simulation rigs, local AI boxes, upgrades, and deployment-ready workstations. The public Forge Concierge guides visitors one question at a time through workload, room, budget, service, and tradeoff posture, then holds the resulting brief for human review. Its product neighborhoods and counterfactual previews are not quotes, compatibility verdicts, inventory promises, configurations, or orders."
     },
     {
       "id": "card-studio",
@@ -54,5 +54,5 @@ export const PUBLIC_CORPUS = {
       "content": "Victor Amani is the founder and systems architect behind Hyperion Industries' local-first infrastructure direction. Keshawn Rowe is the founding operator focused on operations, deployment, field systems, build intake, and client handoff. Public profiles describe responsibility without exposing private records or operator controls."
     }
   ],
-  "sha256": "738c53ff32c0c29b40dd61e1de1b07e49c4a408fa0da1dab2da40a605bebc9c8"
+  "sha256": "b7e7f17e4a0d7e56aebacd4faca44027aa32ef6117839243e56cf24588416b67"
 } as const;

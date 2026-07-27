@@ -95,10 +95,10 @@ export const cityFamilies = [
         previewMedia: forgeVideo('custom-workstation', 'Hyperion Forge systems catalog'),
         previewStills: forgeNavigationStills,
       }),
-      route('/forge/configurator', 'Forge Configurator', 'infrastructure', {
+      route('/forge/configurator', 'Forge Concierge', 'infrastructure', {
         status: 'COMMERCIAL LANE · REVIEW REQUIRED',
         tone: 'inquiry',
-        keywords: ['configure', 'custom pc', 'workstation', 'intake'],
+        keywords: ['concierge', 'guided', 'configure', 'custom pc', 'workstation', 'intake'],
         previewMedia: forgeVideo('workspace-systems', 'Hyperion Forge operator environment'),
       }),
       route('/pandora', 'Pandora Rackworks', 'infrastructure', { keywords: ['hardware', 'rack', 'poc'], previewMedia: forgeVideo('gpu-telemetry', 'GPU telemetry inside a Hyperion Forge build') }),

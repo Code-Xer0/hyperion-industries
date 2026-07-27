@@ -1,7 +1,7 @@
 {
   "form_id": "forge-configurator",
-  "version": "1.0.0",
-  "title": "Forge Configurator",
+  "version": "2.0.0",
+  "title": "Forge Concierge",
   "maturity": "COMMERCIAL LANE · REVIEW REQUIRED",
   "authority_boundary": "operator_review_only",
   "branches": [
@@ -19,5 +19,12 @@
     { "id": "handoff", "label": "Handoff" }
   ],
   "public_artifact_policy": "uploads_excluded",
-  "submission_state": "held_for_review"
+  "submission_state": "held_for_review",
+  "guide_contract": "forge-guide-session/1",
+  "question_graph_contract": "forge-question-graph/1",
+  "requirements_projection_contract": "forge-requirements/1",
+  "identity_collection_stage": "final_handoff",
+  "draft_retention_days": 14,
+  "raw_answers_domain": "intake_only",
+  "hypom_handoff": "operator_approved_projection_only"
 }

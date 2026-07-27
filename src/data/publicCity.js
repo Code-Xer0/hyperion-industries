@@ -115,7 +115,7 @@ export const cityRoutes = [
     accent: 'gold',
     summary: 'Custom workstations, local-AI machines, sim rigs, and deployment-ready systems.',
     doctrine: 'The machine is shaped around the workload, room, budget, serviceability, and taste.',
-    primaryCta: { label: 'Open Forge Configurator', path: '/forge/configurator' },
+    primaryCta: { label: 'Meet the Forge Concierge', path: '/forge/configurator' },
     secondaryCta: { label: 'Explore System Lanes', path: '/forge/catalog' },
     seoTitle: 'The Forge District | Hyperion Industries',
     seoDescription: 'Commercial inquiry lane for custom PCs, local AI machines, sim rigs, and workstations.',

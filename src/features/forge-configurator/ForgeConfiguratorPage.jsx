@@ -1,17 +1,29 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
-import { AlertTriangle, ArrowLeft, ArrowRight, Check, CircleAlert, Cpu, Gauge, HardDrive, LoaderCircle, ShieldCheck, Sparkles, Wrench } from 'lucide-react';
+import {
+  AlertTriangle, ArrowLeft, ArrowRight, Check, ChevronDown, CircleAlert, Compass,
+  ExternalLink, KeyRound, LoaderCircle, Map, Search, ShieldCheck, Sparkles, X,
+} from 'lucide-react';
 import contract from '../../../shared/intake/contracts/forms/forge-configurator.form.json';
 import { CONTRACT_VERSION, evaluateRoute } from '../../../shared/intake/model';
+import { FORGE_GUIDE_FALLBACK, isForgeGuideBundle } from '../../data/forgeGuideBundle.js';
+import { track } from '../../utils/telemetry.js';
+import {
+  COUNTERFACTUALS, GUIDE_SKIPPED, GUIDE_UNKNOWN, deriveRecommendations,
+  deriveRequirements, mapGuideToIntake, matchingCues, migrateLegacyDraft,
+  nextQuestionIndex, sha256Document, visibleQuestions,
+} from './forgeGuideModel.js';
 import './ForgeConfiguratorPage.css';
 
 const API_ORIGIN = import.meta.env.PROD
   ? 'https://hyperion-operator.hyperion-industries-intake.workers.dev'
   : '';
-const LOCAL_KEY = 'hyperion-forge-configurator-v1';
+const LOCAL_KEY = 'hyperion-forge-concierge-v2';
+const LEGACY_KEY = 'hyperion-forge-configurator-v1';
 const LOCAL_RETENTION_MS = 14 * 24 * 60 * 60 * 1000;
-const STEPS = ['System', 'Workload', 'Limits', 'Handoff', 'Review'];
+const LANDMARKS = ['destination', 'work', 'room', 'comfort', 'itinerary'];
+const LANDMARK_LABELS = { destination: 'Destination', work: 'Work', room: 'Room', comfort: 'Comfort', itinerary: 'Itinerary' };
 
 const makeId = (prefix) => {
   const value = globalThis.crypto?.randomUUID?.().replaceAll('-', '')
@@ -34,248 +46,444 @@ async function api(path, options = {}) {
   return body;
 }
 
-const sharedFields = {
-  system: [
-    { id: 'forge.outcome', label: 'What must this system make possible?', type: 'textarea', required: true, hint: 'Describe the outcome, not a parts list.' },
-    { id: 'forge.location', label: 'Where will it live?', type: 'select', required: true, options: [['desk_home', 'Desk / home'], ['desk_office', 'Desk / office'], ['studio_lab', 'Studio / lab'], ['field_mobile', 'Field / mobile'], ['rack_server', 'Rack / equipment room'], ['unknown', 'Not sure yet']] },
-    { id: 'forge.local_first', label: 'Should it remain useful without a cloud dependency?', type: 'select', required: true, options: [['yes', 'Yes, custody matters'], ['no', 'No strong preference'], ['unknown', 'Not sure yet']] },
-  ],
-  limits: [
-    { id: 'forge.form_factor', label: 'Size envelope', type: 'select', required: true, options: [['standard_tower', 'Standard tower'], ['compact', 'Compact'], ['very_compact', 'Very compact'], ['rack', 'Rack / equipment case'], ['no_constraint', 'No strong size limit'], ['unknown', 'Not sure yet']] },
-    { id: 'forge.acoustics', label: 'Noise envelope', type: 'select', required: true, options: [['flexible', 'Flexible'], ['normal_office', 'Normal office'], ['quiet_studio', 'Quiet studio'], ['near_silent', 'Near silent'], ['unknown', 'Not sure yet']] },
-    { id: 'forge.visual', label: 'Visual direction', type: 'checks', options: [['understated', 'Understated'], ['hyperion_cinematic', 'Hyperion cinematic'], ['client_brand', 'Client brand'], ['rgb_controlled', 'Controlled RGB'], ['no_lighting', 'No lighting']] },
-    { id: 'forge.budget', label: 'Budget boundary', type: 'select', required: true, options: [['under_1500', 'Under $1,500'], ['1500_2500', '$1,500–$2,500'], ['2500_4000', '$2,500–$4,000'], ['4000_6500', '$4,000–$6,500'], ['6500_plus', '$6,500+'], ['unknown', 'Need a recommendation']] },
-    { id: 'forge.timeline', label: 'Timing posture', type: 'select', required: true, options: [['flexible', 'Flexible / discovery first'], ['one_month', 'About one month'], ['quarter', 'This quarter'], ['urgent', 'A real deadline exists'], ['unknown', 'Not sure yet']] },
-  ],
-  handoff: [
-    { id: 'forge.services', label: 'What should Hyperion carry?', type: 'checks', required: true, options: [['architecture', 'Architecture'], ['parts_sourcing', 'Parts sourcing'], ['assembly', 'Assembly'], ['os_setup', 'OS and application setup'], ['data_migration', 'Data migration'], ['delivery', 'Delivery / install'], ['benchmarking', 'Benchmarking'], ['documentation', 'Documentation']] },
-    { id: 'forge.support', label: 'Support posture', type: 'select', required: true, options: [['handoff_only', 'Handoff only'], ['warranty_only', 'Warranty / repair'], ['scheduled_support', 'Scheduled support'], ['managed_support', 'Managed support'], ['unknown', 'Decide after discovery']] },
-  ],
-};
-
-const branchFields = {
-  desktop: [
-    { id: 'forge.workloads', label: 'Primary workloads', type: 'checks', required: true, options: [['gaming', 'Gaming'], ['software_development', 'Software development'], ['office_web', 'Daily work'], ['streaming', 'Streaming'], ['data_analysis', 'Data analysis']] },
-    { id: 'forge.applications', label: 'Games, applications, or tools that define success', type: 'textarea', required: true },
-    { id: 'forge.sustained_load', label: 'Heavy-load duration', type: 'select', required: true, options: [['rare_bursts', 'Rare bursts'], ['hours_weekly', 'Hours weekly'], ['hours_daily', 'Hours daily'], ['continuous', 'Continuous'], ['unknown', 'Not sure yet']] },
-  ],
-  creator: [
-    { id: 'forge.workloads', label: 'Primary workloads', type: 'checks', required: true, options: [['video_editing', 'Video editing'], ['photo_design', 'Photo / design'], ['3d_rendering', '3D rendering'], ['audio', 'Audio production'], ['simulation_cad', 'CAD / simulation']] },
-    { id: 'forge.applications', label: 'Applications, engines, or codecs that define success', type: 'textarea', required: true },
-    { id: 'forge.sustained_load', label: 'Heavy-load duration', type: 'select', required: true, options: [['hours_weekly', 'Hours weekly'], ['hours_daily', 'Hours daily'], ['continuous', 'Continuous'], ['unknown', 'Not sure yet']] },
-  ],
-  local_ai: [
-    { id: 'forge.ai_level', label: 'How central is local AI?', type: 'select', required: true, options: [['exploring', 'Exploring'], ['regular_inference', 'Regular inference'], ['daily_service', 'Daily service'], ['training_or_tuning', 'Training / tuning'], ['unknown', 'Not sure yet']] },
-    { id: 'forge.applications', label: 'Models, applications, data scale, or workload targets', type: 'textarea', required: true },
-    { id: 'forge.data_scale', label: 'Active data that must remain fast', type: 'select', required: true, options: [['under_1tb', 'Under 1 TB'], ['1_to_4tb', '1–4 TB'], ['4_to_12tb', '4–12 TB'], ['over_12tb', 'Over 12 TB'], ['unknown', 'Not sure yet']] },
-    { id: 'forge.sustained_load', label: 'Heavy-load duration', type: 'select', required: true, options: [['hours_daily', 'Hours daily'], ['continuous', 'Continuous'], ['unknown', 'Not sure yet']] },
-  ],
-  upgrade_repair: [
-    { id: 'forge.current_path', label: 'Current work', type: 'select', required: true, options: [['upgrade', 'Upgrade'], ['repair_diagnose', 'Repair / diagnose'], ['replace', 'Replace a current machine'], ['unknown', 'Need help deciding']] },
-    { id: 'forge.current_specs', label: 'Current system and known specifications', type: 'textarea', required: true },
-    { id: 'forge.reuse_parts', label: 'Parts worth evaluating for reuse', type: 'checks', options: [['cpu', 'CPU'], ['gpu', 'GPU'], ['memory', 'Memory'], ['storage', 'Storage'], ['power_supply', 'Power supply'], ['case', 'Case'], ['nothing', 'Nothing / unknown']] },
-    { id: 'forge.current_failure', label: 'What currently breaks, slows down, or feels wrong?', type: 'textarea', required: true },
-  ],
-  sim_rig: [
-    { id: 'forge.sim_titles', label: 'Primary titles, vehicles, or simulation environments', type: 'textarea', required: true },
-    { id: 'forge.sim_displays', label: 'Display / VR target', type: 'select', required: true, options: [['single', 'Single display'], ['triple', 'Triple display'], ['ultrawide', 'Ultrawide'], ['vr', 'VR'], ['mixed', 'Mixed / unsure']] },
-    { id: 'forge.sim_controls', label: 'Controls and physical gear', type: 'textarea', required: true, hint: 'Wheelbase, pedals, flight controls, motion, audio, or existing hardware.' },
-    { id: 'forge.room_constraints', label: 'Room, mounting, delivery, or power constraints', type: 'textarea', required: true },
-  ],
-  deployment: [
-    { id: 'deployment_goal', label: 'What workload or capability should this deployment support?', type: 'textarea', required: true },
-    { id: 'site_control', label: 'Do you control the intended site or rack location?', type: 'select', required: true, options: [['yes', 'Yes'], ['no', 'No'], ['unknown', 'Not sure yet']] },
-    { id: 'power_network_readiness', label: 'Current power and network posture', type: 'select', required: true, options: [['documented', 'Documented and available'], ['partial', 'Partially known'], ['not_ready', 'Not ready'], ['unknown', 'Not sure yet']] },
-    { id: 'onsite_sponsor', label: 'Is there an accountable on-site technical sponsor?', type: 'select', required: true, options: [['yes', 'Yes'], ['no', 'No'], ['unknown', 'Not sure yet']] },
-    { id: 'regulated_environment', label: 'Is the environment regulated or controlled?', type: 'select', required: true, options: [['yes', 'Yes'], ['no', 'No'], ['unknown', 'Not sure yet']] },
-  ],
-};
-
-function valuePresent(value) {
-  return Array.isArray(value) ? value.length > 0 : Boolean(String(value || '').trim());
+function optionLabel(question, value) {
+  if (value === GUIDE_UNKNOWN) return 'I’m not sure — guide me';
+  if (value === GUIDE_SKIPPED) return 'Skipped for now';
+  if (Array.isArray(value)) return value.map((item) => optionLabel(question, item)).join(', ');
+  return question?.options?.find(([id]) => id === value)?.[1] || String(value || '').replace(/^note:/, '');
 }
 
-function FormField({ field, value, onChange }) {
-  const current = value ?? (field.type === 'checks' ? [] : '');
-  if (field.type === 'textarea') {
-    return <label className="forge-field forge-field-wide"><span>{field.label}{field.required && <b> *</b>}</span>{field.hint && <small>{field.hint}</small>}<textarea value={current} rows="4" onChange={(event) => onChange(field.id, event.target.value)} /></label>;
-  }
-  if (field.type === 'select') {
-    return <label className="forge-field"><span>{field.label}{field.required && <b> *</b>}</span><select value={current} onChange={(event) => onChange(field.id, event.target.value)}><option value="">Select one</option>{field.options.map(([id, label]) => <option key={id} value={id}>{label}</option>)}</select></label>;
-  }
-  if (field.type === 'checks') {
-    return <fieldset className="forge-field forge-field-wide forge-checks"><legend>{field.label}{field.required && <b> *</b>}</legend><div>{field.options.map(([id, label]) => <label key={id}><input type="checkbox" checked={current.includes(id)} onChange={(event) => onChange(field.id, event.target.checked ? [...current, id] : current.filter((item) => item !== id))} /><span>{label}</span></label>)}</div></fieldset>;
-  }
-  return null;
+function statusLabel(value) {
+  if (!value || value === GUIDE_UNKNOWN) return 'Unresolved';
+  if (value === GUIDE_SKIPPED) return 'Skipped';
+  return 'Set';
 }
 
-function Panel({ label, title, children, tone = 'default' }) {
-  return <section className={`forge-panel is-${tone}`}><div className="forge-panel-head"><span>{label}</span>{title && <h2>{title}</h2>}</div>{children}</section>;
+function SourceDrawer({ cue, bundle }) {
+  const [open, setOpen] = useState(false);
+  const sources = (cue?.source_ids || []).map((id) => bundle.sources.find((source) => source.source_id === id)).filter(Boolean);
+  if (!sources.length) return null;
+  return (
+    <div className="concierge-sources">
+      <button type="button" aria-expanded={open} onClick={() => setOpen((value) => !value)}>
+        Why I’m asking <ChevronDown size={14} className={open ? 'is-open' : ''} />
+      </button>
+      {open && <div className="concierge-source-list">
+        {sources.map((source) => (
+          <article key={source.source_id}>
+            <span>{source.evidence_class}</span>
+            <strong>{source.organization}</strong>
+            <p>{source.display_name} · {source.source_version}</p>
+            <small>Retrieved {new Date(source.retrieved_at).toLocaleDateString()} · {source.state.replaceAll('_', ' ')}</small>
+            <a href={source.source_url} target="_blank" rel="noreferrer noopener">
+              Visit source <ExternalLink size={12} />
+            </a>
+          </article>
+        ))}
+      </div>}
+    </div>
+  );
 }
 
-function StatusBadge({ children, tone = 'gold' }) {
-  return <span className={`forge-status is-${tone}`}>{children}</span>;
+function SearchSelector({ question, value = [], bundle, onChange }) {
+  const [query, setQuery] = useState('');
+  const selected = Array.isArray(value) ? value : [];
+  const suggestions = question.id === 'reuse'
+    ? [
+      ['part:gpu', 'Graphics card'], ['part:storage', 'Storage drives'], ['part:memory', 'Memory'],
+      ['part:case', 'Case or enclosure'], ['part:psu', 'Power supply'], ['part:cooling', 'Cooling hardware'],
+    ].map(([id, label]) => ({ id, label, kind: 'existing part' }))
+    : question.id === 'output_target'
+      ? bundle.application_aliases.filter((item) => item.kind === 'display')
+      : bundle.application_aliases.filter((item) => item.kind !== 'display');
+  const filtered = suggestions.filter((item) => {
+    const haystack = `${item.label} ${(item.tags || []).join(' ')}`.toLowerCase();
+    return !selected.includes(item.id) && haystack.includes(query.trim().toLowerCase());
+  }).slice(0, 7);
+  const add = (id) => {
+    if (!selected.includes(id)) onChange([...selected, id]);
+    setQuery('');
+  };
+  const addNote = () => {
+    const clean = query.trim().slice(0, 400);
+    if (!clean) return;
+    add(`note:${clean}`);
+  };
+  return (
+    <div className="concierge-search">
+      {selected.length > 0 && <div className="concierge-chips">
+        {selected.map((id) => {
+          const found = suggestions.find((item) => item.id === id);
+          return <span key={id}>{found?.label || id.replace(/^note:/, '')}<button type="button" aria-label={`Remove ${found?.label || 'note'}`} onClick={() => onChange(selected.filter((item) => item !== id))}><X size={12} /></button></span>;
+        })}
+      </div>}
+      <label>
+        <Search size={16} />
+        <input
+          value={query}
+          maxLength={400}
+          placeholder={question.id === 'reuse' ? 'Search a part type or describe an exact part…' : 'Search applications, games, models, or workflows…'}
+          onChange={(event) => setQuery(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter') {
+              event.preventDefault();
+              if (filtered[0]) add(filtered[0].id);
+              else addNote();
+            }
+          }}
+        />
+      </label>
+      {query.trim() && <div className="concierge-results">
+        {filtered.map((item) => <button type="button" key={item.id} onClick={() => add(item.id)}><strong>{item.label}</strong><span>{item.kind?.replaceAll('_', ' ')}{item.tags?.length ? ` · ${item.tags.slice(0, 2).join(' · ')}` : ''}</span></button>)}
+        {question.allow_free_text && <button type="button" className="is-note" onClick={addNote}><strong>Keep “{query.trim().slice(0, 60)}” as a note</strong><span>Operator note only · not an engineering fact</span></button>}
+      </div>}
+    </div>
+  );
 }
 
-function branchLabel(id) {
-  return contract.branches.find((branch) => branch.id === id)?.label || 'Forge brief';
+function QuestionCard({ question, value, bundle, cue, onAnswer, onBack, canBack, headingRef }) {
+  return (
+    <section className="concierge-card" aria-labelledby="concierge-question">
+      <div className="concierge-guide-line">
+        <span><Sparkles size={15} /> Forge Concierge</span>
+        {cue && <div><strong>{cue.title}</strong><p>{cue.body}</p></div>}
+      </div>
+      <div className="concierge-question-head">
+        <span>{LANDMARK_LABELS[question.landmark]} · one stop at a time</span>
+        <h2 id="concierge-question" tabIndex="-1" ref={headingRef}>{question.prompt}</h2>
+        {question.help && <p>{question.help}</p>}
+      </div>
+      {question.type === 'single_choice' ? (
+        <div className="concierge-options">
+          {question.options.map(([id, label, description]) => (
+            <button type="button" key={id} className={value === id ? 'is-selected' : ''} onClick={() => onAnswer(id, 'answered')}>
+              <span>{value === id && <Check size={15} />}</span><strong>{label}</strong>{description && <small>{description}</small>}
+            </button>
+          ))}
+        </div>
+      ) : <SearchSelector question={question} value={value} bundle={bundle} onChange={(next) => onAnswer(next, 'answered', false)} />}
+      <SourceDrawer cue={cue} bundle={bundle} />
+      <footer className="concierge-controls">
+        <button type="button" className="forge-button is-ghost" onClick={onBack} disabled={!canBack}><ArrowLeft size={15} />Back</button>
+        <div>
+          <button type="button" className="concierge-text-button" onClick={() => onAnswer(GUIDE_SKIPPED, 'skipped')}>Skip for now</button>
+          <button type="button" className="forge-button is-ghost" onClick={() => onAnswer(GUIDE_UNKNOWN, 'unknown')}>I’m not sure — guide me</button>
+          {question.type === 'search_multi' && Array.isArray(value) && value.length > 0 && <button type="button" className="forge-button" onClick={() => onAnswer(value, 'confirmed')}>Continue<ArrowRight size={15} /></button>}
+        </div>
+      </footer>
+    </section>
+  );
 }
 
-function deriveProfile(branch, answers) {
-  const missing = [];
-  const required = [...sharedFields.system, ...(branchFields[branch] || []), ...sharedFields.limits, ...sharedFields.handoff]
-    .filter((field) => field.required);
-  required.forEach((field) => { if (!valuePresent(answers[field.id]) || answers[field.id] === 'unknown') missing.push(field.label); });
-  const conflicts = [];
-  if (answers['forge.form_factor'] === 'very_compact' && answers['forge.acoustics'] === 'near_silent' && answers['forge.sustained_load'] === 'continuous') {
-    conflicts.push('Very compact, near-silent, continuous-load systems need an operator thermal review.');
-  }
-  if (branch === 'deployment' && ['unknown', 'not_ready'].includes(answers.power_network_readiness)) {
-    conflicts.push('Deployment readiness is incomplete until power and network posture are clarified.');
-  }
-  return { missing, conflicts, completion: required.length ? Math.round(((required.length - missing.length) / required.length) * 100) : 0 };
+function ProductCard({ item, primary = false }) {
+  return (
+    <article className={`concierge-spot ${primary ? 'is-primary' : ''}`}>
+      <div className="concierge-spot-media"><img src={item.media.path} alt={item.media.alt} loading="lazy" onError={(event) => { event.currentTarget.hidden = true; }} /><span>{item.media.posture.replaceAll('_', ' ')}</span></div>
+      <div><small>{item.eyebrow}</small><h3>{item.title}</h3><p>{item.summary}</p><ul>{item.highlights.slice(0, 3).map((highlight) => <li key={highlight}>{highlight}</li>)}</ul><div className="concierge-badges">{item.badges.map((badge) => <span key={badge}>{badge}</span>)}</div></div>
+    </article>
+  );
+}
+
+function RoomKey({ bundle, answers, events, recommendations, onEdit, unresolved }) {
+  const destination = bundle.graph.questions.find((question) => question.id === 'destination');
+  const seen = new Set();
+  const answered = [...events].reverse().filter((event) => {
+    if (event.kind === 'edited' || seen.has(event.question_id)) return false;
+    seen.add(event.question_id);
+    return true;
+  }).slice(0, 8);
+  return (
+    <aside className="concierge-room-key" aria-label="Room Key">
+      <div className="room-key-title"><KeyRound size={17} /><div><span>ROOM KEY</span><strong>{optionLabel(destination, answers.destination) || 'Your route is open'}</strong></div></div>
+      <div className="room-key-status"><span>NOT A QUOTE</span><span className={unresolved.length ? 'is-review' : ''}>{unresolved.length ? `${unresolved.length} UNRESOLVED` : 'DRAFT READY'}</span></div>
+      <section><h3>Current neighborhood</h3><p>{recommendations.items[0]?.title || 'We’ll narrow it together.'}</p></section>
+      <section><h3>Inferred priorities</h3><ul>
+        <li>Workload fit <b>{answers.destination ? 'high confidence' : 'unresolved'}</b></li>
+        <li>Acoustics <b>{statusLabel(answers.acoustics)}</b></li>
+        <li>Service access <b>{statusLabel(answers.service)}</b></li>
+        <li>Footprint <b>{statusLabel(answers.footprint)}</b></li>
+      </ul></section>
+      {answered.length > 0 && <section><h3>Answer trail</h3><div className="room-key-trail">{answered.map((event) => {
+        const question = bundle.graph.questions.find((item) => item.id === event.question_id);
+        return <button type="button" key={`${event.sequence}-${event.question_id}`} onClick={() => onEdit(event.question_id)}><span>{question?.prompt || event.question_id}</span><b>Edit</b></button>;
+      })}</div></section>}
+      <section className="room-key-boundary"><ShieldCheck size={15} /><p>Guidance is a deterministic public projection. Compatibility, pricing, and selection remain operator-reviewed HypOM work.</p></section>
+    </aside>
+  );
+}
+
+function Itinerary({ mode, requirements, recommendations, counterfactuals, onToggle, onDeepen, onHandoff, onBack, headingRef }) {
+  return (
+    <section className="concierge-itinerary" aria-labelledby="itinerary-title">
+      <header><span><Map size={15} /> YOUR ITINERARY</span><h2 id="itinerary-title" tabIndex="-1" ref={headingRef}>A few neighborhoods worth seeing.</h2><p>These are architecture patterns—not a quote, parts list, compatibility verdict, or inventory promise.</p></header>
+      <div className="concierge-spots">{recommendations.items.map((item, index) => <ProductCard item={item} primary={index === 0} key={item.slug} />)}</div>
+      <section className="concierge-counterfactuals"><span>Try another route</span><h3>What should we lean toward?</h3><div>{COUNTERFACTUALS.map(([id, label, help]) => <button type="button" key={id} className={counterfactuals.includes(id) ? 'is-selected' : ''} onClick={() => onToggle(id)}><strong>{label}</strong><small>{help}</small></button>)}</div><p>These controls preview the public guidance only. Formal Forge Brain scenarios begin after operator handoff.</p></section>
+      <section className="concierge-projection"><div><span>Requirements draft</span><strong>{requirements.unresolved.length ? 'Review posture' : 'Ready for operator review'}</strong></div><dl><div><dt>Workload lane</dt><dd>{requirements.workload_profile?.replaceAll('_', ' ') || 'Unresolved'}</dd></div><div><dt>Operating lane</dt><dd>{requirements.operational_lane?.replaceAll('_', ' ') || 'Unresolved'}</dd></div><div><dt>Budget posture</dt><dd>{requirements.budget ? `Up to $${(requirements.budget.parts_ceiling_minor / 100).toLocaleString()}` : 'Operator guidance needed'}</dd></div><div><dt>Unknown policy</dt><dd>Review · never implicit pass</dd></div></dl>{requirements.unresolved.length > 0 && <p><AlertTriangle size={15} /> {requirements.unresolved.length} item{requirements.unresolved.length === 1 ? '' : 's'} remain explicit for operator clarification.</p>}</section>
+      <footer className="concierge-controls"><button type="button" className="forge-button is-ghost" onClick={onBack}><ArrowLeft size={15} />Back</button><div>{mode === 'express' && <button type="button" className="forge-button is-ghost" onClick={onDeepen}>Continue the full tour</button>}<button type="button" className="forge-button" onClick={onHandoff}>Prepare the handoff<ArrowRight size={15} /></button></div></footer>
+    </section>
+  );
+}
+
+function Handoff({ identity, setIdentity, consent, setConsent, reviewed, setReviewed, requirements, decision, errors, errorRef, submitting, onBack, onSubmit, headingRef }) {
+  return (
+    <section className="concierge-handoff" aria-labelledby="handoff-title">
+      {errors.length > 0 && <div className="forge-error" role="alert" ref={errorRef} tabIndex="-1"><CircleAlert size={18} /><div><strong>One last check</strong><ul>{errors.map((error) => <li key={error}>{error}</li>)}</ul></div></div>}
+      <header><span>FINAL STOP · IDENTITY ONLY NOW</span><h2 id="handoff-title" tabIndex="-1" ref={headingRef}>Hand the itinerary to a real operator.</h2><p>Your contact details stay with intake. HypOM receives only an operator-approved, source-opaque requirements projection later.</p></header>
+      <div className="concierge-handoff-grid">
+        <div className="concierge-contact">
+          <label><span>Name *</span><input value={identity.name} autoComplete="name" onChange={(event) => setIdentity((current) => ({ ...current, name: event.target.value }))} /></label>
+          <label><span>Email *</span><input type="email" value={identity.email} autoComplete="email" onChange={(event) => setIdentity((current) => ({ ...current, email: event.target.value }))} /></label>
+          <label><span>Organization <i>optional</i></span><input value={identity.organization} autoComplete="organization" onChange={(event) => setIdentity((current) => ({ ...current, organization: event.target.value }))} /></label>
+        </div>
+        <div className="concierge-review">
+          <h3>Held-review brief</h3>
+          <dl><div><dt>Classification</dt><dd>{decision?.classification || 'FX · REVIEW REQUIRED'}</dd></div><div><dt>Unresolved</dt><dd>{requirements.unresolved.length}</dd></div><div><dt>Created now</dt><dd>Intake signal only</dd></div><div><dt>Not created</dt><dd>Quote, configuration, verdict, or order</dd></div></dl>
+          <label><input type="checkbox" checked={consent} onChange={(event) => setConsent(event.target.checked)} /><span>I consent to Hyperion processing this brief for operator review.</span></label>
+          <label><input type="checkbox" checked={reviewed} onChange={(event) => setReviewed(event.target.checked)} /><span>I reviewed this itinerary and want to dispatch this revision.</span></label>
+        </div>
+      </div>
+      <footer className="concierge-controls"><button type="button" className="forge-button is-ghost" onClick={onBack}><ArrowLeft size={15} />Back</button><button type="button" className="forge-button" disabled={submitting} onClick={onSubmit}>{submitting ? <><LoaderCircle className="forge-spin" size={16} />Receiving brief…</> : <>Dispatch for held review<ArrowRight size={15} /></>}</button></footer>
+    </section>
+  );
 }
 
 export default function ForgeConfiguratorPage() {
-  const [branch, setBranch] = useState('');
-  const [step, setStep] = useState(0);
+  const [bundle, setBundle] = useState(FORGE_GUIDE_FALLBACK);
+  const [bundlePosture, setBundlePosture] = useState('bundled_verified');
+  const [stage, setStage] = useState('welcome');
+  const [mode, setMode] = useState('full');
+  const [questionIndex, setQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState({});
-  const [identity, setIdentity] = useState({ name: '', email: '', organization: '', preference: 'email', phone: '' });
+  const [events, setEvents] = useState([]);
+  const [counterfactuals, setCounterfactuals] = useState([]);
+  const [identity, setIdentity] = useState({ name: '', email: '', organization: '' });
   const [consent, setConsent] = useState(false);
-  const [clientReviewed, setClientReviewed] = useState(false);
+  const [reviewed, setReviewed] = useState(false);
   const [decision, setDecision] = useState(null);
   const [receipt, setReceipt] = useState(null);
   const [errors, setErrors] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [revision, setRevision] = useState(1);
   const [supersedes, setSupersedes] = useState(null);
+  const [migratedFrom, setMigratedFrom] = useState(null);
   const ids = useRef({ intake: makeId('int'), session: makeId('ses'), trace: makeId('trc'), idempotency: makeId('idem') });
-  const errorRef = useRef(null);
   const headingRef = useRef(null);
+  const errorRef = useRef(null);
+
+  useEffect(() => {
+    let live = true;
+    fetch('/api/forge/guide', { headers: { accept: 'application/json' } })
+      .then((response) => response.ok ? response.json() : Promise.reject(new Error('guide_unavailable')))
+      .then((payload) => {
+        const candidate = payload.bundle || payload;
+        if (live && isForgeGuideBundle(candidate)) {
+          setBundle(candidate);
+          setBundlePosture(payload.source_posture || candidate.source_posture || 'hypom_approved');
+        }
+      })
+      .catch(() => { if (live) setBundlePosture('bundled_verified'); });
+    return () => { live = false; };
+  }, []);
 
   useEffect(() => {
     try {
       const draft = JSON.parse(localStorage.getItem(LOCAL_KEY) || 'null');
       if (draft?.expires_at > Date.now()) {
-        setBranch(draft.branch || ''); setStep(Math.min(draft.step || 0, 4)); setAnswers(draft.answers || {});
+        setStage(draft.stage || 'welcome'); setMode(draft.mode || 'full'); setQuestionIndex(draft.questionIndex || 0);
+        setAnswers(draft.answers || {}); setEvents(draft.events || []); setCounterfactuals(draft.counterfactuals || []);
         setIdentity((current) => ({ ...current, ...(draft.identity || {}) })); setConsent(Boolean(draft.consent));
-        setRevision(draft.revision || 1); setSupersedes(draft.supersedes || null); ids.current = { ...ids.current, ...(draft.ids || {}) };
-      } else localStorage.removeItem(LOCAL_KEY);
-    } catch { /* Draft recovery is best-effort only. */ }
+        setRevision(draft.revision || 1); setSupersedes(draft.supersedes || null); setMigratedFrom(draft.migratedFrom || null);
+        ids.current = { ...ids.current, ...(draft.ids || {}) };
+        return;
+      }
+      localStorage.removeItem(LOCAL_KEY);
+      const legacy = migrateLegacyDraft(JSON.parse(localStorage.getItem(LEGACY_KEY) || 'null'));
+      if (legacy) {
+        setAnswers(legacy.answers); setIdentity((current) => ({ ...current, ...legacy.identity })); setConsent(legacy.consent);
+        setRevision(legacy.revision); setSupersedes(legacy.supersedes); setMigratedFrom(legacy.migrated_from);
+        if (legacy.ids) ids.current = { ...ids.current, ...legacy.ids };
+        setStage('welcome');
+      }
+    } catch { /* Local recovery is best-effort and never blocks the guide. */ }
   }, []);
 
   useEffect(() => {
+    if (receipt) return;
     try {
-      localStorage.setItem(LOCAL_KEY, JSON.stringify({ branch, step, answers, identity, consent, revision, supersedes, ids: ids.current, expires_at: Date.now() + LOCAL_RETENTION_MS }));
+      localStorage.setItem(LOCAL_KEY, JSON.stringify({
+        schema_version: 'forge-guide-session/1', stage, mode, questionIndex, answers, events,
+        counterfactuals, identity, consent, revision, supersedes, migratedFrom, ids: ids.current,
+        expires_at: Date.now() + LOCAL_RETENTION_MS,
+      }));
     } catch { /* Browser storage is optional. */ }
-  }, [answers, branch, consent, identity, revision, step, supersedes]);
+  }, [answers, consent, counterfactuals, events, identity, migratedFrom, mode, questionIndex, receipt, revision, stage, supersedes]);
 
-  useEffect(() => { requestAnimationFrame(() => headingRef.current?.focus()); }, [step]);
+  useEffect(() => { requestAnimationFrame(() => headingRef.current?.focus()); }, [questionIndex, stage]);
 
-  const profile = useMemo(() => deriveProfile(branch, answers), [answers, branch]);
-  const fields = useMemo(() => {
-    if (!branch) return [];
-    if (step === 1) return [...sharedFields.system, ...(branchFields[branch] || [])];
-    if (step === 2) return sharedFields.limits;
-    if (step === 3) return sharedFields.handoff;
-    return [];
-  }, [branch, step]);
+  const questions = useMemo(() => visibleQuestions(bundle, answers, mode), [answers, bundle, mode]);
+  const question = questions[questionIndex] || questions[0];
+  const cues = useMemo(() => matchingCues(bundle, answers), [answers, bundle]);
+  const cue = [...cues].reverse().find((item) => !events.some((event) => event.cue_key === item.cue_key)) || cues.at(-1);
+  const recommendations = useMemo(() => deriveRecommendations(bundle, answers, counterfactuals), [answers, bundle, counterfactuals]);
+  const requirements = useMemo(() => deriveRequirements(bundle, answers, counterfactuals), [answers, bundle, counterfactuals]);
 
-  const updateAnswer = (id, value) => { setAnswers((current) => ({ ...current, [id]: value })); setDecision(null); setReceipt(null); };
-  const selectBranch = (next) => { setBranch(next); setAnswers({ 'forge.system_type': next }); setStep(1); setDecision(null); setReceipt(null); };
-
-  const validateStep = () => {
-    const next = [];
-    if (step === 0 && !branch) next.push('Choose the Forge system you want to shape.');
-    if ([1, 2, 3].includes(step)) {
-      fields.filter((field) => field.required).forEach((field) => {
-        if (!valuePresent(answers[field.id])) next.push(`${field.label} is required.`);
-      });
-    }
-    if (step === 3) {
-      if (!identity.name.trim()) next.push('Name is required.');
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identity.email)) next.push('Enter a valid email address.');
-      if (!consent) next.push('Consent to process this build brief is required.');
-    }
-    if (step === 4 && !clientReviewed) next.push('Confirm that you reviewed this build brief before dispatch.');
-    setErrors(next);
-    if (next.length) requestAnimationFrame(() => errorRef.current?.focus());
-    return next.length === 0;
+  const start = (nextMode) => {
+    setMode(nextMode); setStage('questions'); setQuestionIndex(0);
+    track('forge_guide_start', { mode: nextMode });
   };
 
-  const evaluate = async () => {
-    const local = evaluateRoute({ lane: 'forge', answers });
+  const advance = (nextAnswers, currentQuestion) => {
+    const nextQuestions = visibleQuestions(bundle, nextAnswers, mode);
+    const current = nextQuestions.findIndex((item) => item.id === currentQuestion.id);
+    const next = nextQuestionIndex(nextQuestions, nextAnswers, Math.max(0, current + 1));
+    if (next < 0) setStage('itinerary');
+    else setQuestionIndex(next);
+  };
+
+  const answerQuestion = (value, kind, shouldAdvance = true) => {
+    const sequence = events.length + 1;
+    const nextAnswers = { ...answers, [question.id]: value };
+    setAnswers(nextAnswers);
+    setEvents((current) => [...current, {
+      sequence, question_id: question.id, kind, answered_at: new Date().toISOString(), cue_key: cue?.cue_key || null,
+    }]);
+    setDecision(null); setReceipt(null);
+    track('forge_guide_question', { question_id: question.id, action: kind, mode });
+    if (shouldAdvance) advance(nextAnswers, question);
+  };
+
+  const back = () => {
+    if (stage !== 'questions') { setStage('questions'); setQuestionIndex(Math.max(0, questions.length - 1)); return; }
+    setQuestionIndex((index) => Math.max(0, index - 1));
+    track('forge_guide_back', { question_id: question?.id || 'unknown', mode });
+  };
+
+  const editQuestion = (id) => {
+    const full = visibleQuestions(bundle, answers, 'full');
+    const index = full.findIndex((item) => item.id === id);
+    if (index < 0) return;
+    setMode('full'); setStage('questions'); setQuestionIndex(index);
+    setEvents((current) => [...current, { sequence: current.length + 1, question_id: id, kind: 'edited', answered_at: new Date().toISOString() }]);
+  };
+
+  const deepen = () => {
+    const full = visibleQuestions(bundle, answers, 'full');
+    const next = nextQuestionIndex(full, answers, 0);
+    setMode('full');
+    if (next < 0) setStage('itinerary');
+    else { setQuestionIndex(next); setStage('questions'); }
+    track('forge_guide_deepen', { mode: 'express' });
+  };
+
+  const toggleCounterfactual = (id) => {
+    setCounterfactuals((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id]);
+    track('forge_guide_counterfactual', { counterfactual_id: id });
+  };
+
+  const openHandoff = async () => {
+    const intakeAnswers = mapGuideToIntake(answers);
+    const local = evaluateRoute({ lane: 'forge', answers: intakeAnswers });
     try {
-      const response = await api('/api/intake/evaluate', { method: 'POST', body: JSON.stringify({ lane: 'forge', answers, automated_classification: true }) });
+      const response = await api('/api/intake/evaluate', { method: 'POST', body: JSON.stringify({ lane: 'forge', answers: intakeAnswers, automated_classification: true }) });
       setDecision(response.decision);
     } catch { setDecision(local); }
-  };
-
-  const next = async () => {
-    if (!validateStep()) return;
-    setErrors([]);
-    if (step === 3) await evaluate();
-    setStep((current) => Math.min(4, current + 1));
+    setStage('handoff');
   };
 
   const submit = async () => {
-    if (!validateStep() || submitting) return;
+    const nextErrors = [];
+    if (!identity.name.trim()) nextErrors.push('Name is required.');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(identity.email)) nextErrors.push('Enter a valid email address.');
+    if (!consent) nextErrors.push('Consent to process this brief is required.');
+    if (!reviewed) nextErrors.push('Confirm that you reviewed this itinerary.');
+    setErrors(nextErrors);
+    if (nextErrors.length || submitting) {
+      requestAnimationFrame(() => errorRef.current?.focus());
+      return;
+    }
     setSubmitting(true);
     const now = new Date().toISOString();
+    const projection = { ...requirements };
+    const projectionHash = await sha256Document(projection);
+    projection.projection_hash = projectionHash;
+    const sessionDocument = {
+      schema_version: 'forge-guide-session/1',
+      graph_version: bundle.graph.version,
+      ordered_answer_events: events,
+      skipped_questions: events.filter((event) => event.kind === 'skipped').map((event) => event.question_id),
+      guide_cues_shown: [...new Set(events.map((event) => event.cue_key).filter(Boolean))],
+      lane_recommendations: recommendations.items.map((item) => item.slug),
+      requested_counterfactuals: counterfactuals,
+      unresolved_fields: requirements.unresolved.map((item) => item.field),
+    };
+    const sessionHash = await sha256Document(sessionDocument);
+    const intakeAnswers = mapGuideToIntake(answers);
+    const rawAnswers = Object.entries(answers).map(([id, value]) => [`guide.${id}`, value]);
     const payload = {
-      intake_id: ids.current.intake, session_id: ids.current.session, submission_id: makeId('sub'), revision,
-      supersedes_submission_id: supersedes, form_id: contract.form_id, form_version: contract.version,
+      intake_id: ids.current.intake, session_id: ids.current.session, submission_id: makeId('sub'),
+      revision, supersedes_submission_id: supersedes, form_id: contract.form_id, form_version: contract.version,
       locale: navigator.language || 'en-US', submitted_at: now, trace_id: ids.current.trace, client_reviewed: true,
-      identity: { contact_name: identity.name.trim(), email: identity.email.trim().toLowerCase(), phone: identity.preference === 'phone' ? identity.phone.trim() || null : null, organization: identity.organization.trim() || null, organization_domain: null },
-      answers: Object.entries({ ...answers, 'forge.system_type': branch }).map(([question_id, value]) => ({ question_id, value, answered_at: now, source: 'client', data_classification: 'client_confidential' })),
+      identity: { contact_name: identity.name.trim(), email: identity.email.trim().toLowerCase(), phone: null, organization: identity.organization.trim() || null, organization_domain: null },
+      answers: [...Object.entries(intakeAnswers), ...rawAnswers].map(([question_id, value]) => ({ question_id, value, answered_at: now, source: 'client', data_classification: 'client_confidential' })),
       artifacts: [],
-      consents: [{ consent_id: 'process_intake', notice_version: CONTRACT_VERSION, granted: true, recorded_at: now }, { consent_id: 'automated_classification', notice_version: CONTRACT_VERSION, granted: true, recorded_at: now }],
-      client_context: { entry_url: window.location.href, effects_mode: 'full', save_resume_used: true },
+      consents: [
+        { consent_id: 'process_intake', notice_version: CONTRACT_VERSION, granted: true, recorded_at: now },
+        { consent_id: 'automated_classification', notice_version: CONTRACT_VERSION, granted: true, recorded_at: now },
+      ],
+      client_context: {
+        entry_url: window.location.href, effects_mode: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'reduced' : 'full',
+        save_resume_used: true, guide_mode: mode, guide_bundle_hash: bundle.bundle_hash,
+        question_graph_version: bundle.graph.version, guide_session_hash: sessionHash,
+        guide_requirements_projection: projection, recommendation_reason_codes: recommendations.reason_codes,
+        unresolved_items: requirements.unresolved.map((item) => item.field),
+        requested_counterfactuals: counterfactuals,
+      },
     };
     try {
       const result = await api('/api/intake/submissions', { method: 'POST', headers: { 'idempotency-key': ids.current.idempotency }, body: JSON.stringify(payload) });
-      setReceipt(result.receipt); localStorage.removeItem(LOCAL_KEY);
+      setReceipt(result.receipt);
+      localStorage.removeItem(LOCAL_KEY);
+      localStorage.removeItem(LEGACY_KEY);
     } catch (error) {
-      setErrors([error.message || 'The build brief was not received. Your local draft remains available.']);
+      setErrors([error.message || 'The itinerary was not received. Your local draft remains available.']);
       requestAnimationFrame(() => errorRef.current?.focus());
     } finally { setSubmitting(false); }
   };
 
   const correct = () => {
     if (!receipt) return;
-    setSupersedes(receipt.submission_id); setRevision(receipt.revision + 1); ids.current.idempotency = makeId('idem'); setClientReviewed(false); setReceipt(null); setStep(1);
+    setSupersedes(receipt.submission_id); setRevision(receipt.revision + 1); ids.current.idempotency = makeId('idem');
+    setReviewed(false); setReceipt(null); setStage('questions'); setQuestionIndex(0);
   };
+
+  const currentLandmark = stage === 'itinerary' || stage === 'handoff' ? 'itinerary' : question?.landmark || 'destination';
+  const progressIndex = Math.max(0, LANDMARKS.indexOf(currentLandmark));
 
   return (
     <main className="forge-configurator-page">
-      <Helmet><title>Forge Configurator | Hyperion Industries</title><meta name="description" content="Shape a custom Hyperion system around the work, room, budget, and support reality—then dispatch it for operator review." /><link rel="canonical" href="https://hyperion-industries.dev/forge/configurator" /></Helmet>
+      <Helmet><title>Forge Concierge | Hyperion Industries</title><meta name="description" content="Take a guided, source-backed route from what you want to accomplish to a held-review Hyperion Forge system brief." /><link rel="canonical" href="https://hyperion-industries.dev/forge/configurator" /></Helmet>
       <div className="forge-configurator-shell">
-        <header className="forge-hero"><div><Link to="/forge" className="forge-back"><ArrowLeft size={15} />Forge District</Link><p>HYPERION // FORGE CONFIGURATOR</p><h1>Shape the system<br /><em>around the work.</em></h1><span>Guided build brief · operator review · no checkout</span></div><div className="forge-hero-mark" aria-hidden="true"><Cpu /><Sparkles /></div></header>
+        <header className="forge-hero"><div><Link to="/forge" className="forge-back"><ArrowLeft size={15} />Forge District</Link><p>HYPERION // FORGE CONCIERGE</p><h1>Tell us where<br /><em>you want to go.</em></h1><span>One useful question at a time · evidence-backed · operator reviewed</span></div><div className="forge-hero-mark" aria-hidden="true"><Compass /><Sparkles /></div></header>
 
-        <div className="forge-layout">
-          <section className="forge-main" aria-labelledby="forge-step-title">
-            <nav className="forge-progress" aria-label="Configurator progress">{STEPS.map((label, index) => <span key={label} className={index === step ? 'is-active' : index < step ? 'is-complete' : ''}><b>{String(index + 1).padStart(2, '0')}</b>{label}</span>)}</nav>
-            {errors.length > 0 && <div className="forge-error" role="alert" ref={errorRef} tabIndex="-1"><CircleAlert size={18} /><div><strong>Complete this checkpoint</strong><ul>{errors.map((error) => <li key={error}>{error}</li>)}</ul></div></div>}
-            {receipt ? (
-              <Panel label="SIGNAL RECEIVED" title="Build brief held for review" tone="success"><div className="forge-receipt"><Check size={32} /><p>Reference <strong>{receipt.reference}</strong>. Your brief is in the Forge review queue; no order, payment, or quote was created.</p><div><button type="button" className="forge-button is-ghost" onClick={correct}>Correct with a new revision</button><Link className="forge-button" to="/forge">Return to the Forge</Link></div></div></Panel>
-            ) : <>
-              <Panel label={`CHECKPOINT ${String(step + 1).padStart(2, '0')}`} title={STEPS[step]}>
-                <h2 id="forge-step-title" tabIndex="-1" ref={headingRef} className="forge-step-title">{step === 0 ? 'Choose the system lane.' : step === 1 ? `Describe the ${branchLabel(branch).toLowerCase()}.` : step === 2 ? 'Set the non-negotiables.' : step === 3 ? 'Define the handoff.' : 'Review before dispatch.'}</h2>
-                {step === 0 && <div className="forge-branch-grid">{contract.branches.map((item) => <button type="button" key={item.id} onClick={() => selectBranch(item.id)} className={`forge-branch ${branch === item.id ? 'is-selected' : ''}`}><span>{item.id === 'upgrade_repair' ? <Wrench /> : item.id === 'local_ai' ? <Cpu /> : item.id === 'deployment' ? <HardDrive /> : <Gauge />}</span><strong>{item.label}</strong><small>{item.description}</small></button>)}</div>}
-                {[1, 2, 3].includes(step) && <div className="forge-fields">{fields.map((field) => <FormField field={field} key={field.id} value={answers[field.id]} onChange={updateAnswer} />)}{step === 3 && <div className="forge-contact"><label className="forge-field"><span>Name <b>*</b></span><input value={identity.name} autoComplete="name" onChange={(event) => setIdentity((current) => ({ ...current, name: event.target.value }))} /></label><label className="forge-field"><span>Email <b>*</b></span><input type="email" value={identity.email} autoComplete="email" onChange={(event) => setIdentity((current) => ({ ...current, email: event.target.value }))} /></label><label className="forge-field"><span>Organization <i>optional</i></span><input value={identity.organization} autoComplete="organization" onChange={(event) => setIdentity((current) => ({ ...current, organization: event.target.value }))} /></label><label className="forge-field"><span>Follow-up</span><select value={identity.preference} onChange={(event) => setIdentity((current) => ({ ...current, preference: event.target.value }))}><option value="email">Email</option><option value="phone">Phone</option><option value="video_call">Video call</option></select></label><label className="forge-consent"><input type="checkbox" checked={consent} onChange={(event) => setConsent(event.target.checked)} /><span>I consent to Hyperion processing this build brief for operator review. No payment or order is created here.</span></label><p className="forge-boundary"><ShieldCheck size={16} />Files, credentials, private logs, and restricted evidence are not accepted in this public form.</p></div>}</div>}
-                {step === 4 && <div className="forge-review"><DataList rows={[['System', branchLabel(branch)], ['Maturity', 'COMMERCIAL LANE · REVIEW REQUIRED'], ['Classification', decision?.classification || (profile.missing.length || profile.conflicts.length ? 'FX · REVIEW REQUIRED' : 'F1 · FOCUSED BRIEF')], ['Boundary', 'No price, compatibility verdict, payment, or order']]} />{(profile.missing.length > 0 || profile.conflicts.length > 0) && <div className="forge-review-warning"><AlertTriangle size={18} /><div><strong>Requirements needing review</strong><ul>{[...profile.missing, ...profile.conflicts].map((item) => <li key={item}>{item}</li>)}</ul></div></div>}<label className="forge-consent"><input type="checkbox" checked={clientReviewed} onChange={(event) => setClientReviewed(event.target.checked)} /><span>I reviewed this build brief and want to dispatch this revision for operator review.</span></label></div>}
-              </Panel>
-              <footer className="forge-nav">{step > 0 ? <button type="button" className="forge-button is-ghost" onClick={() => { setErrors([]); setStep((current) => current - 1); }}><ArrowLeft size={15} />Back</button> : <Link className="forge-button is-ghost" to="/forge"><ArrowLeft size={15} />Exit</Link>}{step < 4 ? <button type="button" className="forge-button" onClick={next}>Continue<ArrowRight size={15} /></button> : <button type="button" className="forge-button" onClick={submit} disabled={submitting}>{submitting ? <><LoaderCircle className="forge-spin" size={16} />Receiving brief…</> : <>Dispatch for operator review<ArrowRight size={15} /></>}</button>}</footer>
-            </>}
+        {stage !== 'welcome' && !receipt && <nav className="concierge-progress" aria-label="Concierge progress">{LANDMARKS.map((landmark, index) => <span key={landmark} className={index === progressIndex ? 'is-active' : index < progressIndex ? 'is-complete' : ''}><b>{index < progressIndex ? <Check size={12} /> : String(index + 1).padStart(2, '0')}</b>{LANDMARK_LABELS[landmark]}</span>)}</nav>}
+
+        {receipt ? (
+          <section className="concierge-receipt"><Check size={34} /><span>SIGNAL RECEIVED · HELD FOR REVIEW</span><h2>Your itinerary is with the Forge desk.</h2><p>Reference <strong>{receipt.reference}</strong>. No quote, configuration, compatibility verdict, payment, or order was created.</p><div><button type="button" className="forge-button is-ghost" onClick={correct}>Correct with a new revision</button><Link className="forge-button" to="/forge">Return to the Forge</Link></div></section>
+        ) : stage === 'welcome' ? (
+          <section className="concierge-welcome" aria-labelledby="welcome-title">
+            <div><span><Compass size={15} /> YOUR GUIDE IS READY</span><h2 id="welcome-title">This should feel like a good shop tour, not a tax form.</h2><p>Start with what you want the system to make possible. The Concierge will explain the tradeoffs, show relevant Forge neighborhoods, and keep every unknown visible for a real operator.</p><div className="concierge-welcome-actions"><button type="button" className="forge-button" onClick={() => start('full')}>Take the guided itinerary<ArrowRight size={15} /></button><button type="button" className="forge-button is-ghost" onClick={() => start('express')}>Show me around · 3 questions</button></div><small>{migratedFrom ? 'Your earlier configurator draft was carried forward safely. ' : ''}Guide source: {bundlePosture.replaceAll('_', ' ')} · {bundle.sources.length} curated source lanes.</small></div><ol><li><b>01</b><span>Tell us the destination.</span></li><li><b>02</b><span>Get useful context as the route sharpens.</span></li><li><b>03</b><span>Preview several system neighborhoods.</span></li><li><b>04</b><span>Hand a source-opaque draft to an operator.</span></li></ol>
           </section>
-
-          <aside className="forge-aside" aria-label="Build profile summary"><Panel label="LIVE BUILD PROFILE" title={branch ? branchLabel(branch) : 'Awaiting system lane'}><div className="forge-meter"><div><span>Profile completeness</span><b>{profile.completion}%</b></div><i><span style={{ width: `${profile.completion}%` }} /></i></div><div className="forge-status-stack"><StatusBadge tone="gold">NOT A QUOTE</StatusBadge><StatusBadge tone={profile.missing.length || profile.conflicts.length ? 'red' : 'cyan'}>{profile.missing.length || profile.conflicts.length ? 'REVIEW REQUIRED' : 'DRAFT PROFILE'}</StatusBadge></div><DataList rows={[['System lane', branch ? branchLabel(branch) : 'Not selected'], ['Budget', answers['forge.budget'] ? sharedFields.limits.find((field) => field.id === 'forge.budget')?.options.find(([id]) => id === answers['forge.budget'])?.[1] : 'Not set'], ['Timing', answers['forge.timeline'] ? sharedFields.limits.find((field) => field.id === 'forge.timeline')?.options.find(([id]) => id === answers['forge.timeline'])?.[1] : 'Not set'], ['Support', answers['forge.support']?.replaceAll('_', ' ') || 'Not set']]} /></Panel><Panel label="OPERATOR POSTURE" title="What happens next" tone="dark"><ol className="forge-posture"><li><b>01</b><span>Your brief enters a held review queue.</span></li><li><b>02</b><span>An operator confirms constraints and fit.</span></li><li><b>03</b><span>Eligible PC work may be proposed to the Forge domain service.</span></li></ol></Panel></aside>
-        </div>
+        ) : (
+          <div className="concierge-layout">
+            <section className="concierge-main">
+              {stage === 'questions' && question && <QuestionCard question={question} value={answers[question.id]} bundle={bundle} cue={cue} onAnswer={answerQuestion} onBack={back} canBack={questionIndex > 0} headingRef={headingRef} />}
+              {stage === 'itinerary' && <Itinerary mode={mode} requirements={requirements} recommendations={recommendations} counterfactuals={counterfactuals} onToggle={toggleCounterfactual} onDeepen={deepen} onHandoff={openHandoff} onBack={back} headingRef={headingRef} />}
+              {stage === 'handoff' && <Handoff identity={identity} setIdentity={setIdentity} consent={consent} setConsent={setConsent} reviewed={reviewed} setReviewed={setReviewed} requirements={requirements} decision={decision} errors={errors} errorRef={errorRef} submitting={submitting} onBack={() => setStage('itinerary')} onSubmit={submit} headingRef={headingRef} />}
+            </section>
+            <RoomKey bundle={bundle} answers={answers} events={events} recommendations={recommendations} onEdit={editQuestion} unresolved={requirements.unresolved} />
+          </div>
+        )}
       </div>
     </main>
   );
-}
-
-function DataList({ rows }) {
-  return <dl className="forge-data-list">{rows.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value || 'Not set'}</dd></div>)}</dl>;
 }
