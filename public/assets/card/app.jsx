@@ -28,12 +28,12 @@ const FALLBACK_CONFIG = {
     "/assets/operators/victor-portrait.webm",
     "/assets/operators/victor-portrait.mp4",
   ],
-  // Blend mode dissolves the portrait edge-first into the card. It assumes a
-  // subject that is brighter than the panel; this operator plate is a dark
-  // helmet on a night city, so the mask kept the near-black centre and faded
-  // the bright neon rim — the portrait read as empty. Circle crop restores the
-  // accent ring + haze, which gives the dark plate a defined edge.
-  portraitBlend: false,
+  // Blend mode dissolves the portrait edge-first into the card (no ring, no
+  // circle). The mask geometry lives in card.css and is tuned for this dark
+  // plate: opaque core wide enough that the whole helmet reads, fading out by
+  // the frame edge. Composited candidates against the card background before
+  // picking — the design's original 32%-core mask left only a ~60px blob.
+  portraitBlend: true,
   qr: "/assets/card/qr.png",
   doctrine: {
     label:          "HYPERION DOCTRINE",
