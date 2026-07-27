@@ -3,6 +3,7 @@ import test from 'node:test';
 import { FORGE_GUIDE_FALLBACK, isForgeGuideBundle } from '../../../src/data/forgeGuideBundle.js';
 import {
   GUIDE_SKIPPED,
+  GUIDE_UNKNOWN,
   deriveRecommendations,
   deriveRequirements,
   mapGuideToIntake,
@@ -290,4 +291,17 @@ test('legacy drafts migrate without treating free text as a capability fact', ()
   const intake = mapGuideToIntake(migrated.answers);
   assert.equal(intake['forge.system_type'], 'local_ai');
   assert.equal(intake['forge.local_first'], 'unknown');
+});
+
+test('search questions may remain unknown or skipped without breaking intake projection', () => {
+  for (const unresolvedWorkloads of [GUIDE_UNKNOWN, GUIDE_SKIPPED, undefined]) {
+    const intake = mapGuideToIntake({
+      destination: 'gaming',
+      workloads: unresolvedWorkloads,
+      budget: '1500_2500',
+    });
+    assert.equal(intake['forge.system_type'], 'desktop');
+    assert.equal(intake['forge.outcome'], 'Operator clarification required');
+    assert.equal(intake['forge.budget'], '1500_2500');
+  }
 });

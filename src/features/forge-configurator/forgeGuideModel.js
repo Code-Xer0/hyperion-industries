@@ -172,7 +172,8 @@ export function mapGuideToIntake(answers) {
   const load = {
     bursty: 'rare_bursts', few_hours: 'hours_daily', all_day: 'hours_daily', continuous: 'continuous',
   }[answers.load_pattern] || 'unknown';
-  const workloadText = (answers.workloads || []).map((value) => String(value).replace(/^note:/, '')).join(', ');
+  const workloadValues = Array.isArray(answers.workloads) ? answers.workloads : [];
+  const workloadText = workloadValues.map((value) => String(value).replace(/^note:/, '')).join(', ');
   return {
     'forge.system_type': system,
     'forge.outcome': workloadText || 'Operator clarification required',
