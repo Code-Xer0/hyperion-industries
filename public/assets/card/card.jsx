@@ -1,8 +1,20 @@
 // =========================================================
-// <OperatorCard> — front + back face, lock/activate, flip
+// <OperatorCard> — front + back face, lock/activate, flip, tilt.
+// Content is passed in via `data` (built from card.config.json by
+// app.jsx); everything visual lives here + card.css and is shared
+// by every operator.
 // =========================================================
 
 const { useState, useEffect, useRef, useMemo } = React;
+
+// icon-name → component (config references icons by string key)
+const ICONS = {
+  mail: IconMail, phone: IconPhone, globe: IconGlobe, github: IconGithub,
+  heart: IconHeart, coffee: IconCoffee, link: IconLink, location: IconLocation,
+  instagram: IconInstagram,
+};
+const iconFor = (k) => (typeof k === "function" ? k : ICONS[k] || IconLink);
+const isLocalHref = (h) => !h || /^(#|mailto:|tel:)/.test(h);
 
 // ---- vCard (.vcf) download ----
 // Lets a visitor save the operator's contact details even if they later
@@ -38,35 +50,6 @@ function downloadVCard(data) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-// ---- deterministic-looking QR grid (fake; placeholder) ----
-function QRCells({ seed = "deusx" }) {
-  const cells = useMemo(() => {
-    const grid = [];
-    let h = 0;
-    for (let i = 0; i < seed.length; i++) h = (h * 31 + seed.charCodeAt(i)) | 0;
-    for (let r = 0; r < 7; r++) {
-      for (let c = 0; c < 7; c++) {
-        const corner =
-          (r < 3 && c < 3) || (r < 3 && c > 3) || (r > 3 && c < 3);
-        if (corner) {
-          const isEdge = r === 0 || c === 0 || r === 2 || c === 2 || r === 6 || (c === 6 && r < 3) || (r === 6 && c < 3);
-          const isCenter = (r === 1 && c === 1) || (r === 1 && c === 5) || (r === 5 && c === 1);
-          grid.push(isEdge || isCenter);
-        } else {
-          h = (h * 1103515245 + 12345) | 0;
-          grid.push(((h >> 8) & 1) === 1);
-        }
-      }
-    }
-    return grid;
-  }, [seed]);
-  return (
-    <div className="scan-qr" aria-hidden="true">
-      {cells.map((on, i) => <i key={i} style={{ visibility: on ? "visible" : "hidden" }} />)}
-    </div>
-  );
-}
-
 // ---- shared live clock hook ----
 function useUTC() {
   const [time, setTime] = useState(() => new Date());
@@ -81,15 +64,15 @@ function useUTC() {
 }
 
 // ---- top operator bar ----
-function OpBar({ serial, onFlip, side = "front" }) {
+function OpBar({ serial, status, onFlip, side = "front" }) {
   return (
     <div className="opbar">
       <div className="opbar-left">
-        <span className="pill"><span className="dot" /> {side === "front" ? "ONLINE" : "ARCHIVE"}</span>
+        <span className="pill"><span className="dot" /> {side === "front" ? (status?.front || "ONLINE") : (status?.back || "ARCHIVE")}</span>
         <span className="opbar-meta">SER · {serial}</span>
       </div>
       <div className="opbar-right">
-        <span className="opbar-meta tick">CAL · NOMINAL</span>
+        <span className="opbar-meta tick">CAL · {status?.cal || "NOMINAL"}</span>
         {onFlip ? (
           <button className="op-flip" onClick={onFlip} aria-label={side === "front" ? "Flip to back" : "Flip to front"}>
             <IconFlip size={14} />
@@ -102,13 +85,14 @@ function OpBar({ serial, onFlip, side = "front" }) {
   );
 }
 
-// ---- vertical glyph column ----
-function GlyphCol() {
+// ---- vertical glyph column beside the portrait ----
+function GlyphCol({ glyph }) {
+  const g = glyph || {};
   return (
     <div className="glyph-col" aria-hidden="true">
-      <span>Δ</span>
-      <span>X</span>
-      <span className="small">OPERATOR · I</span>
+      <span>{g.top}</span>
+      <span>{g.bottom}</span>
+      <span className="small">{g.label}</span>
     </div>
   );
 }
@@ -140,36 +124,83 @@ function OrbitalRing() {
 }
 
 // ---- portrait block ----
-function Portrait() {
+// blend=true dissolves the portrait into the card with a soft radial mask
+// (no circle, no ring). image-slot clips to its own frame inside shadow DOM,
+// so blend mode uses a square frame and lets the host mask do the fade.
+//
+// An animated portrait is served as muted looping video, not GIF: the source
+// GIF was 800×450 × 418 frames, and Chromium's decoded-frame cache for that
+// pins the main thread hard enough to freeze the page. Video is
+// hardware-decoded and ~15× smaller for the same motion.
+const VIDEO_RE = /\.(mp4|webm|mov|m4v)(\?|$)/i;
+const VIDEO_MIME = { mp4: "video/mp4", m4v: "video/mp4", mov: "video/quicktime", webm: "video/webm" };
+const mimeFor = (src) => VIDEO_MIME[String(src).split("?")[0].split(".").pop().toLowerCase()];
+
+function PortraitVideo({ sources, motion }) {
+  const ref = useRef(null);
+  // The motion toggle freezes the canvases; the portrait follows suit.
+  useEffect(() => {
+    const v = ref.current;
+    if (!v) return;
+    if (motion === "off") v.pause();
+    else v.play?.().catch(() => {});
+  }, [motion]);
   return (
-    <div className="portrait">
+    <video
+      ref={ref}
+      className="portrait-video"
+      autoPlay muted loop playsInline preload="auto"
+      aria-hidden="true" tabIndex={-1}
+    >
+      {sources.map((s) => <source key={s} src={s} type={mimeFor(s)} />)}
+    </video>
+  );
+}
+
+function Portrait({ glyph, portrait, portraitSources, slotId, blend, motion }) {
+  // Prefer an explicit source list (webm first, mp4 fallback); otherwise fall
+  // back to the single `portrait` path when it points at a video.
+  const sources = (portraitSources && portraitSources.length)
+    ? portraitSources
+    : (portrait && VIDEO_RE.test(portrait) ? [portrait] : null);
+
+  return (
+    <div className={"portrait" + (blend ? " blend" : "")}>
       <div className="portrait-outer">
         <OrbitalRing />
-        <div className="portrait-frame">
-          <image-slot
-            id="operator-portrait"
-            shape="circle"
-            placeholder="ΔEUS χ"
-            src="/assets/operators/victor-amani-focus.webp"
-          ></image-slot>
+        <div className={"portrait-frame" + (blend ? " blend" : "")}>
+          {sources ? (
+            <PortraitVideo sources={sources} motion={motion} />
+          ) : (
+            <image-slot
+              id={slotId || "operator-portrait"}
+              shape={blend ? "rounded" : "circle"}
+              radius={blend ? "0" : undefined}
+              fit="cover"
+              placeholder="ΔEUS χ"
+              {...(portrait ? { src: portrait } : {})}
+            ></image-slot>
+          )}
+          <span className="portrait-scan" aria-hidden="true" />
         </div>
       </div>
-      <GlyphCol />
+      <GlyphCol glyph={glyph} />
     </div>
   );
 }
 
 // ---- identity ----
-function Identity({ name, alias, role, brand, capability }) {
+function Identity({ name, alias, role, brand, capability, index }) {
   return (
     <div className="identity">
-      <h1>
-        <span>{name}</span>
-        <span className="alias">ALIAS · <span>{alias}</span></span>
-      </h1>
+      <div className="identity-top">
+        <span className="op-index">OPR<b>{index}</b></span>
+      </div>
+      <h1><span>{name}</span></h1>
+      <div className="alias"><span className="alias-key">ALIAS</span><span>{alias}</span></div>
+      <div className="rule" />
       <div className="role">{role}</div>
       <div className="brand">{brand}</div>
-      <div className="rule" />
       {capability && <div className="capability">{capability}</div>}
     </div>
   );
@@ -179,7 +210,7 @@ function Identity({ name, alias, role, brand, capability }) {
 function Tagline({ text }) {
   return (
     <div className="tagline">
-      <em>"{text}"</em>
+      <em>&ldquo;{text}&rdquo;</em>
     </div>
   );
 }
@@ -190,13 +221,13 @@ function Modules({ items }) {
     <div className="systems">
       <div className="systems-label">
         <span>MODULES</span>
-        <span className="systems-count">CONSULTING · LIVE</span>
+        <span className="systems-count">REGISTRY · LIVE</span>
       </div>
       <div className="systems-row">
-        {items.map((s) => (
+        {(items || []).map((s) => (
           <a key={s.name}
              href={s.href}
-             target={s.href?.startsWith?.("mailto:") ? undefined : "_blank"}
+             target={isLocalHref(s.href) ? undefined : "_blank"}
              rel="noreferrer"
              className={"sys-chip "
                + (s.status === "soon" ? "coming " : "")
@@ -204,7 +235,7 @@ function Modules({ items }) {
             <span className="sys-status" />
             <span className="sys-name">{s.name}</span>
             <span className="sys-tag">{s.tag}</span>
-            {s.cta && <span className="sys-chev">›</span>}
+            {s.cta && <span className="sys-chev"><IconArrow size={13} /></span>}
           </a>
         ))}
       </div>
@@ -213,7 +244,7 @@ function Modules({ items }) {
 }
 
 // ---- communications console ----
-function CommsConsole({ channels: primaryChannels, rail }) {
+function CommsConsole({ channels, rail }) {
   return (
     <div className="connect">
       <div className="connect-label">
@@ -222,31 +253,38 @@ function CommsConsole({ channels: primaryChannels, rail }) {
       </div>
 
       <div className="comms-stack">
-        {primaryChannels.map((c, i) => (
-          <a key={i} className="comms-row" href={c.href}>
-            <span className="well"><c.icon size={15} /></span>
-            <span className="comms-meta">
-              <span className="comms-eyebrow">{c.eyebrow}</span>
-              <span className="comms-value">{c.value}</span>
-            </span>
-            <span className="connect-chev">›</span>
-          </a>
-        ))}
+        {(channels || []).map((c, i) => {
+          const Ico = iconFor(c.icon);
+          return (
+            <a key={i} className="comms-row" href={c.href}
+               target={isLocalHref(c.href) ? undefined : "_blank"} rel="noreferrer">
+              <span className="well"><Ico size={15} /></span>
+              <span className="comms-meta">
+                <span className="comms-eyebrow">{c.eyebrow}</span>
+                <span className="comms-value">{c.value}</span>
+              </span>
+              <span className="connect-chev"><IconArrow size={14} /></span>
+            </a>
+          );
+        })}
       </div>
 
       <div className="connect-rail" role="list">
-        {rail.map((c, i) => (
-          <a key={i}
-             role="listitem"
-             className="chan"
-             href={c.href}
-             target={c.href?.startsWith?.("#") || c.href?.startsWith?.("mailto:") || c.href?.startsWith?.("tel:") ? undefined : "_blank"}
-             rel="noreferrer"
-             aria-label={c.label}>
-            <c.icon size={15} />
-            <span className="chan-tip">{c.label}</span>
-          </a>
-        ))}
+        {(rail || []).map((c, i) => {
+          const Ico = iconFor(c.icon);
+          return (
+            <a key={i}
+               role="listitem"
+               className="chan"
+               href={c.href}
+               target={isLocalHref(c.href) ? undefined : "_blank"}
+               rel="noreferrer"
+               aria-label={c.label}>
+              <Ico size={15} />
+              <span className="chan-tip">{c.label}</span>
+            </a>
+          );
+        })}
       </div>
     </div>
   );
@@ -272,13 +310,13 @@ function Waveform() {
 }
 
 // ---- telemetry strip + signature line ----
-function TelemetryStrip() {
+function TelemetryStrip({ mark }) {
   const { hh, mm, ss } = useUTC();
   return (
     <div className="telemetry">
       <div className="tele-mark">
         <span className="gold-mark" />
-        <span className="gold">HYPERION</span>
+        <span className="gold">{mark || "HYPERION"}</span>
       </div>
       <Waveform />
       <div className="tele-clock">
@@ -300,6 +338,7 @@ function Signature({ text }) {
 }
 
 // ---- back face: hyperion doctrine ----
+const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII"];
 function BackFace({ data }) {
   const d = data.doctrine || {};
   return (
@@ -310,7 +349,7 @@ function BackFace({ data }) {
       </div>
       <div className="back-title">
         <span>{d.titlePre}</span>{" "}
-        <span>{d.titleHighlight}</span><br />
+        <span className="hl">{d.titleHighlight}</span><br />
         <span>{d.titlePost}</span>
       </div>
 
@@ -318,34 +357,27 @@ function BackFace({ data }) {
 
       <div className="tenets">
         <div className="tenets-label"><span>PRINCIPLES</span></div>
-        <div className="tenet"><span className="n">I.</span><span>OBSERVE BEFORE YOU BUILD</span></div>
-        <div className="tenet"><span className="n">II.</span><span>OPTIMIZE FOR RECOVERY</span></div>
-        <div className="tenet"><span className="n">III.</span><span>SHIP TRUTH, NOT THEATRE</span></div>
-        <div className="tenet"><span className="n">IV.</span><span>REDUCE OPERATIONAL FRICTION</span></div>
-        <div className="tenet"><span className="n">V.</span><span>DESIGN FOR CONTINUITY</span></div>
+        {(data.principles || []).map((p, i) => (
+          <div className="tenet" key={i}><span className="n">{ROMAN[i] || (i + 1)}</span><span>{p}</span></div>
+        ))}
       </div>
 
       <div className="available">
         <div className="available-label"><span>AVAILABLE FOR</span></div>
-        <ul>
-          <li>Systems consulting</li>
-          <li>Deployment architecture</li>
-          <li>Infrastructure modernization</li>
-          <li>AI systems integration</li>
-          <li>Workflow continuity design</li>
-        </ul>
+        <ul>{(data.availableFor || []).map((a, i) => <li key={i}>{a}</li>)}</ul>
       </div>
 
       <div className="scan-box">
+        {/* Real branded QR — encodes the live card URL. */}
         <img
           className="scan-qr-img"
-          src="/assets/card/qr.png"
+          src={data.qr || "/assets/card/qr.png"}
           alt="Scan to open operator card"
         />
         <div className="scan-meta">
           <strong>OPEN A CHANNEL</strong>
-          <span>{d.website}</span><br />
-          <span>{d.email}</span>
+          <span>{d.website || data.website}</span><br />
+          <span>{d.email || data.email}</span>
         </div>
       </div>
     </div>
@@ -357,8 +389,40 @@ function OperatorCard({ data, motion = "on" }) {
   const [locked, setLocked] = useState(true);
   const [activating, setActivating] = useState(false);
   const [flipped, setFlipped] = useState(false);
+  const wrapRef = useRef(null);
 
   const fb = (typeof window !== "undefined" && window.HypFeedback) || null;
+
+  // Tilt is a hover/fine-pointer affordance only — touch devices and
+  // reduced-motion users get the flat card.
+  const tiltOK = useMemo(() => {
+    const mm = window.matchMedia;
+    if (!mm) return false;
+    return mm("(hover: hover) and (pointer: fine)").matches
+      && !mm("(prefers-reduced-motion: reduce)").matches;
+  }, []);
+
+  const onMove = (e) => {
+    const el = wrapRef.current;
+    if (!el || !tiltOK || motion === "off") return;
+    const r = el.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width - 0.5;
+    const y = (e.clientY - r.top) / r.height - 0.5;
+    el.style.setProperty("--tilt-y", (x * 12).toFixed(2) + "deg");
+    el.style.setProperty("--tilt-x", (y * -10).toFixed(2) + "deg");
+    el.style.setProperty("--glare-x", ((x + 0.5) * 100).toFixed(1) + "%");
+    el.style.setProperty("--glare-y", ((y + 0.5) * 100).toFixed(1) + "%");
+    el.style.setProperty("--glare-o", "1");
+    el.style.setProperty("--lift", "14px");
+  };
+  const onLeave = () => {
+    const el = wrapRef.current;
+    if (!el) return;
+    el.style.setProperty("--tilt-y", "0deg");
+    el.style.setProperty("--tilt-x", "0deg");
+    el.style.setProperty("--glare-o", "0");
+    el.style.setProperty("--lift", "0px");
+  };
 
   const activate = () => {
     if (!locked || activating) return;
@@ -390,36 +454,53 @@ function OperatorCard({ data, motion = "on" }) {
     }
   }, [motion]); // eslint-disable-line
 
+  const Frame = () => (
+    <>
+      <div className="frame">
+        <div className="bracket tl" />
+        <div className="bracket tr" />
+        <div className="bracket bl" />
+        <div className="bracket br" />
+      </div>
+      <div className="frame-inner" />
+    </>
+  );
+
   return (
-    <div className="card-wrap">
+    <div className="card-wrap" ref={wrapRef} onPointerMove={onMove} onPointerLeave={onLeave}>
+      <div className="card-tilt">
       <div className={"card " + (flipped ? "flipped" : "")}>
         {/* FRONT */}
         <div className={"face front " + (!locked ? "live" : "")}>
-          <MeshBG density={26} />
-          <div className="frame">
-            <div className="bracket tl" />
-            <div className="bracket tr" />
-            <div className="bracket bl" />
-            <div className="bracket br" />
-          </div>
-          <div className="frame-inner" />
+          <MeshBG density={30} energy={1.6} />
+          <Frame />
 
-          <OpBar serial={data.serial} onFlip={() => flipTo(true)} side="front" />
-          <Portrait />
+          <OpBar serial={data.serial} status={data.status} onFlip={() => flipTo(true)} side="front" />
+          <Portrait
+            glyph={data.glyph}
+            portrait={data.portrait}
+            portraitSources={data.portraitSources}
+            slotId={data.slotId}
+            blend={data.portraitBlend}
+            motion={motion}
+          />
           <Identity
             name={data.name}
             alias={data.alias}
             role={data.role}
             brand={data.brand}
             capability={data.capability}
+            index={data.index}
           />
           <Tagline text={data.tagline} />
           <Modules items={data.systems} />
           <CommsConsole channels={data.comms} rail={data.rail} />
           <div className="cardfoot">
-            <TelemetryStrip />
+            <TelemetryStrip mark={data.teleMark} />
             <Signature text={data.footTag} />
           </div>
+          <span className="holo-glare" aria-hidden="true" />
+          {!locked && <span className="face-scan" aria-hidden="true" />}
 
           {/* lock overlay */}
           {locked && (
@@ -457,17 +538,13 @@ function OperatorCard({ data, motion = "on" }) {
 
         {/* BACK */}
         <div className="face back">
-          <MeshBG density={26} />
-          <div className="frame">
-            <div className="bracket tl" />
-            <div className="bracket tr" />
-            <div className="bracket bl" />
-            <div className="bracket br" />
-          </div>
-          <div className="frame-inner" />
-          <OpBar serial={data.serial} onFlip={() => flipTo(false)} side="back" />
+          <MeshBG density={30} energy={1.6} />
+          <Frame />
+          <OpBar serial={data.serial} status={data.status} onFlip={() => flipTo(false)} side="back" />
           <BackFace data={data} />
+          <span className="holo-glare" aria-hidden="true" />
         </div>
+      </div>
       </div>
     </div>
   );

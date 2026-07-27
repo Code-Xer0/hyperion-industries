@@ -10,6 +10,24 @@
   "capability": "INFRASTRUCTURE · CONTINUITY · AI SYSTEMS",
   "tagline": "Building systems that remember, adapt, and survive contact with reality.",
   "footTag": "SYSTEMS BUILT TO SURVIVE FAILURE",
+  "teleMark": "HYPERION",
+  "glyph": {
+    "top": "Δ",
+    "bottom": "X",
+    "label": "OPERATOR · I"
+  },
+  "status": {
+    "front": "ONLINE",
+    "back": "ARCHIVE",
+    "cal": "NOMINAL"
+  },
+  "portrait": "/assets/operators/victor-portrait.mp4",
+  "portraitSources": [
+    "/assets/operators/victor-portrait.webm",
+    "/assets/operators/victor-portrait.mp4"
+  ],
+  "portraitBlend": true,
+  "qr": "/assets/card/qr.png",
   "doctrine": {
     "label": "HYPERION DOCTRINE",
     "vol": "VOL · 01",
@@ -18,17 +36,31 @@
     "titlePost": "contact with reality.",
     "body": "Hyperion develops resilient infrastructure, continuity systems, and adaptive operational tooling — designed to remain functional under pressure, change, and uncertainty.",
     "website": "hyperion-industries.dev",
-    "email": "deusx@hyperion.industries"
+    "email": "va@hyperion-industries.dev"
   },
-  "email": "deusx@hyperion.industries",
+  "principles": [
+    "OBSERVE BEFORE YOU BUILD",
+    "OPTIMIZE FOR RECOVERY",
+    "SHIP TRUTH, NOT THEATRE",
+    "REDUCE OPERATIONAL FRICTION",
+    "DESIGN FOR CONTINUITY"
+  ],
+  "availableFor": [
+    "Systems consulting",
+    "Deployment architecture",
+    "Infrastructure modernization",
+    "AI systems integration",
+    "Workflow continuity design"
+  ],
+  "email": "va@hyperion-industries.dev",
   "phone": "+1 (612) 314-9992",
   "website": "hyperion-industries.dev",
   "links": {
-    "hyperion":  "https://hyperion-industries.dev",
-    "chronos":   "https://chr0nos.app",
-    "forge":     "mailto:forge@hyperion-industries.dev?subject=Forge%20Inquiry",
-    "github":    "https://github.com/Code-Xer0",
+    "hyperion": "https://hyperion-industries.dev",
+    "chronos": "https://chr0nos.app",
+    "forge": "mailto:va@hyperion-industries.dev?subject=Forge%20Inquiry",
+    "github": "https://github.com/Code-Xer0",
     "instagram": "https://www.instagram.com/code_xer0/",
-    "kofi":      "https://ko-fi.com/hyperionindustries"
+    "kofi": "https://ko-fi.com/hyperionindustries"
   }
 }
