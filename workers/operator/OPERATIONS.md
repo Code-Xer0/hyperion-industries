@@ -35,7 +35,7 @@ Apply all migrations in order before enabling intake. `0002_operator_inquiry_bud
 
 Inquiry records contain submitted contact data by design. Worker logs do not: the logger accepts only request IDs, routes, status/reason codes, durations, counts, byte sizes, model name, notification state, and purge counts. Upstream error bodies and exception messages are never consumed into logs.
 
-The intake operator feed is delivery-only. Acknowledgments are per outbox record and require the source revision hash plus the local receipt ID. `conflict_quarantined` can never be acknowledged as accepted business truth. Service tokens are hashed before constant-time comparison; logs include only the non-secret key ID and whether the current or previous rotation slot matched.
+The intake operator feed is delivery-only and advertises `hyperion.intake.operator-feed/2.0`. Its fixed transport metadata scopes `held_for_review` to the Worker delivery outbox; Founder owner, SLA, business-review, approval, and promotion state are deliberately absent. Consumer receipts are append-only: an exact acknowledgement replay is idempotent, while any changed receipt ID, outcome, revision hash, payload hash, or business-truth value returns `409 acknowledgement_conflict` without updating the stored receipt. `conflict_quarantined` can never be acknowledged as accepted business truth. Service tokens are hashed before constant-time comparison; logs include only the non-secret key ID and whether the current or previous rotation slot matched.
 
 ## Public corpus updates
 
