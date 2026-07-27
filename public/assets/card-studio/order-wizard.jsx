@@ -247,8 +247,8 @@ function OrderWizard() {
           <div className="wrap">
             <div className="wiz-done">
               <div className="check"><IconCheck size={30} /></div>
-              <h2>Your card is on its way</h2>
-              <p>{total > 0 ? "We've got your order — your card ships in 5–7 days, and your digital profile is live right now." : "Your digital card is live right now. Share it by link, tap, or scan."}</p>
+              <h2>Preview captured locally</h2>
+              <p>This legacy room does not place an order, publish a profile, reserve a price, or confirm shipment. Open the native Card Studio to stage an operator-reviewed design brief.</p>
               <div className="cta-actions" style={{ justifyContent: "center", marginTop: 28 }}>
                 <a className="btn btn-primary btn-lg" href={HOME_HREF}>Back to home <IconArrowRight size={16} /></a>
                 <a className="btn btn-ghost btn-lg" href="Templates.html">Browse templates</a>
@@ -294,7 +294,7 @@ function OrderWizard() {
                 </button>
                 {step.key === "review"
                   ? <button className="btn btn-primary" onClick={() => setPlaced(true)}>
-                      {total > 0 ? "Place order · $" + total : "Claim free card"} <IconArrowRight size={16} />
+                      Save preview locally <IconArrowRight size={16} />
                     </button>
                   : <button className="btn btn-primary" onClick={() => go(1)} disabled={!canNext}
                             style={{ opacity: canNext ? 1 : 0.5, pointerEvents: canNext ? "auto" : "none" }}>

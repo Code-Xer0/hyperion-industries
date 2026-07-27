@@ -115,7 +115,7 @@ export const cityFamilies = [
     ambient: { primary: '255, 75, 69', secondary: '33, 214, 232', intensity: 0.9 },
     routes: [
       route('/identity', 'Operator Identity Embassy', 'identity', { keywords: ['nfc', 'cards', 'shipping'] }),
-      route('/card-studio', 'Card Studio', 'identity', { status: 'SHIPPING', tone: 'shipping', keywords: ['business card', 'studio'] }),
+      route('/card-studio', 'Card Studio', 'identity', { status: 'PREVIEW', tone: 'preview', keywords: ['business card', 'studio'] }),
       route('/dxcard', 'Operator Card', 'identity', { status: 'SHIPPING', tone: 'shipping', keywords: ['dx card', 'profile'] }),
     ],
   },

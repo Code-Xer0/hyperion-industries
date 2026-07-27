@@ -164,10 +164,10 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
       "id": "card-studio",
       "path": "/card-studio",
       "canonicalUrl": "https://hyperion-industries.dev/card-studio",
-      "title": "Hyperion Card Studio | Smart Operator Identity",
-      "description": "Compose and refine smart business cards, operator cards, NFC identity surfaces, and public profile handoffs.",
-      "summary": "A shipping studio for smart cards, NFC identity, and operator-controlled public profiles.",
-      "maturity": "SHIPPING",
+      "title": "Hyperion Card Studio Preview | Smart Operator Identity",
+      "description": "Compose a guarded operator-card design brief with live front, back, and digital proofs. All submissions remain operator reviewed and are not quotes.",
+      "summary": "A native public preview for card design briefs, deterministic proofs, and operator-reviewed identity handoff.",
+      "maturity": "PUBLIC PREVIEW · ORDERING NOT LIVE",
       "schemaType": "SoftwareApplication",
       "indexable": true,
       "image": "https://hyperion-industries.dev/assets/city/proof/card-studio-smoke.png",
@@ -707,11 +707,11 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
     },
     {
       "id": "card-studio",
-      "name": "Hyperion Card Studio",
+      "name": "Hyperion Card Studio Preview",
       "route": "/card-studio",
       "canonicalUrl": "https://hyperion-industries.dev/card-studio",
-      "summary": "A shipping studio for smart cards, NFC identity, and operator-controlled public profiles.",
-      "maturity": "SHIPPING",
+      "summary": "A native public preview for card design briefs, deterministic proofs, and operator-reviewed identity handoff.",
+      "maturity": "PUBLIC PREVIEW · ORDERING NOT LIVE",
       "availability": "Limited scoped requests are accepted after operator review.",
       "intakeLane": "operator-identity"
     }
@@ -897,5 +897,5 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
       }
     ]
   },
-  "sha256": "a90593116483466a99457632ba0069d6f3ebdaf721915c5ef1aa092908a7cb88"
+  "sha256": "b74f6bdc9944ab23ef89e0ec5b9e4f50b89e207631eed887ced59e1b2dce2ea0"
 } as const;

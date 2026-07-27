@@ -130,6 +130,7 @@ export default function App() {
               <Route path="/build-archive" element={<BuildArchivePage />} />
               <Route path="/gallery" element={<GalleryPage />} />
               <Route path="/card-studio" element={<CardStudioPage />} />
+              <Route path="/card-studio/legacy" element={<CardStudioPage legacy />} />
               <Route path="/card-studio/studio.html" element={<StaticRedirect to="/card-studio" />} />
               <Route path="/studio/card-studio" element={<StaticRedirect to="/card-studio" />} />
               <Route path="/dxcard" element={<StaticRedirect to="/dxcard/index.html" />} />

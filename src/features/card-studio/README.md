@@ -1,20 +1,18 @@
-# Hyperion Card Studio Source-Port Scaffold
+# Hyperion Card Studio native public preview
 
-The live `/card-studio` path serves the Business Card DX landing bundle directly on the static host. The fallback standalone asset is mirrored at `public/assets/card-studio/studio.html`, copied from the Business Card DX template:
+`/card-studio` is the compiled React Card Studio surface. It provides a bounded design-document editor, eight guarded templates, front/back/digital proofs, deterministic preflight feedback, local draft recovery, and a future Worker submission adapter.
 
-`<workspace>\hyperion-studio\Business Card. Dx. (Template)\Hyperion Card Studio (standalone).html`
+Public posture:
 
-The shipped default state is the Ivory card template with the gold accent:
+- `PUBLIC PREVIEW · ORDERING NOT LIVE`
+- every staged brief is `HELD FOR REVIEW`
+- every proof is `NOT A QUOTE`
+- no browser action publishes a profile, programs NFC, creates checkout, takes payment, or confirms fulfillment
 
-- `accent`: `#cba35a`
-- `heroTemplate`: `ivory`
+The adapter posts `card-studio-order/1` to `VITE_CARD_STUDIO_API_PATH` or `/api/card-studio/intents`. Until the Worker lane exists, a failed request leaves the local draft intact and reports that the review lane is staged.
 
-This is intentionally a hybrid first pass. The standalone bundle remains the shipped tool surface while the React route only redirects during local Vite development. The live GitHub Pages path includes `public/card-studio/index.html` so `/card-studio` resolves as the canonical clean landing URL without SPA fallback or iframe chrome. The compatibility route `/card-studio/studio.html` and matching static redirect file both point to the non-conflicting static asset path.
+The previous browser-global runtime remains available only at `/card-studio/legacy` for temporary parity review. It is noindex, explicitly non-operational, and should be removed after native visual parity is accepted.
 
-Future native port work should extract these parts from the standalone bundle:
+Focused model tests live beside the model and run with:
 
-- the Studio app shell and card canvas components
-- the Scen.OS glass/HUD token set
-- the tweak/state controls and persistence model
-- the export/download/media handling
-- any self-contained font/resource assets currently embedded in the bundle
+`node --test src/features/card-studio/cardStudioModel.test.js`
