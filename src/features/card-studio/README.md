@@ -11,7 +11,7 @@ Public posture:
 
 The adapter posts `card-studio-order/1` to `VITE_CARD_STUDIO_API_PATH` or `/api/card-studio/intents`. Until the Worker lane exists, a failed request leaves the local draft intact and reports that the review lane is staged.
 
-The previous browser-global runtime remains available only at `/card-studio/legacy` for temporary parity review. It is noindex, explicitly non-operational, and should be removed after native visual parity is accepted.
+The previous browser-global runtime has been removed from the public copy tree. Legacy static entrypoints redirect to `/card-studio`, so production publishes only compiled application assets for this feature.
 
 Focused model tests live beside the model and run with:
 
