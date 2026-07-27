@@ -104,6 +104,7 @@ export async function createShopifyCart(
   if (checkout.protocol !== "https:") {
     throw new HttpError(502, "shopify_checkout_url_invalid", "Shopify returned an unsafe checkout URL.");
   }
+  checkout.searchParams.set("sso", "silent");
   return { cartId: cart.id, checkoutUrl: checkout.toString() };
 }
 

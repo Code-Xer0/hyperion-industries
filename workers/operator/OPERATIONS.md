@@ -65,6 +65,9 @@ reserved attempt before network access; uncertain provider outcomes become
 Shopify webhooks are verified against the exact raw body, recorded by event ID
 and hash, and projected into local order state without retaining the raw body.
 Provider secrets are Wrangler secrets and never browser-visible.
+Released checkout URLs carry Shopify's `sso=silent` hint so an existing
+Customer Accounts session can be reused without making Hyperion a second
+credential authority.
 
 ## Public corpus updates
 

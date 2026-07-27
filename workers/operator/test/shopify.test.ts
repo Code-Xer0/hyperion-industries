@@ -49,7 +49,7 @@ describe("Card Studio Shopify adapter", () => {
       productSku: "card_pvc_standard",
       quantity: 1,
     });
-    expect(result.checkoutUrl).toMatch(/^https:\/\//);
+    expect(result.checkoutUrl).toBe("https://hyperion-test.myshopify.com/checkouts/test-cart?sso=silent");
     expect(fetcher).toHaveBeenCalledOnce();
   });
 

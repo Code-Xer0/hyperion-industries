@@ -356,7 +356,7 @@ describe("Card Studio operator decisions", () => {
     expect(response.status).toBe(201);
     expect(await response.json()).toMatchObject({
       provider_checkout_ref: "gid://shopify/Cart/test",
-      checkout_url: "https://hyperion-test.myshopify.com/checkouts/test",
+      checkout_url: "https://hyperion-test.myshopify.com/checkouts/test?sso=silent",
       source_outbox_mutated: false,
     });
     expect(providerFetch).toHaveBeenCalledOnce();
