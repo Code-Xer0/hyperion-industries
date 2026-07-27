@@ -82,7 +82,7 @@ describe("GET /api/operator/status", () => {
 
     expect(response.status).toBe(204);
     expect(response.headers.get("access-control-allow-origin")).toBe("https://hyperion-industries.dev");
-    expect(response.headers.get("access-control-allow-headers")).toBe("content-type, idempotency-key");
+    expect(response.headers.get("access-control-allow-headers")).toBe("content-type, idempotency-key, x-card-session");
   });
 });
 

@@ -15,6 +15,7 @@ INQUIRY_CONSENT_VERSION = "2026-07-13"
 INTAKE_RESUME_FROM = "signal@intake.hyperion-industries.dev"
 INTAKE_COOKIE_NAME = "hyperion_resume"
 FOUNDER_COMMAND_PULL_KEY_ID = "fc-intake-v1"
+CARD_STUDIO_INVITE_REQUIRED = "true"
 
 [[d1_databases]]
 binding = "DB"
@@ -66,6 +67,18 @@ namespace_id = "41005"
   [ratelimits.simple]
   limit = 120
   period = 60
+
+[[ratelimits]]
+name = "CARD_STUDIO_RATE_LIMITER"
+namespace_id = "41006"
+
+  [ratelimits.simple]
+  limit = 30
+  period = 60
+
+# Bind CARD_STUDIO_ASSETS to the private quarantine R2 bucket and
+# CARD_STUDIO_UPLOAD_SCANNER to the scanning broker before enabling uploads.
+# The Worker intentionally fails closed when either binding is unavailable.
 
 # Production retention schedule: `17 4 * * *`.
 # The schedule is managed as a separate Cloudflare trigger so a trigger-permission

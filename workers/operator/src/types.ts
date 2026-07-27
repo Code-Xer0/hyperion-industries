@@ -24,6 +24,8 @@ export interface Env {
   INTAKE_RESUME_RATE_LIMITER?: RateLimitBinding;
   INTAKE_SUBMISSION_RATE_LIMITER?: RateLimitBinding;
   INTAKE_OPERATOR_RATE_LIMITER?: RateLimitBinding;
+  CARD_STUDIO_RATE_LIMITER?: RateLimitBinding;
+  CARD_STUDIO_INVITE_REQUIRED?: string;
   FOUNDER_COMMAND_PULL_KEY_ID?: string;
   FOUNDER_COMMAND_PULL_TOKEN_SHA256?: string;
   FOUNDER_COMMAND_PULL_PREVIOUS_TOKEN_SHA256?: string;
@@ -33,6 +35,8 @@ export interface Env {
   INTAKE_RESUME_FROM?: string;
   INTAKE_COOKIE_NAME?: string;
   DB?: D1Database;
+  CARD_STUDIO_ASSETS?: R2Bucket;
+  CARD_STUDIO_UPLOAD_SCANNER?: Fetcher;
 }
 
 export interface RuntimeDependencies {

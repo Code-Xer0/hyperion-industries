@@ -17,6 +17,10 @@ Configure the template bindings as follows:
 | `FOUNDER_COMMAND_PULL_KEY_ID` | Non-secret current key version identifier |
 | `FOUNDER_COMMAND_PULL_PREVIOUS_TOKEN_SHA256` | Optional previous digest during a bounded rotation overlap |
 | `FOUNDER_COMMAND_PULL_PREVIOUS_UNTIL` | ISO-8601 deadline after which the previous digest fails closed |
+| `CARD_STUDIO_RATE_LIMITER` | Abuse limit for project, revision, submit, and upload-session traffic |
+| `CARD_STUDIO_INVITE_REQUIRED` | Defaults to fail-closed invite enforcement; set `false` only for bounded local tests |
+| `CARD_STUDIO_ASSETS` | Private R2 quarantine bucket; absence disables artwork sessions |
+| `CARD_STUDIO_UPLOAD_SCANNER` | Internal upload/scanning broker; absence disables artwork sessions |
 | `OPENROUTER_MODEL` | Server-only model override |
 | `SITE_ORIGIN` | Canonical HTTPS origin used by strict POST checks |
 | `INQUIRY_NOTIFY_TO` | Verified notification destination |
@@ -37,6 +41,22 @@ Inquiry records contain submitted contact data by design. Worker logs do not: th
 
 The intake operator feed is delivery-only. Acknowledgments are per outbox record and require the source revision hash plus the local receipt ID. `conflict_quarantined` can never be acknowledged as accepted business truth. Service tokens are hashed before constant-time comparison; logs include only the non-secret key ID and whether the current or previous rotation slot matched.
 
+Card Studio uses the same authenticated feed and token rotation. Run migration
+`0005_card_studio_v1.sql` before exposing Card Studio routes. Issue invite rows
+out of band; raw invite tokens are never stored, only SHA-256 digests. Project
+session tokens are returned once and stored only as digests.
+
+Artwork stays in a private quarantine lane. The scanner broker owns the actual
+upload target and scan transition; this Worker stores bounded metadata and
+opaque references. Do not bind a public R2 bucket. Until both bindings are
+healthy, `POST /api/card-studio/uploads/sessions` returns
+`503 secure_upload_unavailable`.
+
+`release_checkout` stages a `commerce-order-projection/1` record only. A
+separate Shopify adapter must verify SKU mappings, create checkout idempotently,
+and write signed webhook projections. This release intentionally contains no
+Shopify credential or network path.
+
 ## Public corpus updates
 
 Edit only `corpus/public-corpus.source.json`, keep every item explicitly public, and regenerate. CI or local verification should run `npm run corpus:check`; it compares the whole generated module and SHA-256 digest, so an unreviewed runtime corpus change cannot hide behind a stale artifact.
@@ -50,5 +70,8 @@ Edit only `corpus/public-corpus.source.json`, keep every item explicitly public,
 - `504 upstream_timeout`: provider did not establish the stream inside the bounded lifetime.
 - `503 inquiry_storage_unavailable`: nothing was accepted or emailed.
 - `202 notification_pending`: inquiry status is `submitted`, but notification delivery or state confirmation is incomplete.
+- `409 order_intent_conflict_quarantined`: a reused public intent identifier carried different content.
+- `409 checkout_not_eligible`: an operator attempted to release a review-required proposal.
+- `503 secure_upload_unavailable`: R2 quarantine or the scanning broker is unavailable.
 
 Deployment is intentionally outside this package's test and verification commands.

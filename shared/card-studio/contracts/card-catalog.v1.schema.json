@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hyperion-industries.dev/contracts/card-studio/card-catalog.v1.schema.json",
+  "title": "Hyperion Card Studio catalog",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "catalog_version", "currency", "release_state", "items"],
+  "properties": {
+    "contract_version": { "const": "card-catalog/1" },
+    "catalog_version": { "type": "string", "pattern": "^card-catalog\\.[0-9]{4}-[0-9]{2}-[0-9]{2}$" },
+    "currency": { "const": "USD" },
+    "release_state": { "enum": ["preview", "invite_only", "public"] },
+    "items": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 32,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["sku", "name", "kind", "unit_amount", "checkout_mode", "minimum_quantity", "maximum_quantity", "production_profile"],
+        "properties": {
+          "sku": { "type": "string", "pattern": "^card_[a-z0-9_]{3,48}$" },
+          "name": { "type": "string", "minLength": 1, "maxLength": 80 },
+          "kind": { "enum": ["digital", "physical", "subscription", "team"] },
+          "unit_amount": { "type": ["integer", "null"], "minimum": 0, "maximum": 10000000 },
+          "billing_period": { "enum": ["none", "month", "year", "custom"] },
+          "checkout_mode": { "enum": ["free", "fixed_checkout", "proposal_only"] },
+          "minimum_quantity": { "type": "integer", "minimum": 1, "maximum": 10000 },
+          "maximum_quantity": { "type": "integer", "minimum": 1, "maximum": 10000 },
+          "production_profile": { "enum": ["digital", "pvc_standard", "metal_standard", "software", "custom"] },
+          "shopify_mapping_state": { "enum": ["not_required", "pending", "verified"] }
+        }
+      }
+    }
+  }
+}

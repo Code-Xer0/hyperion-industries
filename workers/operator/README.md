@@ -80,10 +80,42 @@ Store the raw pull token only in Founder Command's Windows Credential Manager. S
 
 The downstream preview/apply, strict review PATCH, single-flight synchronization lease, and promotion authority contracts are defined in `docs/intake-os/CUSTODY_CHAIN_V1.md`. They are not activated by this Worker release.
 
+## Card Studio order spine
+
+Card Studio v1 adds a compiled-only, invite-aware public contract lane:
+
+- `GET /api/card-studio/catalog`
+- `POST /api/card-studio/projects`
+- `GET /api/card-studio/projects/:project_id`
+- `POST /api/card-studio/projects/:project_id/revisions`
+- `POST /api/card-studio/projects/:project_id/submit`
+- `GET /api/card-studio/orders/:intent_id/status`
+- `POST /api/card-studio/uploads/sessions`
+- authenticated `GET /api/card-studio/operator/status`
+- authenticated `POST /api/card-studio/operator/decisions`
+
+Projects use an opaque one-time session token whose SHA-256 digest is stored in
+D1. Design revisions are immutable declarative JSON documents. Submitting an
+order intent atomically stores the intent, a minimized design proposal, a
+`held_for_review` outbox event, and a Shopify projection in `not_created`.
+Neither public submission nor an operator command performs a Shopify network
+call.
+
+The existing Founder Command feed at `/api/intake/operator/feed` also emits
+`source_kind: "card_studio"` envelopes. Those envelopes contain proposal JSON
+and opaque proof references only; artwork bytes and account secrets are
+excluded. Acknowledgment writes a per-consumer receipt and never updates either
+source outbox.
+
+Artwork upload-session creation fails closed unless both the private R2
+quarantine binding and scanning broker are configured. This Worker accepts
+upload metadata only; arbitrary binary bodies are rejected.
+
 - `migrations/0001_operator_inquiries.sql`: initial structured D1 schema
 - `migrations/0002_operator_inquiry_budget.sql`: forward migration for optional budget
 - `migrations/0003_intake_os_v1.sql`: immutable public intake, proposal provenance, outbox, collision, and audit records
 - `migrations/0004_intake_operator_feed.sql`: per-consumer delivery receipts without business-outbox mutation
+- `migrations/0005_card_studio_v1.sql`: immutable Card Studio projects, revisions, proposals, delivery receipts, upload metadata, and commerce projections
 - `corpus/public-corpus.source.json`: reviewed public allowlist
 - `corpus/public-corpus.schema.json`: corpus contract
 - `src/generated/public-corpus.generated.ts`: deterministic compiled corpus
