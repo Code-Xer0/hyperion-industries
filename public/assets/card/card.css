@@ -87,9 +87,11 @@ html, body {
   height: 100%;
   z-index: 0;
   pointer-events: none;
-  /* draw under everything but the stage background gradients */
+  /* draw under everything but the stage background gradients.
+     Full opacity + screen blend matches the founder page, where the
+     same lattice runs at 1.0 — at 0.85 the links washed out to nothing. */
   mix-blend-mode: screen;
-  opacity: 0.85;
+  opacity: 1;
 }
 
 .stage::after {
@@ -361,11 +363,16 @@ html, body {
   border-radius: 50%;
   overflow: hidden;
 }
-/* animated portrait (muted looping video) — cover-crops like image-slot */
+/* animated portrait (muted looping video) — cover-crops like image-slot.
+   The operator plate is a night-city composition averaging ~26/255
+   luminance against a card face of ~8, so it needs a modest lift to
+   separate from the panel. Kept gentle: heavier curves crush the
+   visor's red readout into a flat block. */
 .portrait-frame .portrait-video {
   object-fit: cover;
-  object-position: 50% 50%;
+  object-position: 50% 42%;
   pointer-events: none;
+  filter: brightness(1.28) contrast(1.05) saturate(1.1);
 }
 /* slow scan pass across the portrait */
 .portrait-scan {

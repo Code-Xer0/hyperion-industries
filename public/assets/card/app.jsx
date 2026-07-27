@@ -28,7 +28,12 @@ const FALLBACK_CONFIG = {
     "/assets/operators/victor-portrait.webm",
     "/assets/operators/victor-portrait.mp4",
   ],
-  portraitBlend: true,
+  // Blend mode dissolves the portrait edge-first into the card. It assumes a
+  // subject that is brighter than the panel; this operator plate is a dark
+  // helmet on a night city, so the mask kept the near-black centre and faded
+  // the bright neon rim — the portrait read as empty. Circle crop restores the
+  // accent ring + haze, which gives the dark plate a defined edge.
+  portraitBlend: false,
   qr: "/assets/card/qr.png",
   doctrine: {
     label:          "HYPERION DOCTRINE",
