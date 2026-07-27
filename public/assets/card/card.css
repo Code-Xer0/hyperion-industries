@@ -13,10 +13,11 @@
   --hair: rgba(243, 239, 230, 0.08);
 
   --accent: #ff2a36;
-  --accent-soft: rgba(255, 42, 54, 0.18);
-  --accent-faint: rgba(255, 42, 54, 0.06);
-  --accent-line: rgba(255, 42, 54, 0.55);
-  --accent-glow: rgba(255, 42, 54, 0.35);
+  --accent-rgb: 255, 42, 54;
+  --accent-soft: rgba(var(--accent-rgb), 0.18);
+  --accent-faint: rgba(var(--accent-rgb), 0.06);
+  --accent-line: rgba(var(--accent-rgb), 0.55);
+  --accent-glow: rgba(var(--accent-rgb), 0.35);
 
   --gold: #c79a48;
 
@@ -24,7 +25,7 @@
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
 
   --card-w: 420px;
-  --card-h: 700px;
+  --card-h: 720px;
   --radius: 14px;
 }
 
@@ -54,20 +55,26 @@ html, body {
   padding: 16px 16px 24px;
   position: relative;
   background:
-    radial-gradient(1100px 700px at 50% -10%, rgba(255, 42, 54, 0.10), transparent 60%),
-    radial-gradient(900px 600px at 50% 110%, rgba(255, 42, 54, 0.05), transparent 60%),
+    radial-gradient(1100px 700px at 50% -10%, rgba(var(--accent-rgb), 0.10), transparent 60%),
+    radial-gradient(900px 600px at 50% 110%, rgba(var(--accent-rgb), 0.05), transparent 60%),
     var(--bg-deep);
 }
 
 .stage::before {
   content: "";
   position: absolute; inset: 0;
-  background-image:
-    /* hex mesh */
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='56' height='48' viewBox='0 0 56 48'><g fill='none' stroke='%23ff2a36' stroke-width='0.5' opacity='0.22'><polygon points='14,4 28,4 35,16 28,28 14,28 7,16'/><polygon points='42,4 56,4 63,16 56,28 42,28 35,16'/><polygon points='14,28 28,28 35,40 28,52 14,52 7,40'/><polygon points='42,28 56,28 63,40 56,52 42,52 35,40'/></g></svg>");
+  /* Accent-tinted hex mesh. The stroke colour is baked into the SVG by
+     applyAccent() (--hexmesh), so the field still recolours from the one
+     operator hex — but it stays a plain tiled background under a single
+     radial mask. Painting it as accent-fill + composited hex/radial masks
+     is visually identical and pathologically slow: the full-viewport mask
+     buffer is rebuilt on every repaint the blended SignalField triggers,
+     which pins the main thread. */
+  background-image: var(--hexmesh);
   background-size: 56px 48px;
-  mask-image: radial-gradient(closest-side at 50% 45%, black 0%, transparent 75%);
-  opacity: 0.32;
+  -webkit-mask-image: radial-gradient(closest-side at 50% 45%, black 0%, transparent 72%);
+          mask-image: radial-gradient(closest-side at 50% 45%, black 0%, transparent 72%);
+  opacity: 0.30;
   pointer-events: none;
   z-index: 0;
 }
@@ -125,6 +132,18 @@ html, body {
   width: min(100%, var(--card-w));
   position: relative;
   z-index: 2;
+  --tilt-x: 0deg; --tilt-y: 0deg;
+  --glare-x: 50%; --glare-y: 50%; --glare-o: 0;
+  --lift: 0px;
+}
+
+/* tilt layer — pointer-tracked 3D tilt, decoupled from the flip so each
+   keeps its own transition timing. Hover-capable devices only (JS-gated). */
+.card-tilt {
+  transform-style: preserve-3d;
+  transform: rotateX(var(--tilt-x)) rotateY(var(--tilt-y)) translateZ(var(--lift));
+  transition: transform 180ms ease-out;
+  will-change: transform;
 }
 
 .card {
@@ -144,10 +163,10 @@ html, body {
   border-radius: var(--radius);
   background:
     linear-gradient(180deg, #0a0709 0%, #050406 60%, #07060a 100%);
-  border: 1px solid rgba(255, 42, 54, 0.22);
+  border: 1px solid rgba(var(--accent-rgb), 0.22);
   box-shadow:
-    0 0 0 1px rgba(255, 42, 54, 0.06) inset,
-    0 30px 80px -30px rgba(255, 42, 54, 0.35),
+    0 0 0 1px rgba(var(--accent-rgb), 0.06) inset,
+    0 30px 80px -30px rgba(var(--accent-rgb), 0.35),
     0 6px 24px -8px rgba(0,0,0,0.8);
   overflow: hidden;
   isolation: isolate;
@@ -177,7 +196,7 @@ html, body {
 .frame {
   position: absolute;
   inset: 10px;
-  border: 1px solid rgba(255, 42, 54, 0.30);
+  border: 1px solid rgba(var(--accent-rgb), 0.30);
   /* notched corners */
   clip-path: polygon(
     14px 0, calc(100% - 14px) 0, 100% 14px,
@@ -244,7 +263,7 @@ html, body {
   align-items: center;
   gap: 6px;
   padding: 4px 8px;
-  border: 1px solid rgba(255, 42, 54, 0.35);
+  border: 1px solid rgba(var(--accent-rgb), 0.35);
   color: var(--accent);
   border-radius: 2px;
 }
@@ -273,14 +292,14 @@ html, body {
   display: grid; place-items: center;
   background: transparent;
   color: var(--accent);
-  border: 1px solid rgba(255, 42, 54, 0.35);
+  border: 1px solid rgba(var(--accent-rgb), 0.35);
   cursor: pointer;
   transition: background 160ms, border-color 160ms, transform 200ms;
   clip-path: polygon(4px 0, 100% 0, 100% calc(100% - 4px), calc(100% - 4px) 100%, 0 100%, 0 4px);
   padding: 0;
 }
 .op-flip:hover {
-  background: rgba(255, 42, 54, 0.12);
+  background: rgba(var(--accent-rgb), 0.12);
   border-color: var(--accent);
 }
 .op-flip:active { transform: scale(0.94); }
@@ -318,7 +337,7 @@ html, body {
   border: 1.5px solid var(--accent);
   box-shadow:
     0 0 28px var(--accent-glow) inset,
-    0 0 40px rgba(255,42,54,0.25);
+    0 0 40px rgba(var(--accent-rgb),0.25);
   z-index: 3;
   pointer-events: none;
 }
@@ -328,11 +347,12 @@ html, body {
   position: absolute; inset: 4%;
   border-radius: 50%;
   background:
-    radial-gradient(closest-side, rgba(255,42,54,0.35), rgba(255,42,54,0) 70%),
-    repeating-conic-gradient(from 0deg, rgba(255,42,54,0.10) 0deg 4deg, transparent 4deg 12deg);
+    radial-gradient(closest-side, rgba(var(--accent-rgb),0.35), rgba(var(--accent-rgb),0) 70%),
+    repeating-conic-gradient(from 0deg, rgba(var(--accent-rgb),0.10) 0deg 4deg, transparent 4deg 12deg);
   z-index: 0;
 }
-.portrait-frame image-slot {
+.portrait-frame image-slot,
+.portrait-frame .portrait-video {
   position: relative;
   z-index: 1;
   display: block;
@@ -340,6 +360,53 @@ html, body {
   height: 100%;
   border-radius: 50%;
   overflow: hidden;
+}
+/* animated portrait (muted looping video) — cover-crops like image-slot */
+.portrait-frame .portrait-video {
+  object-fit: cover;
+  object-position: 50% 50%;
+  pointer-events: none;
+}
+/* slow scan pass across the portrait */
+.portrait-scan {
+  position: absolute; inset: 0;
+  z-index: 2;
+  border-radius: 50%;
+  pointer-events: none;
+  overflow: hidden;
+}
+.portrait-scan::before {
+  content: "";
+  position: absolute; left: 0; right: 0;
+  height: 36%; top: -36%;
+  background: linear-gradient(to bottom, transparent, rgba(var(--accent-rgb),0.16), transparent);
+  animation: pscan 5s ease-in-out infinite;
+}
+@keyframes pscan { 0% { top: -36%; } 55% { top: 100%; } 100% { top: 100%; } }
+
+/* ---- blended portrait (space-blended gif; no hard ring/circle) ---- */
+.portrait.blend { grid-template-columns: 168px 32px; }
+.portrait.blend .portrait-outer { width: 168px; height: 168px; }
+.portrait.blend .orbit { opacity: 0.55; }
+.portrait-frame.blend { overflow: visible; border-radius: 0; }
+.portrait-frame.blend::before { display: none; } /* drop the hard accent ring */
+.portrait-frame.blend::after {
+  /* larger, softer accent haze bleeding past the image edge */
+  inset: -16%;
+  opacity: 0.5;
+  z-index: 0;
+}
+.portrait-frame.blend image-slot,
+.portrait-frame.blend .portrait-video {
+  border-radius: 0;
+  overflow: visible;
+  -webkit-mask-image: radial-gradient(ellipse 60% 60% at 50% 46%, #000 32%, rgba(0,0,0,0) 78%);
+          mask-image: radial-gradient(ellipse 60% 60% at 50% 46%, #000 32%, rgba(0,0,0,0) 78%);
+}
+.portrait.blend .portrait-scan {
+  border-radius: 0;
+  -webkit-mask-image: radial-gradient(ellipse 60% 60% at 50% 46%, #000 32%, rgba(0,0,0,0) 78%);
+          mask-image: radial-gradient(ellipse 60% 60% at 50% 46%, #000 32%, rgba(0,0,0,0) 78%);
 }
 
 /* orbital ring — ambient HUD rotating around portrait */
@@ -376,7 +443,7 @@ html, body {
   color: var(--accent);
   font: 700 24px/1 var(--font-display);
   letter-spacing: 0.04em;
-  text-shadow: 0 0 12px rgba(255,42,54,0.45);
+  text-shadow: 0 0 12px rgba(var(--accent-rgb),0.45);
 }
 .glyph-col .small {
   font: 500 8.5px/1 var(--font-mono);
@@ -395,18 +462,37 @@ html, body {
   padding: 10px 22px 0;
   z-index: 2;
 }
+.identity-top { display: flex; align-items: center; justify-content: flex-end; margin-bottom: 5px; }
+.op-index {
+  font: 500 8.5px/1 var(--font-mono);
+  letter-spacing: 0.28em;
+  color: var(--ink-mute);
+  border: 1px solid rgba(var(--accent-rgb),0.28);
+  padding: 3px 7px;
+  clip-path: polygon(4px 0, 100% 0, 100% calc(100% - 4px), calc(100% - 4px) 100%, 0 100%, 0 4px);
+}
+.op-index b { color: var(--accent); font-weight: 700; margin-left: 5px; letter-spacing: 0.12em; }
 .identity h1 {
-  font: 700 24px/0.95 var(--font-display);
+  font: 700 25px/0.95 var(--font-display);
   letter-spacing: 0.005em;
   margin: 0;
   color: var(--ink);
 }
-.identity h1 .alias {
-  display: block;
+.identity .alias {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font: 500 11px/1 var(--font-mono);
+  letter-spacing: 0.24em;
+  color: var(--ink);
+  margin-top: 7px;
+}
+.identity .alias-key {
+  font-size: 8px;
   letter-spacing: 0.3em;
   color: var(--ink-mute);
-  margin-top: 6px;
+  border: 1px solid rgba(var(--accent-rgb),0.22);
+  padding: 3px 5px;
 }
 .identity .role {
   display: flex;
@@ -513,8 +599,8 @@ html, body {
 .sys-chip {
   position: relative;
   padding: 7px 10px 7px 18px;
-  background: rgba(255, 42, 54, 0.04);
-  border: 1px solid rgba(255, 42, 54, 0.22);
+  background: rgba(var(--accent-rgb), 0.04);
+  border: 1px solid rgba(var(--accent-rgb), 0.22);
   text-decoration: none;
   color: var(--ink);
   display: flex;
@@ -524,7 +610,7 @@ html, body {
   clip-path: polygon(7px 0, 100% 0, 100% calc(100% - 7px), calc(100% - 7px) 100%, 0 100%, 0 7px);
 }
 .sys-chip:hover {
-  background: rgba(255, 42, 54, 0.10);
+  background: rgba(var(--accent-rgb), 0.10);
   border-color: var(--accent);
   transform: translateY(-1px);
 }
@@ -558,12 +644,12 @@ html, body {
 
 /* CTA module — commercial action variant (Forge Inquiry) */
 .sys-chip.cta {
-  background: rgba(255, 42, 54, 0.10);
-  border-color: rgba(255, 42, 54, 0.45);
+  background: rgba(var(--accent-rgb), 0.10);
+  border-color: rgba(var(--accent-rgb), 0.45);
   padding-right: 22px;
 }
 .sys-chip.cta:hover {
-  background: rgba(255, 42, 54, 0.16);
+  background: rgba(var(--accent-rgb), 0.16);
 }
 .sys-chip.cta .sys-status {
   /* hollow square instead of dot — reads as 'action' not 'live state' */
@@ -577,11 +663,11 @@ html, body {
 }
 .sys-chip.cta .sys-chev {
   position: absolute;
-  right: 9px;
+  right: 8px;
   top: 50%;
   transform: translateY(-50%);
   color: var(--accent);
-  font: 500 14px/1 var(--font-mono);
+  display: grid; place-items: center;
   transition: transform 180ms;
 }
 .sys-chip.cta:hover .sys-chev { transform: translateY(-50%) translateX(2px); }
@@ -613,8 +699,8 @@ html, body {
 .comms-stack {
   display: grid;
   gap: 4px;
-  background: rgba(255, 42, 54, 0.04);
-  border: 1px solid rgba(255, 42, 54, 0.28);
+  background: rgba(var(--accent-rgb), 0.04);
+  border: 1px solid rgba(var(--accent-rgb), 0.28);
   clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
   position: relative;
   overflow: hidden;
@@ -624,7 +710,7 @@ html, body {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(105deg, transparent 40%, rgba(255,42,54,0.10) 50%, transparent 60%);
+  background: linear-gradient(105deg, transparent 40%, rgba(var(--accent-rgb),0.10) 50%, transparent 60%);
   transform: translateX(-100%);
   animation: sheen 11s ease-in-out infinite;
   pointer-events: none;
@@ -647,13 +733,13 @@ html, body {
   transition: background 180ms;
 }
 .comms-row + .comms-row {
-  border-top: 1px solid rgba(255, 42, 54, 0.20);
+  border-top: 1px solid rgba(var(--accent-rgb), 0.20);
 }
-.comms-row:hover { background: rgba(255, 42, 54, 0.06); }
+.comms-row:hover { background: rgba(var(--accent-rgb), 0.06); }
 .comms-row .well {
   display: grid; place-items: center;
   height: 100%;
-  border-right: 1px solid rgba(255, 42, 54, 0.20);
+  border-right: 1px solid rgba(var(--accent-rgb), 0.20);
   color: var(--accent);
 }
 .comms-meta {
@@ -678,9 +764,10 @@ html, body {
 }
 .connect-chev {
   color: var(--accent);
-  font: 500 18px/1 var(--font-mono);
-  padding-right: 12px;
-  text-align: right;
+  display: grid;
+  place-items: center;
+  justify-content: end;
+  padding-right: 10px;
   transition: transform 180ms;
 }
 .comms-row:hover .connect-chev { transform: translateX(2px); }
@@ -699,14 +786,14 @@ html, body {
   place-items: center;
   color: var(--accent);
   background: transparent;
-  border: 1px solid rgba(255, 42, 54, 0.22);
+  border: 1px solid rgba(var(--accent-rgb), 0.22);
   text-decoration: none;
   transition: background 160ms, border-color 160ms, color 160ms;
   clip-path: polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px);
   height: 30px;
 }
 .chan:hover {
-  background: rgba(255, 42, 54, 0.10);
+  background: rgba(var(--accent-rgb), 0.10);
   border-color: var(--accent);
 }
 .chan-tip {
@@ -718,7 +805,7 @@ html, body {
   letter-spacing: 0.22em;
   color: var(--ink);
   background: rgba(7,6,8,0.92);
-  border: 1px solid rgba(255,42,54,0.30);
+  border: 1px solid rgba(var(--accent-rgb),0.30);
   padding: 5px 8px;
   white-space: nowrap;
   opacity: 0;
@@ -754,7 +841,7 @@ html, body {
   gap: 14px;
   height: 22px;
   padding-bottom: 6px;
-  border-bottom: 1px solid rgba(255,42,54,0.18);
+  border-bottom: 1px solid rgba(var(--accent-rgb),0.18);
   position: relative;
 }
 .telemetry::before {
@@ -850,7 +937,7 @@ html, body {
 }
 .sig-hair {
   height: 1px;
-  background: linear-gradient(to right, transparent, rgba(255,42,54,0.30), transparent);
+  background: linear-gradient(to right, transparent, rgba(var(--accent-rgb),0.30), transparent);
 }
 .sig-text {
   font: 500 9px/1 var(--font-mono);
@@ -890,7 +977,7 @@ html, body {
   position: relative;
   width: 96px; height: 96px;
   border-radius: 50%;
-  border: 1px solid rgba(255,42,54,0.4);
+  border: 1px solid rgba(var(--accent-rgb),0.4);
   display: grid; place-items: center;
   color: var(--accent);
 }
@@ -898,7 +985,7 @@ html, body {
   content: "";
   position: absolute;
   border-radius: 50%;
-  border: 1px solid rgba(255,42,54,0.5);
+  border: 1px solid rgba(var(--accent-rgb),0.5);
   inset: -10px;
   animation: ringPulse 2.2s ease-out infinite;
 }
@@ -924,7 +1011,7 @@ html, body {
 .lock-vcard {
   margin-top: 22px;
   background: transparent;
-  border: 1px solid rgba(255, 42, 54, 0.40);
+  border: 1px solid rgba(var(--accent-rgb), 0.40);
   color: var(--ink);
   font: 500 9.5px/1 var(--font-mono);
   letter-spacing: 0.32em;
@@ -935,7 +1022,7 @@ html, body {
   clip-path: polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px);
 }
 .lock-vcard:hover {
-  background: rgba(255, 42, 54, 0.12);
+  background: rgba(var(--accent-rgb), 0.12);
   border-color: var(--accent);
 }
 .lock-vcard:active { transform: scale(0.97); }
@@ -957,12 +1044,12 @@ html, body {
   background: linear-gradient(
     to bottom,
     transparent 0%,
-    rgba(255,42,54,0.10) 30%,
-    rgba(255,42,54,0.65) 50%,
-    rgba(255,42,54,0.10) 70%,
+    rgba(var(--accent-rgb),0.10) 30%,
+    rgba(var(--accent-rgb),0.65) 50%,
+    rgba(var(--accent-rgb),0.10) 70%,
     transparent 100%
   );
-  box-shadow: 0 0 30px rgba(255,42,54,0.55);
+  box-shadow: 0 0 30px rgba(var(--accent-rgb),0.55);
   animation: sweep 1400ms cubic-bezier(.6,.05,.2,1) forwards;
 }
 @keyframes sweep {
@@ -1017,7 +1104,7 @@ html, body {
   letter-spacing: 0.005em;
   color: var(--ink);
 }
-.back-title span { color: var(--accent); }
+.back-title .hl { color: var(--accent); }
 
 .back-body {
   margin: 10px 0 0;
@@ -1039,7 +1126,7 @@ html, body {
   color: var(--ink-mute);
   margin-bottom: 8px;
   padding-bottom: 6px;
-  border-bottom: 1px solid rgba(255,42,54,0.18);
+  border-bottom: 1px solid rgba(var(--accent-rgb),0.18);
   display: flex;
   justify-content: space-between;
   align-items: baseline;
@@ -1084,7 +1171,7 @@ html, body {
   letter-spacing: 0.16em;
   color: var(--ink);
   text-transform: uppercase;
-  border-bottom: 1px dashed rgba(255,42,54,0.10);
+  border-bottom: 1px dashed rgba(var(--accent-rgb),0.10);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -1111,7 +1198,7 @@ html, body {
 .scan-box {
   margin-top: auto;
   padding-top: 12px;
-  border-top: 1px solid rgba(255,42,54,0.18);
+  border-top: 1px solid rgba(var(--accent-rgb),0.18);
   display: grid;
   grid-template-columns: 64px 1fr;
   gap: 12px;
@@ -1119,13 +1206,13 @@ html, body {
 }
 .scan-qr {
   width: 64px; height: 64px;
-  border: 1px solid rgba(255,42,54,0.35);
+  border: 1px solid rgba(var(--accent-rgb),0.35);
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   grid-template-rows: repeat(7, 1fr);
   gap: 1.5px;
   padding: 5px;
-  background: rgba(255,42,54,0.04);
+  background: rgba(var(--accent-rgb),0.04);
 }
 .scan-qr i {
   display: block;
@@ -1137,12 +1224,17 @@ html, body {
 .scan-qr-img {
   width: 64px;
   height: 64px;
-  border: 1px solid rgba(255,42,54,0.35);
+  border: 1px solid rgba(var(--accent-rgb), 0.35);
   background: #fff;
   border-radius: 2px;
   display: block;
   object-fit: contain;
   padding: 3px;
+  transition: box-shadow 240ms, border-color 240ms;
+}
+.scan-box:hover .scan-qr-img {
+  border-color: var(--accent);
+  box-shadow: 0 0 22px rgba(var(--accent-rgb), 0.25);
 }
 .scan-meta {
   font: 500 9.5px/1.55 var(--font-mono);
@@ -1160,13 +1252,122 @@ html, body {
 /* legacy manifesto class \u2014 unused now */
 .manifesto { display: none; }
 
+/* ---------- round 2: holo glare + periodic scan + micro-interactions ---------- */
+
+/* pointer-following holographic glare (vars inherit from .card-wrap) */
+.holo-glare {
+  position: absolute; inset: 0;
+  z-index: 9;
+  pointer-events: none;
+  background:
+    radial-gradient(420px 300px at var(--glare-x) var(--glare-y), rgba(255,255,255,0.09), transparent 60%),
+    radial-gradient(240px 170px at var(--glare-x) var(--glare-y), rgba(var(--accent-rgb),0.10), transparent 60%);
+  opacity: var(--glare-o, 0);
+  transition: opacity 400ms ease;
+  mix-blend-mode: screen;
+}
+
+/* periodic full-face scanline pass (front, once live) */
+.face-scan {
+  position: absolute; inset: 0;
+  z-index: 8;
+  pointer-events: none;
+  overflow: hidden;
+}
+.face-scan::before {
+  content: "";
+  position: absolute; left: 0; right: 0;
+  height: 110px; top: -120px;
+  background: linear-gradient(to bottom, transparent, rgba(var(--accent-rgb),0.05) 40%, rgba(var(--accent-rgb),0.13) 50%, rgba(var(--accent-rgb),0.05) 60%, transparent);
+  animation: facescan 8s cubic-bezier(.6,.05,.3,1) infinite 2.2s;
+}
+@keyframes facescan { 0% { top: -120px; } 26% { top: 100%; } 100% { top: 100%; } }
+
+/* rare rgb-split glitch on the operator name */
+.live .identity h1 span {
+  display: inline-block;
+  animation: glitch-flicker 7s steps(1) infinite 1.4s;
+}
+@keyframes glitch-flicker {
+  0%, 93.4%, 95.9%, 100% { transform: none; text-shadow: none; opacity: 1; }
+  93.8% { transform: translateX(-1.5px) skewX(-4deg); text-shadow: 2px 0 rgba(var(--accent-rgb),0.85), -2px 0 rgba(90,200,255,0.5); }
+  94.6% { transform: translateX(1px); text-shadow: -2px 0 rgba(var(--accent-rgb),0.85); opacity: 0.85; }
+  95.3% { transform: none; text-shadow: none; }
+}
+
+/* portrait reacts to hover — orbit + scan accelerate, ring flares */
+.portrait:hover .orbit-spin { animation-duration: 5s; }
+.portrait:hover .orbit-counter { animation-duration: 14s; }
+.portrait:hover .portrait-scan::before { animation-duration: 1.7s; }
+.portrait-frame::before { transition: box-shadow 300ms ease; }
+.portrait:hover .portrait-frame::before {
+  box-shadow: 0 0 34px var(--accent-glow) inset, 0 0 60px rgba(var(--accent-rgb),0.42);
+}
+
+/* module chips — light sweep on hover */
+.sys-chip::after {
+  content: "";
+  position: absolute; inset: 0;
+  background: linear-gradient(105deg, transparent 42%, rgba(var(--accent-rgb),0.22) 50%, transparent 58%);
+  transform: translateX(-110%);
+  pointer-events: none;
+}
+.sys-chip:hover::after { transform: translateX(110%); transition: transform 480ms ease; }
+
+/* comms rows — well lights, eyebrow tracks out */
+.comms-row .well { transition: background 180ms, color 180ms; }
+.comms-row:hover .well { background: rgba(var(--accent-rgb),0.14); color: var(--ink); }
+.comms-eyebrow { transition: letter-spacing 300ms ease; }
+.comms-row:hover .comms-eyebrow { letter-spacing: 0.42em; }
+.chan { transition: background 160ms, border-color 160ms, color 160ms, transform 180ms; }
+.chan:hover { transform: translateY(-2px); }
+
+/* back face — staggered reveal on flip */
+.flipped .back-pad > * { opacity: 0; animation: rise 520ms cubic-bezier(.2,.7,.2,1) forwards; }
+.flipped .back-pad > *:nth-child(1) { animation-delay: 320ms; }
+.flipped .back-pad > *:nth-child(2) { animation-delay: 400ms; }
+.flipped .back-pad > *:nth-child(3) { animation-delay: 480ms; }
+.flipped .back-pad > *:nth-child(4) { animation-delay: 560ms; }
+.flipped .back-pad > *:nth-child(5) { animation-delay: 640ms; }
+.flipped .back-pad > *:nth-child(6) { animation-delay: 720ms; }
+
+/* doctrine highlight — underline draws in after flip */
+.back-title .hl { position: relative; }
+.back-title .hl::after {
+  content: "";
+  position: absolute; left: 0; right: 0; bottom: -2px;
+  height: 2px;
+  background: var(--accent);
+  box-shadow: 0 0 10px var(--accent-glow);
+  transform: scaleX(1);
+  transform-origin: left;
+}
+.card.flipped .back-title .hl::after { animation: hl-draw 900ms 700ms cubic-bezier(.2,.7,.2,1) both; }
+@keyframes hl-draw { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+/* tenets + availability — hover states */
+.tenet { padding: 2px 4px; margin: 0 -4px; transition: background 160ms; }
+.tenet:hover { background: rgba(var(--accent-rgb),0.07); }
+.tenet:hover .n { text-shadow: 0 0 8px var(--accent-glow); }
+.available li { transition: color 160ms, padding-left 200ms ease; }
+.available li:hover { color: var(--accent); padding-left: 24px; }
+.scan-qr { transition: box-shadow 240ms, border-color 240ms; }
+.scan-box:hover .scan-qr { border-color: var(--accent); box-shadow: 0 0 22px rgba(var(--accent-rgb),0.25); }
+
+@media (prefers-reduced-motion: reduce) {
+  .card-tilt { transform: none !important; }
+  .face-scan, .holo-glare { display: none; }
+  .live .identity h1 span { animation: none; }
+  .flipped .back-pad > * { animation-duration: 1ms; }
+}
+
 /* ---------- flip control (legacy, hidden — flip now lives in opbar) ---------- */
 
 .flip-btn { display: none; }
 
 /* mobile tweaks */
 @media (max-width: 480px) {
-  :root { --card-w: 360px; --card-h: 680px; }
+  :root { --card-w: 360px; --card-h: 744px; }
   .identity h1 { font-size: 22px; }
   .sys-chip .sys-name { font-size: 11px; }
   .link .label { font-size: 10px; letter-spacing: 0.12em; }
