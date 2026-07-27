@@ -8,6 +8,7 @@ const AUTH_HEADERS = {
   authorization: `Bearer ${TOKEN}`,
   "x-hyprm-consumer": "founder-command-desktop",
 };
+const FEED_CONTRACT = "hyperion.intake.operator-feed/2.0";
 
 const feedRow = {
   outbox_id: "out_abcdefghijkl",
@@ -93,6 +94,38 @@ describe("Founder Command operator intake feed", () => {
     expect(await response.json()).toMatchObject({ key_id: "fc-intake-test", key_version: "previous" });
   });
 
+  it("advertises a versioned transport-only contract without Founder workflow state", async () => {
+    const db = new MockD1().queueFirst({ count: 1 });
+    const response = await createWorker().fetch(
+      new Request("https://hyperion-industries.dev/api/intake/operator/status", { headers: AUTH_HEADERS }),
+      operatorEnv(db),
+      executionContext().ctx,
+    );
+    const body = await response.json<{
+      feed_contract: string;
+      authority: string;
+      transport: Record<string, unknown>;
+    }>();
+
+    expect(response.status).toBe(200);
+    expect(body.feed_contract).toBe(FEED_CONTRACT);
+    expect(body.authority).toBe("transport_delivery_only");
+    expect(body.transport).toEqual({
+      authority: "worker_delivery_outbox",
+      source_outbox_state: "held_for_review",
+      source_outbox_mutation_allowed: false,
+      acknowledgement_scope: "transport_receipt_only",
+      business_review_state_included: false,
+      replay: "until_transport_acknowledged",
+      ordering: ["created_at", "outbox_id"],
+      max_page_items: 100,
+    });
+    expect(body).not.toHaveProperty("owner");
+    expect(body).not.toHaveProperty("sla");
+    expect(body).not.toHaveProperty("approval");
+    expect(body).not.toHaveProperty("promotion");
+  });
+
   it("returns immutable revisions with normalized and source lane values", async () => {
     const db = new MockD1().queueAll([feedRow]);
     const worker = createWorker();
@@ -103,18 +136,67 @@ describe("Founder Command operator intake feed", () => {
       ctx,
     );
     const body = await response.json<{
+      feed_contract: string;
       count: number;
       outbox_mutated: boolean;
-      items: Array<{ payload_hash: string; outbox: { revision_hash: string }; routing: { source_lane: string; canonical_lane: string; proposal_state: string }; authority: { source_outbox_unchanged: boolean } }>;
+      transport: Record<string, unknown>;
+      items: Array<{
+        feed_contract: string;
+        payload_hash: string;
+        outbox: { revision_hash: string; state: string; state_scope: string };
+        routing: { source_lane: string; canonical_lane: string; proposal_state: string };
+        authority: {
+          source_outbox_unchanged: boolean;
+          acknowledgement_scope: string;
+          business_review_state_included: boolean;
+        };
+      }>;
     }>();
     expect(response.status).toBe(200);
+    expect(body.feed_contract).toBe(FEED_CONTRACT);
     expect(body.count).toBe(1);
     expect(body.outbox_mutated).toBe(false);
+    expect(body.transport).toMatchObject({
+      authority: "worker_delivery_outbox",
+      source_outbox_state: "held_for_review",
+      source_outbox_mutation_allowed: false,
+      acknowledgement_scope: "transport_receipt_only",
+      business_review_state_included: false,
+    });
+    expect(body.items[0]?.feed_contract).toBe(FEED_CONTRACT);
     expect(body.items[0]?.payload_hash).toMatch(/^[a-f0-9]{64}$/);
-    expect(body.items[0]?.outbox.revision_hash).toBe(feedRow.revision_hash);
+    expect(body.items[0]?.outbox).toMatchObject({
+      revision_hash: feedRow.revision_hash,
+      state: "held_for_review",
+      state_scope: "worker_delivery_outbox",
+    });
     expect(body.items[0]?.routing).toMatchObject({ source_lane: "operator-identity", canonical_lane: "identity", proposal_state: "active" });
-    expect(body.items[0]?.authority.source_outbox_unchanged).toBe(true);
+    expect(body.items[0]?.authority).toMatchObject({
+      source_outbox_unchanged: true,
+      acknowledgement_scope: "transport_receipt_only",
+      business_review_state_included: false,
+    });
+    expect(body.items[0]).not.toHaveProperty("owner");
+    expect(body.items[0]).not.toHaveProperty("sla");
+    expect(body.items[0]).not.toHaveProperty("review_state");
+    expect(body.items[0]).not.toHaveProperty("approval");
+    expect(body.items[0]).not.toHaveProperty("promotion");
+    expect(JSON.stringify(body.transport)).not.toContain("operator@example.test");
+    expect(JSON.stringify(body.transport)).not.toContain("Sanitized intake");
     expect(db.statements.every((statement) => !/UPDATE\s+intake_outbox/i.test(statement.sql))).toBe(true);
+  });
+
+  it("keeps feed pages bounded by the contract limit", async () => {
+    const db = new MockD1();
+    const response = await createWorker().fetch(
+      new Request("https://hyperion-industries.dev/api/intake/operator/feed?limit=101", { headers: AUTH_HEADERS }),
+      operatorEnv(db),
+      executionContext().ctx,
+    );
+
+    expect(response.status).toBe(400);
+    expect(await response.json()).toMatchObject({ error: { code: "invalid_limit" } });
+    expect(db.statements).toHaveLength(0);
   });
 
   it("acknowledges delivery idempotently without changing the business outbox", async () => {
@@ -145,10 +227,23 @@ describe("Founder Command operator intake feed", () => {
       operatorEnv(db),
       ctx,
     );
-    const body = await response.json<{ acknowledged: Array<{ outbox_id: string; local_receipt_id: string }>; outbox_mutated: boolean }>();
+    const body = await response.json<{
+      feed_contract: string;
+      acknowledged: Array<{ outbox_id: string; local_receipt_id: string }>;
+      outbox_mutated: boolean;
+      transport: Record<string, unknown>;
+    }>();
     expect(response.status).toBe(200);
+    expect(body.feed_contract).toBe(FEED_CONTRACT);
     expect(body.acknowledged).toEqual([{ outbox_id: feedRow.outbox_id, revision_hash: feedRow.revision_hash, local_receipt_id: "local_12345678", outcome: "received" }]);
     expect(body.outbox_mutated).toBe(false);
+    expect(body.transport).toEqual({
+      authority: "consumer_delivery_receipt",
+      acknowledgement_scope: "transport_receipt_only",
+      accepted_business_truth: false,
+      source_outbox_mutation_allowed: false,
+      business_review_state_included: false,
+    });
     expect(db.batches[0]?.some((statement) => statement.sql.includes("INSERT INTO intake_consumer_receipts"))).toBe(true);
     expect(db.statements.every((statement) => !/UPDATE\s+intake_consumer_receipts/i.test(statement.sql))).toBe(true);
     expect(db.statements.every((statement) => !/UPDATE\s+intake_outbox/i.test(statement.sql))).toBe(true);

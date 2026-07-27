@@ -4,6 +4,7 @@ import type { Env, RuntimeDependencies } from "./types";
 
 const MAX_FEED_LIMIT = 100;
 const ACK_MAX_BODY_BYTES = 64 * 1024;
+const OPERATOR_FEED_CONTRACT = "hyperion.intake.operator-feed/2.0";
 const CONSUMER_PATTERN = /^[a-z0-9][a-z0-9._-]{2,63}$/i;
 const OUTBOX_PATTERN = /^out_[A-Za-z0-9_-]{12,64}$/;
 const RECEIPT_PATTERN = /^[A-Za-z0-9_-]{8,160}$/;
@@ -69,6 +70,29 @@ interface OperatorAuthorization {
   consumerId: string;
   keyId: string;
   keyVersion: "current" | "previous";
+}
+
+function feedTransportMetadata(): Record<string, unknown> {
+  return {
+    authority: "worker_delivery_outbox",
+    source_outbox_state: "held_for_review",
+    source_outbox_mutation_allowed: false,
+    acknowledgement_scope: "transport_receipt_only",
+    business_review_state_included: false,
+    replay: "until_transport_acknowledged",
+    ordering: ["created_at", "outbox_id"],
+    max_page_items: MAX_FEED_LIMIT,
+  };
+}
+
+function acknowledgementTransportMetadata(): Record<string, unknown> {
+  return {
+    authority: "consumer_delivery_receipt",
+    acknowledgement_scope: "transport_receipt_only",
+    accepted_business_truth: false,
+    source_outbox_mutation_allowed: false,
+    business_review_state_included: false,
+  };
 }
 
 function requireDb(env: Env): D1Database {
@@ -159,12 +183,14 @@ async function envelope(row: FeedRow): Promise<Record<string, unknown>> {
   const sourceLane = row.primary_route;
   const canonicalLane = sourceLane === "operator-identity" ? "identity" : sourceLane === "relationships" ? "relationship" : sourceLane;
   const body: Record<string, unknown> = {
+    feed_contract: OPERATOR_FEED_CONTRACT,
     outbox: {
       outbox_id: row.outbox_id,
       proposal_id: row.proposal_id,
       revision_hash: row.revision_hash,
       event_type: row.event_type,
       state: row.outbox_state,
+      state_scope: "worker_delivery_outbox",
       created_at: row.created_at,
     },
     submission: {
@@ -208,6 +234,8 @@ async function envelope(row: FeedRow): Promise<Record<string, unknown>> {
       data_classification: "client_confidential",
       authority_class: "proposal",
       source_outbox_unchanged: true,
+      acknowledgement_scope: "transport_receipt_only",
+      business_review_state_included: false,
     },
   };
   return { ...body, payload_hash: await sha256(JSON.stringify(stable(body))) };
@@ -245,14 +273,16 @@ export async function handleOperatorStatus(request: Request, env: Env, deps: Run
       WHERE o.state = 'held_for_review' AND r.outbox_id IS NULL`,
   ).bind(consumerId).first<{ count: number }>();
   return jsonResponse({
+    feed_contract: OPERATOR_FEED_CONTRACT,
     service: "hyperion-site-intake",
     status: "ready",
     consumer_id: consumerId,
     key_id: authorization.keyId,
     key_version: authorization.keyVersion,
     pending: Number(pending?.count ?? 0),
-    authority: "operator_review_only",
+    authority: "transport_delivery_only",
     outbox_mutation_allowed: false,
+    transport: feedTransportMetadata(),
   });
 }
 
@@ -269,6 +299,7 @@ export async function handleOperatorFeed(request: Request, env: Env, deps: Runti
   const items = await Promise.all(rows.map(envelope));
   const last = rows.at(-1);
   return jsonResponse({
+    feed_contract: OPERATOR_FEED_CONTRACT,
     consumer_id: consumerId,
     key_id: authorization.keyId,
     key_version: authorization.keyVersion,
@@ -277,6 +308,7 @@ export async function handleOperatorFeed(request: Request, env: Env, deps: Runti
     next_cursor: last ? encodeCursor(last.created_at, last.outbox_id) : url.searchParams.get("cursor") ?? "",
     has_more: rows.length === requestedLimit,
     outbox_mutated: false,
+    transport: feedTransportMetadata(),
   });
 }
 
@@ -375,6 +407,7 @@ export async function handleOperatorAck(request: Request, env: Env, deps: Runtim
   }
   if (statements.length) await db.batch(statements);
   return jsonResponse({
+    feed_contract: OPERATOR_FEED_CONTRACT,
     acknowledged: deliveries.map((delivery) => ({
       outbox_id: delivery.outbox_id,
       revision_hash: delivery.revision_hash,
@@ -382,6 +415,7 @@ export async function handleOperatorAck(request: Request, env: Env, deps: Runtim
       outcome: delivery.outcome,
     })),
     outbox_mutated: false,
+    transport: acknowledgementTransportMetadata(),
     key_id: authorization.keyId,
     key_version: authorization.keyVersion,
   });

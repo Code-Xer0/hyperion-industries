@@ -47,7 +47,7 @@ Inquiry records contain submitted contact data by design. Worker logs do not: th
 
 Direct inbound mail to `forge@hyperion-industries.dev` is handled separately by `workers/forge-mail-router`. That Worker forwards to the primary owner first and sends an operator continuity copy without inspecting or persisting content. Its required secret names are `FORGE_PRIMARY_DESTINATION` and `FORGE_OPERATOR_COPY_DESTINATION`.
 
-The intake operator feed is delivery-only. Consumer receipts are append-only: an exact acknowledgement replay is idempotent, while any changed receipt ID, outcome, revision hash, payload hash, or business-truth value returns `409 acknowledgement_conflict` without updating the stored receipt. `conflict_quarantined` can never be acknowledged as accepted business truth. Service tokens are hashed before constant-time comparison; logs include only the non-secret key ID and whether the current or previous rotation slot matched.
+The intake operator feed is delivery-only and advertises `hyperion.intake.operator-feed/2.0`. Its fixed transport metadata scopes `held_for_review` to the Worker delivery outbox; Founder owner, SLA, business-review, approval, and promotion state are deliberately absent. Consumer receipts are append-only: an exact acknowledgement replay is idempotent, while any changed receipt ID, outcome, revision hash, payload hash, or business-truth value returns `409 acknowledgement_conflict` without updating the stored receipt. `conflict_quarantined` can never be acknowledged as accepted business truth. Service tokens are hashed before constant-time comparison; logs include only the non-secret key ID and whether the current or previous rotation slot matched.
 
 ## Public corpus updates
 
