@@ -91,6 +91,15 @@
 .concierge-room-key section { padding: 14px 0; border-top: 1px solid rgba(230,214,181,.1); }.concierge-room-key h3 { margin: 0 0 8px; color: #8f887c; font: 700 .62rem/1 var(--font-display, monospace); text-transform: uppercase; letter-spacing: .11em; }
 .concierge-room-key section > p { margin: 0; color: #dcd4c5; font-size: .82rem; line-height: 1.45; }
 .concierge-room-key ul { display: grid; gap: 7px; margin: 0; padding: 0; list-style: none; }.concierge-room-key li { display: flex; justify-content: space-between; gap: 10px; color: #bbb2a2; font-size: .74rem; }.concierge-room-key li b { color: #e4dac8; font-weight: 500; text-align: right; }
+.room-key-builds > div { display: grid; gap: 7px; }
+.room-key-builds > p { color: #8e887d !important; font-size: .72rem !important; }
+.room-key-builds button { display: grid; gap: 4px; min-width: 0; padding: 8px; color: #bbb2a2; text-align: left; border: 1px solid rgba(230,214,181,.12); border-radius: 6px; background: rgba(9,12,15,.52); cursor: pointer; }
+.room-key-builds button:hover, .room-key-builds button:focus-visible, .room-key-builds button.is-preferred { border-color: rgba(248,191,69,.72); outline: 0; background: rgba(248,191,69,.07); }
+.room-key-builds button > span { display: flex; align-items: center; justify-content: space-between; gap: 8px; color: #f8bf45; font: 700 .58rem/1 var(--font-display, monospace); text-transform: uppercase; letter-spacing: .08em; }
+.room-key-builds button > span em { color: #77c7c3; font-style: normal; }
+.room-key-builds button > b { overflow: hidden; color: #eee7da; font-size: .75rem; text-overflow: ellipsis; white-space: nowrap; }
+.room-key-builds button > small { overflow: hidden; color: #a9a194; font-size: .66rem; text-overflow: ellipsis; white-space: nowrap; }
+.room-key-builds button > i { margin-top: 2px; color: #ff9e8d; font: 700 .51rem/1.25 var(--font-display, monospace); font-style: normal; text-transform: uppercase; letter-spacing: .06em; }
 .room-key-trail { display: grid; gap: 5px; }.room-key-trail button { display: flex; justify-content: space-between; gap: 10px; padding: 6px 0; color: #a9a194; text-align: left; border: 0; background: transparent; font-size: .69rem; cursor: pointer; }.room-key-trail span { max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }.room-key-trail b { color: #f8bf45; font-size: .63rem; text-transform: uppercase; letter-spacing: .08em; }
 .room-key-boundary { display: grid !important; grid-template-columns: 18px 1fr; gap: 8px; color: #77c7c3; }.room-key-boundary p { color: #8e887d !important; font-size: .7rem !important; }
 

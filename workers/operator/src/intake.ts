@@ -1,6 +1,11 @@
 import Ajv2020 from "ajv/dist/2020";
 import submissionSchema from "../../../shared/intake/contracts/schemas/intake-submission.schema.json";
 import {
+  deriveForgeBuildCandidatesProjection,
+  type ForgeBuildCandidatesProjection,
+  type ForgeRequirementsProjection,
+} from "../../../shared/intake/forge-build-candidates.js";
+import {
   CONTRACT_VERSION,
   evaluateRoute,
   isLaneId,
@@ -184,6 +189,31 @@ function normalizeSubmission(value: unknown): SubmissionShape {
       }))
     : raw.answers;
   return { ...raw, answers };
+}
+
+async function validateForgeBuildCandidatesProjection(submission: SubmissionShape): Promise<void> {
+  if (submission.form_id !== "forge-configurator") return;
+  const context = submission.client_context ?? {};
+  const guideBundleHash = context.guide_bundle_hash;
+  const requirements = context.guide_requirements_projection as ForgeRequirementsProjection | undefined;
+  const submitted = context.guide_build_candidates_projection as ForgeBuildCandidatesProjection | undefined;
+  if (typeof guideBundleHash !== "string" || !requirements || !submitted ||
+    submitted.guide_bundle_hash !== guideBundleHash) {
+    throw new HttpError(400, "forge_build_projection_mismatch", "The Forge build guidance projection could not be verified.");
+  }
+  try {
+    const expected = await deriveForgeBuildCandidatesProjection({
+      guide_bundle_hash: guideBundleHash,
+      requirements_projection: requirements,
+      generated_at: submitted.generated_at,
+      preferred_candidate_id: submitted.preferred_candidate_id,
+    });
+    if (canonicalJson(expected) !== canonicalJson(submitted)) {
+      throw new Error("projection content mismatch");
+    }
+  } catch {
+    throw new HttpError(400, "forge_build_projection_mismatch", "The Forge build guidance projection could not be verified.");
+  }
 }
 
 function validateContactPatch(submission: SubmissionShape): void {
@@ -427,6 +457,7 @@ export async function handleSubmission(
     throw new HttpError(400, "schema_rejected", `Submission failed schema validation: ${details.join("; ")}`);
   }
   validateContactPatch(submission);
+  await validateForgeBuildCandidatesProjection(submission);
   const now = deps.now();
   const payloadHash = await hashText(canonicalJson(submission));
   const existingSubmission = await db.prepare(

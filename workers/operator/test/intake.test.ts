@@ -1,4 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
+import {
+  deriveForgeBuildCandidatesProjection,
+  sha256CanonicalDocument,
+} from "../../../shared/intake/forge-build-candidates.js";
 import { createWorker } from "../src/index";
 import { purgeExpiredIntake } from "../src/intake";
 import type { Env, RateLimitBinding } from "../src/types";
@@ -56,6 +60,62 @@ function validSubmission(formId: string, answers: Record<string, unknown> = {}):
     ],
     client_context: { entry_url: "https://hyperion-industries.dev/intake", effects_mode: "static", save_resume_used: false },
   };
+}
+
+async function validForgeConfiguratorSubmission(): Promise<any> {
+  const submission = validSubmission("forge-configurator", {
+    "forge.system_type": "desktop",
+    "forge.outcome": "Play and create locally",
+    "forge.local_first": "yes",
+    "forge.budget": "2500_4000",
+    "forge.timeline": "flexible",
+  });
+  const guideBundleHash = "a".repeat(64);
+  const requirements = {
+    schema_version: "forge-requirements/1",
+    source: "forge-guide-session/1",
+    workload_profile: "gaming",
+    operational_lane: "fast_validated",
+    workload_refs: ["fortnite"],
+    budget: { currency: "USD" as const, parts_ceiling_minor: 400000 },
+    cooling_mode: "any" as const,
+    allowed_motherboard_form_factors: ["Micro-ATX", "ATX"],
+    fresh_offer_required: true,
+    unknown_policy: "review",
+    required_parts: [],
+    excluded_parts: [],
+    priorities: {
+      workload_fit: 5, cost: 4, power_headroom: 3, evidence: 5,
+      serviceability: 4, compactness: 5, upgradeability: 2, acoustics: 2,
+    },
+    inference: [{ field: "workload_profile", reason_code: "destination_mapping", confidence_basis_points: 9000 }],
+    unresolved: [{ field: "output_target", reason_code: "requires_clarification" }],
+    operator_notes: [],
+    requested_counterfactuals: ["smaller"],
+  };
+  const requirementsWithHash = {
+    ...requirements,
+    projection_hash: await sha256CanonicalDocument(requirements),
+  };
+  const buildCandidates = await deriveForgeBuildCandidatesProjection({
+    guide_bundle_hash: guideBundleHash,
+    requirements_projection: requirementsWithHash,
+    generated_at: fixedNow.toISOString(),
+  });
+  submission.form_version = "2.0.0";
+  submission.client_context = {
+    ...submission.client_context,
+    guide_mode: "express",
+    guide_bundle_hash: guideBundleHash,
+    question_graph_version: "forge-concierge-2026.07-v1",
+    guide_session_hash: "b".repeat(64),
+    recommendation_reason_codes: ["destination.gaming", "counterfactual.smaller"],
+    unresolved_items: ["output_target"],
+    requested_counterfactuals: ["smaller"],
+    guide_requirements_projection: requirementsWithHash,
+    guide_build_candidates_projection: buildCandidates,
+  };
+  return submission;
 }
 
 const laneFixtures = [
@@ -190,47 +250,7 @@ describe("intake evaluation and submission", () => {
 
   it("routes the Forge configurator form to the durable Forge review queue", async () => {
     const db = new MockD1().queueFirst(null);
-    const submission = validSubmission("forge-configurator", {
-      "forge.system_type": "desktop",
-      "forge.outcome": "Play and create locally",
-      "forge.local_first": "yes",
-      "forge.budget": "2500_4000",
-      "forge.timeline": "flexible",
-    });
-    submission.form_version = "2.0.0";
-    submission.client_context = {
-      ...submission.client_context,
-      guide_mode: "express",
-      guide_bundle_hash: "a".repeat(64),
-      question_graph_version: "forge-concierge-2026.07-v1",
-      guide_session_hash: "b".repeat(64),
-      recommendation_reason_codes: ["destination.gaming", "counterfactual.smaller"],
-      unresolved_items: ["output_target"],
-      requested_counterfactuals: ["smaller"],
-      guide_requirements_projection: {
-        schema_version: "forge-requirements/1",
-        source: "forge-guide-session/1",
-        workload_profile: "gaming",
-        operational_lane: "fast_validated",
-        workload_refs: ["fortnite"],
-        budget: { currency: "USD", parts_ceiling_minor: 400000 },
-        cooling_mode: "any",
-        allowed_motherboard_form_factors: ["Micro-ATX", "ATX"],
-        fresh_offer_required: true,
-        unknown_policy: "review",
-        required_parts: [],
-        excluded_parts: [],
-        priorities: {
-          workload_fit: 5, cost: 4, power_headroom: 3, evidence: 5,
-          serviceability: 4, compactness: 5, upgradeability: 2, acoustics: 2,
-        },
-        inference: [{ field: "workload_profile", reason_code: "destination_mapping", confidence_basis_points: 9000 }],
-        unresolved: [{ field: "output_target", reason_code: "requires_clarification" }],
-        operator_notes: [],
-        requested_counterfactuals: ["smaller"],
-        projection_hash: "c".repeat(64),
-      },
-    };
+    const submission = await validForgeConfiguratorSubmission();
     const response = await worker().fetch(
       postJson("/api/intake/submissions", submission, { "idempotency-key": "submit-forge-configurator-123456" }),
       baseEnv({ DB: db.binding() }), executionContext().ctx,
@@ -243,6 +263,22 @@ describe("intake evaluation and submission", () => {
     const submissionInsert = db.batches[0]?.find((statement) => statement.sql.includes("INSERT INTO intake_submissions"));
     expect(JSON.stringify(submissionInsert?.values)).toContain("forge-requirements/1");
     expect(JSON.stringify(submissionInsert?.values)).not.toContain("parts_ceiling_minor\":400000,\"payment");
+  });
+
+  it("rejects a tampered Forge build candidate projection before durable intake writes", async () => {
+    const db = new MockD1().queueFirst(null);
+    const submission = await validForgeConfiguratorSubmission();
+    submission.client_context.guide_build_candidates_projection.candidates[0].component_classes.cpu =
+      "client-altered exact part";
+    const response = await worker().fetch(
+      postJson("/api/intake/submissions", submission, { "idempotency-key": "submit-forge-tampered-123456" }),
+      baseEnv({ DB: db.binding() }),
+      executionContext().ctx,
+    );
+
+    expect(response.status).toBe(400);
+    expect(await response.json()).toMatchObject({ error: { code: "forge_build_projection_mismatch" } });
+    expect(db.batches).toHaveLength(0);
   });
 
   it("durably quarantines a same-ID different-hash revision collision", async () => {

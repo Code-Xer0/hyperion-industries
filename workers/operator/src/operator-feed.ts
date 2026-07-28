@@ -4,7 +4,7 @@ import type { Env, RuntimeDependencies } from "./types";
 
 const MAX_FEED_LIMIT = 100;
 const ACK_MAX_BODY_BYTES = 64 * 1024;
-const OPERATOR_FEED_CONTRACT = "hyperion.intake.operator-feed/2.0";
+const OPERATOR_FEED_CONTRACT = "hyperion.intake.operator-feed/2.1";
 const CONSUMER_PATTERN = /^[a-z0-9][a-z0-9._-]{2,63}$/i;
 const OUTBOX_PATTERN = /^out_[A-Za-z0-9_-]{12,64}$/;
 const RECEIPT_PATTERN = /^[A-Za-z0-9_-]{8,160}$/;

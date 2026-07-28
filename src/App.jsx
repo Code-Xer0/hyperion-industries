@@ -83,7 +83,7 @@ function FounderRoute() {
 
 function IntakeLaneRoute() {
   const { lane } = useParams();
-  if (lane === 'forge') return <StaticRedirect to="/forge/configurator" />;
+  if (lane === 'forge') return <ForgeConfiguratorPage />;
   return PUBLIC_INTAKE_LANES.has(lane) ? <IntakePage /> : <NotFoundPage />;
 }
 

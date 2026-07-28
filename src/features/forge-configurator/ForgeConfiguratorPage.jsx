@@ -6,6 +6,7 @@ import {
   ExternalLink, KeyRound, LoaderCircle, Map, Search, ShieldCheck, Sparkles, X,
 } from 'lucide-react';
 import contract from '../../../shared/intake/contracts/forms/forge-configurator.form.json';
+import { deriveForgeBuildCandidatesProjection } from '../../../shared/intake/forge-build-candidates.js';
 import { CONTRACT_VERSION, evaluateRoute } from '../../../shared/intake/model';
 import { FORGE_GUIDE_FALLBACK, isForgeGuideBundle } from '../../data/forgeGuideBundle.js';
 import { track } from '../../utils/telemetry.js';
@@ -16,9 +17,7 @@ import {
 } from './forgeGuideModel.js';
 import './ForgeConfiguratorPage.css';
 
-const API_ORIGIN = import.meta.env.PROD
-  ? 'https://hyperion-operator.hyperion-industries-intake.workers.dev'
-  : '';
+const API_ORIGIN = '';
 const LOCAL_KEY = 'hyperion-forge-concierge-v2';
 const LEGACY_KEY = 'hyperion-forge-configurator-v1';
 const LOCAL_RETENTION_MS = 14 * 24 * 60 * 60 * 1000;
@@ -184,7 +183,24 @@ function ProductCard({ item, primary = false }) {
   );
 }
 
-function RoomKey({ bundle, answers, events, recommendations, onEdit, unresolved }) {
+function candidatePriceBand(candidate) {
+  const { minimum_minor: minimum, maximum_minor: maximum, currency } = candidate.price_band;
+  if (minimum == null && maximum == null) return 'Price band pending';
+  const formatter = new Intl.NumberFormat(undefined, { style: 'currency', currency, maximumFractionDigits: 0 });
+  return `${minimum == null ? 'Open' : formatter.format(minimum / 100)} - ${maximum == null ? 'Open' : formatter.format(maximum / 100)}`;
+}
+
+function RoomKey({
+  bundle,
+  answers,
+  events,
+  recommendations,
+  onEdit,
+  unresolved,
+  buildCandidatesProjection,
+  preferredTier,
+  onPreferCandidate,
+}) {
   const destination = bundle.graph.questions.find((question) => question.id === 'destination');
   const seen = new Set();
   const answered = [...events].reverse().filter((event) => {
@@ -203,6 +219,28 @@ function RoomKey({ bundle, answers, events, recommendations, onEdit, unresolved 
         <li>Service access <b>{statusLabel(answers.service)}</b></li>
         <li>Footprint <b>{statusLabel(answers.footprint)}</b></li>
       </ul></section>
+      <section className="room-key-builds">
+        <h3>Proposed builds</h3>
+        {!buildCandidatesProjection?.candidates?.length && <p>Answer the workload questions to reveal build concepts.</p>}
+        <div>
+          {buildCandidatesProjection?.candidates?.map((candidate) => (
+            <button
+              type="button"
+              key={candidate.candidate_id}
+              className={preferredTier === candidate.tier ? 'is-preferred' : ''}
+              onClick={() => onPreferCandidate(candidate.tier)}
+              aria-pressed={preferredTier === candidate.tier}
+            >
+              <span><strong>{candidate.tier}</strong><em>{Math.round(candidate.confidence_basis_points / 100)}%</em></span>
+              <b>{candidate.title}</b>
+              <small>{candidate.component_classes.cpu}</small>
+              <small>{candidate.component_classes.gpu}</small>
+              <small>{candidatePriceBand(candidate)}</small>
+              <i>Not a quote · compatibility unverified</i>
+            </button>
+          ))}
+        </div>
+      </section>
       {answered.length > 0 && <section><h3>Answer trail</h3><div className="room-key-trail">{answered.map((event) => {
         const question = bundle.graph.questions.find((item) => item.id === event.question_id);
         return <button type="button" key={`${event.sequence}-${event.question_id}`} onClick={() => onEdit(event.question_id)}><span>{question?.prompt || event.question_id}</span><b>Edit</b></button>;
@@ -263,6 +301,8 @@ export default function ForgeConfiguratorPage() {
   const [receipt, setReceipt] = useState(null);
   const [errors, setErrors] = useState([]);
   const [submitting, setSubmitting] = useState(false);
+  const [buildCandidatesProjection, setBuildCandidatesProjection] = useState(null);
+  const [preferredCandidateTier, setPreferredCandidateTier] = useState(null);
   const [revision, setRevision] = useState(1);
   const [supersedes, setSupersedes] = useState(null);
   const [migratedFrom, setMigratedFrom] = useState(null);
@@ -292,6 +332,7 @@ export default function ForgeConfiguratorPage() {
         setStage(draft.stage || 'welcome'); setMode(draft.mode || 'full'); setQuestionIndex(draft.questionIndex || 0);
         setAnswers(draft.answers || {}); setEvents(draft.events || []); setCounterfactuals(draft.counterfactuals || []);
         setIdentity((current) => ({ ...current, ...(draft.identity || {}) })); setConsent(Boolean(draft.consent));
+        setPreferredCandidateTier(draft.preferredCandidateTier || null);
         setRevision(draft.revision || 1); setSupersedes(draft.supersedes || null); setMigratedFrom(draft.migratedFrom || null);
         ids.current = { ...ids.current, ...(draft.ids || {}) };
         return;
@@ -312,11 +353,11 @@ export default function ForgeConfiguratorPage() {
     try {
       localStorage.setItem(LOCAL_KEY, JSON.stringify({
         schema_version: 'forge-guide-session/1', stage, mode, questionIndex, answers, events,
-        counterfactuals, identity, consent, revision, supersedes, migratedFrom, ids: ids.current,
+        counterfactuals, identity, consent, preferredCandidateTier, revision, supersedes, migratedFrom, ids: ids.current,
         expires_at: Date.now() + LOCAL_RETENTION_MS,
       }));
     } catch { /* Browser storage is optional. */ }
-  }, [answers, consent, counterfactuals, events, identity, migratedFrom, mode, questionIndex, receipt, revision, stage, supersedes]);
+  }, [answers, consent, counterfactuals, events, identity, migratedFrom, mode, preferredCandidateTier, questionIndex, receipt, revision, stage, supersedes]);
 
   useEffect(() => { requestAnimationFrame(() => headingRef.current?.focus()); }, [questionIndex, stage]);
 
@@ -326,6 +367,29 @@ export default function ForgeConfiguratorPage() {
   const cue = [...cues].reverse().find((item) => !events.some((event) => event.cue_key === item.cue_key)) || cues.at(-1);
   const recommendations = useMemo(() => deriveRecommendations(bundle, answers, counterfactuals), [answers, bundle, counterfactuals]);
   const requirements = useMemo(() => deriveRequirements(bundle, answers, counterfactuals), [answers, bundle, counterfactuals]);
+
+  useEffect(() => {
+    let active = true;
+    deriveForgeBuildCandidatesProjection({
+      guide_bundle_hash: bundle.bundle_hash,
+      requirements_projection: requirements,
+    }).then(async (baseProjection) => {
+      const preferredCandidateId = baseProjection.candidates
+        .find((candidate) => candidate.tier === preferredCandidateTier)?.candidate_id ?? null;
+      const projection = preferredCandidateId
+        ? await deriveForgeBuildCandidatesProjection({
+            guide_bundle_hash: bundle.bundle_hash,
+            requirements_projection: requirements,
+            generated_at: baseProjection.generated_at,
+            preferred_candidate_id: preferredCandidateId,
+          })
+        : baseProjection;
+      if (active) setBuildCandidatesProjection(projection);
+    }).catch(() => {
+      if (active) setBuildCandidatesProjection(null);
+    });
+    return () => { active = false; };
+  }, [bundle.bundle_hash, preferredCandidateTier, requirements]);
 
   const start = (nextMode) => {
     setMode(nextMode); setStage('questions'); setQuestionIndex(0);
@@ -406,6 +470,13 @@ export default function ForgeConfiguratorPage() {
     const projection = { ...requirements };
     const projectionHash = await sha256Document(projection);
     projection.projection_hash = projectionHash;
+    const candidateProjection = buildCandidatesProjection?.requirements_projection_hash === projectionHash
+      ? buildCandidatesProjection
+      : await deriveForgeBuildCandidatesProjection({
+          guide_bundle_hash: bundle.bundle_hash,
+          requirements_projection: projection,
+          generated_at: now,
+        });
     const sessionDocument = {
       schema_version: 'forge-guide-session/1',
       graph_version: bundle.graph.version,
@@ -435,6 +506,7 @@ export default function ForgeConfiguratorPage() {
         save_resume_used: true, guide_mode: mode, guide_bundle_hash: bundle.bundle_hash,
         question_graph_version: bundle.graph.version, guide_session_hash: sessionHash,
         guide_requirements_projection: projection, recommendation_reason_codes: recommendations.reason_codes,
+        guide_build_candidates_projection: candidateProjection,
         unresolved_items: requirements.unresolved.map((item) => item.field),
         requested_counterfactuals: counterfactuals,
       },
@@ -480,7 +552,17 @@ export default function ForgeConfiguratorPage() {
               {stage === 'itinerary' && <Itinerary mode={mode} requirements={requirements} recommendations={recommendations} counterfactuals={counterfactuals} onToggle={toggleCounterfactual} onDeepen={deepen} onHandoff={openHandoff} onBack={back} headingRef={headingRef} />}
               {stage === 'handoff' && <Handoff identity={identity} setIdentity={setIdentity} consent={consent} setConsent={setConsent} reviewed={reviewed} setReviewed={setReviewed} requirements={requirements} decision={decision} errors={errors} errorRef={errorRef} submitting={submitting} onBack={() => setStage('itinerary')} onSubmit={submit} headingRef={headingRef} />}
             </section>
-            <RoomKey bundle={bundle} answers={answers} events={events} recommendations={recommendations} onEdit={editQuestion} unresolved={requirements.unresolved} />
+            <RoomKey
+              bundle={bundle}
+              answers={answers}
+              events={events}
+              recommendations={recommendations}
+              onEdit={editQuestion}
+              unresolved={requirements.unresolved}
+              buildCandidatesProjection={buildCandidatesProjection}
+              preferredTier={preferredCandidateTier}
+              onPreferCandidate={setPreferredCandidateTier}
+            />
           </div>
         )}
       </div>

@@ -24,9 +24,7 @@ import './IntakePage.css';
 const STEPS = ['Aperture', 'Handshake', 'Signal', 'Load / Limits', 'Fit', 'Review', 'Dispatch'];
 const LOCAL_PREFIX = 'hyperion-intake-v1';
 const LOCAL_RETENTION_MS = 14 * 24 * 60 * 60 * 1000;
-const API_ORIGIN = import.meta.env.PROD
-  ? 'https://hyperion-operator.hyperion-industries-intake.workers.dev'
-  : '';
+const API_ORIGIN = '';
 const FORM_IDS = {
   forge: 'forge-build-profile',
   pandora: 'pandora-readiness',

@@ -8,7 +8,7 @@ const AUTH_HEADERS = {
   authorization: `Bearer ${TOKEN}`,
   "x-hyprm-consumer": "founder-command-desktop",
 };
-const FEED_CONTRACT = "hyperion.intake.operator-feed/2.0";
+const FEED_CONTRACT = "hyperion.intake.operator-feed/2.1";
 
 const feedRow = {
   outbox_id: "out_abcdefghijkl",
