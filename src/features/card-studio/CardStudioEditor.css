@@ -7,6 +7,13 @@
   color: var(--text);
 }
 
+.hcs-editor > *,
+.hcs-workspace > *,
+.hcs-review-grid > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
 .hcs-editor button,
 .hcs-editor input,
 .hcs-editor select,
@@ -1194,6 +1201,10 @@
 
   .hcs-template-grid {
     display: flex;
+    width: 100%;
+    min-width: 0;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
   }
 
   .hcs-template {
