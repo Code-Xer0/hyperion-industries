@@ -467,6 +467,7 @@ function OperatorCard({ data, motion = "on" }) {
   );
 
   return (
+    <div className="card-fit">
     <div className="card-wrap" ref={wrapRef} onPointerMove={onMove} onPointerLeave={onLeave}>
       <div className="card-tilt">
       <div className={"card " + (flipped ? "flipped" : "")}>
@@ -546,6 +547,7 @@ function OperatorCard({ data, motion = "on" }) {
         </div>
       </div>
       </div>
+    </div>
     </div>
   );
 }

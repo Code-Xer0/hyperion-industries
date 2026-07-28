@@ -26,7 +26,7 @@
     "/assets/operators/victor-portrait.webm",
     "/assets/operators/victor-portrait.mp4"
   ],
-  "portraitBlend": false,
+  "portraitBlend": true,
   "qr": "/assets/card/qr.png",
   "doctrine": {
     "label": "HYPERION DOCTRINE",

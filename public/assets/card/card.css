@@ -27,6 +27,9 @@
   --card-w: 420px;
   --card-h: 720px;
   --radius: 14px;
+  --control-gap: 6px;
+  --control-h: 32px;
+  --control-track: 0.14em;
 }
 
 * { box-sizing: border-box; }
@@ -47,12 +50,19 @@ html, body {
 
 /* ---------- stage ---------- */
 
+/* The card is a locked surface: it always fits the viewport whole, at every
+   size, with no scrolling. The stage is pinned to exactly one viewport
+   (dvh, so mobile browser chrome collapsing does not change it) and clips.
+   A transform does NOT shrink the layout box, so the unscaled card still
+   reserves its full height inside here — the clip is what stops the page
+   scrolling; the scale is what keeps it visible. */
 .stage {
-  min-height: 100vh;
-  min-height: 100dvh;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
   display: grid;
   place-items: center;
-  padding: 16px 16px 24px;
+  padding: 16px 16px calc(16px + env(safe-area-inset-bottom, 8px));
   position: relative;
   background:
     radial-gradient(1100px 700px at 50% -10%, rgba(var(--accent-rgb), 0.10), transparent 60%),
@@ -129,9 +139,37 @@ html, body {
 
 /* ---------- card shell ---------- */
 
+/* Fit layer — scales the whole card to whatever the viewport allows, so the
+   composition stays locked (nothing reflows, nothing clips, type keeps its
+   exact proportions) and the card is always fully visible. --card-fit is
+   computed in app.jsx from the stage's real content box, so it accounts for
+   padding, safe-area insets and orientation. Capped at 1: scaling type up
+   past its designed size only makes it soft.
+   This sits OUTSIDE .card-wrap on purpose — .card-wrap owns the perspective
+   for the tilt/flip, and scaling that same element would rescale the
+   perspective depth along with it. */
+.card-fit {
+  /* Centred by absolute positioning, not by the stage's grid. The card keeps
+     its full unscaled height (744px) as its layout box, so as a grid item the
+     row would stretch to 744 and overflow downward from the top edge — the
+     card sat 52px below the viewport. Absolute centring pins the box's centre
+     to the stage's centre regardless of how far it overflows, and the scale
+     then shrinks it about that same centre.
+     Explicit width too: shrink-to-fit would leave .card-wrap's percentage
+     width with nothing definite to resolve against. */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--card-w);
+  transform: translate(-50%, -50%) scale(var(--card-fit, 1));
+  transform-origin: center center;
+  will-change: transform;
+  z-index: 2;
+}
+
 .card-wrap {
   perspective: 2200px;
-  width: min(100%, var(--card-w));
+  width: 100%;
   position: relative;
   z-index: 2;
   --tilt-x: 0deg; --tilt-y: 0deg;
@@ -391,7 +429,20 @@ html, body {
 }
 @keyframes pscan { 0% { top: -36%; } 55% { top: 100%; } 100% { top: 100%; } }
 
-/* ---- blended portrait (space-blended gif; no hard ring/circle) ---- */
+/* ---- blended portrait (space-blended plate; no hard ring/circle) ----
+   Mask geometry is tuned for THIS plate (dark helmet, night city). Two
+   constraints fight each other: the opaque core must cover the whole
+   helmet or the portrait reads as empty at 168px (the design's original
+   32% core survived only as a ~60px blob), but any mask still carrying
+   alpha where the element ends gets sliced flat and shows the video's
+   square border.
+
+   `closest-side` sizes the ellipse to the nearest edge — 50% of the
+   width, 46% of the height from the offset centre — so alpha is
+   guaranteed to hit 0 at every edge and corner, with no square. The
+   middle stop bends the falloff: solid through the helmet, then a long
+   gentle tail instead of a linear ramp, which reads as a dissolve
+   rather than a vignette with a rim. */
 .portrait.blend { grid-template-columns: 168px 32px; }
 .portrait.blend .portrait-outer { width: 168px; height: 168px; }
 .portrait.blend .orbit { opacity: 0.55; }
@@ -407,13 +458,13 @@ html, body {
 .portrait-frame.blend .portrait-video {
   border-radius: 0;
   overflow: visible;
-  -webkit-mask-image: radial-gradient(ellipse 60% 60% at 50% 46%, #000 32%, rgba(0,0,0,0) 78%);
-          mask-image: radial-gradient(ellipse 60% 60% at 50% 46%, #000 32%, rgba(0,0,0,0) 78%);
+  -webkit-mask-image: radial-gradient(ellipse closest-side at 50% 46%, #000 55%, rgba(0,0,0,0.55) 80%, rgba(0,0,0,0) 100%);
+          mask-image: radial-gradient(ellipse closest-side at 50% 46%, #000 55%, rgba(0,0,0,0.55) 80%, rgba(0,0,0,0) 100%);
 }
 .portrait.blend .portrait-scan {
   border-radius: 0;
-  -webkit-mask-image: radial-gradient(ellipse 60% 60% at 50% 46%, #000 32%, rgba(0,0,0,0) 78%);
-          mask-image: radial-gradient(ellipse 60% 60% at 50% 46%, #000 32%, rgba(0,0,0,0) 78%);
+  -webkit-mask-image: radial-gradient(ellipse closest-side at 50% 46%, #000 55%, rgba(0,0,0,0.55) 80%, rgba(0,0,0,0) 100%);
+          mask-image: radial-gradient(ellipse closest-side at 50% 46%, #000 55%, rgba(0,0,0,0.55) 80%, rgba(0,0,0,0) 100%);
 }
 
 /* orbital ring — ambient HUD rotating around portrait */
@@ -600,19 +651,22 @@ html, body {
 }
 .systems-row {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--control-gap);
 }
 .sys-chip {
   position: relative;
-  padding: 7px 10px 7px 18px;
+  min-width: 0;
+  min-height: 60px;
+  padding: 7px 18px;
   background: rgba(var(--accent-rgb), 0.04);
   border: 1px solid rgba(var(--accent-rgb), 0.22);
   text-decoration: none;
   color: var(--ink);
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+  display: grid;
+  grid-template-rows: 23px 21px;
+  align-content: center;
+  gap: 3px;
   transition: background 200ms, border-color 200ms, transform 200ms;
   clip-path: polygon(7px 0, 100% 0, 100% calc(100% - 7px), calc(100% - 7px) 100%, 0 100%, 0 7px);
 }
@@ -623,13 +677,21 @@ html, body {
 }
 .sys-chip .sys-name {
   font: 700 11.5px/1 var(--font-mono);
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   color: var(--ink);
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  text-wrap: balance;
 }
 .sys-chip .sys-tag {
   font: 500 8.5px/1.2 var(--font-mono);
-  letter-spacing: 0.22em;
+  letter-spacing: var(--control-track);
   color: var(--accent);
+  display: flex;
+  align-items: flex-start;
+  min-width: 0;
+  text-wrap: balance;
 }
 .sys-chip .sys-status {
   position: absolute;
@@ -653,7 +715,6 @@ html, body {
 .sys-chip.cta {
   background: rgba(var(--accent-rgb), 0.10);
   border-color: rgba(var(--accent-rgb), 0.45);
-  padding-right: 22px;
 }
 .sys-chip.cta:hover {
   background: rgba(var(--accent-rgb), 0.16);
@@ -783,12 +844,14 @@ html, body {
 .connect-rail {
   margin-top: 8px;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 6px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--control-gap);
 }
 .chan {
   position: relative;
-  aspect-ratio: 1 / 1;
+  width: 100%;
+  min-width: 0;
+  height: var(--control-h);
   display: grid;
   place-items: center;
   color: var(--accent);
@@ -797,7 +860,8 @@ html, body {
   text-decoration: none;
   transition: background 160ms, border-color 160ms, color 160ms;
   clip-path: polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px);
-  height: 30px;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 .chan:hover {
   background: rgba(var(--accent-rgb), 0.10);
@@ -809,7 +873,7 @@ html, body {
   left: 50%;
   transform: translateX(-50%);
   font: 500 8.5px/1 var(--font-mono);
-  letter-spacing: 0.22em;
+  letter-spacing: var(--control-track);
   color: var(--ink);
   background: rgba(7,6,8,0.92);
   border: 1px solid rgba(var(--accent-rgb),0.30);
