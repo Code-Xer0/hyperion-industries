@@ -47,12 +47,19 @@ html, body {
 
 /* ---------- stage ---------- */
 
+/* The card is a locked surface: it always fits the viewport whole, at every
+   size, with no scrolling. The stage is pinned to exactly one viewport
+   (dvh, so mobile browser chrome collapsing does not change it) and clips.
+   A transform does NOT shrink the layout box, so the unscaled card still
+   reserves its full height inside here — the clip is what stops the page
+   scrolling; the scale is what keeps it visible. */
 .stage {
-  min-height: 100vh;
-  min-height: 100dvh;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
   display: grid;
   place-items: center;
-  padding: 16px 16px 24px;
+  padding: 16px 16px calc(16px + env(safe-area-inset-bottom, 8px));
   position: relative;
   background:
     radial-gradient(1100px 700px at 50% -10%, rgba(var(--accent-rgb), 0.10), transparent 60%),
@@ -129,9 +136,37 @@ html, body {
 
 /* ---------- card shell ---------- */
 
+/* Fit layer — scales the whole card to whatever the viewport allows, so the
+   composition stays locked (nothing reflows, nothing clips, type keeps its
+   exact proportions) and the card is always fully visible. --card-fit is
+   computed in app.jsx from the stage's real content box, so it accounts for
+   padding, safe-area insets and orientation. Capped at 1: scaling type up
+   past its designed size only makes it soft.
+   This sits OUTSIDE .card-wrap on purpose — .card-wrap owns the perspective
+   for the tilt/flip, and scaling that same element would rescale the
+   perspective depth along with it. */
+.card-fit {
+  /* Centred by absolute positioning, not by the stage's grid. The card keeps
+     its full unscaled height (744px) as its layout box, so as a grid item the
+     row would stretch to 744 and overflow downward from the top edge — the
+     card sat 52px below the viewport. Absolute centring pins the box's centre
+     to the stage's centre regardless of how far it overflows, and the scale
+     then shrinks it about that same centre.
+     Explicit width too: shrink-to-fit would leave .card-wrap's percentage
+     width with nothing definite to resolve against. */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--card-w);
+  transform: translate(-50%, -50%) scale(var(--card-fit, 1));
+  transform-origin: center center;
+  will-change: transform;
+  z-index: 2;
+}
+
 .card-wrap {
   perspective: 2200px;
-  width: min(100%, var(--card-w));
+  width: 100%;
   position: relative;
   z-index: 2;
   --tilt-x: 0deg; --tilt-y: 0deg;
@@ -420,13 +455,13 @@ html, body {
 .portrait-frame.blend .portrait-video {
   border-radius: 0;
   overflow: visible;
-  -webkit-mask-image: radial-gradient(ellipse closest-side at 50% 46%, #000 45%, rgba(0,0,0,0.55) 75%, rgba(0,0,0,0) 100%);
-          mask-image: radial-gradient(ellipse closest-side at 50% 46%, #000 45%, rgba(0,0,0,0.55) 75%, rgba(0,0,0,0) 100%);
+  -webkit-mask-image: radial-gradient(ellipse closest-side at 50% 46%, #000 55%, rgba(0,0,0,0.55) 80%, rgba(0,0,0,0) 100%);
+          mask-image: radial-gradient(ellipse closest-side at 50% 46%, #000 55%, rgba(0,0,0,0.55) 80%, rgba(0,0,0,0) 100%);
 }
 .portrait.blend .portrait-scan {
   border-radius: 0;
-  -webkit-mask-image: radial-gradient(ellipse closest-side at 50% 46%, #000 45%, rgba(0,0,0,0.55) 75%, rgba(0,0,0,0) 100%);
-          mask-image: radial-gradient(ellipse closest-side at 50% 46%, #000 45%, rgba(0,0,0,0.55) 75%, rgba(0,0,0,0) 100%);
+  -webkit-mask-image: radial-gradient(ellipse closest-side at 50% 46%, #000 55%, rgba(0,0,0,0.55) 80%, rgba(0,0,0,0) 100%);
+          mask-image: radial-gradient(ellipse closest-side at 50% 46%, #000 55%, rgba(0,0,0,0.55) 80%, rgba(0,0,0,0) 100%);
 }
 
 /* orbital ring — ambient HUD rotating around portrait */

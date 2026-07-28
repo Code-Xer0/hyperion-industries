@@ -6,7 +6,57 @@
 // the fetch fails (file:// preview, offline, etc.).
 // =========================================================
 
-const { useState: useStateApp, useEffect: useEffectApp } = React;
+const { useState: useStateApp, useEffect: useEffectApp, useRef: useRefApp } = React;
+
+// Scale the card so it always fits the viewport whole — no scrolling at any
+// screen size. Measured from the stage's real content box rather than
+// window.innerHeight so padding, safe-area insets and orientation are all
+// already accounted for. Capped at 1 so the card never upscales into softness.
+// `ready` re-runs this once the stage actually exists — App renders null until
+// the config resolves, so on first mount there is no node to measure.
+function useCardFit(stageRef, ready) {
+  useEffectApp(() => {
+    const stage = stageRef.current;
+    if (!stage) return;
+    const root = document.documentElement;
+
+    const apply = () => {
+      const rootStyle = getComputedStyle(root);
+      const cardW = parseFloat(rootStyle.getPropertyValue("--card-w")) || 420;
+      const cardH = parseFloat(rootStyle.getPropertyValue("--card-h")) || 720;
+      const pad = getComputedStyle(stage);
+      const availW = stage.clientWidth
+        - parseFloat(pad.paddingLeft) - parseFloat(pad.paddingRight);
+      const availH = stage.clientHeight
+        - parseFloat(pad.paddingTop) - parseFloat(pad.paddingBottom);
+      if (availW <= 0 || availH <= 0) return;
+      const fit = Math.min(1, availW / cardW, availH / cardH);
+      root.style.setProperty("--card-fit", fit.toFixed(4));
+    };
+
+    // Re-measure on the next frame as well: --card-w/--card-h switch at the
+    // 480px breakpoint, and we want the value that lands *after* the media
+    // query has applied, not the one mid-change.
+    const schedule = () => { apply(); requestAnimationFrame(apply); };
+
+    schedule();
+    const ro = new ResizeObserver(schedule);
+    ro.observe(stage);
+    // Belt and braces: a ResizeObserver on the stage is the precise signal,
+    // but window resize is the one that always fires, and visualViewport
+    // catches mobile browser chrome collapsing without a layout resize.
+    window.addEventListener("resize", schedule);
+    window.addEventListener("orientationchange", schedule);
+    window.visualViewport?.addEventListener("resize", schedule);
+
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", schedule);
+      window.removeEventListener("orientationchange", schedule);
+      window.visualViewport?.removeEventListener("resize", schedule);
+    };
+  }, [stageRef, ready]);
+}
 
 const FALLBACK_CONFIG = {
   accent:   "#ff2a36",
@@ -167,6 +217,8 @@ window.__cardConfig = window.__cardConfig || {
 
 function App() {
   const [config, setConfig] = useStateApp(null);
+  const stageRef = useRefApp(null);
+  useCardFit(stageRef, !!config);
 
   useEffectApp(() => {
     let cancelled = false;
@@ -195,7 +247,7 @@ function App() {
   if (!config) return null; // brief blank while fetching; lock overlay covers it
 
   return (
-    <div className="stage">
+    <div className="stage" ref={stageRef}>
       <SignalField enabled={config.motion === "on"} />
       <StageMarks serial={config.serial} index={config.index || FALLBACK_CONFIG.index} />
       <OperatorCard data={buildData(config)} motion={config.motion} />
