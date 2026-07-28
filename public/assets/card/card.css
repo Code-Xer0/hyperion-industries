@@ -392,11 +392,19 @@ html, body {
 @keyframes pscan { 0% { top: -36%; } 55% { top: 100%; } 100% { top: 100%; } }
 
 /* ---- blended portrait (space-blended plate; no hard ring/circle) ----
-   Mask geometry is tuned for THIS plate (dark helmet, night city): the
-   opaque core must cover the whole helmet or the portrait reads as empty
-   at 168px — the design's original 32% core survived only as a ~60px
-   blob. Fade completes just inside the frame edge so the city dissolves
-   into the card without a visible rectangle. */
+   Mask geometry is tuned for THIS plate (dark helmet, night city). Two
+   constraints fight each other: the opaque core must cover the whole
+   helmet or the portrait reads as empty at 168px (the design's original
+   32% core survived only as a ~60px blob), but any mask still carrying
+   alpha where the element ends gets sliced flat and shows the video's
+   square border.
+
+   `closest-side` sizes the ellipse to the nearest edge — 50% of the
+   width, 46% of the height from the offset centre — so alpha is
+   guaranteed to hit 0 at every edge and corner, with no square. The
+   middle stop bends the falloff: solid through the helmet, then a long
+   gentle tail instead of a linear ramp, which reads as a dissolve
+   rather than a vignette with a rim. */
 .portrait.blend { grid-template-columns: 168px 32px; }
 .portrait.blend .portrait-outer { width: 168px; height: 168px; }
 .portrait.blend .orbit { opacity: 0.55; }
@@ -412,13 +420,13 @@ html, body {
 .portrait-frame.blend .portrait-video {
   border-radius: 0;
   overflow: visible;
-  -webkit-mask-image: radial-gradient(ellipse 72% 72% at 50% 46%, #000 52%, rgba(0,0,0,0) 96%);
-          mask-image: radial-gradient(ellipse 72% 72% at 50% 46%, #000 52%, rgba(0,0,0,0) 96%);
+  -webkit-mask-image: radial-gradient(ellipse closest-side at 50% 46%, #000 45%, rgba(0,0,0,0.55) 75%, rgba(0,0,0,0) 100%);
+          mask-image: radial-gradient(ellipse closest-side at 50% 46%, #000 45%, rgba(0,0,0,0.55) 75%, rgba(0,0,0,0) 100%);
 }
 .portrait.blend .portrait-scan {
   border-radius: 0;
-  -webkit-mask-image: radial-gradient(ellipse 72% 72% at 50% 46%, #000 52%, rgba(0,0,0,0) 96%);
-          mask-image: radial-gradient(ellipse 72% 72% at 50% 46%, #000 52%, rgba(0,0,0,0) 96%);
+  -webkit-mask-image: radial-gradient(ellipse closest-side at 50% 46%, #000 45%, rgba(0,0,0,0.55) 75%, rgba(0,0,0,0) 100%);
+          mask-image: radial-gradient(ellipse closest-side at 50% 46%, #000 45%, rgba(0,0,0,0.55) 75%, rgba(0,0,0,0) 100%);
 }
 
 /* orbital ring — ambient HUD rotating around portrait */
