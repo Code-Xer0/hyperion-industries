@@ -1,84 +1,10 @@
 .card-studio-page {
   min-height: 100vh;
-  padding: 112px 0 42px;
-}
-
-.card-studio-shell {
-  display: grid;
-  gap: 12px;
-}
-
-.card-studio-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 18px;
-  padding: 18px 20px;
-}
-
-.card-studio-kicker {
-  margin: 0 0 4px;
-  color: var(--gold);
-  font-family: var(--font-display);
-  font-size: 9px;
-  font-weight: 800;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-}
-
-.card-studio-head h1 {
-  color: var(--text);
-  font-size: clamp(28px, 4vw, 48px);
-  font-weight: 900;
-  line-height: 0.95;
-  text-transform: uppercase;
-}
-
-.card-studio-open {
-  flex-shrink: 0;
-}
-
-.card-studio-frame {
-  overflow: hidden;
-  height: min(900px, calc(100vh - 236px));
-  min-height: 640px;
-  padding: 0;
-}
-
-.card-studio-frame iframe {
-  display: block;
-  width: 100%;
-  height: 100%;
-  border: 0;
-  background: #050506;
-}
-
-body.theme-light .card-studio-frame iframe {
-  background: #fffdf8;
+  padding: 112px 0 54px;
 }
 
 @media (max-width: 760px) {
   .card-studio-page {
-    padding-top: 86px;
-  }
-
-  .card-studio-shell {
-    width: min(100%, calc(100% - 16px));
-  }
-
-  .card-studio-head {
-    align-items: flex-start;
-    flex-direction: column;
-    padding: 16px;
-  }
-
-  .card-studio-open {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .card-studio-frame {
-    height: calc(100dvh - 238px);
-    min-height: 520px;
+    padding-top: 84px;
   }
 }

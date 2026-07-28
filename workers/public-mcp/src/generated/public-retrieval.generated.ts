@@ -164,10 +164,10 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
       "id": "card-studio",
       "path": "/card-studio",
       "canonicalUrl": "https://hyperion-industries.dev/card-studio",
-      "title": "Hyperion Card Studio | Smart Operator Identity",
-      "description": "Compose and refine smart business cards, operator cards, NFC identity surfaces, and public profile handoffs.",
-      "summary": "A shipping studio for smart cards, NFC identity, and operator-controlled public profiles.",
-      "maturity": "SHIPPING",
+      "title": "Hyperion Card Studio Invite Preview | Smart Operator Identity",
+      "description": "Compose a guarded operator-card design brief with live front, back, and digital proofs in Hyperion's invite-only soft-launch lane.",
+      "summary": "An invite-only native studio for deterministic card proofs and operator-reviewed identity handoff.",
+      "maturity": "INVITE-ONLY PREVIEW",
       "schemaType": "SoftwareApplication",
       "indexable": true,
       "image": "https://hyperion-industries.dev/assets/city/proof/card-studio-smoke.png",
@@ -707,11 +707,11 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
     },
     {
       "id": "card-studio",
-      "name": "Hyperion Card Studio",
+      "name": "Hyperion Card Studio Invite Preview",
       "route": "/card-studio",
       "canonicalUrl": "https://hyperion-industries.dev/card-studio",
-      "summary": "A shipping studio for smart cards, NFC identity, and operator-controlled public profiles.",
-      "maturity": "SHIPPING",
+      "summary": "An invite-only native studio for deterministic card proofs and operator-reviewed identity handoff.",
+      "maturity": "INVITE-ONLY PREVIEW",
       "availability": "Limited scoped requests are accepted after operator review.",
       "intakeLane": "operator-identity"
     }
@@ -897,5 +897,5 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
       }
     ]
   },
-  "sha256": "a90593116483466a99457632ba0069d6f3ebdaf721915c5ef1aa092908a7cb88"
+  "sha256": "5a3136c0bc21e870c8b66e530e2fe145895ee444427592daeb69b9a9f18810c4"
 } as const;

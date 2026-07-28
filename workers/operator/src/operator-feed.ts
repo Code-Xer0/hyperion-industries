@@ -1,14 +1,12 @@
-import { enforceRateLimitKey, HttpError, jsonResponse, readJsonBody, rejectUnknownFields, requireObject } from "./http";
-import { logMetadata } from "./log";
+import { HttpError, jsonResponse, readJsonBody, rejectUnknownFields, requireObject } from "./http";
+import { authorizeOperator, constantTimeEqual, sha256 } from "./operator-auth";
 import type { Env, RuntimeDependencies } from "./types";
 
 const MAX_FEED_LIMIT = 100;
 const ACK_MAX_BODY_BYTES = 64 * 1024;
-const CONSUMER_PATTERN = /^[a-z0-9][a-z0-9._-]{2,63}$/i;
-const OUTBOX_PATTERN = /^out_[A-Za-z0-9_-]{12,64}$/;
+const OUTBOX_PATTERN = /^(?:out|cso)_[A-Za-z0-9_-]{12,64}$/;
 const RECEIPT_PATTERN = /^[A-Za-z0-9_-]{8,160}$/;
 const HASH_PATTERN = /^[a-f0-9]{64}$/;
-const KEY_ID_PATTERN = /^[A-Za-z0-9._-]{3,80}$/;
 
 interface FeedRow {
   outbox_id: string;
@@ -48,6 +46,25 @@ interface FeedRow {
   decision_created_at: string;
 }
 
+interface CardFeedRow {
+  outbox_id: string;
+  proposal_id: string;
+  intent_id: string;
+  revision_hash: string;
+  event_type: string;
+  outbox_state: string;
+  created_at: string;
+  project_id: string;
+  revision_id: string;
+  product_sku: string;
+  quantity: number;
+  catalog_version: string;
+  eligibility: string;
+  order_status: string;
+  proposal_json: string;
+  proposal_state: string;
+}
+
 interface AckItem {
   outbox_id: string;
   revision_hash: string;
@@ -57,20 +74,9 @@ interface AckItem {
   accepted_business_truth: boolean;
 }
 
-interface OperatorAuthorization {
-  consumerId: string;
-  keyId: string;
-  keyVersion: "current" | "previous";
-}
-
 function requireDb(env: Env): D1Database {
   if (!env.DB) throw new HttpError(503, "operator_feed_unavailable", "Operator intake feed is not configured.");
   return env.DB;
-}
-
-async function sha256(value: string): Promise<string> {
-  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
-  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, "0")).join("");
 }
 
 function stable(value: unknown): unknown {
@@ -85,45 +91,6 @@ function parseJson(value: string, fallback: unknown): unknown {
   } catch {
     return fallback;
   }
-}
-
-function bearer(request: Request): string {
-  const authorization = request.headers.get("authorization")?.trim() ?? "";
-  const match = authorization.match(/^Bearer\s+(.+)$/i);
-  return match?.[1]?.trim() ?? "";
-}
-
-function consumer(request: Request): string {
-  const value = request.headers.get("x-hyprm-consumer")?.trim() ?? "";
-  if (!CONSUMER_PATTERN.test(value)) throw new HttpError(400, "consumer_required", "A valid consumer identifier is required.");
-  return value;
-}
-
-function constantTimeEqual(left: string, right: string): boolean {
-  if (left.length !== right.length) return false;
-  let mismatch = 0;
-  for (let index = 0; index < left.length; index += 1) mismatch |= left.charCodeAt(index) ^ right.charCodeAt(index);
-  return mismatch === 0;
-}
-
-async function authorize(request: Request, env: Env, now: Date): Promise<OperatorAuthorization> {
-  const keyId = env.FOUNDER_COMMAND_PULL_KEY_ID?.trim() ?? "";
-  const current = env.FOUNDER_COMMAND_PULL_TOKEN_SHA256?.trim().toLowerCase() ?? "";
-  const previous = env.FOUNDER_COMMAND_PULL_PREVIOUS_TOKEN_SHA256?.trim().toLowerCase() ?? "";
-  const previousUntil = Date.parse(env.FOUNDER_COMMAND_PULL_PREVIOUS_UNTIL?.trim() ?? "");
-  const supplied = bearer(request);
-  const suppliedHash = supplied ? await sha256(supplied) : "0".repeat(64);
-  const currentMatch = HASH_PATTERN.test(current) && constantTimeEqual(suppliedHash, current);
-  const previousMatch = HASH_PATTERN.test(previous) && Number.isFinite(previousUntil) && previousUntil > now.getTime() &&
-    constantTimeEqual(suppliedHash, previous);
-  if (!KEY_ID_PATTERN.test(keyId) || !supplied || (!currentMatch && !previousMatch)) {
-    throw new HttpError(401, "operator_auth_required", "Operator feed authentication failed.", { "www-authenticate": "Bearer" });
-  }
-  const consumerId = consumer(request);
-  await enforceRateLimitKey(env.INTAKE_OPERATOR_RATE_LIMITER, consumerId, "operator-feed");
-  const keyVersion = currentMatch ? "current" : "previous";
-  logMetadata("operator_auth", { auth_key_version: `${keyId}:${keyVersion}` });
-  return { consumerId, keyId, keyVersion };
 }
 
 function encodeCursor(createdAt: string, outboxId: string): string {
@@ -205,6 +172,43 @@ async function envelope(row: FeedRow): Promise<Record<string, unknown>> {
   return { ...body, payload_hash: await sha256(JSON.stringify(stable(body))) };
 }
 
+async function cardEnvelope(row: CardFeedRow, siteOrigin = ""): Promise<Record<string, unknown>> {
+  const proposal = parseJson(row.proposal_json, {});
+  const body: Record<string, unknown> = {
+    source_kind: "card_studio",
+    outbox: {
+      outbox_id: row.outbox_id,
+      proposal_id: row.proposal_id,
+      revision_hash: row.revision_hash,
+      event_type: row.event_type,
+      state: row.outbox_state,
+      created_at: row.created_at,
+    },
+    card_studio: {
+      intent_id: row.intent_id,
+      project_id: row.project_id,
+      revision_id: row.revision_id,
+      product_sku: row.product_sku,
+      quantity: row.quantity,
+      catalog_version: row.catalog_version,
+      eligibility: row.eligibility,
+      order_status: row.order_status,
+      proposal_state: row.proposal_state,
+      proposal,
+      source_link: /^https:\/\/[^/]+$/i.test(siteOrigin) ? `${siteOrigin}/card-studio` : "",
+      binary_artifacts: [],
+      artifact_policy: "opaque_references_only",
+    },
+    authority: {
+      data_classification: "client_confidential",
+      authority_class: "proposal",
+      source_outbox_unchanged: true,
+      checkout_created: false,
+    },
+  };
+  return { ...body, payload_hash: await sha256(JSON.stringify(stable(body))) };
+}
+
 async function feedRows(db: D1Database, consumerId: string, cursor: [string, string], limit: number): Promise<FeedRow[]> {
   const result = await db.prepare(
     `SELECT o.outbox_id, o.intake_id, o.submission_id, o.proposal_id, o.revision_hash,
@@ -227,13 +231,37 @@ async function feedRows(db: D1Database, consumerId: string, cursor: [string, str
   return result.results ?? [];
 }
 
+async function cardFeedRows(db: D1Database, consumerId: string, cursor: [string, string], limit: number): Promise<CardFeedRow[]> {
+  const result = await db.prepare(
+    `SELECT x.outbox_id, x.proposal_id, x.intent_id, x.revision_hash, x.event_type,
+            x.state AS outbox_state, x.created_at,
+            o.project_id, o.revision_id, o.product_sku, o.quantity, o.catalog_version,
+            o.eligibility, o.status AS order_status,
+            p.proposal_json, p.state AS proposal_state
+       FROM card_studio_proposal_outbox x
+       JOIN card_studio_order_intents o ON o.intent_id = x.intent_id
+       JOIN card_studio_design_proposals p ON p.proposal_id = x.proposal_id
+       LEFT JOIN card_studio_consumer_receipts r ON r.outbox_id = x.outbox_id AND r.consumer_id = ?
+      WHERE x.state = 'held_for_review' AND r.outbox_id IS NULL
+        AND (x.created_at > ? OR (x.created_at = ? AND x.outbox_id > ?))
+      ORDER BY x.created_at ASC, x.outbox_id ASC
+      LIMIT ?`,
+  ).bind(consumerId, cursor[0], cursor[0], cursor[1], limit).all<CardFeedRow>();
+  return result.results ?? [];
+}
+
 export async function handleOperatorStatus(request: Request, env: Env, deps: RuntimeDependencies): Promise<Response> {
-  const authorization = await authorize(request, env, deps.now());
+  const authorization = await authorizeOperator(request, env, deps.now());
   const { consumerId } = authorization;
   const db = requireDb(env);
   const pending = await db.prepare(
     `SELECT COUNT(*) AS count FROM intake_outbox o
        LEFT JOIN intake_consumer_receipts r ON r.outbox_id = o.outbox_id AND r.consumer_id = ?
+      WHERE o.state = 'held_for_review' AND r.outbox_id IS NULL`,
+  ).bind(consumerId).first<{ count: number }>();
+  const cardPending = await db.prepare(
+    `SELECT COUNT(*) AS count FROM card_studio_proposal_outbox o
+       LEFT JOIN card_studio_consumer_receipts r ON r.outbox_id = o.outbox_id AND r.consumer_id = ?
       WHERE o.state = 'held_for_review' AND r.outbox_id IS NULL`,
   ).bind(consumerId).first<{ count: number }>();
   return jsonResponse({
@@ -242,14 +270,18 @@ export async function handleOperatorStatus(request: Request, env: Env, deps: Run
     consumer_id: consumerId,
     key_id: authorization.keyId,
     key_version: authorization.keyVersion,
-    pending: Number(pending?.count ?? 0),
+    pending: Number(pending?.count ?? 0) + Number(cardPending?.count ?? 0),
+    pending_by_source: {
+      intake: Number(pending?.count ?? 0),
+      card_studio: Number(cardPending?.count ?? 0),
+    },
     authority: "operator_review_only",
     outbox_mutation_allowed: false,
   });
 }
 
 export async function handleOperatorFeed(request: Request, env: Env, deps: RuntimeDependencies): Promise<Response> {
-  const authorization = await authorize(request, env, deps.now());
+  const authorization = await authorizeOperator(request, env, deps.now());
   const { consumerId } = authorization;
   const db = requireDb(env);
   const url = new URL(request.url);
@@ -257,8 +289,15 @@ export async function handleOperatorFeed(request: Request, env: Env, deps: Runti
   if (!Number.isInteger(requestedLimit) || requestedLimit < 1 || requestedLimit > MAX_FEED_LIMIT) {
     throw new HttpError(400, "invalid_limit", `Feed limit must be between 1 and ${MAX_FEED_LIMIT}.`);
   }
-  const rows = await feedRows(db, consumerId, decodeCursor(url.searchParams.get("cursor")), requestedLimit);
-  const items = await Promise.all(rows.map(envelope));
+  const cursor = decodeCursor(url.searchParams.get("cursor"));
+  const [intakeRows, cardRows] = await Promise.all([
+    feedRows(db, consumerId, cursor, requestedLimit + 1),
+    cardFeedRows(db, consumerId, cursor, requestedLimit + 1),
+  ]);
+  const rows = [...intakeRows, ...cardRows]
+    .sort((left, right) => left.created_at.localeCompare(right.created_at) || left.outbox_id.localeCompare(right.outbox_id))
+    .slice(0, requestedLimit);
+  const items = await Promise.all(rows.map((row) => "intake_id" in row ? envelope(row) : cardEnvelope(row, env.SITE_ORIGIN)));
   const last = rows.at(-1);
   return jsonResponse({
     consumer_id: consumerId,
@@ -267,7 +306,7 @@ export async function handleOperatorFeed(request: Request, env: Env, deps: Runti
     items,
     count: items.length,
     next_cursor: last ? encodeCursor(last.created_at, last.outbox_id) : url.searchParams.get("cursor") ?? "",
-    has_more: rows.length === requestedLimit,
+    has_more: intakeRows.length + cardRows.length > rows.length,
     outbox_mutated: false,
   });
 }
@@ -297,7 +336,7 @@ function parseAckItem(value: unknown): AckItem {
 }
 
 export async function handleOperatorAck(request: Request, env: Env, deps: RuntimeDependencies): Promise<Response> {
-  const authorization = await authorize(request, env, deps.now());
+  const authorization = await authorizeOperator(request, env, deps.now());
   const { consumerId } = authorization;
   const db = requireDb(env);
   const body = requireObject(await readJsonBody(request, ACK_MAX_BODY_BYTES));
@@ -322,32 +361,70 @@ export async function handleOperatorAck(request: Request, env: Env, deps: Runtim
          JOIN intake_routing_decisions d ON d.submission_id = o.submission_id
         WHERE o.outbox_id = ? AND o.state = 'held_for_review' LIMIT 1`,
     ).bind(delivery.outbox_id).first<FeedRow>();
-    if (!row) throw new HttpError(404, "delivery_not_found", "Delivery record was not found.");
-    if (!constantTimeEqual(row.revision_hash, delivery.revision_hash)) {
+    const cardRow = row ? null : await db.prepare(
+      `SELECT x.outbox_id, x.proposal_id, x.intent_id, x.revision_hash, x.event_type,
+              x.state AS outbox_state, x.created_at,
+              o.project_id, o.revision_id, o.product_sku, o.quantity, o.catalog_version,
+              o.eligibility, o.status AS order_status,
+              p.proposal_json, p.state AS proposal_state
+         FROM card_studio_proposal_outbox x
+         JOIN card_studio_order_intents o ON o.intent_id = x.intent_id
+         JOIN card_studio_design_proposals p ON p.proposal_id = x.proposal_id
+        WHERE x.outbox_id = ? AND x.state = 'held_for_review' LIMIT 1`,
+    ).bind(delivery.outbox_id).first<CardFeedRow>();
+    const sourceRow = row ?? cardRow;
+    if (!sourceRow) throw new HttpError(404, "delivery_not_found", "Delivery record was not found.");
+    if (!constantTimeEqual(sourceRow.revision_hash, delivery.revision_hash)) {
       throw new HttpError(409, "revision_hash_conflict", "Delivery revision hash does not match.");
     }
-    const expected = String((await envelope(row)).payload_hash);
+    const expected = String((row ? await envelope(row) : await cardEnvelope(cardRow as CardFeedRow, env.SITE_ORIGIN)).payload_hash);
     if (!constantTimeEqual(expected, delivery.payload_hash)) throw new HttpError(409, "payload_hash_conflict", "Delivery payload hash does not match.");
-    statements.push(
-      db.prepare(
-        `INSERT INTO intake_consumer_receipts
-         (consumer_id, outbox_id, submission_id, revision_hash, payload_hash, local_receipt_id,
-          outcome, accepted_business_truth, first_seen_at, acknowledged_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-         ON CONFLICT(consumer_id, outbox_id) DO UPDATE SET
-           revision_hash = excluded.revision_hash, payload_hash = excluded.payload_hash,
-           local_receipt_id = excluded.local_receipt_id, outcome = excluded.outcome,
-           accepted_business_truth = excluded.accepted_business_truth, acknowledged_at = excluded.acknowledged_at`,
-      ).bind(
-        consumerId, delivery.outbox_id, row.submission_id, delivery.revision_hash, delivery.payload_hash,
-        delivery.local_receipt_id, delivery.outcome, delivery.accepted_business_truth ? 1 : 0, at, at,
-      ),
-      db.prepare(
-        `INSERT INTO intake_audit_events
-         (audit_id, intake_id, submission_id, event_type, actor_class, request_id, created_at)
-         VALUES (?, ?, ?, 'consumer_delivery_acknowledged', 'service', ?, ?)`,
-      ).bind(`aud_${deps.randomUUID().replaceAll("-", "")}`, row.intake_id, row.submission_id, consumerId, at),
-    );
+    if (row) {
+      statements.push(
+        db.prepare(
+          `INSERT INTO intake_consumer_receipts
+           (consumer_id, outbox_id, submission_id, revision_hash, payload_hash, local_receipt_id,
+            outcome, accepted_business_truth, first_seen_at, acknowledged_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+           ON CONFLICT(consumer_id, outbox_id) DO UPDATE SET
+             revision_hash = excluded.revision_hash, payload_hash = excluded.payload_hash,
+             local_receipt_id = excluded.local_receipt_id, outcome = excluded.outcome,
+             accepted_business_truth = excluded.accepted_business_truth, acknowledged_at = excluded.acknowledged_at`,
+        ).bind(
+          consumerId, delivery.outbox_id, row.submission_id, delivery.revision_hash, delivery.payload_hash,
+          delivery.local_receipt_id, delivery.outcome, delivery.accepted_business_truth ? 1 : 0, at, at,
+        ),
+        db.prepare(
+          `INSERT INTO intake_audit_events
+           (audit_id, intake_id, submission_id, event_type, actor_class, request_id, created_at)
+           VALUES (?, ?, ?, 'consumer_delivery_acknowledged', 'service', ?, ?)`,
+        ).bind(`aud_${deps.randomUUID().replaceAll("-", "")}`, row.intake_id, row.submission_id, consumerId, at),
+      );
+    } else if (cardRow) {
+      statements.push(
+        db.prepare(
+          `INSERT INTO card_studio_consumer_receipts
+           (consumer_id, outbox_id, intent_id, revision_hash, payload_hash, local_receipt_id,
+            outcome, accepted_business_truth, first_seen_at, acknowledged_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+           ON CONFLICT(consumer_id, outbox_id) DO UPDATE SET
+             revision_hash = excluded.revision_hash, payload_hash = excluded.payload_hash,
+             local_receipt_id = excluded.local_receipt_id, outcome = excluded.outcome,
+             accepted_business_truth = excluded.accepted_business_truth, acknowledged_at = excluded.acknowledged_at`,
+        ).bind(
+          consumerId, delivery.outbox_id, cardRow.intent_id, delivery.revision_hash, delivery.payload_hash,
+          delivery.local_receipt_id, delivery.outcome, delivery.accepted_business_truth ? 1 : 0, at, at,
+        ),
+        db.prepare(
+          `INSERT INTO card_studio_audit_events
+           (audit_id, project_id, intent_id, proposal_id, event_type, actor_class, request_id, created_at)
+           VALUES (?, ?, ?, ?, 'consumer_delivery_acknowledged', 'service', ?, ?)`,
+        ).bind(
+          `csaud_${deps.randomUUID().replaceAll("-", "")}`, cardRow.project_id, cardRow.intent_id,
+          cardRow.proposal_id, consumerId, at,
+        ),
+      );
+    }
   }
   await db.batch(statements);
   return jsonResponse({

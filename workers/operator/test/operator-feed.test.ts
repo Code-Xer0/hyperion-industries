@@ -47,6 +47,31 @@ const feedRow = {
   decision_created_at: "2026-07-13T12:00:00.000Z",
 };
 
+const cardFeedRow = {
+  outbox_id: "cso_abcdefghijkl",
+  proposal_id: "cdp_abcdefghijkl",
+  intent_id: "coi_abcdefghijkl",
+  revision_hash: "c".repeat(64),
+  event_type: "card_studio.proposal_staged.v1",
+  outbox_state: "held_for_review",
+  created_at: "2026-07-13T12:01:00.000Z",
+  project_id: "csp_abcdefghijkl",
+  revision_id: "csr_abcdefghijkl",
+  product_sku: "card_pvc_standard",
+  quantity: 1,
+  catalog_version: "card-catalog.2026-07-27",
+  eligibility: "instant_checkout_eligible",
+  order_status: "proposal_staged",
+  proposal_json: JSON.stringify({
+    contract_version: "card-design-proposal/1",
+    proposal_id: "cdp_abcdefghijkl",
+    proof_refs: ["proof_abcdefgh"],
+    warnings: [],
+    authority: "operator_review_only",
+  }),
+  proposal_state: "active",
+};
+
 function operatorEnv(db: MockD1) {
   return baseEnv({
     DB: db.binding(),
@@ -151,6 +176,58 @@ describe("Founder Command operator intake feed", () => {
     expect(body.outbox_mutated).toBe(false);
     expect(db.batches[0]?.some((statement) => statement.sql.includes("ON CONFLICT(consumer_id, outbox_id)"))).toBe(true);
     expect(db.statements.every((statement) => !/UPDATE\s+intake_outbox/i.test(statement.sql))).toBe(true);
+  });
+
+  it("delivers minimized Card Studio proposals and records receipts without mutating their source outbox", async () => {
+    const db = new MockD1().queueAll([], [cardFeedRow]);
+    const worker = createWorker({
+      now: () => new Date("2026-07-13T12:05:00.000Z"),
+      randomUUID: () => "12345678-1234-4234-8234-123456789abc",
+    });
+    const response = await worker.fetch(
+      new Request("https://hyperion-industries.dev/api/intake/operator/feed", { headers: AUTH_HEADERS }),
+      operatorEnv(db),
+      executionContext().ctx,
+    );
+    const feed = await response.json<{
+      items: Array<{
+        source_kind: string;
+        payload_hash: string;
+        card_studio: { intent_id: string; artifact_policy: string; binary_artifacts: unknown[] };
+        authority: { checkout_created: boolean; source_outbox_unchanged: boolean };
+      }>;
+    }>();
+    expect(response.status).toBe(200);
+    expect(feed.items[0]).toMatchObject({
+      source_kind: "card_studio",
+      card_studio: {
+        intent_id: cardFeedRow.intent_id,
+        artifact_policy: "opaque_references_only",
+        binary_artifacts: [],
+      },
+      authority: { checkout_created: false, source_outbox_unchanged: true },
+    });
+
+    db.queueFirst(null, cardFeedRow);
+    const ack = await worker.fetch(
+      postJson("/api/intake/operator/ack", {
+        deliveries: [{
+          outbox_id: cardFeedRow.outbox_id,
+          revision_hash: cardFeedRow.revision_hash,
+          payload_hash: feed.items[0]?.payload_hash,
+          local_receipt_id: "local_card_1234",
+          outcome: "received",
+          accepted_business_truth: false,
+        }],
+      }, AUTH_HEADERS),
+      operatorEnv(db),
+      executionContext().ctx,
+    );
+    expect(ack.status).toBe(200);
+    const sql = db.batches.at(-1)?.map((statement) => statement.sql).join("\n") ?? "";
+    expect(sql).toContain("INSERT INTO card_studio_consumer_receipts");
+    expect(sql).not.toMatch(/UPDATE\s+card_studio_proposal_outbox/i);
+    expect(db.statements.every((statement) => !/UPDATE\s+(?:intake_outbox|card_studio_proposal_outbox)/i.test(statement.sql))).toBe(true);
   });
 
   it("rejects a quarantined conflict that claims accepted business truth", async () => {

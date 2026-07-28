@@ -1,20 +1,19 @@
-# Hyperion Card Studio Source-Port Scaffold
+# Hyperion Card Studio native public preview
 
-The live `/card-studio` path serves the Business Card DX landing bundle directly on the static host. The fallback standalone asset is mirrored at `public/assets/card-studio/studio.html`, copied from the Business Card DX template:
+`/card-studio` is the compiled React Card Studio surface. It provides a bounded design-document editor, eight guarded templates, front/back/digital proofs, deterministic preflight feedback, local draft recovery, and an invite-gated Worker submission adapter.
 
-`<workspace>\hyperion-studio\Business Card. Dx. (Template)\Hyperion Card Studio (standalone).html`
+Public posture:
 
-The shipped default state is the Ivory card template with the gold accent:
+- `INVITE-ONLY PREVIEW`
+- every staged brief is `HELD FOR REVIEW`
+- every proof is `NOT A QUOTE`
+- eligible fixed-SKU briefs can be marked checkout-eligible, but only a revision-bound operator action can release checkout
+- no browser action publishes a profile, programs NFC, creates checkout, takes payment, or confirms fulfillment
 
-- `accent`: `#cba35a`
-- `heroTemplate`: `ivory`
+The adapter uses the durable `/api/card-studio` project → immutable revision → proposal sequence. It compiles the native editor state into `card-design-document/1` and `card-order-intent/1`, supplies an idempotency key, and preserves the local draft when any network stage fails.
 
-This is intentionally a hybrid first pass. The standalone bundle remains the shipped tool surface while the React route only redirects during local Vite development. The live GitHub Pages path includes `public/card-studio/index.html` so `/card-studio` resolves as the canonical clean landing URL without SPA fallback or iframe chrome. The compatibility route `/card-studio/studio.html` and matching static redirect file both point to the non-conflicting static asset path.
+The previous browser-global runtime has been removed from the public copy tree. Legacy static entrypoints redirect to `/card-studio`, so production publishes only compiled application assets for this feature.
 
-Future native port work should extract these parts from the standalone bundle:
+Focused model, contract adapter, and public-boundary tests live beside the model and run with:
 
-- the Studio app shell and card canvas components
-- the Scen.OS glass/HUD token set
-- the tweak/state controls and persistence model
-- the export/download/media handling
-- any self-contained font/resource assets currently embedded in the bundle
+`npm run card-studio:check`

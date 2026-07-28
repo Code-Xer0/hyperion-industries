@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hyperion-industries.dev/contracts/card-studio/commerce-order-projection.v1.schema.json",
+  "title": "Hyperion Card Studio commerce projection",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "projection_id", "intent_id", "provider", "status", "updated_at"],
+  "properties": {
+    "contract_version": { "const": "commerce-order-projection/1" },
+    "projection_id": { "type": "string", "pattern": "^cop_[A-Za-z0-9_-]{12,64}$" },
+    "intent_id": { "type": "string", "pattern": "^coi_[A-Za-z0-9_-]{12,64}$" },
+    "provider": { "const": "shopify" },
+    "provider_order_ref": { "type": ["string", "null"], "maxLength": 200 },
+    "provider_checkout_ref": { "type": ["string", "null"], "maxLength": 200 },
+    "status": { "enum": ["not_created", "staged", "checkout_pending", "paid", "production", "shipped", "delivered", "cancelled", "refunded", "conflict_review"] },
+    "updated_at": { "type": "string", "format": "date-time" }
+  }
+}

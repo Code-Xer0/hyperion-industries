@@ -451,7 +451,7 @@
         "currency": "USD",
         "publicCheckoutEnabled": false,
         "pricingPosture": "public_prices_operator_review",
-        "activePricingSource": "src/data/commerce.json and public/assets/card-studio/catalog.jsx",
+        "activePricingSource": "src/data/commerce.json",
         "digital": { "label": "Digital card", "price": 0, "note": "Free forever" },
         "physicalFinishes": [
           { "key": "pvc-matte", "label": "PVC NFC Card - Matte", "price": 39 },
