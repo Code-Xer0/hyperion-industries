@@ -23,3 +23,15 @@ test('Card Studio responsive grids contain intrinsic-width controls', () => {
     /@media \(max-width: 620px\)[\s\S]*?\.hcs-template-grid \{[\s\S]*?min-width: 0;[\s\S]*?overflow-x: auto;/,
   );
 });
+
+test('Card Studio production submissions use the verified first-party Worker origin', () => {
+  const submission = readFileSync('src/features/card-studio/cardStudioSubmission.js', 'utf8');
+  assert.match(
+    submission,
+    /import\.meta\.env\?\.PROD[\s\S]*?https:\/\/hyperion-operator\.hyperion-industries-intake\.workers\.dev/,
+  );
+  assert.match(
+    submission,
+    /const DEFAULT_BASE_PATH = `\$\{PRODUCTION_API_ORIGIN\}\/api\/card-studio`;/,
+  );
+});
