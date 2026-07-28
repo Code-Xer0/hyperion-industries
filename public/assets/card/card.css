@@ -27,6 +27,9 @@
   --card-w: 420px;
   --card-h: 720px;
   --radius: 14px;
+  --control-gap: 6px;
+  --control-h: 32px;
+  --control-track: 0.14em;
 }
 
 * { box-sizing: border-box; }
@@ -648,19 +651,22 @@ html, body {
 }
 .systems-row {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--control-gap);
 }
 .sys-chip {
   position: relative;
-  padding: 7px 10px 7px 18px;
+  min-width: 0;
+  min-height: 60px;
+  padding: 7px 18px;
   background: rgba(var(--accent-rgb), 0.04);
   border: 1px solid rgba(var(--accent-rgb), 0.22);
   text-decoration: none;
   color: var(--ink);
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
+  display: grid;
+  grid-template-rows: 23px 21px;
+  align-content: center;
+  gap: 3px;
   transition: background 200ms, border-color 200ms, transform 200ms;
   clip-path: polygon(7px 0, 100% 0, 100% calc(100% - 7px), calc(100% - 7px) 100%, 0 100%, 0 7px);
 }
@@ -671,13 +677,21 @@ html, body {
 }
 .sys-chip .sys-name {
   font: 700 11.5px/1 var(--font-mono);
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   color: var(--ink);
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  text-wrap: balance;
 }
 .sys-chip .sys-tag {
   font: 500 8.5px/1.2 var(--font-mono);
-  letter-spacing: 0.22em;
+  letter-spacing: var(--control-track);
   color: var(--accent);
+  display: flex;
+  align-items: flex-start;
+  min-width: 0;
+  text-wrap: balance;
 }
 .sys-chip .sys-status {
   position: absolute;
@@ -701,7 +715,6 @@ html, body {
 .sys-chip.cta {
   background: rgba(var(--accent-rgb), 0.10);
   border-color: rgba(var(--accent-rgb), 0.45);
-  padding-right: 22px;
 }
 .sys-chip.cta:hover {
   background: rgba(var(--accent-rgb), 0.16);
@@ -831,12 +844,14 @@ html, body {
 .connect-rail {
   margin-top: 8px;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 6px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--control-gap);
 }
 .chan {
   position: relative;
-  aspect-ratio: 1 / 1;
+  width: 100%;
+  min-width: 0;
+  height: var(--control-h);
   display: grid;
   place-items: center;
   color: var(--accent);
@@ -845,7 +860,8 @@ html, body {
   text-decoration: none;
   transition: background 160ms, border-color 160ms, color 160ms;
   clip-path: polygon(5px 0, 100% 0, 100% calc(100% - 5px), calc(100% - 5px) 100%, 0 100%, 0 5px);
-  height: 30px;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 .chan:hover {
   background: rgba(var(--accent-rgb), 0.10);
@@ -857,7 +873,7 @@ html, body {
   left: 50%;
   transform: translateX(-50%);
   font: 500 8.5px/1 var(--font-mono);
-  letter-spacing: 0.22em;
+  letter-spacing: var(--control-track);
   color: var(--ink);
   background: rgba(7,6,8,0.92);
   border: 1px solid rgba(var(--accent-rgb),0.30);
