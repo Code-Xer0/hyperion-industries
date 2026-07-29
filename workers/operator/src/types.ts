@@ -31,6 +31,8 @@ export interface Env {
   INQUIRY_EMAIL?: EmailBinding;
   RESEND_API_KEY?: string;
   INTAKE_RESUME_FROM?: string;
+  INTAKE_ACKNOWLEDGEMENT_FROM?: string;
+  RESEND_WEBHOOK_SIGNING_SECRET?: string;
   INTAKE_COOKIE_NAME?: string;
   DB?: D1Database;
 }

@@ -33,6 +33,7 @@ import {
   rejectUnknownFields,
   requireObject,
 } from "./http";
+import { deliverIntakeAcknowledgement } from "./intake-acknowledgement";
 import { logMetadata } from "./log";
 import type { Env, RuntimeDependencies } from "./types";
 
@@ -261,6 +262,10 @@ export function handleIntakeStatus(env: Env): Response {
       evaluation: "ready",
       storage: env.DB && env.INTAKE_SUBMISSION_RATE_LIMITER ? "ready" : "configuration_required",
       resume: env.DB && env.INTAKE_RESUME_RATE_LIMITER && env.RESEND_API_KEY?.trim() && isEmailAddress(env.INTAKE_RESUME_FROM?.trim())
+        ? "ready" : "configuration_required",
+      acknowledgement: env.DB && env.RESEND_API_KEY?.trim() && isEmailAddress(env.INTAKE_ACKNOWLEDGEMENT_FROM?.trim())
+        ? "ready" : "configuration_required",
+      acknowledgement_webhook: env.DB && env.RESEND_WEBHOOK_SIGNING_SECRET?.trim()
         ? "ready" : "configuration_required",
     },
     retention: { anonymous_draft_days: 14, identified_draft_days: 30, public_copy_days: 90 },
@@ -568,6 +573,13 @@ export async function handleSubmission(
     if (racedDuplicate) return jsonResponse({ ok: true, receipt: JSON.parse(racedDuplicate.receipt_json), duplicate: true }, 200);
     throw new HttpError(503, "submission_storage_unavailable", "The submission could not be stored atomically.");
   }
+  await deliverIntakeAcknowledgement(env, deps, {
+    submissionId: submission.submission_id,
+    revision: submission.revision,
+    revisionHash: payloadHash,
+    receiptReference: receipt.reference,
+    recipient: submission.identity?.email ?? "",
+  });
   logMetadata("intake_submitted", {
     request_id: requestId, route: "/api/intake/submissions", status: 201,
     classification: decision.classification, primary_route: decision.primary_route, outbox_state: "held_for_review",
@@ -583,6 +595,8 @@ export async function purgeExpiredIntake(db: D1Database, now: Date): Promise<Int
     db.prepare("DELETE FROM intake_audit_events WHERE submission_id IN (SELECT submission_id FROM intake_submissions WHERE expires_at <= ? AND retention_basis IS NULL)").bind(at),
     db.prepare("DELETE FROM intake_consumer_receipts WHERE submission_id IN (SELECT submission_id FROM intake_submissions WHERE expires_at <= ? AND retention_basis IS NULL)").bind(at),
     db.prepare("DELETE FROM intake_revision_conflicts WHERE submission_id IN (SELECT submission_id FROM intake_submissions WHERE expires_at <= ? AND retention_basis IS NULL)").bind(at),
+    db.prepare("DELETE FROM intake_acknowledgement_webhook_events WHERE delivery_id IN (SELECT delivery_id FROM intake_acknowledgement_deliveries WHERE submission_id IN (SELECT submission_id FROM intake_submissions WHERE expires_at <= ? AND retention_basis IS NULL))").bind(at),
+    db.prepare("DELETE FROM intake_acknowledgement_deliveries WHERE submission_id IN (SELECT submission_id FROM intake_submissions WHERE expires_at <= ? AND retention_basis IS NULL)").bind(at),
     db.prepare("DELETE FROM intake_outbox WHERE submission_id IN (SELECT submission_id FROM intake_submissions WHERE expires_at <= ? AND retention_basis IS NULL)").bind(at),
     db.prepare("DELETE FROM intake_routing_decisions WHERE submission_id IN (SELECT submission_id FROM intake_submissions WHERE expires_at <= ? AND retention_basis IS NULL)").bind(at),
     db.prepare("DELETE FROM intake_submissions WHERE expires_at <= ? AND retention_basis IS NULL").bind(at),
@@ -590,7 +604,7 @@ export async function purgeExpiredIntake(db: D1Database, now: Date): Promise<Int
   return {
     grants: results[0]?.meta.changes ?? 0,
     drafts: results[1]?.meta.changes ?? 0,
-    submissions: results[7]?.meta.changes ?? 0,
+    submissions: results[9]?.meta.changes ?? 0,
   };
 }
 

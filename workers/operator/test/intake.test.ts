@@ -248,6 +248,90 @@ describe("intake evaluation and submission", () => {
     expect(outboxInsert?.sql).toContain("revision_hash");
   });
 
+  it("sends the deterministic acknowledgement only after immutable intake commits", async () => {
+    const db = new MockD1().queueFirst(null);
+    const fetcher = vi.fn(async (_input: RequestInfo | URL, init?: RequestInit) => {
+      expect(init?.headers).toMatchObject({ "idempotency-key": expect.stringMatching(/^ack_[a-f0-9]{32}$/) });
+      expect(init?.body).toContain("held for operator review");
+      expect(init?.body).toContain("not a quote, order, contract, or commitment");
+      return new Response(JSON.stringify({ id: "email_ack_123" }), { status: 200 });
+    });
+    const response = await worker(fetcher as typeof fetch).fetch(
+      postJson("/api/intake/submissions", validSubmission("general"), {
+        "idempotency-key": "post-commit-ack-123456789",
+      }),
+      baseEnv({
+        DB: db.binding(),
+        RESEND_API_KEY: "resend-test",
+        INTAKE_ACKNOWLEDGEMENT_FROM: "signal@intake.hyperion-industries.dev",
+      }),
+      executionContext().ctx,
+    );
+
+    expect(response.status).toBe(201);
+    expect(fetcher).toHaveBeenCalledTimes(1);
+    expect(db.batch.mock.invocationCallOrder[0]).toBeLessThan(fetcher.mock.invocationCallOrder[0]!);
+    const insert = db.statements.find((statement) => statement.sql.includes("INSERT INTO intake_acknowledgement_deliveries"));
+    expect(insert?.values).toEqual(expect.arrayContaining([
+      "sub_generalxxxxx",
+      1,
+      "intake-received/1",
+    ]));
+    expect(JSON.stringify(insert?.values)).not.toContain("client@example.com");
+    expect(JSON.stringify(insert?.values)).not.toContain("held for operator review");
+    expect(db.statements.some((statement) =>
+      statement.sql.includes("provider_reference = ?") && statement.values[0] === "email_ack_123")).toBe(true);
+  });
+
+  it("keeps a committed intake successful when acknowledgement delivery fails", async () => {
+    const db = new MockD1().queueFirst(null);
+    const response = await worker(vi.fn(async () => new Response("provider unavailable", { status: 503 }))).fetch(
+      postJson("/api/intake/submissions", validSubmission("general"), {
+        "idempotency-key": "post-commit-failure-123456",
+      }),
+      baseEnv({
+        DB: db.binding(),
+        RESEND_API_KEY: "resend-test",
+        INTAKE_ACKNOWLEDGEMENT_FROM: "signal@intake.hyperion-industries.dev",
+      }),
+      executionContext().ctx,
+    );
+
+    expect(response.status).toBe(201);
+    expect(await response.json()).toMatchObject({ ok: true, duplicate: false });
+    expect(db.batches[0]?.some((statement) => statement.sql.includes("'held_for_review'"))).toBe(true);
+    expect(db.statements.some((statement) =>
+      statement.sql.includes("delivery_state = 'failed'") && statement.values.includes("provider_http_503"))).toBe(true);
+  });
+
+  it("does not resend an acknowledgement for an idempotent submission replay", async () => {
+    const db = new MockD1().queueFirst(null);
+    const fetcher = vi.fn(async () => new Response(JSON.stringify({ id: "email_once" }), { status: 200 })) as typeof fetch;
+    const env = baseEnv({
+      DB: db.binding(),
+      RESEND_API_KEY: "resend-test",
+      INTAKE_ACKNOWLEDGEMENT_FROM: "signal@intake.hyperion-industries.dev",
+    });
+    const idempotencyKey = "submission-replay-ack-123456";
+    const first = await worker(fetcher).fetch(
+      postJson("/api/intake/submissions", validSubmission("general"), { "idempotency-key": idempotencyKey }),
+      env,
+      executionContext().ctx,
+    );
+    const receipt = (await first.json() as { receipt: Record<string, unknown> }).receipt;
+    db.queueFirst({ receipt_json: JSON.stringify(receipt) });
+    const replay = await worker(fetcher).fetch(
+      postJson("/api/intake/submissions", validSubmission("general"), { "idempotency-key": idempotencyKey }),
+      env,
+      executionContext().ctx,
+    );
+
+    expect(first.status).toBe(201);
+    expect(replay.status).toBe(200);
+    expect(await replay.json()).toMatchObject({ duplicate: true });
+    expect(fetcher).toHaveBeenCalledTimes(1);
+  });
+
   it("routes the Forge configurator form to the durable Forge review queue", async () => {
     const db = new MockD1().queueFirst(null);
     const submission = await validForgeConfiguratorSubmission();
@@ -310,12 +394,18 @@ describe("intake evaluation and submission", () => {
   it("reports a transactional storage failure without a partial success", async () => {
     const db = new MockD1().queueFirst(null, null);
     db.batchError = new Error("rollback");
-    const response = await worker().fetch(
+    const fetcher = vi.fn(async () => new Response(JSON.stringify({ id: "should_not_send" }), { status: 200 })) as typeof fetch;
+    const response = await worker(fetcher).fetch(
       postJson("/api/intake/submissions", validSubmission("general"), { "idempotency-key": "rollback-key-1234567890" }),
-      baseEnv({ DB: db.binding() }), executionContext().ctx,
+      baseEnv({
+        DB: db.binding(),
+        RESEND_API_KEY: "resend-test",
+        INTAKE_ACKNOWLEDGEMENT_FROM: "signal@intake.hyperion-industries.dev",
+      }), executionContext().ctx,
     );
     expect(response.status).toBe(503);
     expect(await response.json()).toMatchObject({ error: { code: "submission_storage_unavailable" } });
+    expect(fetcher).not.toHaveBeenCalled();
   });
 
   it("keeps request logs metadata-only", async () => {
@@ -439,7 +529,7 @@ describe("intake retention", () => {
     const db = new MockD1();
     const result = await purgeExpiredIntake(db.binding(), fixedNow);
     expect(result).toEqual({ grants: 1, drafts: 1, submissions: 1 });
-    expect(db.batches[0]).toHaveLength(8);
-    expect(db.batches[0]?.[7]?.sql).toContain("retention_basis IS NULL");
+    expect(db.batches[0]).toHaveLength(10);
+    expect(db.batches[0]?.[9]?.sql).toContain("retention_basis IS NULL");
   });
 });

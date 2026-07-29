@@ -8,7 +8,12 @@ const AUTH_HEADERS = {
   authorization: `Bearer ${TOKEN}`,
   "x-hyprm-consumer": "founder-command-desktop",
 };
-const FEED_CONTRACT = "hyperion.intake.operator-feed/2.1";
+const FEED_CONTRACT = "hyperion.intake.operator-feed/2.2";
+const COMPATIBLE_FEED_CONTRACTS = [
+  "hyperion.intake.operator-feed/2.0",
+  "hyperion.intake.operator-feed/2.1",
+  FEED_CONTRACT,
+];
 
 const feedRow = {
   outbox_id: "out_abcdefghijkl",
@@ -46,6 +51,16 @@ const feedRow = {
   classification: "PROPOSED",
   decision_json: JSON.stringify({ missing_information: [], safety_flags: [] }),
   decision_created_at: "2026-07-13T12:00:00.000Z",
+  acknowledgement_template_version: "intake-received/1",
+  acknowledgement_content_hash: "c".repeat(64),
+  acknowledgement_provider_reference: "email_12345678",
+  acknowledgement_delivery_state: "sent",
+  acknowledgement_attempted_at: "2026-07-13T12:00:01.000Z",
+  acknowledgement_provider_accepted_at: "2026-07-13T12:00:01.000Z",
+  acknowledgement_delivered_at: null,
+  acknowledgement_failed_at: null,
+  acknowledgement_updated_at: "2026-07-13T12:00:01.000Z",
+  acknowledgement_error_code: null,
 };
 
 function operatorEnv(db: MockD1) {
@@ -109,6 +124,7 @@ describe("Founder Command operator intake feed", () => {
 
     expect(response.status).toBe(200);
     expect(body.feed_contract).toBe(FEED_CONTRACT);
+    expect(body).toMatchObject({ compatible_feed_contracts: COMPATIBLE_FEED_CONTRACTS });
     expect(body.authority).toBe("transport_delivery_only");
     expect(body.transport).toEqual({
       authority: "worker_delivery_outbox",
@@ -119,6 +135,7 @@ describe("Founder Command operator intake feed", () => {
       replay: "until_transport_acknowledged",
       ordering: ["created_at", "outbox_id"],
       max_page_items: 100,
+      compatible_feed_contracts: COMPATIBLE_FEED_CONTRACTS,
     });
     expect(body).not.toHaveProperty("owner");
     expect(body).not.toHaveProperty("sla");
@@ -150,6 +167,13 @@ describe("Founder Command operator intake feed", () => {
           acknowledgement_scope: string;
           business_review_state_included: boolean;
         };
+        acknowledgement_delivery: {
+          state: string;
+          template_version: string;
+          content_hash: string;
+          recipient_included: boolean;
+          rendered_content_included: boolean;
+        };
       }>;
     }>();
     expect(response.status).toBe(200);
@@ -176,6 +200,21 @@ describe("Founder Command operator intake feed", () => {
       acknowledgement_scope: "transport_receipt_only",
       business_review_state_included: false,
     });
+    expect(body.items[0]?.acknowledgement_delivery).toEqual({
+      scope: "deterministic_intake_receipt",
+      template_version: "intake-received/1",
+      content_hash: "c".repeat(64),
+      provider_reference: "email_12345678",
+      state: "sent",
+      attempted_at: "2026-07-13T12:00:01.000Z",
+      provider_accepted_at: "2026-07-13T12:00:01.000Z",
+      delivered_at: null,
+      failed_at: null,
+      updated_at: "2026-07-13T12:00:01.000Z",
+      error_code: null,
+      recipient_included: false,
+      rendered_content_included: false,
+    });
     expect(body.items[0]).not.toHaveProperty("owner");
     expect(body.items[0]).not.toHaveProperty("sla");
     expect(body.items[0]).not.toHaveProperty("review_state");
@@ -183,7 +222,70 @@ describe("Founder Command operator intake feed", () => {
     expect(body.items[0]).not.toHaveProperty("promotion");
     expect(JSON.stringify(body.transport)).not.toContain("operator@example.test");
     expect(JSON.stringify(body.transport)).not.toContain("Sanitized intake");
+    expect(JSON.stringify(body.items[0]?.acknowledgement_delivery)).not.toContain("operator@example.test");
     expect(db.statements.every((statement) => !/UPDATE\s+intake_outbox/i.test(statement.sql))).toBe(true);
+  });
+
+  it("down-negotiates feed and acknowledgement hashes for 2.0 and 2.1 consumers", async () => {
+    for (const legacyContract of COMPATIBLE_FEED_CONTRACTS.slice(0, 2)) {
+      const db = new MockD1().queueAll([feedRow]);
+      const headers = { ...AUTH_HEADERS, "x-hyperion-feed-contract": legacyContract };
+      const worker = createWorker({
+        now: () => new Date("2026-07-13T12:05:00.000Z"),
+        randomUUID: () => "12345678-1234-4234-8234-123456789abc",
+      });
+      const feedResponse = await worker.fetch(
+        new Request("https://hyperion-industries.dev/api/intake/operator/feed", { headers }),
+        operatorEnv(db),
+        executionContext().ctx,
+      );
+      const feed = await feedResponse.json<{
+        feed_contract: string;
+        latest_feed_contract: string;
+        items: Array<Record<string, unknown> & { payload_hash: string }>;
+      }>();
+
+      expect(feed.feed_contract).toBe(legacyContract);
+      expect(feed.latest_feed_contract).toBe(FEED_CONTRACT);
+      expect(feed.items[0]?.feed_contract).toBe(legacyContract);
+      expect(feed.items[0]).not.toHaveProperty("acknowledgement_delivery");
+
+      db.queueFirst(feedRow);
+      const acknowledgement = await worker.fetch(
+        postJson("/api/intake/operator/ack", {
+          deliveries: [{
+            outbox_id: feedRow.outbox_id,
+            revision_hash: feedRow.revision_hash,
+            payload_hash: feed.items[0]?.payload_hash,
+            local_receipt_id: `local_${legacyContract.endsWith("2.0") ? "20" : "21"}_123456`,
+            outcome: "received",
+            accepted_business_truth: false,
+          }],
+        }, headers),
+        operatorEnv(db),
+        executionContext().ctx,
+      );
+      expect(acknowledgement.status).toBe(200);
+      expect(await acknowledgement.json()).toMatchObject({
+        feed_contract: legacyContract,
+        latest_feed_contract: FEED_CONTRACT,
+        outbox_mutated: false,
+      });
+    }
+  });
+
+  it("rejects unsupported feed contract negotiation before reading D1", async () => {
+    const db = new MockD1();
+    const response = await createWorker().fetch(
+      new Request("https://hyperion-industries.dev/api/intake/operator/feed", {
+        headers: { ...AUTH_HEADERS, "x-hyperion-feed-contract": "hyperion.intake.operator-feed/9.9" },
+      }),
+      operatorEnv(db),
+      executionContext().ctx,
+    );
+    expect(response.status).toBe(400);
+    expect(await response.json()).toMatchObject({ error: { code: "unsupported_feed_contract" } });
+    expect(db.statements).toHaveLength(0);
   });
 
   it("keeps feed pages bounded by the contract limit", async () => {
@@ -235,6 +337,7 @@ describe("Founder Command operator intake feed", () => {
     }>();
     expect(response.status).toBe(200);
     expect(body.feed_contract).toBe(FEED_CONTRACT);
+    expect(body).toMatchObject({ compatible_feed_contracts: COMPATIBLE_FEED_CONTRACTS });
     expect(body.acknowledged).toEqual([{ outbox_id: feedRow.outbox_id, revision_hash: feedRow.revision_hash, local_receipt_id: "local_12345678", outcome: "received" }]);
     expect(body.outbox_mutated).toBe(false);
     expect(db.batches[0]?.some((statement) => statement.sql.includes("ON CONFLICT(consumer_id, outbox_id)"))).toBe(true);

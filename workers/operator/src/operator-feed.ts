@@ -4,7 +4,13 @@ import type { Env, RuntimeDependencies } from "./types";
 
 const MAX_FEED_LIMIT = 100;
 const ACK_MAX_BODY_BYTES = 64 * 1024;
-const OPERATOR_FEED_CONTRACT = "hyperion.intake.operator-feed/2.1";
+const OPERATOR_FEED_CONTRACT = "hyperion.intake.operator-feed/2.2";
+const COMPATIBLE_FEED_CONTRACTS = [
+  "hyperion.intake.operator-feed/2.0",
+  "hyperion.intake.operator-feed/2.1",
+  OPERATOR_FEED_CONTRACT,
+] as const;
+type FeedContract = typeof COMPATIBLE_FEED_CONTRACTS[number];
 const CONSUMER_PATTERN = /^[a-z0-9][a-z0-9._-]{2,63}$/i;
 const OUTBOX_PATTERN = /^out_[A-Za-z0-9_-]{12,64}$/;
 const RECEIPT_PATTERN = /^[A-Za-z0-9_-]{8,160}$/;
@@ -47,6 +53,16 @@ interface FeedRow {
   classification: string;
   decision_json: string;
   decision_created_at: string;
+  acknowledgement_template_version: string | null;
+  acknowledgement_content_hash: string | null;
+  acknowledgement_provider_reference: string | null;
+  acknowledgement_delivery_state: string | null;
+  acknowledgement_attempted_at: string | null;
+  acknowledgement_provider_accepted_at: string | null;
+  acknowledgement_delivered_at: string | null;
+  acknowledgement_failed_at: string | null;
+  acknowledgement_updated_at: string | null;
+  acknowledgement_error_code: string | null;
 }
 
 interface AckItem {
@@ -74,6 +90,7 @@ function feedTransportMetadata(): Record<string, unknown> {
     replay: "until_transport_acknowledged",
     ordering: ["created_at", "outbox_id"],
     max_page_items: MAX_FEED_LIMIT,
+    compatible_feed_contracts: COMPATIBLE_FEED_CONTRACTS,
   };
 }
 
@@ -85,6 +102,15 @@ function acknowledgementTransportMetadata(): Record<string, unknown> {
     source_outbox_mutation_allowed: false,
     business_review_state_included: false,
   };
+}
+
+function requestedFeedContract(request: Request): FeedContract {
+  const requested = request.headers.get("x-hyperion-feed-contract")?.trim();
+  if (!requested) return OPERATOR_FEED_CONTRACT;
+  if (!COMPATIBLE_FEED_CONTRACTS.includes(requested as FeedContract)) {
+    throw new HttpError(400, "unsupported_feed_contract", "Requested operator feed contract is not supported.");
+  }
+  return requested as FeedContract;
 }
 
 function requireDb(env: Env): D1Database {
@@ -109,6 +135,40 @@ function parseJson(value: string, fallback: unknown): unknown {
   } catch {
     return fallback;
   }
+}
+
+function bounded(value: string | null, maximum: number): string | null {
+  if (typeof value !== "string") return null;
+  const normalized = value.trim();
+  return normalized && normalized.length <= maximum ? normalized : null;
+}
+
+function acknowledgementDelivery(row: FeedRow): Record<string, unknown> {
+  const state = bounded(row.acknowledgement_delivery_state, 32);
+  if (!state || !["pending", "sent", "delivered", "bounced", "failed"].includes(state)) {
+    return {
+      scope: "deterministic_intake_receipt",
+      state: "not_recorded",
+      recipient_included: false,
+      rendered_content_included: false,
+    };
+  }
+  const contentHash = bounded(row.acknowledgement_content_hash, 64);
+  return {
+    scope: "deterministic_intake_receipt",
+    template_version: bounded(row.acknowledgement_template_version, 80),
+    content_hash: contentHash && HASH_PATTERN.test(contentHash) ? contentHash : null,
+    provider_reference: bounded(row.acknowledgement_provider_reference, 200),
+    state,
+    attempted_at: bounded(row.acknowledgement_attempted_at, 40),
+    provider_accepted_at: bounded(row.acknowledgement_provider_accepted_at, 40),
+    delivered_at: bounded(row.acknowledgement_delivered_at, 40),
+    failed_at: bounded(row.acknowledgement_failed_at, 40),
+    updated_at: bounded(row.acknowledgement_updated_at, 40),
+    error_code: bounded(row.acknowledgement_error_code, 80),
+    recipient_included: false,
+    rendered_content_included: false,
+  };
 }
 
 function bearer(request: Request): string {
@@ -171,11 +231,14 @@ function decodeCursor(value: string | null): [string, string] {
   }
 }
 
-async function envelope(row: FeedRow): Promise<Record<string, unknown>> {
+async function envelope(
+  row: FeedRow,
+  feedContract: FeedContract = OPERATOR_FEED_CONTRACT,
+): Promise<Record<string, unknown>> {
   const sourceLane = row.primary_route;
   const canonicalLane = sourceLane === "operator-identity" ? "identity" : sourceLane === "relationships" ? "relationship" : sourceLane;
   const body: Record<string, unknown> = {
-    feed_contract: OPERATOR_FEED_CONTRACT,
+    feed_contract: feedContract,
     outbox: {
       outbox_id: row.outbox_id,
       proposal_id: row.proposal_id,
@@ -230,6 +293,9 @@ async function envelope(row: FeedRow): Promise<Record<string, unknown>> {
       business_review_state_included: false,
     },
   };
+  if (feedContract === OPERATOR_FEED_CONTRACT) {
+    body.acknowledgement_delivery = acknowledgementDelivery(row);
+  }
   return { ...body, payload_hash: await sha256(JSON.stringify(stable(body))) };
 }
 
@@ -241,11 +307,22 @@ async function feedRows(db: D1Database, consumerId: string, cursor: [string, str
             s.trace_id, s.identity_json, s.answers_json, s.consents_json, s.client_context_json, s.receipt_json, s.expires_at,
             d.decision_id, d.input_revision_hash, d.policy_version, d.ruleset_version, d.agent_contract_version,
             d.analyzer_kind, d.analyzer_id, d.analyzer_version, d.minimized_projection_hash, d.proposal_state,
-            d.primary_route, d.classification,
-            d.decision_json, d.created_at AS decision_created_at
+             d.primary_route, d.classification,
+             d.decision_json, d.created_at AS decision_created_at,
+             a.template_version AS acknowledgement_template_version,
+             a.content_hash AS acknowledgement_content_hash,
+             a.provider_reference AS acknowledgement_provider_reference,
+             a.delivery_state AS acknowledgement_delivery_state,
+             a.attempted_at AS acknowledgement_attempted_at,
+             a.provider_accepted_at AS acknowledgement_provider_accepted_at,
+             a.delivered_at AS acknowledgement_delivered_at,
+             a.failed_at AS acknowledgement_failed_at,
+             a.updated_at AS acknowledgement_updated_at,
+             a.error_code AS acknowledgement_error_code
        FROM intake_outbox o
        JOIN intake_submissions s ON s.submission_id = o.submission_id
        JOIN intake_routing_decisions d ON d.submission_id = o.submission_id
+       LEFT JOIN intake_acknowledgement_deliveries a ON a.submission_id = o.submission_id
        LEFT JOIN intake_consumer_receipts r ON r.outbox_id = o.outbox_id AND r.consumer_id = ?
       WHERE o.state = 'held_for_review' AND r.outbox_id IS NULL
         AND (o.created_at > ? OR (o.created_at = ? AND o.outbox_id > ?))
@@ -257,6 +334,7 @@ async function feedRows(db: D1Database, consumerId: string, cursor: [string, str
 
 export async function handleOperatorStatus(request: Request, env: Env, deps: RuntimeDependencies): Promise<Response> {
   const authorization = await authorize(request, env, deps.now());
+  const feedContract = requestedFeedContract(request);
   const { consumerId } = authorization;
   const db = requireDb(env);
   const pending = await db.prepare(
@@ -265,7 +343,9 @@ export async function handleOperatorStatus(request: Request, env: Env, deps: Run
       WHERE o.state = 'held_for_review' AND r.outbox_id IS NULL`,
   ).bind(consumerId).first<{ count: number }>();
   return jsonResponse({
-    feed_contract: OPERATOR_FEED_CONTRACT,
+    feed_contract: feedContract,
+    latest_feed_contract: OPERATOR_FEED_CONTRACT,
+    compatible_feed_contracts: COMPATIBLE_FEED_CONTRACTS,
     service: "hyperion-site-intake",
     status: "ready",
     consumer_id: consumerId,
@@ -280,6 +360,7 @@ export async function handleOperatorStatus(request: Request, env: Env, deps: Run
 
 export async function handleOperatorFeed(request: Request, env: Env, deps: RuntimeDependencies): Promise<Response> {
   const authorization = await authorize(request, env, deps.now());
+  const feedContract = requestedFeedContract(request);
   const { consumerId } = authorization;
   const db = requireDb(env);
   const url = new URL(request.url);
@@ -288,10 +369,12 @@ export async function handleOperatorFeed(request: Request, env: Env, deps: Runti
     throw new HttpError(400, "invalid_limit", `Feed limit must be between 1 and ${MAX_FEED_LIMIT}.`);
   }
   const rows = await feedRows(db, consumerId, decodeCursor(url.searchParams.get("cursor")), requestedLimit);
-  const items = await Promise.all(rows.map(envelope));
+  const items = await Promise.all(rows.map((row) => envelope(row, feedContract)));
   const last = rows.at(-1);
   return jsonResponse({
-    feed_contract: OPERATOR_FEED_CONTRACT,
+    feed_contract: feedContract,
+    latest_feed_contract: OPERATOR_FEED_CONTRACT,
+    compatible_feed_contracts: COMPATIBLE_FEED_CONTRACTS,
     consumer_id: consumerId,
     key_id: authorization.keyId,
     key_version: authorization.keyVersion,
@@ -330,6 +413,7 @@ function parseAckItem(value: unknown): AckItem {
 
 export async function handleOperatorAck(request: Request, env: Env, deps: RuntimeDependencies): Promise<Response> {
   const authorization = await authorize(request, env, deps.now());
+  const feedContract = requestedFeedContract(request);
   const { consumerId } = authorization;
   const db = requireDb(env);
   const body = requireObject(await readJsonBody(request, ACK_MAX_BODY_BYTES));
@@ -348,17 +432,28 @@ export async function handleOperatorAck(request: Request, env: Env, deps: Runtim
               s.trace_id, s.identity_json, s.answers_json, s.consents_json, s.client_context_json, s.receipt_json, s.expires_at,
               d.decision_id, d.input_revision_hash, d.policy_version, d.ruleset_version, d.agent_contract_version,
               d.analyzer_kind, d.analyzer_id, d.analyzer_version, d.minimized_projection_hash, d.proposal_state,
-              d.primary_route, d.classification,
-              d.decision_json, d.created_at AS decision_created_at
+               d.primary_route, d.classification,
+               d.decision_json, d.created_at AS decision_created_at,
+               a.template_version AS acknowledgement_template_version,
+               a.content_hash AS acknowledgement_content_hash,
+               a.provider_reference AS acknowledgement_provider_reference,
+               a.delivery_state AS acknowledgement_delivery_state,
+               a.attempted_at AS acknowledgement_attempted_at,
+               a.provider_accepted_at AS acknowledgement_provider_accepted_at,
+               a.delivered_at AS acknowledgement_delivered_at,
+               a.failed_at AS acknowledgement_failed_at,
+               a.updated_at AS acknowledgement_updated_at,
+               a.error_code AS acknowledgement_error_code
          FROM intake_outbox o JOIN intake_submissions s ON s.submission_id = o.submission_id
          JOIN intake_routing_decisions d ON d.submission_id = o.submission_id
+         LEFT JOIN intake_acknowledgement_deliveries a ON a.submission_id = o.submission_id
         WHERE o.outbox_id = ? AND o.state = 'held_for_review' LIMIT 1`,
     ).bind(delivery.outbox_id).first<FeedRow>();
     if (!row) throw new HttpError(404, "delivery_not_found", "Delivery record was not found.");
     if (!constantTimeEqual(row.revision_hash, delivery.revision_hash)) {
       throw new HttpError(409, "revision_hash_conflict", "Delivery revision hash does not match.");
     }
-    const expected = String((await envelope(row)).payload_hash);
+    const expected = String((await envelope(row, feedContract)).payload_hash);
     if (!constantTimeEqual(expected, delivery.payload_hash)) throw new HttpError(409, "payload_hash_conflict", "Delivery payload hash does not match.");
     statements.push(
       db.prepare(
@@ -383,7 +478,9 @@ export async function handleOperatorAck(request: Request, env: Env, deps: Runtim
   }
   await db.batch(statements);
   return jsonResponse({
-    feed_contract: OPERATOR_FEED_CONTRACT,
+    feed_contract: feedContract,
+    latest_feed_contract: OPERATOR_FEED_CONTRACT,
+    compatible_feed_contracts: COMPATIBLE_FEED_CONTRACTS,
     acknowledged: deliveries.map((delivery) => ({
       outbox_id: delivery.outbox_id,
       revision_hash: delivery.revision_hash,

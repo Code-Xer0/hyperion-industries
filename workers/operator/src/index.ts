@@ -1,6 +1,7 @@
 import { handleChat } from "./chat";
 import { browserCorsOrigin, enforceSameOrigin, errorResponse, finalizeResponse, HttpError, jsonResponse } from "./http";
 import { handleInquiry, purgeExpiredInquiries } from "./inquiries";
+import { handleResendWebhook } from "./intake-acknowledgement";
 import {
   handleDraft,
   handleIntakeEvaluate,
@@ -24,6 +25,7 @@ const ROUTES = new Map([
   ["/api/intake/resume/request", "POST"],
   ["/api/intake/resume/exchange", "POST"],
   ["/api/intake/submissions", "POST"],
+  ["/api/intake/webhooks/resend", "POST"],
   ["/api/intake/operator/status", "GET"],
   ["/api/intake/operator/feed", "GET"],
   ["/api/intake/operator/ack", "POST"],
@@ -88,7 +90,10 @@ export function createWorker(overrides: Partial<RuntimeDependencies> = {}): Oper
         }
 
         const operatorFeedRoute = url.pathname.startsWith("/api/intake/operator/");
-        if (["POST", "PUT", "DELETE"].includes(request.method) && !operatorFeedRoute) enforceSameOrigin(request, env);
+        const providerWebhookRoute = url.pathname === "/api/intake/webhooks/resend";
+        if (["POST", "PUT", "DELETE"].includes(request.method) && !operatorFeedRoute && !providerWebhookRoute) {
+          enforceSameOrigin(request, env);
+        }
 
         if (draftMatch) response = await handleDraft(request, env, draftMatch[1] ?? "", deps);
         else if (url.pathname === "/api/operator/status") response = handleStatus(env);
@@ -101,6 +106,7 @@ export function createWorker(overrides: Partial<RuntimeDependencies> = {}): Oper
         else if (url.pathname === "/api/intake/evaluate") response = await handleIntakeEvaluate(request);
         else if (url.pathname === "/api/intake/resume/request") response = await handleResumeRequest(request, env, requestId, deps);
         else if (url.pathname === "/api/intake/resume/exchange") response = await handleResumeExchange(request, env, deps);
+        else if (url.pathname === "/api/intake/webhooks/resend") response = await handleResendWebhook(request, env, deps);
         else response = await handleSubmission(request, env, requestId, deps);
       } catch (error) {
         if (error instanceof HttpError) {

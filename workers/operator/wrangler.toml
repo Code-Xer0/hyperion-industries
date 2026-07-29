@@ -13,6 +13,7 @@ INQUIRY_NOTIFY_TO = "hello@hyperion-industries.dev"
 INQUIRY_FROM_EMAIL = "operator@hyperion-industries.dev"
 INQUIRY_CONSENT_VERSION = "2026-07-13"
 INTAKE_RESUME_FROM = "signal@intake.hyperion-industries.dev"
+INTAKE_ACKNOWLEDGEMENT_FROM = "signal@intake.hyperion-industries.dev"
 INTAKE_COOKIE_NAME = "hyperion_resume"
 FOUNDER_COMMAND_PULL_KEY_ID = "fc-intake-v1"
 
@@ -73,6 +74,7 @@ namespace_id = "41005"
 
 # Add OPENROUTER_API_KEY with `wrangler secret put OPENROUTER_API_KEY`.
 # Add RESEND_API_KEY with `wrangler secret put RESEND_API_KEY`; never place it in this file.
+# Add RESEND_WEBHOOK_SIGNING_SECRET with `wrangler secret put RESEND_WEBHOOK_SIGNING_SECRET`.
 # Add FOUNDER_COMMAND_PULL_TOKEN_SHA256 with `wrangler secret put FOUNDER_COMMAND_PULL_TOKEN_SHA256`.
 # During rotation, add FOUNDER_COMMAND_PULL_PREVIOUS_TOKEN_SHA256 as a secret and set
 # FOUNDER_COMMAND_PULL_PREVIOUS_UNTIL to a bounded ISO-8601 overlap deadline.
