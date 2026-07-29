@@ -87,15 +87,38 @@ function textElement(id, text, x, y, width, height, fontToken, color) {
   };
 }
 
+function assetElement(layer) {
+  return {
+    id: `el_${layer.id.replace(/^layer_/, '').slice(0, 54)}`,
+    kind: 'asset',
+    x: layer.x,
+    y: layer.y,
+    width: layer.width,
+    height: layer.height,
+    locked: layer.locked,
+    asset_ref: layer.artifact_id,
+  };
+}
+
 export function buildWorkerDesignDocument(document, projectId, productSku, options = {}) {
   const now = options.now || new Date().toISOString();
   const revision = options.revision || 1;
   const preflight = evaluateCardPreflight(document);
   const warningTokens = preflight.warnings.map((_, index) => `client_warning_${index + 1}`);
   const visibleLinks = [{ label: 'Profile', url: document.sharing.destination }];
-  const ink = document.template_id === 'ivory' || document.template_id === 'atelier' || document.template_id === 'verdant'
-    ? '#171717'
-    : '#F5F5F2';
+  const ink = document.style.ink;
+  const layerByKind = (side, kind) => document.layers.find((layer) => layer.side === side && layer.kind === kind && layer.visible);
+  const frontIdentity = layerByKind('front', 'identity') || { x: 0.08, y: 0.2, width: 0.72, height: 0.34, locked: true };
+  const frontContact = layerByKind('front', 'contact');
+  const backProfile = layerByKind('back', 'profile') || { x: 0.08, y: 0.2, width: 0.5, height: 0.34, locked: true };
+  const backQr = layerByKind('back', 'qr');
+  const artifacts = document.layers.filter((layer) => layer.visible && layer.kind === 'artifact');
+  const artifactElements = (side) => artifacts.filter((layer) => layer.side === side).map(assetElement);
+  const contactText = [
+    document.visibility.email ? document.contact.email : '',
+    document.visibility.phone ? document.contact.phone : '',
+    document.visibility.website ? document.contact.website : '',
+  ].filter(Boolean).join(' · ');
 
   return {
     contract_version: 'card-design-document/1',
@@ -107,28 +130,33 @@ export function buildWorkerDesignDocument(document, projectId, productSku, optio
     artboards: [
       {
         side: 'front',
-        background: document.style.accent,
+        background: document.style.surface,
         elements: [
-          textElement('name', document.identity.name, 0.08, 0.2, 0.72, 0.16, document.style.typography, ink),
-          textElement('role', document.identity.role, 0.08, 0.42, 0.72, 0.1, document.style.typography, ink),
-          textElement('organization', document.identity.organization, 0.08, 0.57, 0.72, 0.1, document.style.typography, ink),
+          ...artifactElements('front'),
+          textElement('name', document.identity.name, frontIdentity.x, frontIdentity.y, frontIdentity.width, Math.max(0.08, frontIdentity.height * 0.42), document.style.typography, ink),
+          textElement('role', document.identity.role, frontIdentity.x, Math.min(0.94, frontIdentity.y + frontIdentity.height * 0.48), frontIdentity.width, Math.max(0.05, frontIdentity.height * 0.22), document.style.typography, ink),
+          textElement('organization', document.identity.organization, frontIdentity.x, Math.min(0.94, frontIdentity.y + frontIdentity.height * 0.75), frontIdentity.width, Math.max(0.05, frontIdentity.height * 0.2), document.style.typography, ink),
+          ...(frontContact && contactText ? [
+            textElement('contact', contactText, frontContact.x, frontContact.y, frontContact.width, frontContact.height, 'technical', ink),
+          ] : []),
         ],
       },
       {
         side: 'back',
-        background: document.style.accent,
+        background: document.style.surface,
         elements: [
-          {
+          ...artifactElements('back'),
+          ...(backQr ? [{
             id: 'el_profile_qr',
             kind: 'qr',
-            x: 0.66,
-            y: 0.25,
-            width: 0.24,
-            height: 0.4,
-            locked: true,
+            x: backQr.x,
+            y: backQr.y,
+            width: backQr.width,
+            height: backQr.height,
+            locked: backQr.locked,
             destination_ref: `dst_${stableFingerprint(document).replaceAll('-', '').slice(-12)}`,
-          },
-          textElement('destination', document.sharing.destination, 0.08, 0.62, 0.5, 0.12, 'technical', ink),
+          }] : []),
+          textElement('destination', document.sharing.destination, backProfile.x, Math.min(0.9, backProfile.y + backProfile.height * 0.72), backProfile.width, Math.max(0.05, backProfile.height * 0.24), 'technical', ink),
         ],
       },
     ],
@@ -138,11 +166,11 @@ export function buildWorkerDesignDocument(document, projectId, productSku, optio
       visibility: 'unlisted',
       links: visibleLinks,
     },
-    asset_refs: [],
+    asset_refs: [...new Set(artifacts.map((layer) => layer.artifact_id))].slice(0, 16),
     preflight: {
       state: preflight.blockers.length ? 'failed' : warningTokens.length ? 'warnings' : 'passed',
       warnings: warningTokens,
-      renderer_version: 'public-card-studio.1',
+      renderer_version: 'public-card-studio.2',
     },
     updated_at: now,
   };

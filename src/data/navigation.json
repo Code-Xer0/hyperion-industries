@@ -31,6 +31,7 @@
       { "label": "Contact", "path": "/contact" },
       { "label": "Alignment", "path": "/alignment" },
       { "label": "Card Studio", "path": "/card-studio" },
+      { "label": "Other Inquiry", "path": "/intake" },
       { "label": "Gallery", "path": "/gallery" },
       { "label": "Dev Diary", "path": "/dev-diary" },
       { "label": "Store", "path": "/store", "note": "Staged" }

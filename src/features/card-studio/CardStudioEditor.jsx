@@ -1,37 +1,59 @@
 import {
-  Check,
+  ArrowLeft,
   ChevronRight,
   CircleAlert,
   Eye,
   EyeOff,
-  History,
-  PanelTop,
+  Grip,
+  Layers3,
+  Lock,
+  Maximize2,
   Redo2,
   RotateCcw,
   Save,
   Send,
   ShieldCheck,
   Smartphone,
+  Trash2,
   Undo2,
+  Unlock,
 } from 'lucide-react';
 import {
   useCallback,
   useEffect,
   useMemo,
   useReducer,
+  useRef,
   useState,
 } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { CARD_CATALOG } from '../../../shared/card-studio/catalog.ts';
 import {
-  CARD_STUDIO_STORAGE_KEY,
+  CARD_ARTIFACT_CATALOG,
+  CARD_ARTIFACT_BY_ID,
+} from '../../../shared/card-studio/studio-catalog.js';
+import {
   CARD_TEMPLATES,
   TYPE_OPTIONS,
+  addArtifactLayer,
+  alignLayer,
+  applyCardTemplate,
   createCardDocument,
   evaluateCardPreflight,
   normalizeCardDocument,
+  removeLayer,
+  reorderLayer,
   stableFingerprint,
   updateDocumentPath,
+  updateLayer,
 } from './cardStudioModel.js';
+import {
+  createDraft,
+  getActiveDraft,
+  readDraftShelf,
+  saveDraft,
+  writeDraftShelf,
+} from './cardStudioDrafts.js';
 import { getCardStudioOrderStatus, submitCardStudioBrief } from './cardStudioSubmission.js';
 import './CardStudioEditor.css';
 
@@ -41,73 +63,61 @@ const CONTROL_SECTIONS = [
   { id: 'style', label: 'Style' },
   { id: 'sharing', label: 'Sharing' },
 ];
+const HISTORY_LIMIT = 60;
 
-const HISTORY_LIMIT = 40;
-
-function loadLocalDraft() {
-  try {
-    const raw = localStorage.getItem(CARD_STUDIO_STORAGE_KEY);
-    if (!raw) return { document: createCardDocument(), recovered: false };
-    return { document: normalizeCardDocument(JSON.parse(raw)), recovered: true };
-  } catch {
-    return { document: createCardDocument(), recovered: false };
+function initialDocument(starterId, requestedDraftId) {
+  let shelf = readDraftShelf();
+  let document = shelf.drafts.find((draft) => draft.draft_id === requestedDraftId);
+  if (!document && requestedDraftId) document = getActiveDraft(shelf);
+  if (!document && !requestedDraftId && shelf.active_draft_id) document = getActiveDraft(shelf);
+  if (!document || (starterId && document.starter_id !== starterId)) {
+    try {
+      const result = createDraft(shelf, starterId || 'ivory');
+      shelf = result.shelf;
+      document = result.draft;
+      writeDraftShelf(shelf);
+    } catch {
+      document = getActiveDraft(shelf) || createCardDocument(starterId || 'ivory');
+    }
   }
+  return { shelf, document: normalizeCardDocument(document), recovered: Boolean(document) };
 }
 
 function editorReducer(state, action) {
   if (action.type === 'UNDO' && state.past.length) {
-    const previous = state.past.at(-1);
     return {
+      ...state,
       past: state.past.slice(0, -1),
-      present: previous,
+      present: state.past.at(-1),
       future: [state.present, ...state.future].slice(0, HISTORY_LIMIT),
-      recovered: state.recovered,
     };
   }
   if (action.type === 'REDO' && state.future.length) {
-    const [next, ...future] = state.future;
     return {
+      ...state,
       past: [...state.past, state.present].slice(-HISTORY_LIMIT),
-      present: next,
-      future,
-      recovered: state.recovered,
+      present: state.future[0],
+      future: state.future.slice(1),
+    };
+  }
+  if (action.type === 'APPLY') {
+    if (action.document === state.present) return state;
+    return {
+      ...state,
+      past: [...state.past, state.present].slice(-HISTORY_LIMIT),
+      present: normalizeCardDocument(action.document),
+      future: [],
     };
   }
   if (action.type === 'RESET') {
     return {
+      ...state,
       past: [...state.past, state.present].slice(-HISTORY_LIMIT),
-      present: createCardDocument(),
+      present: createCardDocument(state.present.starter_id),
       future: [],
-      recovered: false,
-    };
-  }
-  if (action.type === 'SET') {
-    const next = updateDocumentPath(state.present, action.section, action.key, action.value);
-    return {
-      past: [...state.past, state.present].slice(-HISTORY_LIMIT),
-      present: next,
-      future: [],
-      recovered: state.recovered,
-    };
-  }
-  if (action.type === 'TEMPLATE') {
-    const template = CARD_TEMPLATES.find((candidate) => candidate.id === action.value);
-    if (!template || template.id === state.present.template_id) return state;
-    const next = updateDocumentPath(state.present, 'template_id', null, template.id);
-    next.style.accent = template.tone;
-    return {
-      past: [...state.past, state.present].slice(-HISTORY_LIMIT),
-      present: next,
-      future: [],
-      recovered: state.recovered,
     };
   }
   return state;
-}
-
-function initialEditorState() {
-  const loaded = loadLocalDraft();
-  return { past: [], present: loaded.document, future: [], recovered: loaded.recovered };
 }
 
 function Field({ label, hint, children }) {
@@ -123,24 +133,14 @@ function Field({ label, hint, children }) {
 function TextInput({ label, value, onChange, maxLength = 80, type = 'text', hint }) {
   return (
     <Field label={label} hint={hint}>
-      <input
-        type={type}
-        value={value}
-        maxLength={maxLength}
-        onChange={(event) => onChange(event.target.value)}
-      />
+      <input type={type} value={value} maxLength={maxLength} onChange={(event) => onChange(event.target.value)} />
     </Field>
   );
 }
 
 function VisibilityToggle({ label, checked, onChange }) {
   return (
-    <button
-      className="hcs-visibility-toggle"
-      type="button"
-      aria-pressed={checked}
-      onClick={() => onChange(!checked)}
-    >
+    <button className="hcs-visibility-toggle" type="button" aria-pressed={checked} onClick={() => onChange(!checked)}>
       {checked ? <Eye size={15} /> : <EyeOff size={15} />}
       <span>{label}</span>
       <strong>{checked ? 'VISIBLE' : 'HIDDEN'}</strong>
@@ -155,15 +155,12 @@ function QrPattern({ seed }) {
     return Array.from({ length: 81 }, (_, index) => {
       const row = Math.floor(index / 9);
       const column = index % 9;
-      const finder = (row < 3 && column < 3)
-        || (row < 3 && column > 5)
-        || (row > 5 && column < 3);
+      const finder = (row < 3 && column < 3) || (row < 3 && column > 5) || (row > 5 && column < 3);
       if (finder) return row % 2 === 0 || column % 2 === 0;
       hash = Math.imul(hash ^ index, 1103515245) + 12345;
       return (hash & 4) === 4;
     });
   }, [seed]);
-
   return (
     <div className="hcs-qr" role="img" aria-label="Illustrative QR placement; production code is generated after review">
       {cells.map((active, index) => <i key={index} data-active={active ? 'true' : 'false'} />)}
@@ -174,69 +171,170 @@ function QrPattern({ seed }) {
 function ContactRows({ document }) {
   return (
     <div className="hcs-card-contacts">
-      {document.visibility.email && <span>{document.contact.email || 'EMAIL HIDDEN'}</span>}
-      {document.visibility.phone && <span>{document.contact.phone || 'PHONE HIDDEN'}</span>}
-      {document.visibility.website && <span>{document.contact.website || 'WEBSITE HIDDEN'}</span>}
+      {document.visibility.email && <span>{document.contact.email}</span>}
+      {document.visibility.phone && <span>{document.contact.phone}</span>}
+      {document.visibility.website && <span>{document.contact.website}</span>}
     </div>
   );
 }
 
-function PhysicalCard({ document, overlays }) {
-  const template = CARD_TEMPLATES.find((item) => item.id === document.template_id) || CARD_TEMPLATES[0];
-  const typography = TYPE_OPTIONS.find((item) => item.id === document.style.typography) || TYPE_OPTIONS[0];
-  const style = {
-    '--hcs-card-accent': document.style.accent,
-    '--hcs-card-surface': template.surface,
-    '--hcs-card-ink': template.ink,
-    '--hcs-card-font': typography.stack,
-    '--hcs-card-space': `${Math.max(18, document.style.spacing) / 100}rem`,
+function ArtifactVisual({ layer }) {
+  const artifact = CARD_ARTIFACT_BY_ID.get(layer.artifact_id);
+  if (!artifact) return <span className="hcs-artifact-unknown">UNKNOWN</span>;
+  if (artifact.kind === 'surface') return <span className={`hcs-artifact-surface is-${artifact.renderer_token.split('.')[1]}`} />;
+  if (artifact.kind === 'divider') return <span className={`hcs-artifact-divider is-${artifact.renderer_token.split('.')[1]}`} />;
+  if (artifact.kind === 'mark') return <span className={`hcs-artifact-mark is-${artifact.renderer_token.split('.')[1]}`}>H</span>;
+  if (artifact.kind === 'badge') return <span className="hcs-artifact-badge">{artifact.name}</span>;
+  if (artifact.kind === 'qr-frame') return <span className="hcs-artifact-frame">QR</span>;
+  if (artifact.kind === 'nfc-frame') return <span className="hcs-artifact-nfc">)))</span>;
+  return <span className="hcs-artifact-layout">{artifact.name}</span>;
+}
+
+function SemanticVisual({ layer, document }) {
+  if (layer.kind === 'identity') {
+    return (
+      <div className="hcs-canvas-identity">
+        <span>{document.identity.initials}</span>
+        <strong>{document.identity.name}</strong>
+        <small>{document.identity.role}</small>
+        {document.visibility.tagline && <q>{document.identity.tagline}</q>}
+      </div>
+    );
+  }
+  if (layer.kind === 'contact') return <ContactRows document={document} />;
+  if (layer.kind === 'profile') {
+    return <div className="hcs-canvas-profile"><small>PUBLIC PROFILE</small><strong>{document.identity.name}</strong><span>{document.sharing.destination}</span></div>;
+  }
+  if (layer.kind === 'qr') return <QrPattern seed={document.sharing.destination || document.identity.name} />;
+  return null;
+}
+
+function CanvasLayer({ layer, document, selected, disabled, gestureBounds, onSelect, onCommit }) {
+  const [gesture, setGesture] = useState(null);
+  const gestureRef = useRef(null);
+  const writeGesture = (nextGesture) => {
+    gestureRef.current = nextGesture;
+    setGesture(nextGesture);
   };
-  const mode = document.active_mode === 'digital' ? 'front' : document.active_mode;
+  const live = gesture?.bounds || gestureBounds || layer;
+  const pointerStart = (event, mode) => {
+    if (disabled || layer.locked) return;
+    event.preventDefault();
+    event.stopPropagation();
+    onSelect(layer.id);
+    const parent = event.currentTarget.closest('.hcs-artboard');
+    const rect = parent?.getBoundingClientRect();
+    if (!rect) return;
+    try {
+      event.currentTarget.setPointerCapture?.(event.pointerId);
+    } catch {
+      // Some embedded/touch runtimes reject capture even though pointer events
+      // continue. Geometry state must still start so the bounded drag works.
+    }
+    writeGesture({
+      mode,
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      origin: { x: layer.x, y: layer.y, width: layer.width, height: layer.height },
+      rect,
+      bounds: { x: layer.x, y: layer.y, width: layer.width, height: layer.height },
+    });
+  };
+  const pointerMove = (event) => {
+    const currentGesture = gestureRef.current;
+    if (!currentGesture || event.pointerId !== currentGesture.pointerId) return;
+    const dx = (event.clientX - currentGesture.startX) / currentGesture.rect.width;
+    const dy = (event.clientY - currentGesture.startY) / currentGesture.rect.height;
+    const bounds = currentGesture.mode === 'resize'
+      ? {
+        ...currentGesture.origin,
+        width: Math.min(1 - currentGesture.origin.x, Math.max(0.04, currentGesture.origin.width + dx)),
+        height: Math.min(1 - currentGesture.origin.y, Math.max(0.04, currentGesture.origin.height + dy)),
+      }
+      : {
+        ...currentGesture.origin,
+        x: Math.min(1 - currentGesture.origin.width, Math.max(0, currentGesture.origin.x + dx)),
+        y: Math.min(1 - currentGesture.origin.height, Math.max(0, currentGesture.origin.y + dy)),
+      };
+    writeGesture({ ...currentGesture, bounds });
+  };
+  const pointerEnd = (event) => {
+    const currentGesture = gestureRef.current;
+    if (!currentGesture || event.pointerId !== currentGesture.pointerId) return;
+    onCommit(layer.id, currentGesture.bounds);
+    writeGesture(null);
+  };
+  const keyboardNudge = (event) => {
+    if (disabled || layer.locked || !['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'].includes(event.key)) return;
+    event.preventDefault();
+    const amount = event.shiftKey ? 0.05 : 0.01;
+    const patch = {};
+    if (event.key === 'ArrowLeft') patch.x = Math.max(0, layer.x - amount);
+    if (event.key === 'ArrowRight') patch.x = Math.min(1 - layer.width, layer.x + amount);
+    if (event.key === 'ArrowUp') patch.y = Math.max(0, layer.y - amount);
+    if (event.key === 'ArrowDown') patch.y = Math.min(1 - layer.height, layer.y + amount);
+    onCommit(layer.id, patch);
+  };
 
   return (
     <div
-      className={`hcs-proof-card is-${mode}`}
-      data-template={document.template_id}
-      style={style}
-      aria-label={`${template.name} card ${mode} proof`}
+      className={`hcs-canvas-layer is-${layer.kind}${selected ? ' is-selected' : ''}${layer.locked ? ' is-locked' : ''}`}
+      data-artifact-kind={layer.kind === 'artifact' ? CARD_ARTIFACT_BY_ID.get(layer.artifact_id)?.kind : undefined}
+      style={{ left: `${live.x * 100}%`, top: `${live.y * 100}%`, width: `${live.width * 100}%`, height: `${live.height * 100}%` }}
+      role="button"
+      tabIndex={disabled ? -1 : 0}
+      aria-label={`${layer.label} layer${layer.locked ? ', locked' : ''}. Use arrow keys to move.`}
+      aria-pressed={selected}
+      onFocus={() => onSelect(layer.id)}
+      onPointerDown={(event) => pointerStart(event, 'move')}
+      onPointerMove={pointerMove}
+      onPointerUp={pointerEnd}
+      onPointerCancel={pointerEnd}
+      onKeyDown={keyboardNudge}
     >
-      {overlays.bleed && <div className="hcs-bleed-guide" aria-hidden="true"><span>BLEED</span></div>}
-      {overlays.safe && <div className="hcs-safe-guide" aria-hidden="true"><span>SAFE AREA</span></div>}
-      <div className="hcs-card-topline">
-        <span>{document.identity.organization || 'YOUR ORGANIZATION'}</span>
-        <span>{document.template_id.toUpperCase()} · R{String(document.revision).padStart(2, '0')}</span>
-      </div>
-
-      {mode === 'front' ? (
-        <>
-          <div className="hcs-card-identity">
-            <span className="hcs-card-initials">{document.identity.initials || 'ID'}</span>
-            <h2>{document.identity.name || 'Your name'}</h2>
-            <p>{document.identity.role || 'Your role'}</p>
-            {document.visibility.tagline && <q>{document.identity.tagline || 'Your signal, made tangible.'}</q>}
-          </div>
-          <ContactRows document={document} />
-          <div className="hcs-card-footer">
-            <span className="hcs-card-mark">HYPERION</span>
-            <span>NFC + QR · REVIEW REQUIRED</span>
-          </div>
-        </>
-      ) : (
-        <>
-          <div className="hcs-card-back">
-            <div>
-              <span className="hcs-card-back-label">PUBLIC PROFILE</span>
-              <h2>{document.identity.name || 'Your name'}</h2>
-              <p>{document.sharing.destination || 'Add a destination'}</p>
-            </div>
-            <QrPattern seed={document.sharing.destination || document.identity.name} />
-          </div>
-          <div className="hcs-card-footer">
-            <span className="hcs-card-mark">HYPERION</span>
-            <span>PROOF · NOT PRODUCTION ART</span>
-          </div>
-        </>
+      {layer.kind === 'artifact' ? <ArtifactVisual layer={layer} /> : <SemanticVisual layer={layer} document={document} />}
+      {selected && !disabled && !layer.locked && (
+        <span
+          className="hcs-resize-handle"
+          aria-hidden="true"
+          onPointerDown={(event) => pointerStart(event, 'resize')}
+          onPointerMove={pointerMove}
+          onPointerUp={pointerEnd}
+          onPointerCancel={pointerEnd}
+        />
       )}
+    </div>
+  );
+}
+
+function Artboard({ document, side, selectedLayerId, editing, overlays, onSelect, onCommit }) {
+  const layers = document.layers.filter((layer) => layer.side === side && layer.visible);
+  return (
+    <div
+      className={`hcs-artboard is-${side}`}
+      style={{
+        '--hcs-card-accent': document.style.accent,
+        '--hcs-card-surface': document.style.surface,
+        '--hcs-card-ink': document.style.ink,
+        '--hcs-card-font': TYPE_OPTIONS.find((item) => item.id === document.style.typography)?.stack,
+      }}
+      aria-label={`${side} card artboard`}
+    >
+      {overlays.bleed && <div className="hcs-bleed-guide"><span>BLEED</span></div>}
+      {overlays.safe && <div className="hcs-safe-guide"><span>SAFE</span></div>}
+      {layers.map((layer) => (
+        <CanvasLayer
+          key={layer.id}
+          layer={layer}
+          document={document}
+          selected={selectedLayerId === layer.id}
+          disabled={!editing}
+          onSelect={onSelect}
+          onCommit={onCommit}
+        />
+      ))}
+      <div className="hcs-card-signature">HYPERION · {side.toUpperCase()} · NOT PRODUCTION ART</div>
     </div>
   );
 }
@@ -246,44 +344,20 @@ function DigitalProfile({ document }) {
     <div className="hcs-phone" aria-label="Digital profile preview">
       <div className="hcs-phone-status"><span>9:41</span><span>PROFILE PREVIEW</span></div>
       <div className="hcs-profile-hero" style={{ '--hcs-card-accent': document.style.accent }}>
-        <span className="hcs-profile-avatar">{document.identity.initials || 'ID'}</span>
-        <p className="hcs-profile-eyebrow">{document.identity.organization || 'YOUR ORGANIZATION'}</p>
-        <h2>{document.identity.name || 'Your name'}</h2>
-        <p>{document.identity.role || 'Your role'}</p>
+        <span className="hcs-profile-avatar">{document.identity.initials}</span>
+        <p>{document.identity.organization}</p>
+        <h2>{document.identity.name}</h2>
+        <p>{document.identity.role}</p>
         {document.visibility.tagline && <q>{document.identity.tagline}</q>}
       </div>
-      <div className="hcs-profile-actions">
-        <button type="button" disabled>Save contact</button>
-        <button type="button" disabled>Share profile</button>
-      </div>
+      <div className="hcs-profile-actions"><button type="button" disabled>Save contact</button><button type="button" disabled>Share profile</button></div>
       <ContactRows document={document} />
-      <div className="hcs-profile-truth">Preview only · profile publishing is operator reviewed</div>
+      <div className="hcs-profile-truth">Preview only · publishing requires operator review</div>
     </div>
   );
 }
 
-function TemplateRail({ selected, onSelect }) {
-  return (
-    <div className="hcs-template-grid" role="list" aria-label="Card templates">
-      {CARD_TEMPLATES.map((template) => (
-        <button
-          key={template.id}
-          className="hcs-template"
-          data-selected={selected === template.id ? 'true' : 'false'}
-          type="button"
-          role="listitem"
-          onClick={() => onSelect(template.id)}
-        >
-          <span className="hcs-template-swatch" style={{ '--template-tone': template.tone, '--template-surface': template.surface }} />
-          <span><strong>{template.name}</strong><small>{template.lane}</small></span>
-          {selected === template.id && <Check size={14} aria-hidden="true" />}
-        </button>
-      ))}
-    </div>
-  );
-}
-
-function ControlPanel({ section, document, setField }) {
+function BasicControls({ section, document, setField, setTemplate }) {
   if (section === 'identity') {
     return (
       <div className="hcs-control-stack">
@@ -296,7 +370,6 @@ function ControlPanel({ section, document, setField }) {
       </div>
     );
   }
-
   if (section === 'contact') {
     return (
       <div className="hcs-control-stack">
@@ -309,145 +382,195 @@ function ControlPanel({ section, document, setField }) {
       </div>
     );
   }
-
   if (section === 'style') {
     return (
       <div className="hcs-control-stack">
-        <Field label="Accent color" hint="Used for proof emphasis; production gamut is reviewed later.">
-          <div className="hcs-color-control">
-            <input
-              type="color"
-              value={document.style.accent}
-              onChange={(event) => setField('style', 'accent', event.target.value)}
-              aria-label="Accent color picker"
-            />
-            <input
-              type="text"
-              value={document.style.accent}
-              maxLength={7}
-              pattern="#[0-9a-fA-F]{6}"
-              onChange={(event) => setField('style', 'accent', event.target.value)}
-              aria-label="Accent color hexadecimal value"
-            />
-          </div>
+        <Field label="Template">
+          <select value={document.template_id} onChange={(event) => setTemplate(event.target.value)}>
+            {CARD_TEMPLATES.map((item) => <option key={item.id} value={item.id}>{item.name} · {item.lane}</option>)}
+          </select>
         </Field>
         <Field label="Typography">
           <select value={document.style.typography} onChange={(event) => setField('style', 'typography', event.target.value)}>
-            {TYPE_OPTIONS.map((option) => <option key={option.id} value={option.id}>{option.label}</option>)}
+            {TYPE_OPTIONS.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
           </select>
         </Field>
-        <Field label={`Spacing · ${document.style.spacing}%`} hint="Dense layouts receive an additional preflight warning.">
-          <input
-            type="range"
-            min="10"
-            max="100"
-            step="5"
-            value={document.style.spacing}
-            onChange={(event) => setField('style', 'spacing', Number(event.target.value))}
-          />
+        <Field label="Accent">
+          <input type="color" value={document.style.accent} onChange={(event) => setField('style', 'accent', event.target.value.toUpperCase())} />
+        </Field>
+        <Field label={`Spacing · ${document.style.spacing}`}>
+          <input type="range" min="18" max="82" value={document.style.spacing} onChange={(event) => setField('style', 'spacing', Number(event.target.value))} />
         </Field>
       </div>
     );
   }
-
   return (
     <div className="hcs-control-stack">
-      <TextInput
-        label="Profile handle"
-        value={document.sharing.profile_path}
-        maxLength={48}
-        hint="Reserved only after operator review."
-        onChange={(value) => setField('sharing', 'profile_path', value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
-      />
-      <TextInput
-        label="Tap / scan destination"
-        type="url"
-        value={document.sharing.destination}
-        maxLength={240}
-        hint="Must use HTTPS. This preview does not program an NFC chip."
-        onChange={(value) => setField('sharing', 'destination', value)}
-      />
-      <Field label="Review notes" hint="Describe finish, quantity, constraints, or requested changes.">
-        <textarea
-          value={document.notes}
-          rows="6"
-          maxLength={1200}
-          onChange={(event) => setField('notes', null, event.target.value)}
-        />
+      <TextInput label="Profile path" value={document.sharing.profile_path} maxLength={80} onChange={(value) => setField('sharing', 'profile_path', value)} />
+      <TextInput label="Destination" type="url" value={document.sharing.destination} maxLength={240} onChange={(value) => setField('sharing', 'destination', value)} />
+      <Field label="Production notes" hint="No secrets, passwords, payment data, or medical records.">
+        <textarea value={document.notes} maxLength={1200} onChange={(event) => setField('notes', null, event.target.value)} />
       </Field>
     </div>
   );
 }
 
+function LayerPanel({ document, apply, setSelected }) {
+  const side = document.active_mode === 'back' ? 'back' : 'front';
+  const layers = document.layers.filter((layer) => layer.side === side);
+  const selected = document.layers.find((layer) => layer.id === document.selected_layer_id);
+  const firstPlaceablePack = CARD_ARTIFACT_CATALOG.packs.find((candidate) => (
+    CARD_ARTIFACT_CATALOG.items.some((item) => item.pack === candidate.id && item.kind !== 'palette')
+  ));
+  const [pack, setPack] = useState(firstPlaceablePack?.id ?? CARD_ARTIFACT_CATALOG.packs[0].id);
+  const compatible = CARD_ARTIFACT_CATALOG.items.filter((item) => (
+    item.pack === pack && item.kind !== 'palette' && item.compatible_sides.includes(side)
+  ));
+  const mutateSelected = (callback) => selected && apply(callback(document, selected.id));
+
+  return (
+    <div className="hcs-advanced-panel">
+      <div className="hcs-layer-head"><span>Layers · {side}</span><small>{layers.length}/64</small></div>
+      <div className="hcs-layer-list" role="list" aria-label={`${side} artboard layers`}>
+        {[...layers].reverse().map((layer) => (
+          <button
+            key={layer.id}
+            type="button"
+            role="listitem"
+            className={document.selected_layer_id === layer.id ? 'is-selected' : ''}
+            onClick={() => setSelected(layer.id)}
+          >
+            <Grip size={13} />
+            <span>{layer.label}</span>
+            {layer.locked ? <Lock size={12} /> : null}
+            {layer.visible ? <Eye size={12} /> : <EyeOff size={12} />}
+          </button>
+        ))}
+      </div>
+      {selected && selected.side === side && (
+        <div className="hcs-layer-tools" aria-label="Selected layer controls">
+          <div>
+            {['left', 'center', 'right', 'top', 'middle', 'bottom'].map((alignment) => (
+              <button key={alignment} type="button" disabled={selected.locked} onClick={() => apply(alignLayer(document, selected.id, alignment))}>{alignment}</button>
+            ))}
+          </div>
+          <div>
+            <button type="button" onClick={() => apply(updateLayer(document, selected.id, { locked: !selected.locked }))}>
+              {selected.locked ? <Unlock size={13} /> : <Lock size={13} />}{selected.locked ? 'Unlock' : 'Lock'}
+            </button>
+            <button type="button" onClick={() => apply(updateLayer(document, selected.id, { visible: !selected.visible }))}>
+              {selected.visible ? <EyeOff size={13} /> : <Eye size={13} />}{selected.visible ? 'Hide' : 'Show'}
+            </button>
+            <button type="button" onClick={() => mutateSelected((doc, id) => reorderLayer(doc, id, 1))}>Forward</button>
+            <button type="button" onClick={() => mutateSelected((doc, id) => reorderLayer(doc, id, -1))}>Back</button>
+            {selected.kind === 'artifact' && (
+              <button className="is-danger" type="button" onClick={() => apply(removeLayer(document, selected.id))}><Trash2 size={13} />Remove</button>
+            )}
+          </div>
+          <dl>
+            <div><dt>X</dt><dd>{selected.x.toFixed(2)}</dd></div>
+            <div><dt>Y</dt><dd>{selected.y.toFixed(2)}</dd></div>
+            <div><dt>W</dt><dd>{selected.width.toFixed(2)}</dd></div>
+            <div><dt>H</dt><dd>{selected.height.toFixed(2)}</dd></div>
+          </dl>
+        </div>
+      )}
+      <div className="hcs-artifact-picker">
+        <label>
+          <span>Artifact pack</span>
+          <select value={pack} onChange={(event) => setPack(event.target.value)}>
+            {CARD_ARTIFACT_CATALOG.packs.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
+          </select>
+        </label>
+        <div>
+          {compatible.map((item) => (
+            <button key={item.id} type="button" onClick={() => apply(addArtifactLayer(document, item.id, side))}>
+              <ArtifactVisual layer={{ artifact_id: item.id }} />
+              <span>{item.name}</span>
+              <PlusGlyph />
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function PlusGlyph() {
+  return <span className="hcs-plus-glyph" aria-hidden="true">+</span>;
+}
+
 function ProofSummary({ document, preflight }) {
-  const template = CARD_TEMPLATES.find((item) => item.id === document.template_id);
-  const visibleChannels = ['email', 'phone', 'website'].filter((key) => document.visibility[key]);
-  const fingerprint = stableFingerprint(document);
   return (
     <section className="hcs-proof-summary" aria-labelledby="proof-summary-title">
-      <div className="hcs-panel-title">
-        <div><p>Deterministic handoff</p><h2 id="proof-summary-title">Proof summary</h2></div>
-        <span>{fingerprint}</span>
-      </div>
+      <div><span>Build profile</span><strong id="proof-summary-title">{stableFingerprint(document)}</strong></div>
       <dl>
-        <div><dt>Template</dt><dd>{template?.name} / {template?.lane}</dd></div>
+        <div><dt>Draft</dt><dd>{document.draft_name}</dd></div>
+        <div><dt>Template</dt><dd>{document.template_id}</dd></div>
         <div><dt>Revision</dt><dd>{document.revision}</dd></div>
-        <div><dt>Visible contact</dt><dd>{visibleChannels.length ? visibleChannels.join(', ') : 'None'}</dd></div>
-        <div><dt>Destination</dt><dd>{document.sharing.destination || 'Unknown'}</dd></div>
-        <div><dt>Preflight</dt><dd>{preflight.status}</dd></div>
+        <div><dt>Layers</dt><dd>{document.layers.length}</dd></div>
+        <div><dt>Status</dt><dd>{preflight.status}</dd></div>
         <div><dt>Commerce</dt><dd>NOT A QUOTE</dd></div>
       </dl>
-      <p className="hcs-summary-note">
-        This proof is a design brief. QR generation, NFC programming, material selection, pricing, and production geometry remain subject to operator review.
-      </p>
     </section>
   );
 }
 
-export default function CardStudioEditor() {
-  const [history, dispatch] = useReducer(editorReducer, undefined, initialEditorState);
+export default function CardStudioEditor({ starterId = '' }) {
+  const [searchParams] = useSearchParams();
+  const requestedDraftId = searchParams.get('draft') || '';
+  const initial = useMemo(() => initialDocument(starterId, requestedDraftId), [requestedDraftId, starterId]);
+  const [history, dispatch] = useReducer(editorReducer, {
+    past: [],
+    present: initial.document,
+    future: [],
+  });
+  const [, setShelf] = useState(initial.shelf);
+  const [savedAt, setSavedAt] = useState(null);
+  const [storageError, setStorageError] = useState(false);
   const [controlSection, setControlSection] = useState('identity');
   const [overlays, setOverlays] = useState({ safe: true, bleed: false });
-  const [savedAt, setSavedAt] = useState(null);
   const [consent, setConsent] = useState(false);
   const [proofApproved, setProofApproved] = useState(false);
   const [inviteToken, setInviteToken] = useState('');
-  const [productSku, setProductSku] = useState('card_pvc_standard');
-  const [quantity, setQuantity] = useState(1);
-  const [submission, setSubmission] = useState({ state: 'idle', message: '' });
+  const [productSku, setProductSku] = useState(CARD_CATALOG.items[0].sku);
+  const [quantity, setQuantity] = useState(CARD_CATALOG.items[0].minimum_quantity);
+  const [submission, setSubmission] = useState({ state: 'idle', message: '', checkoutUrl: '' });
   const document = history.present;
   const preflight = useMemo(() => evaluateCardPreflight(document), [document]);
   const selectedProduct = CARD_CATALOG.items.find((item) => item.sku === productSku) || CARD_CATALOG.items[0];
+  const boundedQuantity = Math.min(selectedProduct.maximum_quantity, Math.max(selectedProduct.minimum_quantity, Number(quantity) || selectedProduct.minimum_quantity));
   const inviteReady = inviteToken.trim().length >= 24;
-  const boundedQuantity = Math.max(
-    selectedProduct.minimum_quantity,
-    Math.min(selectedProduct.maximum_quantity, Number(quantity) || selectedProduct.minimum_quantity),
-  );
 
-  const setField = useCallback((section, key, value) => {
-    dispatch({ type: 'SET', section, key, value });
-    setSubmission({ state: 'idle', message: '' });
-  }, []);
+  const apply = useCallback((next) => dispatch({ type: 'APPLY', document: next }), []);
+  const setField = useCallback((section, key, value) => apply(updateDocumentPath(document, section, key, value)), [apply, document]);
+  const setSelected = useCallback((layerId) => {
+    if (document.selected_layer_id !== layerId) apply(updateDocumentPath(document, 'selected_layer_id', null, layerId));
+  }, [apply, document]);
 
   useEffect(() => {
     const timeout = window.setTimeout(() => {
-      try {
-        localStorage.setItem(CARD_STUDIO_STORAGE_KEY, JSON.stringify(document));
-        setSavedAt(new Date());
-      } catch {
-        setSavedAt(null);
-      }
-    }, 250);
+      setShelf((current) => {
+        const next = saveDraft(current, document);
+        if (writeDraftShelf(next)) {
+          setSavedAt(new Date());
+          setStorageError(false);
+        } else {
+          setStorageError(true);
+        }
+        return next;
+      });
+    }, 260);
     return () => window.clearTimeout(timeout);
   }, [document]);
 
   useEffect(() => {
     const onKeyDown = (event) => {
-      if (!(event.ctrlKey || event.metaKey)) return;
-      if (event.key.toLowerCase() === 'z') {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'z') {
         event.preventDefault();
         dispatch({ type: event.shiftKey ? 'REDO' : 'UNDO' });
-      } else if (event.key.toLowerCase() === 'y') {
+      }
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'y') {
         event.preventDefault();
         dispatch({ type: 'REDO' });
       }
@@ -456,9 +579,15 @@ export default function CardStudioEditor() {
     return () => window.removeEventListener('keydown', onKeyDown);
   }, []);
 
+  const setCanvasSide = (side) => {
+    const first = document.layers.find((layer) => layer.side === side && layer.visible);
+    let next = updateDocumentPath(document, 'active_mode', null, side);
+    if (first) next.selected_layer_id = first.id;
+    apply(next);
+  };
+
   const submitBrief = async () => {
-    if (!preflight.ready || !consent || !inviteReady || submission.state === 'submitting') return;
-    setSubmission({ state: 'submitting', message: 'Staging the design brief for review…' });
+    setSubmission({ state: 'submitting', message: 'Creating an immutable review proposal…', checkoutUrl: '' });
     try {
       const result = await submitCardStudioBrief(document, {
         consent,
@@ -469,15 +598,17 @@ export default function CardStudioEditor() {
       });
       setSubmission({
         state: 'submitted',
-        message: `Brief staged for review${result.reference ? ` · ${result.reference}` : ''}. ${result.receipt?.eligibility === 'instant_checkout_eligible' ? 'Eligible for operator-released checkout; no checkout exists yet.' : 'Operator review is required; no checkout or payment was created.'}`,
+        checkoutUrl: result.checkout?.url || '',
+        message: `Proposal ${result.reference} is held for review. ${result.receipt?.eligibility === 'instant_checkout_eligible' ? 'An operator may release checkout later.' : 'No checkout or payment was created.'}`,
       });
     } catch (error) {
       const staged = error.status === 404 || error.status === 501 || error.status === 503;
       setSubmission({
         state: 'error',
+        checkoutUrl: '',
         message: staged
-          ? 'Your draft is saved on this device. The Card Studio review lane is staged but not accepting submissions yet.'
-          : 'The brief could not be staged. Your local draft is safe; retry when the review lane is available.',
+          ? 'Your draft is saved on this device. The review lane is not accepting submissions right now.'
+          : error.message || 'The brief could not be staged. Your local draft is safe.',
       });
     }
   };
@@ -493,10 +624,7 @@ export default function CardStudioEditor() {
         checkoutUrl,
       });
     } catch {
-      setSubmission({
-        state: 'error',
-        message: 'Order status is unavailable in this tab. The durable proposal remains in operator review.',
-      });
+      setSubmission({ state: 'error', message: 'Order status is unavailable in this tab. The durable proposal remains in operator review.', checkoutUrl: '' });
     }
   };
 
@@ -504,93 +632,103 @@ export default function CardStudioEditor() {
     <div className="hcs-editor">
       <section className="hcs-editor-header" aria-labelledby="card-studio-title">
         <div>
-          <p className="hcs-kicker">HYPERION IDENTITY FABRICATION · INVITE-ONLY PREVIEW</p>
+          <Link to="/card-studio" className="hcs-back-link"><ArrowLeft size={15} /> Card Studio library</Link>
+          <p className="hcs-kicker">HYPERION IDENTITY FABRICATION · INVITE-ONLY HANDOFF</p>
           <h1 id="card-studio-title">Compose the signal.<br /><span>Keep authority visible.</span></h1>
-          <p>
-            Build a bounded operator-card brief with a production-aware proof. Your draft stays on this device until you explicitly stage it for review.
-          </p>
+          <p>Design freely on this device. The operator handoff remains invitation-bound, immutable, held for review, and never a quote.</p>
         </div>
         <div className="hcs-status-stack" aria-label="Studio posture">
           <span data-tone={preflight.ready ? 'ready' : 'draft'}>{preflight.status}</span>
-          <span data-tone="review">REVIEW REQUIRED</span>
+          <span data-tone="review">HELD FOR REVIEW</span>
           <span>NOT A QUOTE</span>
         </div>
       </section>
 
-      {history.recovered && (
-        <div className="hcs-recovery-banner" role="status">
-          <History size={16} />
-          Recovered revision {document.revision} from this device. Nothing was submitted.
-        </div>
-      )}
+      <div className="hcs-recovery-banner" role="status">
+        <Save size={16} />
+        {storageError
+          ? 'Local autosave is unavailable in this browser. Keep this tab open or copy your details before leaving; nothing has been submitted.'
+          : `Editing “${document.draft_name}” · revision ${document.revision}. Autosave is device-local; nothing is submitted.`}
+      </div>
 
-      <section className="hcs-template-panel" aria-labelledby="template-heading">
-        <div className="hcs-panel-title">
-          <div><p>01 · Visual system</p><h2 id="template-heading">Choose a guarded template</h2></div>
-          <span>8 PUBLIC TEMPLATES</span>
+      <section className="hcs-mode-panel">
+        <div>
+          <p>01 · Workspace</p>
+          <h2>{document.editor_mode === 'basic' ? 'Guided field editor' : 'Bounded layout designer'}</h2>
         </div>
-        <TemplateRail selected={document.template_id} onSelect={(value) => dispatch({ type: 'TEMPLATE', value })} />
+        <div className="hcs-editor-mode-switch" role="tablist" aria-label="Editor complexity">
+          {['basic', 'advanced'].map((mode) => (
+            <button key={mode} type="button" role="tab" aria-selected={document.editor_mode === mode} onClick={() => setField('editor_mode', null, mode)}>
+              {mode === 'basic' ? 'Basic' : 'Advanced'}
+            </button>
+          ))}
+        </div>
       </section>
 
-      <div className="hcs-workspace">
-        <aside className="hcs-controls" aria-label="Card controls">
-          <div className="hcs-control-tabs" role="tablist" aria-label="Editing controls">
-            {CONTROL_SECTIONS.map((section) => (
-              <button
-                key={section.id}
-                type="button"
-                role="tab"
-                aria-selected={controlSection === section.id}
-                onClick={() => setControlSection(section.id)}
-              >
-                {section.label}
-              </button>
-            ))}
-          </div>
-          <div className="hcs-control-body" role="tabpanel">
-            <ControlPanel section={controlSection} document={document} setField={setField} />
-          </div>
+      <div className={`hcs-workspace is-${document.editor_mode}`}>
+        <aside className="hcs-controls" aria-label={document.editor_mode === 'basic' ? 'Card controls' : 'Layers and artifacts'}>
+          {document.editor_mode === 'basic' ? (
+            <>
+              <div className="hcs-control-tabs" role="tablist" aria-label="Editing controls">
+                {CONTROL_SECTIONS.map((section) => (
+                  <button key={section.id} type="button" role="tab" aria-selected={controlSection === section.id} onClick={() => setControlSection(section.id)}>
+                    {section.label}
+                  </button>
+                ))}
+              </div>
+              <div className="hcs-control-body" role="tabpanel">
+                <BasicControls
+                  section={controlSection}
+                  document={document}
+                  setField={setField}
+                  setTemplate={(id) => apply(applyCardTemplate(document, id))}
+                />
+              </div>
+            </>
+          ) : <LayerPanel document={document} apply={apply} setSelected={setSelected} />}
         </aside>
 
         <section className="hcs-stage" aria-labelledby="proof-heading">
           <div className="hcs-stage-toolbar">
             <div className="hcs-mode-switch" role="tablist" aria-label="Proof mode">
-              {[
-                { id: 'front', label: 'Front', icon: PanelTop },
-                { id: 'back', label: 'Back', icon: RotateCcw },
-                { id: 'digital', label: 'Digital', icon: Smartphone },
-              ].map(({ id, label, icon: Icon }) => (
-                <button
-                  key={id}
-                  type="button"
-                  role="tab"
-                  aria-selected={document.active_mode === id}
-                  onClick={() => setField('active_mode', null, id)}
-                >
-                  <Icon size={14} />{label}
-                </button>
-              ))}
+              <button type="button" role="tab" aria-selected={document.active_mode === 'front'} onClick={() => setCanvasSide('front')}><Layers3 size={14} />Front</button>
+              <button type="button" role="tab" aria-selected={document.active_mode === 'back'} onClick={() => setCanvasSide('back')}><RotateCcw size={14} />Back</button>
+              <button type="button" role="tab" aria-selected={document.active_mode === 'digital'} onClick={() => setField('active_mode', null, 'digital')}><Smartphone size={14} />Digital</button>
             </div>
             <div className="hcs-history-controls">
-              <button type="button" disabled={!history.past.length} onClick={() => dispatch({ type: 'UNDO' })} aria-label="Undo last edit" title="Undo (Ctrl+Z)"><Undo2 size={16} /></button>
-              <button type="button" disabled={!history.future.length} onClick={() => dispatch({ type: 'REDO' })} aria-label="Redo edit" title="Redo (Ctrl+Y)"><Redo2 size={16} /></button>
+              <button type="button" disabled={!history.past.length} onClick={() => dispatch({ type: 'UNDO' })} aria-label="Undo last edit"><Undo2 size={16} /></button>
+              <button type="button" disabled={!history.future.length} onClick={() => dispatch({ type: 'REDO' })} aria-label="Redo edit"><Redo2 size={16} /></button>
             </div>
           </div>
           <div className="hcs-stage-heading">
-            <div><p>02 · Live proof</p><h2 id="proof-heading">{document.active_mode === 'digital' ? 'Digital profile' : `${document.active_mode} face`}</h2></div>
+            <div><p>02 · Live proof</p><h2 id="proof-heading">{document.active_mode === 'digital' ? 'Digital profile' : `${document.active_mode} artboard`}</h2></div>
             <div className="hcs-overlay-controls">
               <button type="button" aria-pressed={overlays.safe} onClick={() => setOverlays((value) => ({ ...value, safe: !value.safe }))}>Safe area</button>
               <button type="button" aria-pressed={overlays.bleed} onClick={() => setOverlays((value) => ({ ...value, bleed: !value.bleed }))}>Bleed</button>
             </div>
           </div>
           <div className="hcs-proof-deck">
-            {document.active_mode === 'digital'
-              ? <DigitalProfile document={document} />
-              : <PhysicalCard document={document} overlays={overlays} />}
+            {document.active_mode === 'digital' ? <DigitalProfile document={document} /> : (
+              <Artboard
+                document={document}
+                side={document.active_mode}
+                selectedLayerId={document.selected_layer_id}
+                editing={document.editor_mode === 'advanced'}
+                overlays={overlays}
+                onSelect={setSelected}
+                onCommit={(id, patch) => apply(updateLayer(document, id, patch))}
+              />
+            )}
           </div>
+          {document.editor_mode === 'advanced' && document.active_mode !== 'digital' && (
+            <p className="hcs-canvas-help"><Maximize2 size={13} /> Drag to move, use the corner handle to resize, or nudge with Arrow keys. Hold Shift for larger keyboard steps.</p>
+          )}
           <div className="hcs-local-save" aria-live="polite">
-            <Save size={14} />
-            {savedAt ? `Saved locally ${savedAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : 'Local save unavailable'}
+            <Save size={14} />{storageError
+              ? 'Local autosave unavailable'
+              : savedAt
+                ? `Saved locally ${savedAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+                : 'Preparing local save'}
           </div>
         </section>
       </div>
@@ -604,12 +742,8 @@ export default function CardStudioEditor() {
           {!preflight.blockers.length && !preflight.warnings.length && (
             <div className="hcs-preflight-item is-ready"><ShieldCheck size={17} /><span><strong>Brief is internally consistent.</strong> Production and commerce review are still required.</span></div>
           )}
-          {preflight.blockers.map((item) => (
-            <div className="hcs-preflight-item is-blocker" key={item}><CircleAlert size={17} /><span>{item}</span></div>
-          ))}
-          {preflight.warnings.map((item) => (
-            <div className="hcs-preflight-item is-warning" key={item}><CircleAlert size={17} /><span>{item}</span></div>
-          ))}
+          {preflight.blockers.map((item) => <div className="hcs-preflight-item is-blocker" key={item}><CircleAlert size={17} /><span>{item}</span></div>)}
+          {preflight.warnings.map((item) => <div className="hcs-preflight-item is-warning" key={item}><CircleAlert size={17} /><span>{item}</span></div>)}
         </section>
         <ProofSummary document={document} preflight={preflight} />
       </div>
@@ -618,9 +752,7 @@ export default function CardStudioEditor() {
         <div>
           <p>04 · Operator handoff</p>
           <h2 id="submit-heading">Stage the design and order intent</h2>
-          <p>
-            This creates an immutable review proposal. It does not publish a profile, generate production artwork, program NFC, charge a card, reserve a price, or create checkout.
-          </p>
+          <p>This creates an immutable review proposal. It does not publish a profile, generate production artwork, charge a card, reserve a price, or create checkout.</p>
         </div>
         <div className="hcs-submit-actions">
           <div className="hcs-order-fields">
@@ -630,33 +762,16 @@ export default function CardStudioEditor() {
                 const nextProduct = CARD_CATALOG.items.find((item) => item.sku === nextSku);
                 setProductSku(nextSku);
                 setQuantity(nextProduct?.minimum_quantity || 1);
-                setSubmission({ state: 'idle', message: '' });
+                setSubmission({ state: 'idle', message: '', checkoutUrl: '' });
               }}>
-                {CARD_CATALOG.items.map((item) => (
-                  <option key={item.sku} value={item.sku}>
-                    {item.name}{item.unit_amount == null ? ' · REVIEW' : ` · $${(item.unit_amount / 100).toFixed(0)}`}
-                  </option>
-                ))}
+                {CARD_CATALOG.items.map((item) => <option key={item.sku} value={item.sku}>{item.name}{item.unit_amount == null ? ' · REVIEW' : ` · $${(item.unit_amount / 100).toFixed(0)}`}</option>)}
               </select>
             </Field>
             <Field label="Quantity" hint={`${selectedProduct.minimum_quantity}–${selectedProduct.maximum_quantity} in this lane`}>
-              <input
-                type="number"
-                min={selectedProduct.minimum_quantity}
-                max={selectedProduct.maximum_quantity}
-                value={quantity}
-                onChange={(event) => setQuantity(event.target.value)}
-                onBlur={() => setQuantity(boundedQuantity)}
-              />
+              <input type="number" min={selectedProduct.minimum_quantity} max={selectedProduct.maximum_quantity} value={quantity} onChange={(event) => setQuantity(event.target.value)} onBlur={() => setQuantity(boundedQuantity)} />
             </Field>
-            <Field label="Invitation code" hint="Invite-only soft launch. The code is sent only when you stage this proposal.">
-              <input
-                type="password"
-                autoComplete="one-time-code"
-                value={inviteToken}
-                onChange={(event) => setInviteToken(event.target.value)}
-                placeholder="Enter your Card Studio invite"
-              />
+            <Field label="Invitation code" hint="The invitation is sent only when you stage this proposal.">
+              <input type="password" autoComplete="one-time-code" value={inviteToken} onChange={(event) => setInviteToken(event.target.value)} placeholder="Enter your Card Studio invite" />
             </Field>
           </div>
           <div className="hcs-commerce-posture" role="note">
@@ -664,41 +779,15 @@ export default function CardStudioEditor() {
             <strong>{selectedProduct.unit_amount == null ? 'CUSTOM ESTIMATE' : `$${(selectedProduct.unit_amount / 100).toFixed(2)} CATALOG ESTIMATE`}</strong>
             <small>NOT A QUOTE · CHECKOUT REQUIRES OPERATOR RELEASE</small>
           </div>
-          <label className="hcs-consent">
-            <input type="checkbox" checked={proofApproved} onChange={(event) => setProofApproved(event.target.checked)} />
-            <span>I reviewed the front, back, and digital proof and approve this revision for production review. This is not approval of a charge.</span>
-          </label>
-          <label className="hcs-consent">
-            <input type="checkbox" checked={consent} onChange={(event) => setConsent(event.target.checked)} />
-            <span>I understand the selected visible fields are intended for a public identity surface and require operator review before publication.</span>
-          </label>
-          <button
-            className="hcs-submit-button"
-            type="button"
-            disabled={!preflight.ready || !consent || !inviteReady || submission.state === 'submitting'}
-            onClick={submitBrief}
-          >
-            {submission.state === 'submitting' ? 'Staging brief…' : 'Stage for review'}
-            {submission.state === 'submitting' ? <span className="hcs-button-pulse" aria-hidden="true" /> : <Send size={16} />}
+          <label className="hcs-consent"><input type="checkbox" checked={proofApproved} onChange={(event) => setProofApproved(event.target.checked)} /><span>I reviewed the front, back, and digital proof and approve this revision for production review. This is not approval of a charge.</span></label>
+          <label className="hcs-consent"><input type="checkbox" checked={consent} onChange={(event) => setConsent(event.target.checked)} /><span>I understand the selected visible fields are intended for a public identity surface and require operator review before publication.</span></label>
+          <button className="hcs-submit-button" type="button" disabled={!preflight.ready || !consent || !proofApproved || !inviteReady || submission.state === 'submitting'} onClick={submitBrief}>
+            {submission.state === 'submitting' ? 'Staging brief…' : 'Stage for review'} <Send size={16} />
           </button>
-          {submission.message && (
-            <p className={`hcs-submit-message is-${submission.state}`} role={submission.state === 'error' ? 'alert' : 'status'}>
-              {submission.message}
-            </p>
-          )}
-          {submission.checkoutUrl && (
-            <a className="hcs-checkout-link" href={submission.checkoutUrl} rel="nofollow noopener">
-              Continue to secure Shopify checkout <ChevronRight size={14} />
-            </a>
-          )}
-          {submission.state === 'submitted' && (
-            <button className="hcs-status-button" type="button" onClick={refreshOrderStatus}>
-              Refresh proposal status
-            </button>
-          )}
-          <button className="hcs-reset-button" type="button" onClick={() => dispatch({ type: 'RESET' })}>
-            Start a clean draft <ChevronRight size={14} />
-          </button>
+          {submission.message && <p className={`hcs-submit-message is-${submission.state}`} role={submission.state === 'error' ? 'alert' : 'status'}>{submission.message}</p>}
+          {submission.checkoutUrl && <a className="hcs-checkout-link" href={submission.checkoutUrl} rel="nofollow noopener">Continue to secure Shopify checkout <ChevronRight size={14} /></a>}
+          {submission.state === 'submitted' && <button className="hcs-status-button" type="button" onClick={refreshOrderStatus}>Refresh proposal status</button>}
+          <button className="hcs-reset-button" type="button" onClick={() => dispatch({ type: 'RESET' })}>Reset from starter <ChevronRight size={14} /></button>
         </div>
       </section>
     </div>

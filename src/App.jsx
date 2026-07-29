@@ -6,6 +6,7 @@ const FoundersPage = lazy(() => import('./pages/FoundersPage'));
 const FounderPage = lazy(() => import('./pages/FounderPage'));
 const DistrictPage = lazy(() => import('./pages/DistrictPage'));
 const CardStudioPage = lazy(() => import('./pages/CardStudioPage'));
+const CardStudioDesignPage = lazy(() => import('./pages/CardStudioDesignPage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 const McpPage = lazy(() => import('./pages/McpPage'));
 
@@ -23,6 +24,7 @@ const ContactPage = lazy(() => import('./pages/ContactPage'));
 const NewsletterPage = lazy(() => import('./pages/NewsletterPage'));
 const StorePage = lazy(() => import('./pages/StorePage'));
 const EditorPage = import.meta.env.DEV ? lazy(() => import('./pages/EditorPage')) : () => null;
+const CardStudioSpecimensPage = import.meta.env.DEV ? lazy(() => import('./pages/CardStudioSpecimensPage')) : () => null;
 import { HelmetProvider } from 'react-helmet-async';
 const AmbientCityLayer = lazy(() => import('./components/ui/AmbientCityLayer'));
 import { EditorProvider, useEditor } from './context/EditorContext';
@@ -130,12 +132,15 @@ export default function App() {
               <Route path="/build-archive" element={<BuildArchivePage />} />
               <Route path="/gallery" element={<GalleryPage />} />
               <Route path="/card-studio" element={<CardStudioPage />} />
+              <Route path="/card-studio/design" element={<CardStudioDesignPage />} />
+              <Route path="/card-studio/design/:starterId" element={<CardStudioDesignPage />} />
               <Route path="/card-studio/legacy" element={<StaticRedirect to="/card-studio" />} />
               <Route path="/card-studio/studio.html" element={<StaticRedirect to="/card-studio" />} />
               <Route path="/studio/card-studio" element={<StaticRedirect to="/card-studio" />} />
               <Route path="/dxcard" element={<StaticRedirect to="/dxcard/index.html" />} />
               <Route path="/dxcard/index.html" element={<StaticRedirect to="/dxcard" />} />
               {isDev && <Route path="/editor" element={<EditorPage />} />}
+              {isDev && <Route path="/dev/card-studio-specimens" element={<CardStudioSpecimensPage />} />}
               <Route path="/dev-diary" element={<DevDiaryPage />} />
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/mcp" element={<McpPage />} />

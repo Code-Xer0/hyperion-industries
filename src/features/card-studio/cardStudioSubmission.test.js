@@ -20,7 +20,11 @@ test('native editor compiles into the durable Worker contracts', () => {
   assert.equal(design.project_id, PROJECT);
   assert.equal(design.template_id, 'template_ivory');
   assert.equal(design.preflight.state, 'passed');
-  assert.deepEqual(design.asset_refs, []);
+  assert.deepEqual(design.asset_refs, [
+    'csa_builtin_divider_double',
+    'csa_builtin_layout_identity_stack',
+  ]);
+  assert.equal(design.artboards[0].elements.filter((element) => element.kind === 'asset').length, 2);
 
   const intent = buildWorkerOrderIntent(PROJECT, REVISION, document, {
     productSku: 'card_pvc_standard',

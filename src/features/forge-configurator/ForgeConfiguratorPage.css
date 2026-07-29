@@ -147,3 +147,19 @@
   .concierge-options > button, .concierge-sources svg { transition: none; }
   .concierge-options > button:hover { transform: none; }
 }
+.concierge-catalog-prefill {
+  display: grid;
+  gap: .3rem;
+  max-width: 42rem;
+  margin: 1rem 0;
+  padding: .85rem 1rem;
+  border: 1px solid rgba(255, 199, 44, .38);
+  background: rgba(255, 199, 44, .07);
+}
+.concierge-catalog-prefill strong {
+  color: var(--forge-gold, #ffc72c);
+  font-family: var(--font-display);
+  font-size: .72rem;
+  text-transform: uppercase;
+}
+.concierge-catalog-prefill span { color: var(--forge-text-muted, #9ba2aa); font-size: .72rem; }

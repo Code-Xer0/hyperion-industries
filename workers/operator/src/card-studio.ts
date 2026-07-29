@@ -1,5 +1,6 @@
 import Ajv2020, { type ValidateFunction } from "ajv/dist/2020";
 import { CARD_CATALOG, cardCatalogItem } from "../../../shared/card-studio/catalog";
+import { BUILTIN_CARD_ASSET_IDS } from "../../../shared/card-studio/studio-catalog";
 import designSchema from "../../../shared/card-studio/contracts/card-design-document.v1.schema.json";
 import proposalSchema from "../../../shared/card-studio/contracts/card-design-proposal.v1.schema.json";
 import orderIntentSchema from "../../../shared/card-studio/contracts/card-order-intent.v1.schema.json";
@@ -78,6 +79,12 @@ type DesignDocument = {
   [key: string]: unknown;
 };
 
+type UploadAssetRow = {
+  asset_ref: string;
+  project_id: string;
+  scan_state: "pending_upload" | "quarantined" | "passed" | "rejected" | "expired";
+};
+
 type OrderIntent = {
   contract_version: "card-order-intent/1";
   intent_id: string;
@@ -127,6 +134,40 @@ function validationError(validate: ValidateFunction): never {
     .map((error) => `${error.instancePath || "/"} ${error.message}`)
     .join("; ");
   throw new HttpError(400, "schema_rejected", `Card Studio contract validation failed: ${details}`);
+}
+
+function designElementAssetRefs(design: DesignDocument): string[] {
+  const artboards = Array.isArray(design.artboards) ? design.artboards : [];
+  return artboards.flatMap((artboard) => {
+    const elements = artboard && typeof artboard === "object" && Array.isArray((artboard as { elements?: unknown[] }).elements)
+      ? (artboard as { elements: Array<{ asset_ref?: unknown }> }).elements
+      : [];
+    return elements
+      .map((element) => typeof element?.asset_ref === "string" ? element.asset_ref : "")
+      .filter(Boolean);
+  });
+}
+
+async function validateDesignAssetReferences(db: D1Database, projectId: string, design: DesignDocument): Promise<void> {
+  const declared = new Set(design.asset_refs);
+  const used = designElementAssetRefs(design);
+  if (used.some((assetRef) => !declared.has(assetRef))) {
+    throw new HttpError(400, "asset_reference_undeclared", "Every placed artifact must be declared in asset_refs.");
+  }
+
+  const uploadedRefs = design.asset_refs.filter((assetRef) => !BUILTIN_CARD_ASSET_IDS.has(assetRef));
+  if (!uploadedRefs.length) return;
+  const rows = await Promise.all(uploadedRefs.map((assetRef) => db.prepare(
+    `SELECT asset_ref, project_id, scan_state
+       FROM card_studio_upload_sessions
+      WHERE asset_ref = ? AND project_id = ? LIMIT 1`,
+  ).bind(assetRef, projectId).first<UploadAssetRow>()));
+  if (rows.some((row) => !row)) {
+    throw new HttpError(400, "asset_reference_unknown", "The design references an unknown or tampered artifact.");
+  }
+  if (rows.some((row) => row?.scan_state !== "passed")) {
+    throw new HttpError(409, "asset_scan_required", "Uploaded artwork must pass quarantine scanning before it can enter a design revision.");
+  }
 }
 
 function parseJson<T>(value: string): T {
@@ -281,6 +322,7 @@ export async function handleRevisionCreate(
     throw new HttpError(409, "design_revision_conflict", `The next immutable design revision must be ${expectedRevision}.`);
   }
   if (!cardCatalogItem(design.product_sku)) throw new HttpError(400, "catalog_sku_unknown", "The design references an unknown catalog SKU.");
+  await validateDesignAssetReferences(db, projectId, design);
 
   const revisionId = generatedId("csr", deps);
   const hash = await sha256(canonical(design));
@@ -333,7 +375,7 @@ export function evaluateCardEligibility(intent: OrderIntent, design: DesignDocum
   if (design.template_id === "blank_guarded") reasons.push("blank_template_requires_review");
   if (!intent.proof_approved) reasons.push("proof_not_approved");
   if (design.preflight.state !== "passed" || design.preflight.warnings.length > 0) reasons.push("preflight_not_clear");
-  if (design.asset_refs.length > 0) reasons.push("artwork_requires_scan_review");
+  if (design.asset_refs.some((assetRef) => !BUILTIN_CARD_ASSET_IDS.has(assetRef))) reasons.push("artwork_requires_scan_review");
   const unitAmount = item?.unit_amount ?? null;
   return {
     outcome: reasons.length === 0 ? "instant_checkout_eligible" : "review_required",
