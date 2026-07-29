@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hyperion-industries.dev/contracts/site-builder/v1/schemas/asset.schema.json",
+  "title": "Hyperion Public Asset",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "asset_id", "content_hash", "path", "mime_type", "alt", "rights_posture", "customer_safe"],
+  "properties": {
+    "schema_version": { "const": "hyperion-asset/1" },
+    "asset_id": { "type": "string", "pattern": "^asset_[a-f0-9]{16,64}$" },
+    "content_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "path": { "type": "string", "pattern": "^/assets/builder/[a-f0-9]{64}/" },
+    "mime_type": { "enum": ["image/jpeg", "image/png", "image/webp", "image/avif", "video/mp4", "video/webm", "audio/mpeg", "audio/ogg"] },
+    "alt": { "type": "string", "minLength": 1, "maxLength": 300 },
+    "creator": { "type": ["string", "null"], "maxLength": 200 },
+    "source_url": { "type": ["string", "null"], "format": "uri" },
+    "rights_posture": { "enum": ["hyperion_owned", "licensed", "attributed", "internal_only"] },
+    "customer_safe": { "type": "boolean" }
+  }
+}

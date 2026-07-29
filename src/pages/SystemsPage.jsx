@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom';
 import PageShell from '../components/layout/PageShell';
 import RoomShell from '../components/portal/RoomShell';
-import systems from '../data/systems.json';
-import content from '../data/content.json';
+import systems from '../../site-content/collections/systems.json';
+import content from '../../site-content/collections/content.json';
 import './SubPage.css';
 import HoverEditor from '../components/ui/HoverEditor';
 import { useState, useEffect, useCallback } from 'react';

@@ -1,0 +1,80 @@
+{
+  "schema_version": "hyperion-site-builder-manifest/1",
+  "bundle_sha256": "60b04e08ccb0227dc455ab1627033d3bec6c18737014ea60fafc55e793489c33",
+  "page_count": 0,
+  "theme_count": 1,
+  "files": [
+    {
+      "path": "contracts/site-builder/v1/schemas/approval-receipt.schema.json",
+      "sha256": "94e2161f7fa5883806e3ab83d45039b0a1f03a9a067c841b6730e5914e498dad"
+    },
+    {
+      "path": "contracts/site-builder/v1/schemas/asset.schema.json",
+      "sha256": "b2cbb64b1c79c61d9440976a84de893cbddc8857deaa2df40180a38b182fd96b"
+    },
+    {
+      "path": "contracts/site-builder/v1/schemas/block.schema.json",
+      "sha256": "c8a0d911216a020c9d2fe3be3877e2da22b38ad908267fee4aa11efa3e600cc9"
+    },
+    {
+      "path": "contracts/site-builder/v1/schemas/page.schema.json",
+      "sha256": "f7471193ff77bea1a510269809284f61744ffe1e9145a94b42cde3415a2b588e"
+    },
+    {
+      "path": "contracts/site-builder/v1/schemas/release.schema.json",
+      "sha256": "1d8f91e4081c42a7c32d38cb5f4161d22f8334549d9a7fc5ac0d19a0a118d68b"
+    },
+    {
+      "path": "contracts/site-builder/v1/schemas/theme.schema.json",
+      "sha256": "e4bb0915cd205297f5c542a52678c30479bf5dfee2343e6674c58a45ae0cbbf6"
+    },
+    {
+      "path": "site-content/collections/commerce.json",
+      "sha256": "8a8f3338431b4c7d1d5f2608a59eb6f36d95ea63c772c5941436c5f3656611ec"
+    },
+    {
+      "path": "site-content/collections/content.json",
+      "sha256": "3d43d9398b4de11cc4e765fc99c94a970264f85d51e7899b306827825076ce63"
+    },
+    {
+      "path": "site-content/collections/destinations.json",
+      "sha256": "618f63d456f1828ad4b387b4e0f61993b878944e054524c706a7d5bf61ceeaf5"
+    },
+    {
+      "path": "site-content/collections/gallery.json",
+      "sha256": "61633a17175228d0a07e45758c7633d4110ec4578efb7bc0288ddb8a715c6d46"
+    },
+    {
+      "path": "site-content/collections/navigation.json",
+      "sha256": "9aca9758d08a45fe704053ca22f79173d9946eba92aea1e6652262bd0a4b5d89"
+    },
+    {
+      "path": "site-content/collections/operators.json",
+      "sha256": "d0048bc0301b3bc389a1ddcdd24dfbaa820a441c6c4b74474454e28f18a45656"
+    },
+    {
+      "path": "site-content/collections/radio.json",
+      "sha256": "799b0a6ce7e02bc2b6cab69aac357280a7e8f7f6c9674a5bb38e26178f114644"
+    },
+    {
+      "path": "site-content/collections/showcase.json",
+      "sha256": "5b1a08b67f26cdcf77be7412f5c3a2c53e865907c1c4b25aa29b48dde4e0b252"
+    },
+    {
+      "path": "site-content/collections/systems.json",
+      "sha256": "1aa2538adaaac20b49fa9e68cd9d6037593317e2b4f449523d6f07f19261b298"
+    },
+    {
+      "path": "site-content/pages/_template.standard.json",
+      "sha256": "60bc83732b24899e1442400b41ae33192e3e1a21a64100f5b394f8fb31170079"
+    },
+    {
+      "path": "site-content/site.json",
+      "sha256": "3e132fbaf9f2447ec0ee91d25cad6fa90adaa5a3e2c03881828dfd4b33391a52"
+    },
+    {
+      "path": "site-content/themes/hyperion-core.json",
+      "sha256": "fa8e83268a28849db84c4b7028648149d8a9a959609059993f5e7e5f71491692"
+    }
+  ]
+}

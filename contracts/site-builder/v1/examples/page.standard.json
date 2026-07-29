@@ -1,0 +1,27 @@
+{
+  "schema_version": "hyperion-page/1",
+  "id": "page_new-content",
+  "path": "/new-content",
+  "template": "standard",
+  "title": "New Hyperion Page",
+  "description": "A governed Hyperion content page.",
+  "summary": "Draft page template.",
+  "maturity": "DRAFT · NOT PUBLISHED",
+  "indexable": false,
+  "theme_ref": "theme_hyperion-core",
+  "og_asset": null,
+  "related_paths": [],
+  "blocks": [
+    {
+      "id": "blk_page-hero",
+      "type": "hero",
+      "version": 1,
+      "variant": "standard",
+      "data": {
+        "eyebrow": "Hyperion Industries",
+        "title": "New page",
+        "lead": "Replace this draft copy before preview approval."
+      }
+    }
+  ]
+}

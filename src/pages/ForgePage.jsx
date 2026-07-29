@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import PageShell from '../components/layout/PageShell';
 import SectionHero from '../components/ui/SectionHero';
 import './SubPage.css';
-import content from '../data/content.json';
+import content from '../../site-content/collections/content.json';
 import HoverEditor from '../components/ui/HoverEditor';
 import MediaFrame from '../components/ui/MediaFrame';
 

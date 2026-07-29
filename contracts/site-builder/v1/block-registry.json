@@ -1,0 +1,17 @@
+{
+  "schema_version": "hyperion-block-registry/1",
+  "blocks": [
+    { "type": "hero", "label": "Hero", "variants": ["standard", "split", "cinematic"], "risk": "governed" },
+    { "type": "rich_text", "label": "Rich text", "variants": ["standard", "lede", "compact"], "risk": "low" },
+    { "type": "media", "label": "Media", "variants": ["wide", "contained", "split"], "risk": "governed" },
+    { "type": "media_strip", "label": "Media strip", "variants": ["pair", "triptych"], "risk": "governed" },
+    { "type": "card_grid", "label": "Card grid", "variants": ["two", "three", "rail"], "risk": "governed" },
+    { "type": "cta_group", "label": "Actions", "variants": ["inline", "stacked"], "risk": "governed" },
+    { "type": "stats", "label": "Stats", "variants": ["rail", "grid"], "risk": "governed" },
+    { "type": "timeline", "label": "Timeline", "variants": ["vertical", "horizontal"], "risk": "governed" },
+    { "type": "faq", "label": "FAQ", "variants": ["accordion"], "risk": "governed" },
+    { "type": "quote", "label": "Quote", "variants": ["pull", "doctrine"], "risk": "governed" },
+    { "type": "gallery", "label": "Gallery", "variants": ["grid", "filmstrip"], "risk": "governed" },
+    { "type": "divider", "label": "Divider", "variants": ["line", "space"], "risk": "governed" }
+  ]
+}

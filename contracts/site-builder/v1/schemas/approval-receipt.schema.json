@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hyperion-industries.dev/contracts/site-builder/v1/schemas/approval-receipt.schema.json",
+  "title": "Hyperion Builder Approval Receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "receipt_id", "release_id", "operator_id", "binding_hash", "nonce", "issued_at", "expires_at", "signature"],
+  "properties": {
+    "schema_version": { "const": "hyperion-approval-receipt/1" },
+    "receipt_id": { "type": "string", "pattern": "^apr_[a-f0-9]{24,64}$" },
+    "release_id": { "type": "string", "pattern": "^rel_[a-f0-9]{24,64}$" },
+    "operator_id": { "type": "string", "pattern": "^op_[a-f0-9]{16,64}$" },
+    "binding_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "nonce": { "type": "string", "pattern": "^[A-Za-z0-9_-]{24,128}$" },
+    "issued_at": { "type": "string", "format": "date-time" },
+    "expires_at": { "type": "string", "format": "date-time" },
+    "consumed_at": { "type": ["string", "null"], "format": "date-time" },
+    "signature": { "type": "string", "pattern": "^[A-Za-z0-9_-]{64,256}$" }
+  }
+}
