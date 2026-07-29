@@ -451,7 +451,7 @@
         "currency": "USD",
         "publicCheckoutEnabled": false,
         "pricingPosture": "public_prices_operator_review",
-        "activePricingSource": "src/data/commerce.json",
+        "activePricingSource": "site-content/collections/commerce.json",
         "digital": { "label": "Digital card", "price": 0, "note": "Free forever" },
         "physicalFinishes": [
           { "key": "pvc-matte", "label": "PVC NFC Card - Matte", "price": 39 },
@@ -816,7 +816,7 @@
       "posture": "preview",
       "access": "request_access",
       "summary": "Public pricing is visible; payment and fulfillment remain operator-reviewed via draft invoices.",
-      "truthSource": "src/data/commerce.json",
+      "truthSource": "site-content/collections/commerce.json",
       "lastVerified": "2026-06-25"
     },
     {

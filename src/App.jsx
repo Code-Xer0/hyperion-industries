@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, useParams } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation, useParams } from 'react-router-dom';
 import Nav from './components/layout/Nav';
 import HomePage from './pages/HomePage';
 const FoundersPage = lazy(() => import('./pages/FoundersPage'));
@@ -8,6 +8,7 @@ const DistrictPage = lazy(() => import('./pages/DistrictPage'));
 const CardStudioPage = lazy(() => import('./pages/CardStudioPage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 const McpPage = lazy(() => import('./pages/McpPage'));
+const ContentPage = lazy(() => import('./pages/ContentPage'));
 
 // Operator-only surfaces: DEV-gated lazy imports so the production bundle
 // contains neither the code nor the route — no source/route leakage.
@@ -31,8 +32,9 @@ import { OperatorPilotProvider, useOperatorPilot } from './context/OperatorPilot
 import EditorModal from './components/ui/EditorModal';
 const OperatorResident = lazy(() => import('./components/operator/OperatorResident'));
 import SeoRouteHead from './components/seo/SeoRouteHead';
-import operators from './data/operators.json';
+import operators from '../site-content/collections/operators.json';
 import { INTAKE_LANE_SEO } from '../shared/intake/lane-seo';
+import { SITE_CONTENT_PAGE_BY_PATH } from './generated/siteContent';
 
 const PUBLIC_FOUNDER_SLUGS = new Set(operators.map((operator) => operator.slug));
 const PUBLIC_INTAKE_LANES = new Set(INTAKE_LANE_SEO.map((lane) => lane.id));
@@ -93,6 +95,11 @@ function OperatorPilotMount() {
   return <Suspense fallback={null}><OperatorResident /></Suspense>;
 }
 
+function ContentOrNotFoundRoute() {
+  const { pathname } = useLocation();
+  return SITE_CONTENT_PAGE_BY_PATH.has(pathname) ? <ContentPage /> : <NotFoundPage />;
+}
+
 export default function App() {
   const isDev = import.meta.env.DEV;
 
@@ -141,7 +148,7 @@ export default function App() {
               <Route path="/mcp" element={<McpPage />} />
               <Route path="/newsletter" element={<NewsletterPage />} />
               <Route path="/store" element={<StorePage />} />
-              <Route path="*" element={<NotFoundPage />} />
+              <Route path="*" element={<ContentOrNotFoundRoute />} />
             </Routes>
             </Suspense>
             <SeoRouteHead />

@@ -1,4 +1,4 @@
-{
+{ 
   "main": [
     { "label": "City Map", "path": "/architecture" },
     { "label": "Systems", "path": "/systems" },

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import navData from '../../data/navigation.json';
+import navData from '../../../site-content/collections/navigation.json';
 import './Footer.css';
 import HoverEditor from '../ui/HoverEditor';
 import { useTheme } from '../../context/ThemeContext';

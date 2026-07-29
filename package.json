@@ -5,8 +5,10 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && node scripts/generate-seo-artifacts.mjs && node scripts/compile-legacy-public.mjs",
+    "build": "npm run site-content:generate && vite build && node scripts/generate-seo-artifacts.mjs && node scripts/compile-legacy-public.mjs",
     "card-studio:check": "node --test src/features/card-studio/*.test.js",
+    "site-content:generate": "node scripts/compile-site-content.mjs",
+    "site-content:check": "node scripts/compile-site-content.mjs --check && node --test scripts/compile-site-content.test.mjs",
     "lint": "eslint .",
     "public:compiled-check": "node scripts/verify-public-artifacts.mjs",
     "seo:generate": "node scripts/generate-seo-artifacts.mjs",
@@ -14,7 +16,7 @@
     "seo:edge-test": "node --test workers/site-edge/test/routing.test.mjs",
     "mcp:check": "npm run check --prefix workers/public-mcp",
     "operator:check": "npm run check --prefix workers/operator",
-    "check": "npm run lint && npm run card-studio:check && npm run build && npm run public:compiled-check && npm run seo:verify && npm run seo:edge-test && npm run operator:check && npm run mcp:check",
+    "check": "npm run lint && npm run site-content:check && npm run card-studio:check && npm run build && npm run public:compiled-check && npm run seo:verify && npm run seo:edge-test && npm run operator:check && npm run mcp:check",
     "substrate:audit": "node scripts/audit-portal.mjs",
     "preview": "vite preview"
   },
@@ -26,7 +28,7 @@
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
     "react-helmet-async": "^3.0.0",
-    "react-router-dom": "^7.18.1"
+    "react-router-dom": "7.18.2"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

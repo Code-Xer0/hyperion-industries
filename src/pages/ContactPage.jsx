@@ -2,7 +2,7 @@ import { ArrowUpRight, Mail } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import PageShell from '../components/layout/PageShell';
 import RoomShell from '../components/portal/RoomShell';
-import content from '../data/content.json';
+import content from '../../site-content/collections/content.json';
 import './SubPage.css';
 
 const stations = [

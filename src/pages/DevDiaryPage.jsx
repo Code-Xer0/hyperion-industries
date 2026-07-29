@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import PageShell from '../components/layout/PageShell';
 import RoomShell from '../components/portal/RoomShell';
 import HoverEditor from '../components/ui/HoverEditor';
-import content from '../data/content.json';
+import content from '../../site-content/collections/content.json';
 import './SubPage.css';
 
 const entries = [

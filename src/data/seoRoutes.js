@@ -1,5 +1,6 @@
 import { INTAKE_LANE_SEO } from '../../shared/intake/lane-seo.js';
 import { cityRoutes } from './publicCity.js';
+import { SITE_CONTENT_PAGES } from '../generated/siteContent.js';
 
 export const SITE_ORIGIN = 'https://hyperion-industries.dev';
 export const ENTITY_SPINE = 'Victor Amani is the professional name of Kushinda Furaha Zeleke, founder and systems architect of Hyperion Industries in Minneapolis.';
@@ -23,7 +24,7 @@ const fixedRoutes = [
     summary: 'A public-safe directory of Hyperion systems and their current maturity.',
     maturity: 'PUBLIC-SAFE MAP',
     schemaType: 'CollectionPage',
-    sourceFiles: ['src/pages/SystemsPage.jsx', 'src/data/systems.json'],
+    sourceFiles: ['src/pages/SystemsPage.jsx', 'site-content/collections/systems.json'],
     relatedPaths: ['/chronos', '/mnemos', '/software-estate'],
   },
   {
@@ -34,7 +35,7 @@ const fixedRoutes = [
     maturity: 'PUBLIC ARCHIVE',
     schemaType: 'CollectionPage',
     ogImage: '/assets/builds/20230803_133211.jpg',
-    sourceFiles: ['src/pages/BuildArchivePage.jsx', 'src/data/showcase.json'],
+    sourceFiles: ['src/pages/BuildArchivePage.jsx', 'site-content/collections/showcase.json'],
     relatedPaths: ['/forge', '/gallery', '/forge/catalog'],
   },
   {
@@ -56,7 +57,7 @@ const fixedRoutes = [
     maturity: 'PUBLIC ARCHIVE',
     schemaType: 'CollectionPage',
     ogImage: '/assets/operators/deus-x-portrait-complete.png',
-    sourceFiles: ['src/pages/GalleryPage.jsx', 'src/data/gallery.json'],
+    sourceFiles: ['src/pages/GalleryPage.jsx', 'site-content/collections/gallery.json'],
     relatedPaths: ['/build-archive', '/identity', '/founders'],
   },
   {
@@ -118,7 +119,7 @@ const fixedRoutes = [
     summary: 'A truthful product-lane directory for systems currently available by scoped inquiry.',
     maturity: 'STAGED · NO CHECKOUT',
     schemaType: 'CollectionPage',
-    sourceFiles: ['src/pages/StorePage.jsx', 'src/data/commerce.json'],
+    sourceFiles: ['src/pages/StorePage.jsx', 'site-content/collections/commerce.json'],
     relatedPaths: ['/forge', '/identity', '/contact'],
   },
   {
@@ -128,7 +129,7 @@ const fixedRoutes = [
     summary: 'The public roster behind Hyperion Industries.',
     maturity: 'PUBLIC PROFILES',
     schemaType: 'CollectionPage',
-    sourceFiles: ['src/pages/FoundersPage.jsx', 'src/data/operators.json'],
+    sourceFiles: ['src/pages/FoundersPage.jsx', 'site-content/collections/operators.json'],
     relatedPaths: ['/founders/victor-amani', '/founders/keshawn-rowe', '/contact'],
   },
   {
@@ -139,7 +140,7 @@ const fixedRoutes = [
     maturity: 'FULL PUBLIC PROFILE',
     schemaType: 'ProfilePage',
     ogImage: '/assets/operators/victor-city-operating-edge.png',
-    sourceFiles: ['src/pages/FounderPage.jsx', 'src/data/operators.json'],
+    sourceFiles: ['src/pages/FounderPage.jsx', 'site-content/collections/operators.json'],
     relatedPaths: ['/', '/systems', '/contact'],
   },
   {
@@ -150,7 +151,7 @@ const fixedRoutes = [
     maturity: 'PROFILE IN PROGRESS',
     schemaType: 'ProfilePage',
     ogImage: '/assets/operators/keshawn-rowe-dossier.jpeg',
-    sourceFiles: ['src/pages/FounderPage.jsx', 'src/data/operators.json'],
+    sourceFiles: ['src/pages/FounderPage.jsx', 'site-content/collections/operators.json'],
     relatedPaths: ['/founders', '/forge', '/contact'],
   },
   {
@@ -254,8 +255,21 @@ const legacyAliases = {
   '/store.html': '/store',
 };
 
+const governedContentRoutes = SITE_CONTENT_PAGES.map((page) => ({
+  path: page.path,
+  title: `${page.title} | Hyperion Industries`,
+  description: page.description,
+  summary: page.summary || page.description,
+  maturity: page.maturity,
+  schemaType: page.template === 'collection' ? 'CollectionPage' : 'WebPage',
+  indexable: page.indexable,
+  ogImage: page.og_asset || DEFAULT_OG_IMAGE,
+  sourceFiles: [`site-content/pages/${page.id.replace(/^page_/, '')}.json`],
+  relatedPaths: page.related_paths || [],
+}));
+
 export const SEO_ROUTES = Object.freeze(
-  [...fixedRoutes, ...districtRoutes, ...intakeRoutes].map((route) => ({
+  [...fixedRoutes, ...districtRoutes, ...intakeRoutes, ...governedContentRoutes].map((route) => ({
     indexable: true,
     ogImage: DEFAULT_OG_IMAGE,
     relatedPaths: [],

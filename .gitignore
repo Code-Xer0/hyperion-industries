@@ -33,6 +33,7 @@ Hyperion Investor Diligence/
 
 # Telemetry dev sink + secrets
 telemetry/
+.builder-preview/
 .env
 .env*.local
 
