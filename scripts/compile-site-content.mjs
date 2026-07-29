@@ -184,7 +184,7 @@ export function compileSiteContent({ rootDir = defaultRoot } = {}) {
   const bundle = loadAndValidateSite(rootDir);
   const sourceManifest = sourceFiles(rootDir).map((absolute) => ({
     path: path.relative(rootDir, absolute).replaceAll('\\', '/'),
-    sha256: sha256(fs.readFileSync(absolute)),
+    sha256: sha256(canonicalJson(readJson(absolute))),
   }));
   const bundleHash = sha256(canonicalJson(bundle));
   const manifest = {

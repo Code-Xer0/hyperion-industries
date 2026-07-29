@@ -13,6 +13,10 @@ import {
 test('canonical JSON and hashes do not depend on object key order', () => {
   assert.equal(canonicalJson({ z: 1, a: { y: 2, b: 3 } }), '{"a":{"b":3,"y":2},"z":1}');
   assert.equal(sha256(canonicalJson({ b: 2, a: 1 })), sha256(canonicalJson({ a: 1, b: 2 })));
+  assert.equal(
+    sha256(canonicalJson(JSON.parse('{\r\n  "a": 1,\r\n  "b": 2\r\n}'))),
+    sha256(canonicalJson(JSON.parse('{\n  "b": 2,\n  "a": 1\n}'))),
+  );
 });
 
 test('the repository site bundle validates and compiles deterministically', () => {
