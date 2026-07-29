@@ -16,6 +16,10 @@ const RadioStatsPage = import.meta.env.DEV ? lazy(() => import('./pages/RadioSta
 const IntakePage = lazy(() => import('./features/intake/IntakePage'));
 const ForgeConfiguratorPage = lazy(() => import('./features/forge-configurator/ForgeConfiguratorPage'));
 const ForgeCatalogPage = lazy(() => import('./features/forge-catalog/ForgeCatalogPage'));
+const ForgeBuilderPage = lazy(() => import('./features/configurator-workbench/ForgeBuilderPage'));
+const PandoraRackworksPage = lazy(() => import('./features/configurator-workbench/PandoraRackworksPage'));
+const PandoraLiteGridPage = lazy(() => import('./features/configurator-workbench/PandoraLiteGridPage'));
+const ClientAccountPage = lazy(() => import('./features/client-account/ClientAccountPage'));
 const SystemsPage = lazy(() => import('./pages/SystemsPage'));
 const BuildArchivePage = lazy(() => import('./pages/BuildArchivePage'));
 const GalleryPage = lazy(() => import('./pages/GalleryPage'));
@@ -123,6 +127,10 @@ export default function App() {
               <Route path="/intake/:lane" element={<IntakeLaneRoute />} />
               <Route path="/forge/catalog" element={<ForgeCatalogPage />} />
               <Route path="/forge/configurator" element={<ForgeConfiguratorPage />} />
+              <Route path="/forge/configurator/build" element={<ForgeBuilderPage />} />
+              <Route path="/pandora/configurator" element={<PandoraRackworksPage />} />
+              <Route path="/pandora-lite/configurator" element={<PandoraLiteGridPage />} />
+              <Route path="/account" element={<ClientAccountPage />} />
               <Route path="/chronos" element={<DistrictPage districtId="chronos" />} />
               <Route path="/forge" element={<DistrictPage districtId="forge" />} />
               <Route path="/pandora" element={<DistrictPage districtId="pandora" />} />
