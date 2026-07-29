@@ -1,6 +1,8 @@
 import { SEO_REDIRECTS, SEO_ROUTE_BY_PATH } from '../../../src/data/seoRoutes.js';
 import { handleForgeGuide } from './forge-guide.js';
 import { handleForgeProducts } from './forge-products.js';
+import { handleConfiguratorApi } from './configurator-api.js';
+import { handleClientAccountApi } from './client-account-api.js';
 
 const PASS_THROUGH_PREFIXES = ['/api/', '/assets/', '/.well-known/'];
 
@@ -44,6 +46,12 @@ export async function handleRequest(request, originFetch = fetch, env = {}, exte
   }
   if (pathname === '/api/forge/guide') {
     return handleForgeGuide(request);
+  }
+  if (pathname.startsWith('/api/configurator/')) {
+    return handleConfiguratorApi(request, env, externalFetch);
+  }
+  if (pathname.startsWith('/api/client/')) {
+    return handleClientAccountApi(request, env, externalFetch);
   }
 
   if (!['GET', 'HEAD'].includes(request.method)) return originFetch(request);
