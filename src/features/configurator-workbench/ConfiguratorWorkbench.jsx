@@ -1,10 +1,10 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import {
   AlertTriangle, ArrowLeft, ArrowRight, Box, Check, ChevronRight, CircleDot,
   Database, Gauge, ImageOff, LoaderCircle, PackageCheck, Search,
-  ShieldCheck, Sparkles, Zap,
+  RefreshCw, ShieldCheck, SlidersHorizontal, Sparkles, Zap,
 } from 'lucide-react';
 import {
   FORGE_CONFIGURATOR_FALLBACK,
@@ -18,6 +18,7 @@ import {
   assemblyState,
   visualForLane,
 } from './configuratorVisualModel.js';
+import { reconcileCatalog } from './catalogRefreshModel.js';
 import './ConfiguratorWorkbench.css';
 
 const FORGE_ROLES = ['cpu', 'motherboard', 'memory', 'gpu', 'storage', 'case', 'cooler', 'psu'];
@@ -51,6 +52,42 @@ const itemRole = (item) => item.category || item.role;
 const itemPrice = (item) => item.price?.unit_landed_cost_minor ?? item.price?.amount_minor ?? null;
 const itemPricePosture = (item) => item.price?.source_posture || item.source_posture || 'unknown';
 const title = (item) => `${item.manufacturer} ${item.model}`.trim();
+const isObservedAvailable = (item) => {
+  const availability = item.price?.availability;
+  return ['in_stock', 'limited', 'fixture_in_stock'].includes(availability)
+    || item.price?.freshness === 'fresh'
+    || item.price?.freshness === 'fixture';
+};
+
+function browserRecommendation(item, selected, role, lane, requirements) {
+  const previewIssues = compatibility({ ...selected, [role]: item }, lane);
+  if (previewIssues.length) return { score: 0, fit: 'blocker', authority: 'browser_preview' };
+  const authoritative = item.recommendation?.authority === 'hypom';
+  if (authoritative) return {
+    score: item.recommendation.score_basis_points,
+    fit: item.recommendation.fit_posture,
+    authority: 'hypom',
+  };
+  let score = 5000;
+  const price = itemPrice(item);
+  if (price != null) score += Math.max(0, 1400 - Math.min(1400, Math.floor(price / 500)));
+  if (isObservedAvailable(item)) score += 700;
+  if (requirements.priority === 'compact') {
+    score += Math.max(0, 900 - Number(item.specs?.length_mm || item.specs?.height_mm || 300) * 2);
+  }
+  if (requirements.priority === 'quiet') score += Math.max(0, 800 - Number(item.specs?.power_w || 0) * 2);
+  if (requirements.priority === 'headroom') {
+    score += Math.min(1200, Number(item.specs?.wattage || item.specs?.capacity_gb || item.specs?.max_memory_gb || 0));
+  }
+  const workloadRoles = {
+    gaming: ['cpu', 'gpu'],
+    creator: ['cpu', 'gpu', 'memory', 'storage'],
+    local_ai: ['gpu', 'memory', 'storage'],
+    engineering: ['cpu', 'gpu', 'memory'],
+  };
+  if (workloadRoles[requirements.workload]?.includes(role)) score += 800;
+  return { score: Math.min(10000, score), fit: 'browser_preview', authority: 'browser_preview' };
+}
 
 function compatibility(selected, lane) {
   if (lane !== 'forge') return [];
@@ -124,9 +161,13 @@ export default function ConfiguratorWorkbench({ lane }) {
   const storageKey = `hyperion-${lane}-workbench-v1`;
   const [catalog, setCatalog] = useState([]);
   const [sourcePosture, setSourcePosture] = useState('loading');
+  const [catalogMeta, setCatalogMeta] = useState({ total: 0, generatedAt: null, refreshState: 'loading' });
   const [selectedRole, setSelectedRole] = useState(roles[0]);
   const [selectedIds, setSelectedIds] = useState(forge ? DEFAULT_FORGE : {});
   const [query, setQuery] = useState('');
+  const [catalogSort, setCatalogSort] = useState('recommended');
+  const [showBlocked, setShowBlocked] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(8);
   const [requirements, setRequirements] = useState(forge
     ? { workload: 'gaming', budget: 250000, priority: 'balanced' }
     : { nodeCount: rack ? 2 : 4, circuit: rack ? 10000 : 2400, fabric: rack ? '25gbe' : '2.5gbe' });
@@ -139,40 +180,109 @@ export default function ConfiguratorWorkbench({ lane }) {
       if (draft) {
         setSelectedIds(draft.selectedIds || (forge ? DEFAULT_FORGE : {}));
         setRequirements(draft.requirements || requirements);
+      } else if (forge) {
+        const guide = JSON.parse(localStorage.getItem('hyperion-forge-concierge-v2') || 'null');
+        if (guide?.answers) {
+          const destination = guide.answers.destination;
+          const budgetMap = { under_1500: 150000, '1500_2500': 250000, '2500_4000': 400000, '4000_plus': 700000 };
+          const priority = guide.answers.footprint === 'compact'
+            ? 'compact'
+            : ['near_silent', 'quiet'].includes(guide.answers.acoustics)
+              ? 'quiet'
+              : guide.answers.service === 'self_service'
+                ? 'service'
+                : 'balanced';
+          setRequirements({
+            workload: destination === 'deployment' ? 'engineering' : destination === 'sim_rig' ? 'gaming' : destination || 'general',
+            budget: budgetMap[guide.answers.budget] || 250000,
+            priority,
+          });
+        }
       }
     } catch { /* local draft is optional */ }
-    fetch(`/api/configurator/${domain}${forge ? '?limit=100' : `?lane=${lane === 'rackworks' ? 'rackworks' : 'lite_grid'}`}`)
-      .then((response) => response.ok ? response.json() : Promise.reject(new Error('catalog_unavailable')))
-      .then((payload) => {
-        setCatalog(payload.items || []);
-        setSourcePosture(payload.source_posture || 'unknown');
-      })
-      .catch(() => {
-        const fallback = forge
-          ? FORGE_CONFIGURATOR_FALLBACK
-          : {
-              ...PANDORA_CONFIGURATOR_FALLBACK,
-              items: PANDORA_CONFIGURATOR_FALLBACK.items.filter(
-                (item) => item.product_lane === (rack ? 'rackworks' : 'lite_grid'),
-              ),
-            };
-        setCatalog(fallback.items);
-        setSourcePosture(fallback.source_posture);
-      });
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [domain, forge, lane, storageKey]);
+  }, [forge, storageKey]);
+
+  const refreshCatalog = useCallback(async ({ silent = false } = {}) => {
+    if (!silent) setCatalogMeta((current) => ({ ...current, refreshState: 'loading' }));
+    const params = new URLSearchParams();
+    if (forge) {
+      params.set('limit', '200');
+      params.set('workload_profile', requirements.workload);
+      params.set('priority', requirements.priority);
+      params.set('sort', 'recommended');
+      const selectedPartIds = Object.values(selectedIds).filter(Boolean);
+      if (selectedPartIds.length) params.set('selected_part_ids', selectedPartIds.join(','));
+    } else {
+      params.set('lane', lane === 'rackworks' ? 'rackworks' : 'lite_grid');
+    }
+    try {
+      const response = await fetch(`/api/configurator/${domain}?${params}`, { cache: 'no-store' });
+      if (!response.ok) throw new Error('catalog_unavailable');
+      const payload = await response.json();
+      const observedAt = payload.generated_at || new Date().toISOString();
+      setCatalog((current) => reconcileCatalog(current, payload.items || [], selectedIds, observedAt));
+      setSourcePosture(payload.source_posture || 'unknown');
+      setCatalogMeta({
+        total: payload.pagination?.total ?? payload.items?.length ?? 0,
+        generatedAt: observedAt,
+        refreshState: 'current',
+      });
+    } catch {
+      const fallback = forge
+        ? FORGE_CONFIGURATOR_FALLBACK
+        : {
+            ...PANDORA_CONFIGURATOR_FALLBACK,
+            items: PANDORA_CONFIGURATOR_FALLBACK.items.filter(
+              (item) => item.product_lane === (rack ? 'rackworks' : 'lite_grid'),
+            ),
+          };
+      setCatalog((current) => reconcileCatalog(current, fallback.items, selectedIds, fallback.generated_at || new Date().toISOString()));
+      setSourcePosture(fallback.source_posture);
+      setCatalogMeta({
+        total: fallback.pagination?.total ?? fallback.items.length,
+        generatedAt: fallback.generated_at || null,
+        refreshState: 'degraded',
+      });
+    }
+  }, [domain, forge, lane, rack, requirements.priority, requirements.workload, selectedIds]);
+
+  useEffect(() => { refreshCatalog(); }, [refreshCatalog]);
+  useEffect(() => {
+    const refresh = () => { if (document.visibilityState === 'visible') refreshCatalog({ silent: true }); };
+    const timer = window.setInterval(refresh, 60_000);
+    document.addEventListener('visibilitychange', refresh);
+    return () => {
+      window.clearInterval(timer);
+      document.removeEventListener('visibilitychange', refresh);
+    };
+  }, [refreshCatalog]);
 
   const byId = useMemo(() => new Map(catalog.map((item) => [itemId(item), item])), [catalog]);
   const selected = useMemo(() => Object.fromEntries(
     Object.entries(selectedIds).map(([role, id]) => [role, byId.get(id)]).filter(([, item]) => item),
   ), [byId, selectedIds]);
   const issues = useMemo(() => compatibility(selected, lane), [lane, selected]);
-  const filtered = useMemo(() => catalog.filter((item) => itemRole(item) === selectedRole && `${item.manufacturer} ${item.model} ${itemId(item)}`.toLowerCase().includes(query.toLowerCase())), [catalog, query, selectedRole]);
+  const ranked = useMemo(() => catalog
+    .filter((item) => itemRole(item) === selectedRole && `${item.manufacturer} ${item.model} ${itemId(item)}`.toLowerCase().includes(query.toLowerCase()))
+    .map((item) => ({ item, recommendation: browserRecommendation(item, selected, selectedRole, lane, requirements) }))
+    .filter(({ recommendation }) => showBlocked || recommendation.fit !== 'blocker')
+    .sort((left, right) => {
+      if (catalogSort === 'price_asc') return (itemPrice(left.item) ?? Number.MAX_SAFE_INTEGER) - (itemPrice(right.item) ?? Number.MAX_SAFE_INTEGER) || itemId(left.item).localeCompare(itemId(right.item));
+      if (catalogSort === 'price_desc') return (itemPrice(right.item) ?? -1) - (itemPrice(left.item) ?? -1) || itemId(left.item).localeCompare(itemId(right.item));
+      if (catalogSort === 'name') return title(left.item).localeCompare(title(right.item));
+      return right.recommendation.score - left.recommendation.score || itemId(left.item).localeCompare(itemId(right.item));
+    }), [catalog, catalogSort, lane, query, requirements, selected, selectedRole, showBlocked]);
+  const filtered = ranked.slice(0, visibleCount);
   const total = useMemo(() => Object.values(selected).reduce((sum, item) => sum + (itemPrice(item) || 0), 0), [selected]);
   const pricedCount = Object.values(selected).filter((item) => itemPrice(item) != null).length;
+  const availablePricedCount = Object.values(selected).filter((item) => itemPrice(item) != null && isObservedAvailable(item)).length;
+  const availabilityChangedCount = Object.values(selected).filter((item) => item.source_posture === 'availability_changed').length;
   const visual = visualForLane(lane);
   const visualAvailable = failedVisualAsset !== visual.asset;
   const assembly = useMemo(() => assemblyState(roles, selected), [roles, selected]);
+
+  useEffect(() => { setVisibleCount(8); }, [catalogSort, query, selectedRole, showBlocked]);
 
   const choose = (item) => {
     setSelectedIds((current) => ({ ...current, [selectedRole]: itemId(item) }));
@@ -305,7 +415,7 @@ export default function ConfiguratorWorkbench({ lane }) {
       <div className="bench-shell">
         <header className="bench-hero">
           <div><Link to={meta.back}><ArrowLeft size={14} />Back to the guided route</Link><span>{meta.eyebrow}</span><h1>{meta.heading}</h1><p>{meta.copy}</p></div>
-          <div className="bench-source"><CircleDot /><span>Source posture</span><strong>{sourcePosture.replaceAll('_', ' ')}</strong><small>Prices are estimates until a formal quote.</small></div>
+          <div className="bench-source"><CircleDot /><span>Source posture</span><strong>{sourcePosture.replaceAll('_', ' ')}</strong><small>{catalogMeta.total} catalog records · {catalogMeta.generatedAt ? `checked ${new Date(catalogMeta.generatedAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}` : 'awaiting first refresh'}</small><button type="button" onClick={() => refreshCatalog()} disabled={catalogMeta.refreshState === 'loading'}><RefreshCw className={catalogMeta.refreshState === 'loading' ? 'bench-spin' : ''} />Refresh availability</button></div>
         </header>
         {forge ? <ForgeControls requirements={requirements} setRequirements={setRequirements} /> : <PandoraControls lane={lane} requirements={requirements} setRequirements={setRequirements} />}
         <GuideRail lane={lane} role={selectedRole} selected={selected} issues={issues} />
@@ -341,13 +451,21 @@ export default function ConfiguratorWorkbench({ lane }) {
             })}
           </nav>
           <section className="bench-catalog">
-            <header><div><span>NOW VISITING</span><h2>{LABELS[selectedRole]}</h2></div><label><Search size={15} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={`Search ${LABELS[selectedRole].toLowerCase()}…`} /></label></header>
+            <header>
+              <div><span>NOW VISITING</span><h2>{LABELS[selectedRole]}</h2><small>{ranked.length} matching option{ranked.length === 1 ? '' : 's'} · ranked for {requirements.workload.replaceAll('_', ' ')}</small></div>
+              <div className="bench-catalog-tools">
+                <label className="bench-search"><Search size={15} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder={`Search ${LABELS[selectedRole].toLowerCase()}…`} /></label>
+                <label className="bench-sort"><SlidersHorizontal /><select value={catalogSort} onChange={(event) => setCatalogSort(event.target.value)}><option value="recommended">Recommended</option><option value="price_asc">Price low to high</option><option value="price_desc">Price high to low</option><option value="name">Manufacturer / model</option></select></label>
+                <label className="bench-show-blocked"><input type="checkbox" checked={showBlocked} onChange={(event) => setShowBlocked(event.target.checked)} /><span>Show fit blockers</span></label>
+              </div>
+            </header>
             <div className="bench-part-list">
-              {filtered.map((item) => {
+              {filtered.map(({ item, recommendation }) => {
                 const chosen = selectedIds[selectedRole] === itemId(item);
-                return <article key={itemId(item)} className={chosen ? 'is-selected' : ''}><PartVisual item={item} role={itemRole(item)} selected={chosen} lane={lane} /><div className="bench-part-copy"><span>{item.manufacturer} · {itemPricePosture(item).replaceAll('_', ' ')}</span><h3>{item.model}</h3><SpecStrip item={item} /></div><div className="bench-part-action"><strong>{money(itemPrice(item), item.price?.currency || 'USD')}</strong><small>{item.price?.freshness || 'fixture estimate'}</small><button type="button" onClick={() => choose(item)}>{chosen ? 'On tray' : 'Choose'}</button></div></article>;
+                return <article key={itemId(item)} className={chosen ? 'is-selected' : ''}><PartVisual item={item} role={itemRole(item)} selected={chosen} lane={lane} /><div className="bench-part-copy"><span>{item.manufacturer} · {itemPricePosture(item).replaceAll('_', ' ')}</span><h3>{item.model}</h3><div className="bench-recommendation"><b>{recommendation.authority === 'hypom' ? 'HypOM ranked' : 'Preview ranked'}</b><span>{recommendation.fit.replaceAll('_', ' ')}</span><em>{Math.round(recommendation.score / 100)}%</em></div><SpecStrip item={item} /></div><div className="bench-part-action"><strong>{money(itemPrice(item), item.price?.currency || 'USD')}</strong><small>{isObservedAvailable(item) ? `${item.price?.freshness || 'observed'} · available posture` : 'availability unresolved'}</small><button type="button" onClick={() => choose(item)}>{chosen ? 'On tray' : 'Choose'}</button></div></article>;
               })}
-              {!filtered.length && <div className="bench-empty"><Database /><strong>No components in this stop.</strong><p>The source is unavailable or this lane has not admitted a matching component.</p></div>}
+              {!ranked.length && <div className="bench-empty"><Database /><strong>No compatible components in this view.</strong><p>Change the search, show fit blockers, or wait for the next managed-source refresh.</p></div>}
+              {ranked.length > visibleCount && <button type="button" className="bench-load-more" onClick={() => setVisibleCount((current) => current + 8)}>Show 8 more <span>{ranked.length - visibleCount} remaining</span></button>}
             </div>
           </section>
           <aside className="bench-tray">
@@ -356,6 +474,7 @@ export default function ConfiguratorWorkbench({ lane }) {
             <div className="bench-fit">
               <span>Fit posture</span>
               {issues.length ? issues.map((issue) => <p key={issue.code}><AlertTriangle />{issue.label}</p>) : <p className="is-good"><Check />No deterministic browser blocker found.</p>}
+              {availabilityChangedCount > 0 && <p><RefreshCw />{availabilityChangedCount} selected part{availabilityChangedCount === 1 ? '' : 's'} left the current feed. The saved choice remains visible for replacement.</p>}
               {!forge && <p><Gauge />Formal circuit and topology checks run when the plan is created.</p>}
             </div>
             <div className="bench-runtime" data-state={runtime.state}><span>{runtime.state === 'loading' ? <LoaderCircle className="bench-spin" /> : runtime.state === 'complete' ? <Check /> : <Zap />}</span><p>{runtime.message}</p></div>
@@ -370,7 +489,7 @@ export default function ConfiguratorWorkbench({ lane }) {
           selectedIds={selectedIds}
           issues={issues}
           sourcePosture={sourcePosture}
-          pricedCount={pricedCount}
+          pricedCount={availablePricedCount}
           total={total}
           requirements={requirements}
           runtime={runtime}

@@ -51,7 +51,24 @@ function fallbackCatalog(request, domain, lane) {
     }, 503);
   }
   if (domain === 'forge') {
-    return json(request, { ...FORGE_CONFIGURATOR_FALLBACK, degraded_reason: 'hypom_not_configured' });
+    const url = new URL(request.url);
+    const category = url.searchParams.get('category');
+    const query = (url.searchParams.get('q') || '').trim().toLowerCase();
+    const requestedLimit = Number(url.searchParams.get('limit') || 50);
+    const requestedOffset = Number(url.searchParams.get('offset') || 0);
+    const limit = Number.isInteger(requestedLimit) ? Math.min(200, Math.max(1, requestedLimit)) : 50;
+    const offset = Number.isInteger(requestedOffset) ? Math.max(0, requestedOffset) : 0;
+    const filtered = FORGE_CONFIGURATOR_FALLBACK.items.filter((item) => (
+      (!category || item.category === category)
+      && (!query || `${item.manufacturer} ${item.model} ${item.mpn}`.toLowerCase().includes(query))
+    ));
+    return json(request, {
+      ...FORGE_CONFIGURATOR_FALLBACK,
+      items: filtered.slice(offset, offset + limit),
+      pagination: { limit, offset, total: filtered.length },
+      generated_at: new Date().toISOString(),
+      degraded_reason: 'hypom_not_configured',
+    });
   }
   const items = PANDORA_CONFIGURATOR_FALLBACK.items.filter((item) => !lane || item.product_lane === lane);
   return json(request, {

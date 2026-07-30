@@ -334,8 +334,18 @@ test('configurator catalogs remain useful and truthful without managed authoriti
   const forgePayload = await forge.json();
   assert.equal(forge.status, 200);
   assert.equal(forgePayload.source_posture, 'bundled_fixture_fallback');
-  assert.equal(forgePayload.items.length, 22);
+  assert.equal(forgePayload.items.length, 97);
+  assert.equal(forgePayload.pagination.total, 97);
   assert.match(forge.headers.get('set-cookie'), /hyperion_subject=.*HttpOnly/);
+
+  const gpuPage = await handleRequest(
+    new Request('https://hyperion-industries.dev/api/configurator/forge?category=gpu&q=radeon&limit=3&offset=1'),
+    originFetch,
+  );
+  const gpuPayload = await gpuPage.json();
+  assert.equal(gpuPayload.items.length, 3);
+  assert.ok(gpuPayload.pagination.total > 3);
+  assert.ok(gpuPayload.items.every((item) => item.category === 'gpu' && item.model.includes('Radeon')));
 
   const pandora = await handleRequest(
     new Request('https://hyperion-industries.dev/api/configurator/pandora?lane=lite_grid'),
