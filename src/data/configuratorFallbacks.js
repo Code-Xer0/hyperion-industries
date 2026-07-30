@@ -48,8 +48,9 @@ export const FORGE_CONFIGURATOR_FALLBACK = {
     forge('HYP-PART-FIX-PSU-1600', 'psu', 'Corsair', 'AX1600i', 60900, { wattage: 1600, connectors: { '12V2X6': 2 } }),
     forge('HYP-PART-FIX-SSD-2TB', 'storage', 'Samsung', '990 PRO 2TB', 17900, { interface: 'M2_NVME', capacity_gb: 2000, power_w: 8 }),
     forge('HYP-PART-FIX-SSD-4TB', 'storage', 'Western Digital', 'Black SN850X 4TB', 29900, { interface: 'M2_NVME', capacity_gb: 4000, power_w: 9 }),
+    ...FORGE_EXPANDED_FIXTURES,
   ],
-  pagination: { limit: 100, offset: 0, total: 22 },
+  pagination: { limit: 200, offset: 0, total: 97 },
 };
 
 const pandora = (id, role, lane, model, amountMinor, specs) => ({
@@ -88,3 +89,4 @@ export const PANDORA_CONFIGURATOR_FALLBACK = {
     pandora('PAND-COMP-LITE-FRAME', 'lite_frame', 'lite_grid', 'Modular Lite Grid Frame', 58000, { node_capacity: 12, power_w: 0 }),
   ],
 };
+import { FORGE_EXPANDED_FIXTURES } from './forgeExpandedFixtures.js';
