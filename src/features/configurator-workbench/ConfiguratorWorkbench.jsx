@@ -3,13 +3,20 @@ import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import {
   AlertTriangle, ArrowLeft, ArrowRight, Box, Check, ChevronRight, CircleDot,
-  Cpu, Database, Gauge, LoaderCircle, PackageCheck, Search, Server,
+  Database, Gauge, ImageOff, LoaderCircle, PackageCheck, Search,
   ShieldCheck, Sparkles, Zap,
 } from 'lucide-react';
 import {
   FORGE_CONFIGURATOR_FALLBACK,
   PANDORA_CONFIGURATOR_FALLBACK,
 } from '../../data/configuratorFallbacks.js';
+import BuildStage from './BuildStage.jsx';
+import PartVisual from './PartVisual.jsx';
+import {
+  VISUAL_AUTHORITY,
+  assemblyState,
+  visualForLane,
+} from './configuratorVisualModel.js';
 import './ConfiguratorWorkbench.css';
 
 const FORGE_ROLES = ['cpu', 'motherboard', 'memory', 'gpu', 'storage', 'case', 'cooler', 'psu'];
@@ -123,6 +130,7 @@ export default function ConfiguratorWorkbench({ lane }) {
     ? { workload: 'gaming', budget: 250000, priority: 'balanced' }
     : { nodeCount: rack ? 2 : 4, circuit: rack ? 10000 : 2400, fabric: rack ? '25gbe' : '2.5gbe' });
   const [runtime, setRuntime] = useState({ state: 'idle', message: 'Local draft ready.', result: null });
+  const [failedVisualAsset, setFailedVisualAsset] = useState(null);
 
   useEffect(() => {
     try {
@@ -161,6 +169,9 @@ export default function ConfiguratorWorkbench({ lane }) {
   const filtered = useMemo(() => catalog.filter((item) => itemRole(item) === selectedRole && `${item.manufacturer} ${item.model} ${itemId(item)}`.toLowerCase().includes(query.toLowerCase())), [catalog, query, selectedRole]);
   const total = useMemo(() => Object.values(selected).reduce((sum, item) => sum + (itemPrice(item) || 0), 0), [selected]);
   const pricedCount = Object.values(selected).filter((item) => itemPrice(item) != null).length;
+  const visual = visualForLane(lane);
+  const visualAvailable = failedVisualAsset !== visual.asset;
+  const assembly = useMemo(() => assemblyState(roles, selected), [roles, selected]);
 
   const choose = (item) => {
     setSelectedIds((current) => ({ ...current, [selectedRole]: itemId(item) }));
@@ -288,6 +299,30 @@ export default function ConfiguratorWorkbench({ lane }) {
         </header>
         {forge ? <ForgeControls requirements={requirements} setRequirements={setRequirements} /> : <PandoraControls lane={lane} requirements={requirements} setRequirements={setRequirements} />}
         <GuideRail lane={lane} role={selectedRole} selected={selected} issues={issues} />
+        <section className="bench-cinematic" aria-label={`${visual.title} and interactive assembly preview`}>
+          <figure className={`bench-concept-art${visualAvailable ? '' : ' is-missing'}`}>
+            <div className="bench-concept-frame">
+              {visualAvailable
+                ? <img src={visual.asset} alt={visual.alt} onError={() => setFailedVisualAsset(visual.asset)} />
+                : <div className="bench-concept-fallback"><ImageOff /><span>Concept reference unavailable</span></div>}
+              <span className="bench-concept-scan" aria-hidden="true" />
+              <span className="bench-concept-index" aria-hidden="true">{String(Math.min(assembly.selectedCount, assembly.totalCount)).padStart(2, '0')} / {String(assembly.totalCount).padStart(2, '0')}</span>
+            </div>
+            <figcaption>
+              <span className="bench-concept-eyebrow">AI-GENERATED CONCEPT REFERENCE</span>
+              <h2>{visual.title}</h2>
+              <p>Use this for spatial orientation and build storytelling only. Exact identity and engineering checks come from the selected records.</p>
+              <span className="bench-visual-truth"><ShieldCheck size={14} />{VISUAL_AUTHORITY.label}</span>
+            </figcaption>
+          </figure>
+          <BuildStage
+            lane={lane}
+            selected={selected}
+            selectedRole={selectedRole}
+            roles={roles}
+            issues={issues}
+          />
+        </section>
         <div className="bench-grid">
           <nav className="bench-roles" aria-label="Component categories">
             {roles.map((role, index) => {
@@ -300,7 +335,7 @@ export default function ConfiguratorWorkbench({ lane }) {
             <div className="bench-part-list">
               {filtered.map((item) => {
                 const chosen = selectedIds[selectedRole] === itemId(item);
-                return <article key={itemId(item)} className={chosen ? 'is-selected' : ''}><div className="bench-part-mark">{forge ? <Cpu /> : <Server />}</div><div className="bench-part-copy"><span>{item.manufacturer} · {itemPricePosture(item).replaceAll('_', ' ')}</span><h3>{item.model}</h3><SpecStrip item={item} /></div><div className="bench-part-action"><strong>{money(itemPrice(item), item.price?.currency || 'USD')}</strong><small>{item.price?.freshness || 'fixture estimate'}</small><button type="button" onClick={() => choose(item)}>{chosen ? 'On tray' : 'Choose'}</button></div></article>;
+                return <article key={itemId(item)} className={chosen ? 'is-selected' : ''}><PartVisual item={item} role={itemRole(item)} selected={chosen} lane={lane} /><div className="bench-part-copy"><span>{item.manufacturer} · {itemPricePosture(item).replaceAll('_', ' ')}</span><h3>{item.model}</h3><SpecStrip item={item} /></div><div className="bench-part-action"><strong>{money(itemPrice(item), item.price?.currency || 'USD')}</strong><small>{item.price?.freshness || 'fixture estimate'}</small><button type="button" onClick={() => choose(item)}>{chosen ? 'On tray' : 'Choose'}</button></div></article>;
               })}
               {!filtered.length && <div className="bench-empty"><Database /><strong>No components in this stop.</strong><p>The source is unavailable or this lane has not admitted a matching component.</p></div>}
             </div>

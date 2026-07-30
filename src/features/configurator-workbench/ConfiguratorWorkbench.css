@@ -26,6 +26,29 @@
 .bench-guide > span { display: flex; align-items: center; gap: 7px; color: var(--bench-accent); font: 700 .64rem/1 var(--font-display, monospace); text-transform: uppercase; letter-spacing: .1em; }
 .bench-guide h2 { margin: 0; font-size: .94rem; }.bench-guide > p { margin: 0; color: #aaa79e; font-size: .78rem; line-height: 1.45; }
 .bench-guide-rule { display: flex; gap: 8px; color: #858881; font-size: .66rem; line-height: 1.4; }.bench-guide-rule svg { flex: 0 0 auto; color: var(--bench-accent); }
+.bench-cinematic { display: grid; grid-template-columns: minmax(0, .92fr) minmax(520px, 1.08fr); gap: 16px; align-items: stretch; margin: 0 0 18px; }
+.bench-concept-art { display: grid; grid-template-rows: minmax(390px, 1fr) auto; min-width: 0; margin: 0; overflow: hidden; border: 1px solid #30332d; border-radius: 16px; background: #0c0e0d; box-shadow: 0 28px 70px rgba(0,0,0,.24); }
+.bench-concept-frame { position: relative; min-height: 390px; overflow: hidden; background:
+  radial-gradient(circle at 68% 43%, color-mix(in srgb, var(--bench-accent) 11%, transparent), transparent 38%),
+  linear-gradient(150deg, #111411, #070908);
+}
+.bench-concept-frame::before, .bench-concept-frame::after { position: absolute; z-index: 3; content: ""; pointer-events: none; }
+.bench-concept-frame::before { inset: 0; background: linear-gradient(90deg, rgba(4,6,5,.78), transparent 42%), linear-gradient(0deg, rgba(5,7,6,.76), transparent 32%); }
+.bench-concept-frame::after { inset: 12px; border: 1px solid rgba(255,255,255,.055); border-radius: 7px; box-shadow: inset 0 0 45px rgba(0,0,0,.2); }
+.bench-concept-frame img { width: 100%; height: 100%; min-height: 390px; object-fit: cover; object-position: center; filter: saturate(.82) contrast(1.04); transform: scale(1.025); animation: bench-concept-breathe 16s ease-in-out infinite alternate; }
+.bench-concept-scan { position: absolute; z-index: 4; top: 0; bottom: 0; left: 14%; width: 1px; opacity: .55; background: linear-gradient(transparent, var(--bench-accent) 20%, var(--bench-accent) 80%, transparent); box-shadow: 0 0 12px color-mix(in srgb, var(--bench-accent) 48%, transparent); animation: bench-concept-scan 8s ease-in-out infinite alternate; pointer-events: none; }
+.bench-concept-index { position: absolute; z-index: 5; right: 25px; bottom: 22px; color: var(--bench-accent); font: 700 .54rem/1 var(--font-display, monospace); letter-spacing: .12em; }
+.bench-concept-art figcaption { position: relative; display: grid; gap: 7px; align-content: start; padding: 18px 20px 20px; border-top: 1px solid #30332d; background:
+  linear-gradient(100deg, color-mix(in srgb, var(--bench-accent) 5%, transparent), transparent 45%),
+  #101210;
+}
+.bench-concept-eyebrow { color: var(--bench-accent); font: 700 .52rem/1 var(--font-display, monospace); letter-spacing: .11em; }
+.bench-concept-art h2 { margin: 0; font-size: 1.06rem; letter-spacing: -.02em; }
+.bench-concept-art figcaption p { max-width: 620px; margin: 0; color: #85887f; font-size: .66rem; line-height: 1.5; }
+.bench-visual-truth { display: inline-flex; gap: 6px; align-items: center; width: fit-content; margin-top: 3px; padding: 6px 8px; color: #a6a9a1; border: 1px solid #3a3d36; border-radius: 999px; background: rgba(5,7,6,.48); font: 700 .48rem/1 var(--font-display, monospace); text-transform: uppercase; letter-spacing: .07em; }
+.bench-visual-truth svg { color: var(--bench-accent); }
+.bench-concept-fallback { position: absolute; inset: 0; display: grid; place-content: center; justify-items: center; gap: 10px; color: #6f736b; font: 700 .58rem/1 var(--font-display, monospace); text-transform: uppercase; letter-spacing: .1em; }
+.bench-concept-fallback svg { width: 28px; height: 28px; color: var(--bench-accent); }
 .bench-grid { display: grid; grid-template-columns: 240px minmax(420px, 1fr) 310px; gap: 16px; align-items: start; }
 .bench-roles, .bench-catalog, .bench-tray { border: 1px solid #2d302a; border-radius: 14px; background: rgba(14,16,13,.84); overflow: hidden; }
 .bench-roles { display: grid; }
@@ -39,7 +62,7 @@
 .bench-catalog header label { display: flex; align-items: center; gap: 7px; min-width: 220px; padding: 9px 10px; color: #73766f; border: 1px solid #373a33; border-radius: 8px; }
 .bench-catalog header input { width: 100%; color: #eee8dc; border: 0; outline: 0; background: transparent; font: inherit; }
 .bench-part-list { display: grid; max-height: 660px; overflow-y: auto; }
-.bench-part-list article { display: grid; grid-template-columns: 56px minmax(0, 1fr) 126px; gap: 13px; align-items: center; min-height: 108px; padding: 13px 16px; border-bottom: 1px solid #292b27; transition: background .18s ease; }
+.bench-part-list article { display: grid; grid-template-columns: 104px minmax(0, 1fr) 126px; gap: 13px; align-items: center; min-height: 122px; padding: 13px 16px; border-bottom: 1px solid #292b27; transition: background .18s ease; }
 .bench-part-list article.is-selected { background: color-mix(in srgb, var(--bench-accent) 7%, transparent); box-shadow: inset 3px 0 var(--bench-accent); }
 .bench-part-mark { display: grid; place-items: center; width: 48px; height: 48px; color: var(--bench-accent); border: 1px solid #3a3d36; border-radius: 11px; background: linear-gradient(145deg, #171a16, #0e100d); }
 .bench-part-copy { min-width: 0; }.bench-part-copy > span { color: #7d8079; font: 700 .52rem/1 var(--font-display, monospace); text-transform: uppercase; letter-spacing: .08em; }
@@ -61,17 +84,33 @@
 .bench-tray > footer { display: flex; gap: 7px; padding: 12px 15px; color: #686b65; border-top: 1px solid #2d302a; font-size: .55rem; }.bench-tray > footer svg { width: 13px; height: 13px; }
 .bench-spin { animation: bench-spin .8s linear infinite; }
 @keyframes bench-spin { to { transform: rotate(360deg); } }
+@keyframes bench-concept-breathe {
+  from { transform: scale(1.025) translate3d(-.35%, 0, 0); }
+  to { transform: scale(1.055) translate3d(.35%, -.25%, 0); }
+}
+@keyframes bench-concept-scan {
+  from { left: 14%; }
+  to { left: 86%; }
+}
+@media (max-width: 1260px) {
+  .bench-cinematic { grid-template-columns: 1fr; }
+  .bench-concept-art { grid-template-columns: minmax(0, 1.45fr) minmax(280px, .55fr); grid-template-rows: minmax(340px, auto); }
+  .bench-concept-frame, .bench-concept-frame img { min-height: 340px; }
+  .bench-concept-art figcaption { align-content: end; border-top: 0; border-left: 1px solid #30332d; }
+}
 @media (max-width: 1180px) {
   .bench-grid { grid-template-columns: 210px minmax(0, 1fr); }.bench-tray { position: static; grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, 1fr); }.bench-tray > header, .bench-tray > footer { grid-column: 1 / -1; }.bench-actions { border-bottom: 1px solid #2b2d28; }
 }
 @media (max-width: 800px) {
   .configurator-workbench { padding: 88px 12px 46px; }.bench-hero { grid-template-columns: 1fr; }.bench-questions { grid-template-columns: 1fr; }.bench-guide { grid-template-columns: 1fr; }
+  .bench-concept-art { grid-template-columns: 1fr; grid-template-rows: minmax(300px, auto) auto; }.bench-concept-art figcaption { border-top: 1px solid #30332d; border-left: 0; }.bench-concept-frame, .bench-concept-frame img { min-height: 300px; }
   .bench-grid { grid-template-columns: 1fr; }.bench-roles { grid-template-columns: repeat(2, minmax(0, 1fr)); }.bench-roles button:nth-last-child(2) { border-bottom: 0; }.bench-catalog header { align-items: stretch; flex-direction: column; }.bench-catalog header label { min-width: 0; }
-  .bench-tray { grid-column: auto; grid-template-columns: 1fr; }.bench-tray > header, .bench-tray > footer { grid-column: auto; }.bench-part-list article { grid-template-columns: 44px minmax(0, 1fr); }.bench-part-action { grid-column: 2; justify-items: start; }
+  .bench-tray { grid-column: auto; grid-template-columns: 1fr; }.bench-tray > header, .bench-tray > footer { grid-column: auto; }.bench-part-list article { grid-template-columns: 84px minmax(0, 1fr); }.bench-part-action { grid-column: 2; justify-items: start; }
 }
 @media (max-width: 520px) {
   .bench-hero h1 { font-size: 2.45rem; }.bench-roles { grid-template-columns: 1fr; }.bench-roles button:nth-last-child(2) { border-bottom: 1px solid #292b27; }
 }
 @media (prefers-reduced-motion: reduce) {
   .bench-part-list article { transition: none; }.bench-spin { animation-duration: 1.8s; }
+  .bench-concept-frame img, .bench-concept-scan { animation: none; }
 }
