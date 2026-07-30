@@ -153,7 +153,7 @@ export async function buildOrderSubmission({
     answer('configurator.selection_hash', selectionHash, submittedAt),
     answer('configurator.source_posture', sourcePosture, submittedAt),
     answer('configurator.browser_fit_posture', issues.length ? 'blocked' : 'clear_preview', submittedAt),
-    answer('configurator.estimated_total_minor', totalMinor, submittedAt),
+    answer('configurator.estimated_total_minor', String(totalMinor), submittedAt),
     answer('configurator.estimate_authority', 'not_a_quote', submittedAt),
     answer('configurator.engineering_authority', engineeringAuthority, submittedAt),
     answer('configurator.fulfillment_country', fulfillment.country, submittedAt),
