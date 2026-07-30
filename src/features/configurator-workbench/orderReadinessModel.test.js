@@ -70,6 +70,7 @@ test('submission contains the operator handoff and excludes checkout secrets', a
   assert.equal(payload.client_reviewed, true);
   assert.equal(payload.artifacts.length, 0);
   assert.ok(payload.answers.find((entry) => entry.question_id === 'configurator.selection_hash').value.match(/^[a-f0-9]{64}$/));
+  assert.equal(payload.answers.find((entry) => entry.question_id === 'configurator.estimated_total_minor').value, '200000');
   const serialized = JSON.stringify(payload).toLowerCase();
   for (const forbidden of ['card_number', 'pan', 'cvv', 'payment_token', 'street_address', 'merchant_credential']) {
     assert.equal(serialized.includes(forbidden), false);
