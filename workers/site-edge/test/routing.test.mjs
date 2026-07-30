@@ -32,6 +32,26 @@ test('Forge catalog direct navigation resolves its generated canonical shell', a
   assert.equal(response.headers.get('x-hyperion-origin-path'), '/forge/catalog/index.html');
 });
 
+test('allowlisted Card Studio starters resolve the shared designer shell', async () => {
+  for (const starterId of ['axis', 'example-axis-consulting']) {
+    const pathname = `/card-studio/design/${starterId}`;
+    const response = await handleRequest(new Request(`https://hyperion-industries.dev${pathname}`), originFetch);
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get('x-hyperion-canonical-route'), pathname);
+    assert.equal(response.headers.get('x-hyperion-origin-path'), '/card-studio/design/index.html');
+  }
+});
+
+test('unknown Card Studio starters remain noindex 404s', async () => {
+  const response = await handleRequest(
+    new Request('https://hyperion-industries.dev/card-studio/design/not-a-starter'),
+    originFetch,
+  );
+  assert.equal(response.status, 404);
+  assert.equal(response.headers.get('x-robots-tag'), 'noindex, nofollow');
+  assert.equal(response.headers.get('x-hyperion-origin-path'), '/404.html');
+});
+
 test('legacy alias redirects in one hop', async () => {
   const response = await handleRequest(new Request('https://hyperion-industries.dev/card-studio/studio.html?ref=test'), originFetch);
   assert.equal(response.status, 301);
