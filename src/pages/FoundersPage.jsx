@@ -4,7 +4,7 @@ import PageShell from '../components/layout/PageShell';
 import RoomShell from '../components/portal/RoomShell';
 import OperatorCard from '../components/cards/OperatorCard';
 import HoverEditor from '../components/ui/HoverEditor';
-import operators from '../data/operators.json';
+import operators from '../../site-content/collections/operators.json';
 import './FoundersPage.css';
 
 export default function FoundersPage() {

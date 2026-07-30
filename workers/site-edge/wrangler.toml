@@ -7,6 +7,14 @@ workers_dev = false
 # Airtable is an optional presentation overlay. Configure AIRTABLE_BASE_ID,
 # AIRTABLE_TABLE_ID, and optionally AIRTABLE_VIEW_ID as Worker variables.
 # Store AIRTABLE_PAT only with `wrangler secret put AIRTABLE_PAT`; never commit it.
+#
+# Managed configurator and client-room authorities are optional at deploy time.
+# Configure HYPOM_PUBLIC_ORIGIN, PANDORA_PUBLIC_ORIGIN, HYPRM_PUBLIC_ORIGIN,
+# CLIENT_PORTAL_ORIGIN, and CLIENT_MAGIC_LINK_FROM as Worker variables.
+# Store HYPOM_PUBLIC_SERVICE_TOKEN, PANDORA_PUBLIC_SERVICE_TOKEN,
+# HYPRM_PUBLIC_SERVICE_TOKEN, RESEND_API_KEY, and AIRTABLE_PAT as Worker
+# secrets. Until configured, the public configurators stay in truthful
+# bundled/local-draft posture and account email access remains unavailable.
 
 [[routes]]
 pattern = "hyperion-industries.dev/*"

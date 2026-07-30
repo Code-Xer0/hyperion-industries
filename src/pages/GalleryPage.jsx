@@ -6,8 +6,8 @@ import './SubPage.css';
 import './GalleryPage.css';
 
 import HoverEditor from '../components/ui/HoverEditor';
-import galleryAssets from '../data/gallery.json';
-import content from '../data/content.json';
+import galleryAssets from '../../site-content/collections/gallery.json';
+import content from '../../site-content/collections/content.json';
 import MediaFrame from '../components/ui/MediaFrame';
 import { mediaSource } from '../utils/media';
 

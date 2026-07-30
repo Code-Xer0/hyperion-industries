@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect } from 'react';
-import { BrowserRouter, Routes, Route, useParams } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation, useParams } from 'react-router-dom';
 import Nav from './components/layout/Nav';
 import HomePage from './pages/HomePage';
 const FoundersPage = lazy(() => import('./pages/FoundersPage'));
@@ -9,6 +9,7 @@ const CardStudioPage = lazy(() => import('./pages/CardStudioPage'));
 const CardStudioDesignPage = lazy(() => import('./pages/CardStudioDesignPage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 const McpPage = lazy(() => import('./pages/McpPage'));
+const ContentPage = lazy(() => import('./pages/ContentPage'));
 
 // Operator-only surfaces: DEV-gated lazy imports so the production bundle
 // contains neither the code nor the route — no source/route leakage.
@@ -16,6 +17,10 @@ const RadioStatsPage = import.meta.env.DEV ? lazy(() => import('./pages/RadioSta
 const IntakePage = lazy(() => import('./features/intake/IntakePage'));
 const ForgeConfiguratorPage = lazy(() => import('./features/forge-configurator/ForgeConfiguratorPage'));
 const ForgeCatalogPage = lazy(() => import('./features/forge-catalog/ForgeCatalogPage'));
+const ForgeBuilderPage = lazy(() => import('./features/configurator-workbench/ForgeBuilderPage'));
+const PandoraRackworksPage = lazy(() => import('./features/configurator-workbench/PandoraRackworksPage'));
+const PandoraLiteGridPage = lazy(() => import('./features/configurator-workbench/PandoraLiteGridPage'));
+const ClientAccountPage = lazy(() => import('./features/client-account/ClientAccountPage'));
 const SystemsPage = lazy(() => import('./pages/SystemsPage'));
 const BuildArchivePage = lazy(() => import('./pages/BuildArchivePage'));
 const GalleryPage = lazy(() => import('./pages/GalleryPage'));
@@ -33,8 +38,9 @@ import { OperatorPilotProvider, useOperatorPilot } from './context/OperatorPilot
 import EditorModal from './components/ui/EditorModal';
 const OperatorResident = lazy(() => import('./components/operator/OperatorResident'));
 import SeoRouteHead from './components/seo/SeoRouteHead';
-import operators from './data/operators.json';
+import operators from '../site-content/collections/operators.json';
 import { INTAKE_LANE_SEO } from '../shared/intake/lane-seo';
+import { SITE_CONTENT_PAGE_BY_PATH } from './generated/siteContent';
 
 const PUBLIC_FOUNDER_SLUGS = new Set(operators.map((operator) => operator.slug));
 const PUBLIC_INTAKE_LANES = new Set(INTAKE_LANE_SEO.map((lane) => lane.id));
@@ -95,6 +101,11 @@ function OperatorPilotMount() {
   return <Suspense fallback={null}><OperatorResident /></Suspense>;
 }
 
+function ContentOrNotFoundRoute() {
+  const { pathname } = useLocation();
+  return SITE_CONTENT_PAGE_BY_PATH.has(pathname) ? <ContentPage /> : <NotFoundPage />;
+}
+
 export default function App() {
   const isDev = import.meta.env.DEV;
 
@@ -118,6 +129,10 @@ export default function App() {
               <Route path="/intake/:lane" element={<IntakeLaneRoute />} />
               <Route path="/forge/catalog" element={<ForgeCatalogPage />} />
               <Route path="/forge/configurator" element={<ForgeConfiguratorPage />} />
+              <Route path="/forge/configurator/build" element={<ForgeBuilderPage />} />
+              <Route path="/pandora/configurator" element={<PandoraRackworksPage />} />
+              <Route path="/pandora-lite/configurator" element={<PandoraLiteGridPage />} />
+              <Route path="/account" element={<ClientAccountPage />} />
               <Route path="/chronos" element={<DistrictPage districtId="chronos" />} />
               <Route path="/forge" element={<DistrictPage districtId="forge" />} />
               <Route path="/pandora" element={<DistrictPage districtId="pandora" />} />
@@ -146,7 +161,7 @@ export default function App() {
               <Route path="/mcp" element={<McpPage />} />
               <Route path="/newsletter" element={<NewsletterPage />} />
               <Route path="/store" element={<StorePage />} />
-              <Route path="*" element={<NotFoundPage />} />
+              <Route path="*" element={<ContentOrNotFoundRoute />} />
             </Routes>
             </Suspense>
             <SeoRouteHead />

@@ -8,7 +8,7 @@ import OperatorCard from '../components/cards/OperatorCard';
 import RoomShell from '../components/portal/RoomShell';
 import { CityMap, ForgeBuildNavigation, MaturityLegend, ProofLane, StatusRail } from '../components/portal/PortalPrimitives';
 import { cityRoutes, getDistrict, getFeaturedDistricts, getStatusRailDistricts } from '../data/publicCity';
-import operators from '../data/operators.json';
+import operators from '../../site-content/collections/operators.json';
 import './HomePage.css';
 
 const doctrine = [

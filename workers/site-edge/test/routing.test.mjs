@@ -305,3 +305,249 @@ test('search questions may remain unknown or skipped without breaking intake pro
     assert.equal(intake['forge.budget'], '1500_2500');
   }
 });
+
+test('configurator catalogs remain useful and truthful without managed authorities', async () => {
+  const forge = await handleRequest(
+    new Request('https://hyperion-industries.dev/api/configurator/forge?limit=100'),
+    originFetch,
+  );
+  const forgePayload = await forge.json();
+  assert.equal(forge.status, 200);
+  assert.equal(forgePayload.source_posture, 'bundled_fixture_fallback');
+  assert.equal(forgePayload.items.length, 22);
+  assert.match(forge.headers.get('set-cookie'), /hyperion_subject=.*HttpOnly/);
+
+  const pandora = await handleRequest(
+    new Request('https://hyperion-industries.dev/api/configurator/pandora?lane=lite_grid'),
+    originFetch,
+  );
+  const pandoraPayload = await pandora.json();
+  assert.equal(pandora.status, 200);
+  assert.equal(pandoraPayload.source_posture, 'bundled_fixture_fallback');
+  assert.ok(pandoraPayload.items.length > 0);
+  assert.ok(pandoraPayload.items.every((item) => item.product_lane === 'lite_grid'));
+
+  const mutation = await handleRequest(
+    new Request('https://hyperion-industries.dev/api/configurator/pandora/plans', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: '{}',
+    }),
+    originFetch,
+  );
+  assert.equal(mutation.status, 503);
+  assert.equal((await mutation.json()).source_posture, 'local_draft_only');
+});
+
+test('configurator proxy keeps service tokens at the edge and maps nested authority routes', async () => {
+  const requests = [];
+  const authorityFetch = async (url, options) => {
+    requests.push({ url: new URL(url), options });
+    return Response.json({
+      schema_version: 'forge-public-candidates/1',
+      items: [],
+      secret_echo: false,
+    });
+  };
+  const env = {
+    HYPOM_PUBLIC_ORIGIN: 'https://hypom.example/',
+    HYPOM_PUBLIC_SERVICE_TOKEN: 'hypom-edge-secret',
+    PANDORA_PUBLIC_ORIGIN: 'https://pandora.example/',
+    PANDORA_PUBLIC_SERVICE_TOKEN: 'pandora-edge-secret',
+  };
+  const response = await handleRequest(
+    new Request('https://hyperion-industries.dev/api/configurator/forge/builds/build_1/runs/run_2/candidates', {
+      headers: {
+        cookie: 'hyperion_subject=HYP-SUB-abcdefgh12345678; hyperion_account=CRM-ACCOUNT-12345678',
+      },
+    }),
+    originFetch,
+    env,
+    authorityFetch,
+  );
+  const payload = await response.json();
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get('x-hyperion-authority'), 'hypom');
+  assert.equal(requests[0].url.pathname, '/public/v1/forge/builds/build_1/runs/run_2/candidates');
+  assert.equal(requests[0].options.headers.get('authorization'), 'Bearer hypom-edge-secret');
+  assert.equal(requests[0].options.headers.get('x-hyperion-subject'), 'HYP-SUB-abcdefgh12345678');
+  assert.equal(requests[0].options.headers.get('x-hyperion-account'), 'CRM-ACCOUNT-12345678');
+  assert.doesNotMatch(JSON.stringify(payload), /hypom-edge-secret|pandora-edge-secret/);
+
+  const pandora = await handleRequest(
+    new Request('https://hyperion-industries.dev/api/configurator/pandora/plans/plan_1/tal-preview', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'idempotency-key': 'preview-once',
+      },
+      body: '{}',
+    }),
+    originFetch,
+    env,
+    authorityFetch,
+  );
+  assert.equal(pandora.status, 200);
+  assert.equal(requests[1].url.pathname, '/public/v1/pandora/plans/plan_1/tal-preview');
+  assert.equal(requests[1].options.headers.get('x-hyperion-service-token'), 'pandora-edge-secret');
+  assert.equal(requests[1].options.headers.get('idempotency-key'), 'preview-once');
+
+  const rejected = await handleRequest(
+    new Request('https://hyperion-industries.dev/api/configurator/forge/admin/secrets'),
+    originFetch,
+    env,
+    authorityFetch,
+  );
+  assert.equal(rejected.status, 404);
+  assert.equal(requests.length, 2);
+});
+
+const clientEnv = {
+  HYPRM_PUBLIC_ORIGIN: 'https://hyprm.example/',
+  HYPRM_PUBLIC_SERVICE_TOKEN: 'hyprm-edge-secret',
+  RESEND_API_KEY: 'resend-edge-secret',
+  CLIENT_MAGIC_LINK_FROM: 'Hyperion Client Room <access@hyperion-industries.dev>',
+  CLIENT_PORTAL_ORIGIN: 'https://hyperion-industries.dev/',
+};
+
+test('client magic-link issuance delivers at the edge without returning either secret token', async () => {
+  const rawMagic = 'm'.repeat(48);
+  const calls = [];
+  const clientFetch = async (url, options) => {
+    calls.push({ url: new URL(url), options });
+    if (new URL(url).origin === 'https://hyprm.example') {
+      return Response.json({
+        accepted: true,
+        delivery: {
+          token: rawMagic,
+          expires_at: '2026-07-29T20:15:00Z',
+          delivery_authority: 'trusted_gateway',
+        },
+      });
+    }
+    return Response.json({ id: 'email_sanitized' });
+  };
+  const response = await handleRequest(
+    new Request('https://hyperion-industries.dev/api/client/magic-link', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        origin: 'https://hyperion-industries.dev',
+      },
+      body: JSON.stringify({ email: 'client@example.invalid', display_name: 'Sanitized Client' }),
+    }),
+    originFetch,
+    clientEnv,
+    clientFetch,
+  );
+  const payload = await response.json();
+  assert.equal(response.status, 202);
+  assert.equal(payload.delivery_posture, 'email_requested');
+  assert.doesNotMatch(JSON.stringify(payload), new RegExp(rawMagic));
+  assert.doesNotMatch(JSON.stringify(payload), /hyprm-edge-secret|resend-edge-secret/);
+  assert.equal(calls[0].url.pathname, '/public/v1/client-auth/magic-links');
+  assert.equal(calls[0].options.headers.get('x-hyperion-service-token'), 'hyprm-edge-secret');
+  assert.equal(calls[1].url.origin, 'https://api.resend.com');
+  assert.equal(calls[1].options.headers.authorization, 'Bearer resend-edge-secret');
+  assert.match(calls[1].options.headers['Idempotency-Key'], /^client-magic\//);
+  assert.match(calls[1].options.body, new RegExp(rawMagic));
+  assert.match(response.headers.get('set-cookie'), /hyperion_magic_requested=.*HttpOnly/);
+});
+
+test('client account bridge keeps the HypRM session in HttpOnly cookies and serves curated history', async () => {
+  const rawMagic = 'n'.repeat(48);
+  const rawSession = 's'.repeat(64);
+  const accountRef = 'CRM-ACCOUNT-SANITIZED-1234';
+  const calls = [];
+  const clientFetch = async (url, options) => {
+    const parsed = new URL(url);
+    calls.push({ url: parsed, options });
+    if (parsed.pathname.endsWith('/magic-links/consume')) {
+      return Response.json({
+        session_token: rawSession,
+        session_id: 'CRM-SESSION-SANITIZED',
+        expires_at: '2026-08-12T20:00:00Z',
+        crm_account_ref: accountRef,
+      });
+    }
+    if (parsed.pathname.endsWith('/client-account/history')) {
+      return Response.json({
+        schema_version: 'hyprm-client-history/1',
+        crm_account_ref: accountRef,
+        source_posture: 'hyprm_authoritative_projection',
+        events: [{ history_event_id: 'EVENT-1', title: 'Review requested', source_hash: 'a'.repeat(64) }],
+        builds: [],
+      });
+    }
+    if (parsed.pathname.endsWith('/client-account/session/revoke')) {
+      return Response.json({ revoked: true });
+    }
+    return Response.json({
+      schema_version: 'hyprm-client-account/1',
+      account: { crm_account_ref: accountRef, display_name: 'Sanitized Client', relationship_state: 'active' },
+      session: { session_id: 'CRM-SESSION-SANITIZED', expires_at: '2026-08-12T20:00:00Z' },
+    });
+  };
+  const consumed = await handleRequest(
+    new Request('https://hyperion-industries.dev/api/client/magic-link/consume', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', origin: 'https://hyperion-industries.dev' },
+      body: JSON.stringify({ token: rawMagic }),
+    }),
+    originFetch,
+    clientEnv,
+    clientFetch,
+  );
+  const consumedPayload = await consumed.json();
+  assert.equal(consumed.status, 200);
+  assert.equal(consumedPayload.authenticated, true);
+  assert.doesNotMatch(JSON.stringify(consumedPayload), new RegExp(rawSession));
+  const setCookies = consumed.headers.get('set-cookie');
+  assert.match(setCookies, /hyperion_session=.*HttpOnly/);
+  assert.match(setCookies, /hyperion_account=.*HttpOnly/);
+
+  const history = await handleRequest(
+    new Request('https://hyperion-industries.dev/api/client/history', {
+      headers: { cookie: `hyperion_session=${rawSession}; hyperion_account=${accountRef}` },
+    }),
+    originFetch,
+    clientEnv,
+    clientFetch,
+  );
+  const historyPayload = await history.json();
+  assert.equal(history.status, 200);
+  assert.equal(historyPayload.source_posture, 'hyprm_authoritative_projection');
+  assert.equal(calls[1].options.headers.get('authorization'), `Bearer ${rawSession}`);
+  assert.equal(calls[1].options.headers.get('x-hyperion-service-token'), 'hyprm-edge-secret');
+
+  const logout = await handleRequest(
+    new Request('https://hyperion-industries.dev/api/client/logout', {
+      method: 'POST',
+      headers: { cookie: `hyperion_session=${rawSession}; hyperion_account=${accountRef}` },
+    }),
+    originFetch,
+    clientEnv,
+    clientFetch,
+  );
+  assert.equal(logout.status, 200);
+  assert.match(logout.headers.get('set-cookie'), /Max-Age=0/);
+  assert.equal(calls[2].url.pathname, '/public/v1/client-account/session/revoke');
+});
+
+test('client-room access fails closed when authority or delivery configuration is absent', async () => {
+  let calls = 0;
+  const response = await handleRequest(
+    new Request('https://hyperion-industries.dev/api/client/magic-link', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ email: 'client@example.invalid' }),
+    }),
+    originFetch,
+    {},
+    async () => { calls += 1; return Response.json({}); },
+  );
+  const payload = await response.json();
+  assert.equal(response.status, 503);
+  assert.equal(payload.source_posture, 'managed_account_unavailable');
+  assert.equal(calls, 0);
+});

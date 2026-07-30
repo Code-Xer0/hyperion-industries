@@ -101,10 +101,26 @@ export const cityFamilies = [
         keywords: ['concierge', 'guided', 'configure', 'custom pc', 'workstation', 'intake'],
         previewMedia: forgeVideo('workspace-systems', 'Hyperion Forge operator environment'),
       }),
+      route('/forge/configurator/build', 'Forge PC Build Bench', 'infrastructure', {
+        status: 'INTERACTIVE DRAFT · NOT A QUOTE',
+        tone: 'inquiry',
+        keywords: ['pcpartpicker', 'parts', 'compatibility', 'live pricing', 'build bench'],
+        previewMedia: forgeVideo('workstation-core', 'Hyperion Forge PC build bench'),
+      }),
       route('/pandora', 'Pandora Rackworks', 'infrastructure', { keywords: ['hardware', 'rack', 'poc'], previewMedia: forgeVideo('gpu-telemetry', 'GPU telemetry inside a Hyperion Forge build') }),
+      route('/pandora/configurator', 'Pandora Rackworks Configurator', 'infrastructure', {
+        status: 'PLANNING PREVIEW · SITE REVIEW REQUIRED',
+        keywords: ['rack', 'nodes', 'power', 'fabric', 'topology', 'configurator'],
+        previewMedia: forgeVideo('gpu-telemetry', 'Pandora Rackworks planning surface'),
+      }),
       route('/talos', 'Tal.OS Control Tower', 'infrastructure', { keywords: ['talos', 'control plane', 'governance'], previewMedia: forgeVideo('operator-console', 'Hyperion operator console and control surfaces') }),
       route('/succession', 'Lifecycle Succession', 'infrastructure', { keywords: ['gpu', 'migration', 'doctrine'], previewMedia: forgeVideo('workspace-systems', 'Hyperion workspace systems in the Forge environment') }),
       route('/pandora-lite', 'Pandora Lite', 'infrastructure', { keywords: ['civic', 'concept', 'second life'], previewMedia: forgeVideo('custom-workstation', 'Custom Hyperion workstation build detail') }),
+      route('/pandora-lite/configurator', 'Pandora Lite Grid Configurator', 'infrastructure', {
+        status: 'PLANNING PREVIEW · SITE REVIEW REQUIRED',
+        keywords: ['lite grid', 'nodes', 'edge', 'fabric', 'power', 'configurator'],
+        previewMedia: forgeVideo('custom-workstation', 'Pandora Lite Grid planning surface'),
+      }),
     ],
   },
   {
@@ -202,6 +218,7 @@ export const cityMotionManifest = cityMotion;
 
 export const cityUtilities = [
   { label: 'Gate', path: '/' },
+  { label: 'Client room', path: '/account' },
   { label: 'Architecture', path: '/architecture' },
   { label: 'Gallery', path: '/gallery' },
   { label: 'Founders', path: '/founders' },

@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import defaultShowcaseItems from '../../data/showcase.json';
+import defaultShowcaseItems from '../../../site-content/collections/showcase.json';
 import MediaFrame from './MediaFrame';
 import './Carousel3D.css';
 

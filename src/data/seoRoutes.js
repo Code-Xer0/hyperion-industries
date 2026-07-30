@@ -1,5 +1,6 @@
 import { INTAKE_LANE_SEO } from '../../shared/intake/lane-seo.js';
 import { cityRoutes } from './publicCity.js';
+import { SITE_CONTENT_PAGES } from '../generated/siteContent.js';
 
 export const SITE_ORIGIN = 'https://hyperion-industries.dev';
 export const ENTITY_SPINE = 'Victor Amani is the professional name of Kushinda Furaha Zeleke, founder and systems architect of Hyperion Industries in Minneapolis.';
@@ -23,7 +24,7 @@ const fixedRoutes = [
     summary: 'A public-safe directory of Hyperion systems and their current maturity.',
     maturity: 'PUBLIC-SAFE MAP',
     schemaType: 'CollectionPage',
-    sourceFiles: ['src/pages/SystemsPage.jsx', 'src/data/systems.json'],
+    sourceFiles: ['src/pages/SystemsPage.jsx', 'site-content/collections/systems.json'],
     relatedPaths: ['/chronos', '/mnemos', '/software-estate'],
   },
   {
@@ -34,7 +35,7 @@ const fixedRoutes = [
     maturity: 'PUBLIC ARCHIVE',
     schemaType: 'CollectionPage',
     ogImage: '/assets/builds/20230803_133211.jpg',
-    sourceFiles: ['src/pages/BuildArchivePage.jsx', 'src/data/showcase.json'],
+    sourceFiles: ['src/pages/BuildArchivePage.jsx', 'site-content/collections/showcase.json'],
     relatedPaths: ['/forge', '/gallery', '/forge/catalog'],
   },
   {
@@ -56,7 +57,7 @@ const fixedRoutes = [
     maturity: 'PUBLIC ARCHIVE',
     schemaType: 'CollectionPage',
     ogImage: '/assets/operators/deus-x-portrait-complete.png',
-    sourceFiles: ['src/pages/GalleryPage.jsx', 'src/data/gallery.json'],
+    sourceFiles: ['src/pages/GalleryPage.jsx', 'site-content/collections/gallery.json'],
     relatedPaths: ['/build-archive', '/identity', '/founders'],
   },
   {
@@ -118,7 +119,7 @@ const fixedRoutes = [
     summary: 'A truthful product-lane directory for systems currently available by scoped inquiry.',
     maturity: 'STAGED · NO CHECKOUT',
     schemaType: 'CollectionPage',
-    sourceFiles: ['src/pages/StorePage.jsx', 'src/data/commerce.json'],
+    sourceFiles: ['src/pages/StorePage.jsx', 'site-content/collections/commerce.json'],
     relatedPaths: ['/forge', '/identity', '/contact'],
   },
   {
@@ -128,7 +129,7 @@ const fixedRoutes = [
     summary: 'The public roster behind Hyperion Industries.',
     maturity: 'PUBLIC PROFILES',
     schemaType: 'CollectionPage',
-    sourceFiles: ['src/pages/FoundersPage.jsx', 'src/data/operators.json'],
+    sourceFiles: ['src/pages/FoundersPage.jsx', 'site-content/collections/operators.json'],
     relatedPaths: ['/founders/victor-amani', '/founders/keshawn-rowe', '/contact'],
   },
   {
@@ -139,7 +140,7 @@ const fixedRoutes = [
     maturity: 'FULL PUBLIC PROFILE',
     schemaType: 'ProfilePage',
     ogImage: '/assets/operators/victor-city-operating-edge.png',
-    sourceFiles: ['src/pages/FounderPage.jsx', 'src/data/operators.json'],
+    sourceFiles: ['src/pages/FounderPage.jsx', 'site-content/collections/operators.json'],
     relatedPaths: ['/', '/systems', '/contact'],
   },
   {
@@ -150,7 +151,7 @@ const fixedRoutes = [
     maturity: 'PROFILE IN PROGRESS',
     schemaType: 'ProfilePage',
     ogImage: '/assets/operators/keshawn-rowe-dossier.jpeg',
-    sourceFiles: ['src/pages/FounderPage.jsx', 'src/data/operators.json'],
+    sourceFiles: ['src/pages/FounderPage.jsx', 'site-content/collections/operators.json'],
     relatedPaths: ['/founders', '/forge', '/contact'],
   },
   {
@@ -209,6 +210,36 @@ const intakeRoutes = [
     aliases: ['/intake/forge'],
   },
   {
+    path: '/forge/configurator/build',
+    title: 'Forge PC Build Bench | Hyperion Industries',
+    description: 'Compare PC components, observe source-labeled price estimates and fit checks, and create an immutable Forge engineering draft.',
+    summary: 'An interactive PC build bench with explicit source posture, revision-safe drafts, and operator-reviewed authority.',
+    maturity: 'INTERACTIVE DRAFT · NOT A QUOTE',
+    schemaType: 'SoftwareApplication',
+    sourceFiles: ['src/features/configurator-workbench/ConfiguratorWorkbench.jsx'],
+    relatedPaths: ['/forge/configurator', '/forge/catalog', '/build-archive'],
+  },
+  {
+    path: '/pandora/configurator',
+    title: 'Pandora Rackworks Configurator | Hyperion Industries',
+    description: 'Plan rack nodes, accelerators, storage, fabric, power, and enclosure capacity with explicit site-review posture.',
+    summary: 'A deterministic Rackworks planning surface backed by immutable Pandora plan revisions.',
+    maturity: 'PLANNING PREVIEW · SITE REVIEW REQUIRED',
+    schemaType: 'SoftwareApplication',
+    sourceFiles: ['src/features/configurator-workbench/ConfiguratorWorkbench.jsx'],
+    relatedPaths: ['/pandora', '/talos', '/succession'],
+  },
+  {
+    path: '/pandora-lite/configurator',
+    title: 'Pandora Lite Grid Configurator | Hyperion Industries',
+    description: 'Compose a compact node grid with visible fabric, placement, circuit, acoustics, and review posture.',
+    summary: 'A deterministic Lite Grid planning surface backed by immutable Pandora plan revisions.',
+    maturity: 'PLANNING PREVIEW · SITE REVIEW REQUIRED',
+    schemaType: 'SoftwareApplication',
+    sourceFiles: ['src/features/configurator-workbench/ConfiguratorWorkbench.jsx'],
+    relatedPaths: ['/pandora-lite', '/pandora', '/alignment'],
+  },
+  {
     path: '/intake',
     title: 'Hyperion Intake OS | Limited Requests and Scoped Contracting',
     description: 'Choose a truthful Hyperion intake lane for limited soft-launch requests, scoped contracting, support, identity, continuity, or partnership review.',
@@ -239,6 +270,17 @@ const intakeRoutes = [
     indexable: false,
     sourceFiles: ['src/features/intake/IntakePage.jsx'],
   },
+  {
+    path: '/account',
+    title: 'Private Client Room | Hyperion Industries',
+    description: 'Open a private Hyperion client-history projection with a single-use email link.',
+    summary: 'A no-password, noindex client room backed by explicitly client-visible HypRM records.',
+    maturity: 'PRIVATE UTILITY · NOT INDEXED',
+    schemaType: 'WebPage',
+    indexable: false,
+    sourceFiles: ['src/features/client-account/ClientAccountPage.jsx'],
+    relatedPaths: ['/forge/configurator/build', '/pandora/configurator'],
+  },
 ];
 
 const legacyAliases = {
@@ -254,8 +296,21 @@ const legacyAliases = {
   '/store.html': '/store',
 };
 
+const governedContentRoutes = SITE_CONTENT_PAGES.map((page) => ({
+  path: page.path,
+  title: `${page.title} | Hyperion Industries`,
+  description: page.description,
+  summary: page.summary || page.description,
+  maturity: page.maturity,
+  schemaType: page.template === 'collection' ? 'CollectionPage' : 'WebPage',
+  indexable: page.indexable,
+  ogImage: page.og_asset || DEFAULT_OG_IMAGE,
+  sourceFiles: [`site-content/pages/${page.id.replace(/^page_/, '')}.json`],
+  relatedPaths: page.related_paths || [],
+}));
+
 export const SEO_ROUTES = Object.freeze(
-  [...fixedRoutes, ...districtRoutes, ...intakeRoutes].map((route) => ({
+  [...fixedRoutes, ...districtRoutes, ...intakeRoutes, ...governedContentRoutes].map((route) => ({
     indexable: true,
     ogImage: DEFAULT_OG_IMAGE,
     relatedPaths: [],

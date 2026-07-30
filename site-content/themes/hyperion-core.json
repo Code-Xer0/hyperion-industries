@@ -1,0 +1,12 @@
+{
+  "schema_version": "hyperion-theme/1",
+  "id": "theme_hyperion-core",
+  "label": "Hyperion Core",
+  "tokens": {
+    "accent": "gold",
+    "surface": "black",
+    "text": "warm",
+    "radius": "soft",
+    "motion": "restrained"
+  }
+}

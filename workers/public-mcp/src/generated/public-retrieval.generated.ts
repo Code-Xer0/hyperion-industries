@@ -518,6 +518,57 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
       ]
     },
     {
+      "id": "forge--configurator--build",
+      "path": "/forge/configurator/build",
+      "canonicalUrl": "https://hyperion-industries.dev/forge/configurator/build",
+      "title": "Forge PC Build Bench | Hyperion Industries",
+      "description": "Compare PC components, observe source-labeled price estimates and fit checks, and create an immutable Forge engineering draft.",
+      "summary": "An interactive PC build bench with explicit source posture, revision-safe drafts, and operator-reviewed authority.",
+      "maturity": "INTERACTIVE DRAFT · NOT A QUOTE",
+      "schemaType": "SoftwareApplication",
+      "indexable": true,
+      "image": "https://hyperion-industries.dev/assets/branding/hyperion/hyperion-link-preview.jpeg",
+      "relatedRoutes": [
+        "/forge/configurator",
+        "/forge/catalog",
+        "/build-archive"
+      ]
+    },
+    {
+      "id": "pandora--configurator",
+      "path": "/pandora/configurator",
+      "canonicalUrl": "https://hyperion-industries.dev/pandora/configurator",
+      "title": "Pandora Rackworks Configurator | Hyperion Industries",
+      "description": "Plan rack nodes, accelerators, storage, fabric, power, and enclosure capacity with explicit site-review posture.",
+      "summary": "A deterministic Rackworks planning surface backed by immutable Pandora plan revisions.",
+      "maturity": "PLANNING PREVIEW · SITE REVIEW REQUIRED",
+      "schemaType": "SoftwareApplication",
+      "indexable": true,
+      "image": "https://hyperion-industries.dev/assets/branding/hyperion/hyperion-link-preview.jpeg",
+      "relatedRoutes": [
+        "/pandora",
+        "/talos",
+        "/succession"
+      ]
+    },
+    {
+      "id": "pandora-lite--configurator",
+      "path": "/pandora-lite/configurator",
+      "canonicalUrl": "https://hyperion-industries.dev/pandora-lite/configurator",
+      "title": "Pandora Lite Grid Configurator | Hyperion Industries",
+      "description": "Compose a compact node grid with visible fabric, placement, circuit, acoustics, and review posture.",
+      "summary": "A deterministic Lite Grid planning surface backed by immutable Pandora plan revisions.",
+      "maturity": "PLANNING PREVIEW · SITE REVIEW REQUIRED",
+      "schemaType": "SoftwareApplication",
+      "indexable": true,
+      "image": "https://hyperion-industries.dev/assets/branding/hyperion/hyperion-link-preview.jpeg",
+      "relatedRoutes": [
+        "/pandora-lite",
+        "/pandora",
+        "/alignment"
+      ]
+    },
+    {
       "id": "intake",
       "path": "/intake",
       "canonicalUrl": "https://hyperion-industries.dev/intake",
@@ -897,5 +948,5 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
       }
     ]
   },
-  "sha256": "c2c4fa63da8b924b35ddcb80e1d1f829ef2df64bce3d16329c18435a4dd54b05"
+  "sha256": "ad9701f3be279952996b6ea45c322d8e66b9124fea0b6cbfe8ddd25844ce7de8"
 } as const;
