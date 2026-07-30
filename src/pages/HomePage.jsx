@@ -37,9 +37,9 @@ export default function HomePage() {
         <div className="gate-copy">
           <p className="gate-kicker">Hyperion Industries · Soft Launch · Limited Requests</p>
           <h2>Infrastructure that remembers who holds authority.</h2>
-          <p className="gate-lead">Local-first software, custom hardware, identity, and continuity systems for people who intend to keep control of the work.</p>
-          <p>Victor Amani is the professional name of Kushinda Furaha Zeleke, founder and systems architect of Hyperion Industries in Minneapolis.</p>
-          <p>Contracting time and project requests are currently limited. Every engagement begins with a scope and fit discussion.</p>
+          <p className="gate-lead">Hyperion Industries designs local-first software, custom compute, operator identity, and continuity infrastructure as one governed system.</p>
+          <p>From Forge workstations and local-AI systems to CHR0N.OS archives and Card Studio identity, every lane begins with custody, serviceability, and a clear human decision boundary.</p>
+          <p>Hyperion is entering soft launch with limited project capacity. Every engagement begins with a scope and fit discussion.</p>
           <div className="room-action-row">
             <Link to="/forge/configurator" className="btn btn-gold">Start a Forge Build</Link>
             <Link to="/card-studio" className="btn btn-ghost">Design a Card</Link>

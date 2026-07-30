@@ -11,6 +11,7 @@ Maturity: release candidate pending production deployment
 - Basic mode retains the bounded field editor. Advanced mode adds front/back artboards, 48 bundled artifacts, normalized layer geometry, move/resize, align/order/lock/visibility, reset, undo/redo, keyboard nudging, and native pointer handling.
 - Local draft migration writes `card-studio-draft/2` before retaining the legacy draft record.
 - The desktop and mobile headers expose Forge inquiry directly. Catalog links pass only an allowlisted lane and anonymous source posture to the configurator.
+- The City Gate Signal now leads with Hyperion's company-level systems, custody, and serviceability posture; personal founder detail remains in the Operators and founder routes.
 - Built-in artifact references are shared with the Worker allowlist. Unknown references fail preflight; non-built-in artwork remains project-bound and scanner-gated.
 
 ## Authority boundaries
@@ -24,7 +25,7 @@ Maturity: release candidate pending production deployment
 ## Verification
 
 - Root `npm run check`: lint, 17 Card Studio tests, production build, compiled-only, SEO, edge routing, Worker 84-test suite, and public MCP 7-test suite.
-- Browser QA at 390, 768, and 1440 px: no horizontal overflow, named controls, one-click Forge inquiry, gallery/deep-link flow, local draft recovery, modal focus containment/Escape/return focus, keyboard and pointer geometry, and front/back/digital proofs for all 20 templates.
+- Browser QA at 390, 768, and 1440 px: no horizontal overflow, named controls, legible company-level Signal framing, one-click Forge inquiry, gallery/deep-link flow, local draft recovery, modal focus containment/Escape/return focus, keyboard and pointer geometry, and front/back/digital proofs for all 20 templates.
 - Production bundle inspection confirms the development specimen route is absent.
 
 ## Operator follow-up

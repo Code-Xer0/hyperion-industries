@@ -83,11 +83,24 @@ body.theme-light .gate-film-shade { background: linear-gradient(90deg, rgba(247,
   .gate-directory-room .city-map-grid { grid-template-columns: 1fr 1fr; }
 }
 
-@media (max-width: 760px) {
+@media (max-width: 820px) {
   .gate-signal-room { grid-template-columns: 1fr; }
+  .gate-copy {
+    position: relative;
+    z-index: 1;
+    padding: 16px;
+    border-left: 1px solid rgba(255, 190, 0, 0.72);
+    background: linear-gradient(90deg, rgba(2, 5, 8, 0.9), rgba(2, 5, 8, 0.72) 84%, rgba(2, 5, 8, 0.28));
+    backdrop-filter: blur(10px);
+  }
+  body.theme-light .gate-copy {
+    background: linear-gradient(90deg, rgba(247, 244, 236, 0.94), rgba(247, 244, 236, 0.86) 84%, rgba(247, 244, 236, 0.54));
+  }
+}
+
+@media (max-width: 760px) {
   .gate-copy h2 { font-size: clamp(36px, 10vw, 58px); }
   .gate-operator { position: absolute; right: 4%; bottom: 54px; width: 150px; opacity: 0.42; }
-  .gate-copy { position: relative; z-index: 1; }
   .gate-copy .city-status-rail { display: none; }
   .gate-room-heading { align-items: flex-start; flex-direction: column; }
   .gate-operators-intro { align-items: flex-start; flex-direction: column; }
@@ -109,7 +122,7 @@ body.theme-light .gate-film-shade { background: linear-gradient(90deg, rgba(247,
 @media (max-width: 520px) {
   .gate-city-room .room-heading p { display: none; }
   .gate-copy h2 { max-width: 92%; font-size: 36px; }
-  .gate-lead { max-width: 88%; font-size: 12px; }
+  .gate-lead { max-width: 88%; font-size: 14px; }
   .gate-copy .room-action-row { max-width: 76%; }
   .gate-copy .btn { width: 100%; justify-content: center; }
   .gate-operator { right: -3%; width: 136px; }

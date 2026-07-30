@@ -71,8 +71,8 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
       "relatedRoutes": [
         "/systems",
         "/forge",
-        "/founders/victor-amani",
-        "/intake"
+        "/card-studio",
+        "/founders"
       ]
     },
     {
@@ -897,5 +897,5 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
       }
     ]
   },
-  "sha256": "5a3136c0bc21e870c8b66e530e2fe145895ee444427592daeb69b9a9f18810c4"
+  "sha256": "c2c4fa63da8b924b35ddcb80e1d1f829ef2df64bce3d16329c18435a4dd54b05"
 } as const;
