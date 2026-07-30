@@ -11,6 +11,7 @@ import {
   PANDORA_CONFIGURATOR_FALLBACK,
 } from '../../data/configuratorFallbacks.js';
 import BuildStage from './BuildStage.jsx';
+import OrderReadiness from './OrderReadiness.jsx';
 import PartVisual from './PartVisual.jsx';
 import {
   VISUAL_AUTHORITY,
@@ -181,8 +182,17 @@ export default function ConfiguratorWorkbench({ lane }) {
   };
 
   const save = () => {
-    localStorage.setItem(storageKey, JSON.stringify({ schema_version: 'hyperion-configurator-draft/1', lane, selectedIds, requirements, saved_at: new Date().toISOString() }));
-    setRuntime({ state: 'saved', message: 'Draft saved on this device.', result: null });
+    localStorage.setItem(storageKey, JSON.stringify({
+      schema_version: 'hyperion-configurator-draft/1',
+      lane,
+      selectedIds,
+      requirements,
+      authority_result: runtime.result,
+      saved_at: new Date().toISOString(),
+    }));
+    setRuntime((current) => current.result
+      ? { ...current, state: 'complete', message: 'Authority receipt and device draft saved.' }
+      : { state: 'saved', message: 'Draft saved on this device.', result: null });
   };
 
   const forgeRequirements = () => {
@@ -350,10 +360,22 @@ export default function ConfiguratorWorkbench({ lane }) {
             </div>
             <div className="bench-runtime" data-state={runtime.state}><span>{runtime.state === 'loading' ? <LoaderCircle className="bench-spin" /> : runtime.state === 'complete' ? <Check /> : <Zap />}</span><p>{runtime.message}</p></div>
             {runtime.result && <div className="bench-result"><span>Authority receipt</span><strong>{runtime.result.build_id || runtime.result.plan_id}</strong><small>{runtime.result.revision?.revision_hash?.slice(0, 16)}…</small></div>}
-            <div className="bench-actions"><button type="button" className="is-secondary" onClick={save}>Save device draft</button><button type="button" disabled={runtime.state === 'loading' || (forge && issues.length > 0)} onClick={runReview}>{runtime.state === 'loading' ? 'Opening desk…' : 'Create engineering draft'}<ArrowRight size={15} /></button></div>
+            <div className="bench-actions"><button type="button" className="is-secondary" onClick={save}>Save device draft</button><button type="button" disabled={runtime.state === 'loading' || (forge && issues.length > 0)} onClick={runReview}>{runtime.state === 'loading' ? 'Opening desk…' : 'Create engineering draft'}<ArrowRight size={15} /></button><a href="#purchase-desk">Open purchase desk<ArrowRight size={15} /></a></div>
             <footer><Box /><span>No checkout · no order · no compatibility promise</span></footer>
           </aside>
         </div>
+        <OrderReadiness
+          lane={lane}
+          roles={roles}
+          selectedIds={selectedIds}
+          issues={issues}
+          sourcePosture={sourcePosture}
+          pricedCount={pricedCount}
+          total={total}
+          requirements={requirements}
+          runtime={runtime}
+          onSave={save}
+        />
       </div>
     </main>
   );
