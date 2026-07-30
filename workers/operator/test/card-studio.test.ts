@@ -102,6 +102,43 @@ describe("Card Studio public order spine", () => {
     expect(db.batches[0]?.some((statement) => statement.sql.includes("INSERT INTO card_studio_design_revisions"))).toBe(true);
   });
 
+  it("rejects unknown artifact references before an immutable revision is written", async () => {
+    const unknown = "csa_tamperedref12";
+    const base = designFixture({ project_id: PROJECT });
+    const firstArtboard = base.artboards[0];
+    if (!firstArtboard) throw new Error("fixture artboard missing");
+    const design = {
+      ...base,
+      asset_refs: [unknown],
+      artboards: [{
+        ...firstArtboard,
+        elements: [
+          ...firstArtboard.elements,
+          {
+            id: "el_tamperedasset",
+            kind: "asset",
+            x: 0.2,
+            y: 0.2,
+            width: 0.2,
+            height: 0.2,
+            locked: false,
+            asset_ref: unknown,
+          },
+        ],
+      }],
+    };
+    const db = new MockD1().queueFirst(await projectRow(), null);
+    const response = await worker().fetch(
+      cardRequest(`/api/card-studio/projects/${PROJECT}/revisions`, design),
+      cardEnv(db),
+      executionContext().ctx,
+    );
+    const body = await response.json<{ error: { code: string } }>();
+    expect(response.status).toBe(400);
+    expect(body.error.code).toBe("asset_reference_unknown");
+    expect(db.batches.length).toBe(0);
+  });
+
   it("routes preflight-safe fixed SKUs to the eligible lane and everything uncertain to review", () => {
     const fixed = orderFixture() as Parameters<typeof evaluateCardEligibility>[0];
     const cleanDesign = designFixture() as Parameters<typeof evaluateCardEligibility>[1];
@@ -109,6 +146,13 @@ describe("Card Studio public order spine", () => {
       outcome: "instant_checkout_eligible",
       reasons: [],
       subtotalAmount: 3900,
+    });
+    expect(evaluateCardEligibility(
+      fixed,
+      { ...cleanDesign, asset_refs: ["csa_builtin_divider_double"] },
+    )).toMatchObject({
+      outcome: "instant_checkout_eligible",
+      reasons: [],
     });
     expect(evaluateCardEligibility(
       { ...fixed, quantity: 40 },

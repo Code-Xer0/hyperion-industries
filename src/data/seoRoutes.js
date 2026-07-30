@@ -15,7 +15,7 @@ const fixedRoutes = [
     maturity: 'PUBLIC EDGE · SOFT LAUNCH',
     schemaType: 'WebSite',
     sourceFiles: ['src/pages/HomePage.jsx', 'src/data/publicCity.js', 'src/data/seoRoutes.js'],
-    relatedPaths: ['/systems', '/forge', '/founders/victor-amani', '/intake'],
+    relatedPaths: ['/systems', '/forge', '/card-studio', '/founders'],
   },
   {
     path: '/systems',
