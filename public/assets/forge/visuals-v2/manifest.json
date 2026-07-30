@@ -1,0 +1,51 @@
+{
+  "schema_version": "hyperion-configurator-visual-manifest/1",
+  "publication_posture": "public_illustrative",
+  "authority": {
+    "origin": "ai_generated",
+    "posture": "illustrative_non_authoritative",
+    "display_label": "Illustrative proxy · non-authoritative",
+    "affects_part_identity": false,
+    "affects_compatibility": false,
+    "affects_ranking": false,
+    "affects_pricing": false
+  },
+  "assets": [
+    {
+      "asset_id": "visual_forge_exploded_workstation_v1",
+      "path": "/assets/forge/visuals-v2/forge-exploded-workstation-v1.png",
+      "lane": "forge",
+      "mime": "image/png",
+      "width": 1672,
+      "height": 941,
+      "bytes": 1842533,
+      "sha256": "b3d257528d571f6f1e55e023571dba4e1c5d2dd6b1792c47790ff4eb8cfd99ea",
+      "subject": "generic exploded high-performance workstation",
+      "exact_product_geometry": false
+    },
+    {
+      "asset_id": "visual_pandora_rackworks_array_v1",
+      "path": "/assets/forge/visuals-v2/pandora-rackworks-array-v1.png",
+      "lane": "rackworks",
+      "mime": "image/png",
+      "width": 1672,
+      "height": 941,
+      "bytes": 1860685,
+      "sha256": "20ad7204a6c4240118cd29f18f905f6ecaf3b7140bd6b003922e83d56f37f8b6",
+      "subject": "generic exploded rack-scale compute array",
+      "exact_product_geometry": false
+    },
+    {
+      "asset_id": "visual_pandora_lite_grid_v1",
+      "path": "/assets/forge/visuals-v2/pandora-lite-grid-v1.png",
+      "lane": "lite_grid",
+      "mime": "image/png",
+      "width": 1672,
+      "height": 941,
+      "bytes": 2010501,
+      "sha256": "69988c70b2acdeec0ed691e9eab7de03a1e34b95beac4fe6fb47b26015054770",
+      "subject": "generic compact four-node compute grid",
+      "exact_product_geometry": false
+    }
+  ]
+}
