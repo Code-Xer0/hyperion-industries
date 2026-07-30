@@ -8,12 +8,18 @@ import { handleClientAccountApi } from './client-account-api.js';
 const PASS_THROUGH_PREFIXES = ['/api/', '/assets/', '/.well-known/'];
 const CARD_STUDIO_STARTER_ROUTE = /^\/card-studio\/design\/([a-z0-9-]+)$/;
 
-function cardStudioStarterRoute(pathname) {
+function cardStudioDesignerRoute(pathname) {
+  if (pathname === '/card-studio/design') {
+    return {
+      canonicalPath: pathname,
+      originPath: '/card-studio/index.html',
+    };
+  }
   const match = pathname.match(CARD_STUDIO_STARTER_ROUTE);
   if (!match || !catalogStarter(match[1])) return null;
   return {
     canonicalPath: pathname,
-    originPath: '/card-studio/design/index.html',
+    originPath: '/card-studio/index.html',
   };
 }
 
@@ -72,7 +78,7 @@ export async function handleRequest(request, originFetch = fetch, env = {}, exte
 
   if (pathname !== '/' && pathname.endsWith('/')) {
     const cleanPath = pathname.replace(/\/+$/, '');
-    if (SEO_ROUTE_BY_PATH.has(cleanPath) || cardStudioStarterRoute(cleanPath)) {
+    if (SEO_ROUTE_BY_PATH.has(cleanPath) || cardStudioDesignerRoute(cleanPath)) {
       return redirectTo(request.url, cleanPath);
     }
   }
@@ -90,11 +96,11 @@ export async function handleRequest(request, originFetch = fetch, env = {}, exte
     });
   }
 
-  const starterRoute = cardStudioStarterRoute(pathname);
-  if (starterRoute) {
-    const response = await originRequest(request, starterRoute.originPath, originFetch);
+  const designerRoute = cardStudioDesignerRoute(pathname);
+  if (designerRoute) {
+    const response = await originRequest(request, designerRoute.originPath, originFetch);
     const headers = new Headers(response.headers);
-    headers.set('x-hyperion-canonical-route', starterRoute.canonicalPath);
+    headers.set('x-hyperion-canonical-route', designerRoute.canonicalPath);
     return new Response(request.method === 'HEAD' ? null : response.body, {
       status: response.status,
       statusText: response.statusText,

@@ -33,12 +33,15 @@ test('Forge catalog direct navigation resolves its generated canonical shell', a
 });
 
 test('allowlisted Card Studio starters resolve the shared designer shell', async () => {
-  for (const starterId of ['axis', 'example-axis-consulting']) {
-    const pathname = `/card-studio/design/${starterId}`;
+  for (const pathname of [
+    '/card-studio/design',
+    '/card-studio/design/axis',
+    '/card-studio/design/example-axis-consulting',
+  ]) {
     const response = await handleRequest(new Request(`https://hyperion-industries.dev${pathname}`), originFetch);
     assert.equal(response.status, 200);
     assert.equal(response.headers.get('x-hyperion-canonical-route'), pathname);
-    assert.equal(response.headers.get('x-hyperion-origin-path'), '/card-studio/design/index.html');
+    assert.equal(response.headers.get('x-hyperion-origin-path'), '/card-studio/index.html');
   }
 });
 
