@@ -558,7 +558,7 @@ export default function IntakePage({ resumeMode = false }) {
   };
 
   const stepDescription = [
-    'Open the right public lane.', 'Add only the contact detail needed for follow-up.', 'State the outcome in your own language.',
+    'Name the continuity failure and open the narrowest useful lane.', 'Add only the contact detail needed for follow-up.', 'State the outcome in your own language.',
     'Make constraints and unknowns visible.', 'Inspect the rule evidence and proposed route.', 'Correct the signal before it becomes immutable.',
     'Stop at the operator-review boundary.',
   ][step];
@@ -567,7 +567,7 @@ export default function IntakePage({ resumeMode = false }) {
     <main className="intake-page" data-effects={effects}>
       <div className="intake-shell">
         <aside className={`intake-operator-panel is-${laneDefinition?.accent || 'cyan'}`}>
-          <div className="intake-brand-line"><span>HYPERION // INTAKE OS</span><small>PUBLIC EDGE · v{CONTRACT_VERSION}</small></div>
+          <div className="intake-brand-line"><span>HYPERION // ASSESSMENT INTAKE</span><small>PUBLIC EDGE · v{CONTRACT_VERSION}</small></div>
           <OperatorSignal effects={effects} step={step} />
           <div className="intake-operator-copy">
             <p className="intake-kicker">Operator signal</p>

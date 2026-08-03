@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { cityRoutes, getDistrict } from '../../data/publicCity';
 import RoomShell from './RoomShell';
 import StatusChip from './StatusChip';
+import { PUBLIC_DOCTRINE } from '../../data/publicDoctrine';
 import './PortalPrimitives.css';
 
 function PortalLink({ action, className }) {
@@ -106,6 +107,32 @@ function RelatedDistricts({ ids }) {
         <DistrictCard key={district.id} district={district} />
       ))}
     </div>
+  );
+}
+
+function AuthorityContract({ district }) {
+  const rows = [
+    ['SOURCE', 'Facts stay source-bound', district.authority.source],
+    ['CONTEXT', 'Meaning stays context-bound', district.authority.context],
+    ['AUTHORITY', 'Actions stay authority-bound', district.authority.action],
+  ];
+
+  return (
+    <section className="district-authority-contract" aria-labelledby={`${district.id}-authority-title`}>
+      <header>
+        <span className="portal-label">Public authority contract</span>
+        <h2 id={`${district.id}-authority-title`}>{PUBLIC_DOCTRINE.principle}</h2>
+      </header>
+      <div>
+        {rows.map(([status, title, text]) => (
+          <article key={status}>
+            <span>{status}</span>
+            <h3>{title}</h3>
+            <p>{text}</p>
+          </article>
+        ))}
+      </div>
+    </section>
   );
 }
 
@@ -307,14 +334,17 @@ export function DistrictLayout({ district }) {
       </div>
     ),
     boundary: (
-      <div className="room-note-grid">
-        {district.sections.map(([title, text], index) => (
-          <article className="room-note" key={title}>
-            <span>{String(index + 1).padStart(2, '0')}</span>
-            <h3>{title}</h3>
-            <p>{text}</p>
-          </article>
-        ))}
+      <div className="district-boundary-room">
+        <AuthorityContract district={district} />
+        <div className="room-note-grid">
+          {district.sections.map(([title, text], index) => (
+            <article className="room-note" key={title}>
+              <span>{String(index + 1).padStart(2, '0')}</span>
+              <h3>{title}</h3>
+              <p>{text}</p>
+            </article>
+          ))}
+        </div>
       </div>
     ),
     next: (
@@ -329,7 +359,7 @@ export function DistrictLayout({ district }) {
         <RelatedDistricts ids={district.related} />
         <div className="room-action-row">
           <PortalLink action={district.primaryCta} className="btn btn-gold" />
-          <Link to="/contact" className="btn btn-ghost">Send a Signal</Link>
+          <Link to="/intake" className="btn btn-ghost">Start an Assessment</Link>
         </div>
       </div>
     ),

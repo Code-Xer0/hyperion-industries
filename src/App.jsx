@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useLocation, useParams } from 'react-router-dom';
 import Nav from './components/layout/Nav';
+import Footer from './components/layout/Footer';
 import HomePage from './pages/HomePage';
 const FoundersPage = lazy(() => import('./pages/FoundersPage'));
 const FounderPage = lazy(() => import('./pages/FounderPage'));
@@ -101,6 +102,12 @@ function OperatorPilotMount() {
   return <Suspense fallback={null}><OperatorResident /></Suspense>;
 }
 
+function PublicFooterMount() {
+  const { pathname } = useLocation();
+  if (pathname === '/account' || pathname === '/intake/resume' || pathname.startsWith('/editor') || pathname.startsWith('/dev/')) return null;
+  return <Footer />;
+}
+
 function ContentOrNotFoundRoute() {
   const { pathname } = useLocation();
   return SITE_CONTENT_PAGE_BY_PATH.has(pathname) ? <ContentPage /> : <NotFoundPage />;
@@ -165,6 +172,7 @@ export default function App() {
             </Routes>
             </Suspense>
             <SeoRouteHead />
+            <PublicFooterMount />
             <OperatorPilotMount />
             {isDev && <EditModeToggle />}
             {isDev && <EditorModal />}

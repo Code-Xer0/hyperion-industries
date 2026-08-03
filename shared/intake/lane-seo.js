@@ -15,9 +15,9 @@ export const INTAKE_LANE_SEO = Object.freeze([
   },
   {
     id: 'continuity',
-    title: 'Continuity Systems Intake | Hyperion Industries',
-    description: 'Map the records, knowledge, and operating context that must survive interruption, handoff, and time.',
-    summary: 'A continuity assessment for records, memory, archives, provenance, and operational recovery.',
+    title: 'Continuity Assessment | Hyperion Industries',
+    description: 'Map the state, records, knowledge, and operating context that must survive interruption, handoff, and time.',
+    summary: 'An assessment-first lane for continuity failures across records, memory, archives, provenance, and operational recovery.',
   },
   {
     id: 'operator-identity',

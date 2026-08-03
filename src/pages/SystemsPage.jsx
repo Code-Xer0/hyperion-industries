@@ -6,6 +6,7 @@ import content from '../../site-content/collections/content.json';
 import './SubPage.css';
 import HoverEditor from '../components/ui/HoverEditor';
 import { useState, useEffect, useCallback } from 'react';
+import { PUBLIC_DOCTRINE } from '../data/publicDoctrine';
 
 const isDev = import.meta.env.DEV;
 
@@ -229,13 +230,11 @@ export default function SystemsPage() {
         <div className="sp-grid-3">{systems.map((system) => <SystemCard key={system.id} system={system} compact />)}</div>
       </div>
     ),
-    active: <div className="sp-grid-2 systems-active-room">{primary.map((system) => <SystemCard key={system.id} system={system} />)}</div>,
-    lanes: <div className="sp-grid-3 systems-lane-room">{secondary.map((system) => <SystemCard key={system.id} system={system} compact />)}</div>,
-    maturity: (
+    proof: <div className="sp-grid-2 systems-active-room">{primary.map((system) => <SystemCard key={system.id} system={system} />)}</div>,
+    research: <div className="sp-grid-3 systems-lane-room">{secondary.map((system) => <SystemCard key={system.id} system={system} compact />)}</div>,
+    authority: (
       <div className="room-note-grid">
-        <article className="room-note"><span>01</span><h3>Public or shipping</h3><p>CHR0N.OS carries stable-beta posture. Operator Identity and the completed card lanes carry shipping posture.</p></article>
-        <article className="room-note"><span>02</span><h3>Building or inquiry</h3><p>Mnem.OS and Tal.OS remain in development. Forge remains a human-scoped commercial inquiry lane.</p></article>
-        <article className="room-note"><span>03</span><h3>Architecture only</h3><p>Concept and research systems stay labeled. Private controls, source, telemetry, and operator state remain outside the public room.</p></article>
+        {PUBLIC_DOCTRINE.contract.map((item, index) => <article className="room-note" key={item.id}><span>{String(index + 1).padStart(2, '0')} · {item.status}</span><h3>{item.label}</h3><p>{item.detail}</p></article>)}
       </div>
     ),
   };
@@ -243,7 +242,7 @@ export default function SystemsPage() {
   return (
     <PageShell>
       <HoverEditor model="content">
-        <RoomShell eyebrow="Systems / Public Directory" title="Systems" summary={content.systems.hero.lead} status="MATURITY-LABELED PUBLIC MAP" tone="map" stations={[{ id: 'directory', label: 'Directory' }, { id: 'active', label: 'Active' }, { id: 'lanes', label: 'Lanes' }, { id: 'maturity', label: 'Maturity' }]} panels={panels} defaultStation="directory" className="systems-room-shell" />
+        <RoomShell eyebrow="Systems / Continuity Domains" title="Systems" summary={content.systems.hero.lead} status="MATURITY-LABELED PUBLIC MAP" tone="map" stations={[{ id: 'directory', label: 'Domains' }, { id: 'proof', label: 'Public Proof' }, { id: 'research', label: 'Research' }, { id: 'authority', label: 'Authority' }]} panels={panels} defaultStation="directory" className="systems-room-shell" />
       </HoverEditor>
 
       {/* Dev-only inline systems manager */}
