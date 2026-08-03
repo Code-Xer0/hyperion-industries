@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import {
   AlertTriangle, ArrowLeft, ArrowRight, Box, Check, ChevronRight, CircleDot,
-  Database, Gauge, ImageOff, LoaderCircle, PackageCheck, Search,
+  Database, Eye, Gauge, ImageOff, LoaderCircle, PackageCheck, Search,
   RefreshCw, ShieldCheck, SlidersHorizontal, Sparkles, Zap,
 } from 'lucide-react';
 import {
@@ -13,6 +13,7 @@ import {
 import BuildStage from './BuildStage.jsx';
 import OrderReadiness from './OrderReadiness.jsx';
 import PartVisual from './PartVisual.jsx';
+import { partReview } from './partContextModel.js';
 import {
   VISUAL_AUTHORITY,
   assemblyState,
@@ -115,6 +116,47 @@ function SpecStrip({ item }) {
     .filter(([, value]) => ['string', 'number'].includes(typeof value))
     .slice(0, 3);
   return <div className="bench-specs">{entries.map(([key, value]) => <span key={key}><b>{String(value)}</b>{key.replaceAll('_', ' ')}</span>)}</div>;
+}
+
+function PartCard({ item, recommendation, chosen, lane, requirements, onChoose }) {
+  const [reviewOpen, setReviewOpen] = useState(false);
+  const review = partReview(item, recommendation, requirements);
+  const reviewId = `forge-read-${itemId(item).replace(/[^a-z0-9_-]/gi, '-')}`;
+  return (
+    <article className={`${chosen ? 'is-selected ' : ''}${reviewOpen ? 'is-review-open' : ''}`}>
+      <PartVisual item={item} role={itemRole(item)} selected={chosen} lane={lane} />
+      <div className="bench-part-copy">
+        <span>{item.manufacturer} · {itemPricePosture(item).replaceAll('_', ' ')}</span>
+        <h3>{item.model}</h3>
+        <div className="bench-recommendation">
+          <b>{recommendation.authority === 'hypom' ? 'HypOM ranked' : 'Preview ranked'}</b>
+          <span>{recommendation.fit.replaceAll('_', ' ')}</span>
+          <em>{Math.round(recommendation.score / 100)}%</em>
+        </div>
+        <SpecStrip item={item} />
+      </div>
+      <div className="bench-part-action">
+        <strong>{money(itemPrice(item), item.price?.currency || 'USD')}</strong>
+        <small>{isObservedAvailable(item) ? `${item.price?.freshness || 'observed'} · available posture` : 'availability unresolved'}</small>
+        <button type="button" onClick={() => onChoose(item)}>{chosen ? 'On tray' : 'Choose'}</button>
+        <button
+          type="button"
+          className="bench-review-toggle"
+          aria-expanded={reviewOpen}
+          aria-controls={reviewId}
+          onClick={() => setReviewOpen((current) => !current)}
+        >
+          <Eye size={13} /> Forge read
+        </button>
+      </div>
+      <aside className="bench-part-review" id={reviewId} aria-label={`Forge review notes for ${title(item)}`}>
+        <header><span>SPEC-DERIVED FORGE READ</span><strong>{review.headline}</strong></header>
+        <p>{review.blurb}</p>
+        <small><AlertTriangle size={12} />{review.watchOut}</small>
+        <em>{review.evidence}</em>
+      </aside>
+    </article>
+  );
 }
 
 function GuideRail({ lane, role, selected, issues }) {
@@ -462,7 +504,7 @@ export default function ConfiguratorWorkbench({ lane }) {
             <div className="bench-part-list">
               {filtered.map(({ item, recommendation }) => {
                 const chosen = selectedIds[selectedRole] === itemId(item);
-                return <article key={itemId(item)} className={chosen ? 'is-selected' : ''}><PartVisual item={item} role={itemRole(item)} selected={chosen} lane={lane} /><div className="bench-part-copy"><span>{item.manufacturer} · {itemPricePosture(item).replaceAll('_', ' ')}</span><h3>{item.model}</h3><div className="bench-recommendation"><b>{recommendation.authority === 'hypom' ? 'HypOM ranked' : 'Preview ranked'}</b><span>{recommendation.fit.replaceAll('_', ' ')}</span><em>{Math.round(recommendation.score / 100)}%</em></div><SpecStrip item={item} /></div><div className="bench-part-action"><strong>{money(itemPrice(item), item.price?.currency || 'USD')}</strong><small>{isObservedAvailable(item) ? `${item.price?.freshness || 'observed'} · available posture` : 'availability unresolved'}</small><button type="button" onClick={() => choose(item)}>{chosen ? 'On tray' : 'Choose'}</button></div></article>;
+                return <PartCard key={itemId(item)} item={item} recommendation={recommendation} chosen={chosen} lane={lane} requirements={requirements} onChoose={choose} />;
               })}
               {!ranked.length && <div className="bench-empty"><Database /><strong>No compatible components in this view.</strong><p>Change the search, show fit blockers, or wait for the next managed-source refresh.</p></div>}
               {ranked.length > visibleCount && <button type="button" className="bench-load-more" onClick={() => setVisibleCount((current) => current + 8)}>Show 8 more <span>{ranked.length - visibleCount} remaining</span></button>}

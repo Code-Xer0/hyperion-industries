@@ -1,4 +1,5 @@
 import './PartVisual.css';
+import { partMediaPresentation } from './partContextModel.js';
 
 const ROLE_LABELS = {
   cpu: 'processor',
@@ -271,9 +272,10 @@ export default function PartVisual({
   const normalizedRole = KNOWN_ROLES.has(requestedRole) ? requestedRole : 'component';
   const roleLabel = ROLE_LABELS[normalizedRole] || 'component';
   const catalogLabel = [item?.manufacturer, item?.model].filter(Boolean).join(' ');
-  const accessibleLabel = catalogLabel
+  const media = partMediaPresentation(item, normalizedRole);
+  const accessibleLabel = media.alt || (catalogLabel
     ? `Illustrative proxy for the ${roleLabel} category. Catalog item: ${catalogLabel}. This is not an exact product image.`
-    : `Illustrative proxy for the ${roleLabel} category. This is not an exact product image.`;
+    : `Illustrative proxy for the ${roleLabel} category. This is not an exact product image.`);
   const isLite = normalizedRole.startsWith('lite_') || lane === 'lite_grid';
   const isRack = !isLite && (
     lane === 'rackworks'
@@ -284,6 +286,8 @@ export default function PartVisual({
     <figure
       className={`part-visual is-${isLite ? 'lite' : isRack ? 'rack' : 'forge'}${selected ? ' is-selected' : ''}`}
       data-role={normalizedRole}
+      data-media-posture={media.posture}
+      data-variant={media.variant}
       aria-label={accessibleLabel}
       title={accessibleLabel}
     >
@@ -297,10 +301,31 @@ export default function PartVisual({
             ? <RackGeometry role={normalizedRole} />
             : <ForgeGeometry role={normalizedRole} />}
         {normalizedRole === 'component' && <GenericGeometry />}
+        {media.fallbackAsset && media.fallbackAsset !== media.asset && (
+          <img
+            className="pv-photo pv-photo-fallback"
+            src={media.fallbackAsset}
+            alt=""
+            loading="lazy"
+            decoding="async"
+            onError={(event) => { event.currentTarget.hidden = true; }}
+          />
+        )}
+        {media.asset && (
+          <img
+            className="pv-photo"
+            src={media.asset}
+            alt=""
+            loading="lazy"
+            decoding="async"
+            onError={(event) => { event.currentTarget.hidden = true; }}
+          />
+        )}
+        {media.asset && <i className="pv-photo-shade" />}
         <i className="pv-scan" />
       </div>
       <figcaption>
-        <span>Illustrative proxy</span>
+        <span>{media.badge}</span>
       </figcaption>
     </figure>
   );
