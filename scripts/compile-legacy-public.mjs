@@ -1,4 +1,5 @@
 import { build } from 'esbuild';
+import { createHash } from 'node:crypto';
 import { readFile, readdir, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -38,6 +39,7 @@ const result = await build({
 
 const output = result.outputFiles?.[0]?.text;
 if (!output) throw new Error('Operator card runtime compilation produced no output.');
+const runtimeVersion = createHash('sha256').update(output).digest('hex').slice(0, 12);
 await writeFile(new URL('assets/card/card-runtime.js', distRoot), output, 'utf8');
 
 const cardHtmlPath = new URL('dxcard/index.html', distRoot);
@@ -47,7 +49,7 @@ cardHtml = cardHtml
   .replace(/\s*<script[^>]+type=["']text\/babel["'][^>]*>[\s\S]*?<\/script>/gi, '')
   .replace(
     '</body>',
-    '  <script defer src="/assets/card/card-runtime.js"></script>\n</body>',
+    `  <script defer src="/assets/card/card-runtime.js?v=${runtimeVersion}"></script>\n</body>`,
   );
 await writeFile(cardHtmlPath, cardHtml, 'utf8');
 

@@ -27,11 +27,12 @@ Align the public `/dxcard` operator card with the current Context Hub doctrine w
 - No claims of unrestricted automation, unrestricted integration, or self-service Forge availability were introduced.
 - Operator Identity / NFC remains **SHIPPING**; CHR0N.OS remains **BETA**; Forge remains **BY INQUIRY**.
 - The existing portrait, identity, vCard, contact channels, external links, card geometry, and responsive scaling implementation are unchanged.
+- The compiled operator-card runtime now receives a content-derived query version so returning visitors cannot combine fresh doctrine config with stale rendering logic.
 
 ## Verification
 
 - `npm run build` — passed; the public card runtime was compiled and private legacy artifacts were removed.
-- `npm run public:compiled-check` — passed across 439 public artifacts.
+- `npm run public:compiled-check` — passed across 449 public artifacts.
 - `npm run seo:verify` — passed across 40 route shells, 38 sitemap URLs, and 17 redirects.
 - `npm run seo:edge-test` — 25 of 25 tests passed.
 - Playwright checks passed at 320 × 568, 390 × 844, and 844 × 390.
@@ -48,3 +49,5 @@ Align the public `/dxcard` operator card with the current Context Hub doctrine w
 - Runtime copy: `public/assets/card/card.config.json`
 - Offline fallback: `public/assets/card/app.jsx`
 - Card metadata: `public/dxcard/index.html`, `public/dxcard/manifest.webmanifest`, and `src/data/seoRoutes.js`
+- Compiled runtime versioning: `scripts/compile-legacy-public.mjs`
+- Cache-boundary regression check: `scripts/verify-public-artifacts.mjs`

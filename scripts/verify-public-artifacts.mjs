@@ -42,6 +42,11 @@ for (const file of files) {
   }
 }
 
+const operatorCardHtml = await readFile(join(distPath, 'dxcard', 'index.html'), 'utf8');
+if (!/<script defer src="\/assets\/card\/card-runtime\.js\?v=[a-f0-9]{12}"><\/script>/.test(operatorCardHtml)) {
+  failures.push('dxcard/index.html: compiled operator-card runtime is not content-versioned');
+}
+
 if (failures.length) {
   console.error('Public compiled-only verification failed:');
   failures.forEach((failure) => console.error(`- ${failure}`));
