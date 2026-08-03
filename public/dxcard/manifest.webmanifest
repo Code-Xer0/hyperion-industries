@@ -1,7 +1,7 @@
 {
   "name": "Δeus χ — Operator Card",
   "short_name": "Operator Card",
-  "description": "Interactive operator card for Victor Amani · Δeus χ — Founder & Systems Architect at Hyperion Industries.",
+  "description": "Victor Amani — founder and systems architect building continuity infrastructure for fragmented operations with provenance and operator control.",
   "start_url": "/dxcard",
   "scope": "/dxcard",
   "display": "standalone",

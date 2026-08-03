@@ -300,8 +300,8 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
       "path": "/dxcard",
       "canonicalUrl": "https://hyperion-industries.dev/dxcard",
       "title": "Δeus χ | Victor Amani Operator Card",
-      "description": "Public operator card for Victor Amani, founder and systems architect of Hyperion Industries.",
-      "summary": "A compact public identity and contact surface for the Hyperion founding operator.",
+      "description": "Victor Amani is a founder and systems architect building continuity infrastructure for fragmented operations with provenance and operator control.",
+      "summary": "A compact public identity and contact surface for Hyperion continuity architecture.",
       "maturity": "SHIPPING",
       "schemaType": "ProfilePage",
       "indexable": true,
@@ -948,5 +948,5 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
       }
     ]
   },
-  "sha256": "ad9701f3be279952996b6ea45c322d8e66b9124fea0b6cbfe8ddd25844ce7de8"
+  "sha256": "1287d7badf5289f06e9a0656c5a3d551895eff482271eaf7c12ef06941c67f84"
 } as const;

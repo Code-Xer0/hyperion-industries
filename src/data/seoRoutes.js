@@ -157,8 +157,8 @@ const fixedRoutes = [
   {
     path: '/dxcard',
     title: 'Δeus χ | Victor Amani Operator Card',
-    description: 'Public operator card for Victor Amani, founder and systems architect of Hyperion Industries.',
-    summary: 'A compact public identity and contact surface for the Hyperion founding operator.',
+    description: 'Victor Amani is a founder and systems architect building continuity infrastructure for fragmented operations with provenance and operator control.',
+    summary: 'A compact public identity and contact surface for Hyperion continuity architecture.',
     maturity: 'SHIPPING',
     schemaType: 'ProfilePage',
     ogImage: '/assets/operators/deus-x-wide-brand.png',
