@@ -3,8 +3,8 @@
   --pv-accent-rgb: 247, 189, 61;
   position: relative;
   display: grid;
-  min-width: 96px;
-  min-height: 88px;
+  min-width: 132px;
+  min-height: 112px;
   margin: 0;
   overflow: hidden;
   isolation: isolate;
@@ -49,10 +49,50 @@
 
 .pv-stage {
   position: relative;
-  min-height: 88px;
+  min-height: 112px;
   perspective: 560px;
   transform-style: preserve-3d;
 }
+
+.pv-photo {
+  position: absolute;
+  z-index: 18;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 50%;
+  filter: saturate(.88) contrast(1.04) brightness(.9);
+  transform: scale(1.015);
+  transition: transform .42s cubic-bezier(.2, .8, .2, 1), filter .28s ease;
+}
+
+.pv-photo-fallback { z-index: 17; }
+.part-visual[data-variant="1"] .pv-photo { object-position: 44% 50%; transform: scale(1.05); }
+.part-visual[data-variant="2"] .pv-photo { object-position: 56% 48%; transform: scale(1.085); }
+
+.pv-photo-shade {
+  z-index: 20;
+  inset: 0;
+  background:
+    linear-gradient(180deg, transparent 48%, rgba(5, 7, 6, .58) 100%),
+    radial-gradient(circle at 74% 16%, rgba(var(--pv-accent-rgb), .08), transparent 34%);
+  pointer-events: none;
+}
+
+.part-visual:hover .pv-photo,
+.part-visual:focus-within .pv-photo,
+.part-visual.is-selected .pv-photo {
+  filter: saturate(.98) contrast(1.06) brightness(.98);
+  transform: scale(1.085) translate3d(0, -1%, 0);
+}
+
+.part-visual[data-variant="1"]:hover .pv-photo,
+.part-visual[data-variant="1"]:focus-within .pv-photo,
+.part-visual[data-variant="1"].is-selected .pv-photo { transform: scale(1.12) translate3d(1%, -1%, 0); }
+.part-visual[data-variant="2"]:hover .pv-photo,
+.part-visual[data-variant="2"]:focus-within .pv-photo,
+.part-visual[data-variant="2"].is-selected .pv-photo { transform: scale(1.15) translate3d(-1%, -1%, 0); }
 
 .pv-grid,
 .pv-halo,
@@ -137,8 +177,8 @@
 .part-visual figcaption {
   position: absolute;
   z-index: 30;
-  right: 5px;
-  bottom: 4px;
+  right: 6px;
+  bottom: 6px;
   pointer-events: none;
 }
 
@@ -149,7 +189,7 @@
   border: 1px solid color-mix(in srgb, var(--pv-accent) 17%, #32352f);
   border-radius: 4px;
   background: rgba(9, 11, 10, .82);
-  font: 700 .38rem/1 var(--font-display, ui-monospace, monospace);
+  font: 700 .4rem/1 var(--font-display, ui-monospace, monospace);
   text-transform: uppercase;
   letter-spacing: .08em;
 }
@@ -599,8 +639,11 @@
 
 @media (max-width: 800px) {
   .part-visual {
-    min-width: 76px;
+    min-width: 96px;
+    min-height: 96px;
   }
+
+  .pv-stage { min-height: 96px; }
 
   .part-visual figcaption span {
     font-size: .34rem;
@@ -609,7 +652,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .part-visual,
-  .pv-object {
+  .pv-object,
+  .pv-photo {
     transition: none;
   }
 
