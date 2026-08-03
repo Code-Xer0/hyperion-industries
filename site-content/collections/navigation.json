@@ -1,7 +1,7 @@
 { 
   "main": [
-    { "label": "City Map", "path": "/architecture" },
-    { "label": "Systems", "path": "/systems" },
+    { "label": "Doctrine", "path": "/#method" },
+    { "label": "Continuity Domains", "path": "/systems" },
     { "label": "Forge", "path": "/forge" },
     { "label": "Identity", "path": "/identity" },
     { "label": "Archive", "path": "/build-archive" },
@@ -10,28 +10,28 @@
   "cta": [
     { "label": "CARDS / NFC ↗", "path": "/card-studio", "variant": "ghost" },
     { "label": "CHR0N.OS ↗", "href": "https://chr0nos.app", "variant": "ghost", "external": true },
-    { "label": "Start a signal →", "path": "/intake", "variant": "gold" }
+    { "label": "Start an assessment →", "path": "/intake", "variant": "gold" }
   ],
   "footer": {
     "systems": [
       { "label": "CHR0N.OS", "path": "/chronos", "note": "Stable beta" },
       { "label": "Mnem.OS", "path": "/mnemos", "note": "In development" },
-      { "label": "Pandora", "path": "/pandora", "note": "Enterprise POC" },
+      { "label": "Pandora", "path": "/pandora", "note": "Architecture / review" },
       { "label": "Tal.OS", "path": "/talos", "note": "In development" }
     ],
     "explore": [
-      { "label": "City Architecture", "path": "/architecture" },
-      { "label": "Systems", "path": "/systems" },
+      { "label": "Continuity Architecture", "path": "/architecture" },
+      { "label": "Continuity Domains", "path": "/systems" },
       { "label": "The Forge", "path": "/forge" },
       { "label": "Operator Identity", "path": "/identity" },
       { "label": "Build Archive", "path": "/build-archive" },
-      { "label": "Founders", "path": "/founders" }
+      { "label": "Company Operators", "path": "/founders" }
     ],
     "connect": [
+      { "label": "Start an Assessment", "path": "/intake" },
       { "label": "Contact", "path": "/contact" },
       { "label": "Alignment", "path": "/alignment" },
       { "label": "Card Studio", "path": "/card-studio" },
-      { "label": "Other Inquiry", "path": "/intake" },
       { "label": "Gallery", "path": "/gallery" },
       { "label": "Dev Diary", "path": "/dev-diary" },
       { "label": "Store", "path": "/store", "note": "Staged" }

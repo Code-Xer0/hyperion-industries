@@ -65,13 +65,13 @@
   },
   "contact": {
     "hero": {
-      "eyebrow": "Contact layer",
-      "title": "Bring the right signal.",
-      "lead": "Reach out for CHR0N.OS pilots, custom builds, deployments, partnerships, support, and aligned collaborations. Hyperion is currently prioritizing builds, pilots, and strategic partnerships."
+      "eyebrow": "Assessment entry",
+      "title": "Start with the continuity failure.",
+      "lead": "Tell Hyperion what keeps getting lost, rediscovered, rebuilt, or handed off badly. We will route the request to a bounded assessment, build, identity, support, or relationship lane."
     },
     "instructions": {
       "title": "What to include.",
-      "desc": "For build inquiries, send your budget range, primary use case, timeline, aesthetic direction, and any must-have hardware. For systems or pilot conversations, send the problem, data type, operating constraints, and what success looks like."
+      "desc": "Share the problem, current environment, affected people or systems, known evidence, constraints, and what a useful first artifact would be. Do not send credentials, private archives, restricted logs, or sensitive records."
     }
   },
   "store": {
@@ -108,9 +108,9 @@
   },
   "systems": {
     "hero": {
-      "eyebrow": "Systems wing",
-      "title": "Maturity-labeled sovereign stack.",
-      "lead": "Live product, shipping identity, commercial hardware, in-development systems, and concept engines are separated clearly. The city shows posture without exposing private authority."
+      "eyebrow": "Continuity domains",
+      "title": "Specialized systems. One governed operating grammar.",
+      "lead": "Hyperion systems preserve state, provenance, context, and human authority in different domains. Public proof, commercial lanes, active development, and research remain visibly separated."
     },
     "active": {
       "title": "Active Systems"

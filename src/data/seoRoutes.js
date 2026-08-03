@@ -1,6 +1,7 @@
 import { INTAKE_LANE_SEO } from '../../shared/intake/lane-seo.js';
 import { cityRoutes } from './publicCity.js';
 import { SITE_CONTENT_PAGES } from '../generated/siteContent.js';
+import { PUBLIC_DOCTRINE } from './publicDoctrine.js';
 
 export const SITE_ORIGIN = 'https://hyperion-industries.dev';
 export const ENTITY_SPINE = 'Victor Amani is the professional name of Kushinda Furaha Zeleke, founder and systems architect of Hyperion Industries in Minneapolis.';
@@ -9,19 +10,19 @@ export const DEFAULT_OG_IMAGE = '/assets/branding/hyperion/hyperion-link-preview
 const fixedRoutes = [
   {
     path: '/',
-    title: 'Hyperion Industries | Local-First Intelligent Infrastructure',
-    description: 'Hyperion Industries is a Minneapolis systems company in soft launch, accepting limited local-first software, infrastructure, identity, and custom-systems requests after scope review.',
-    summary: 'A public city for local-first software, custom hardware, operator identity, continuity, and limited scoped contracting.',
+    title: 'Hyperion Industries | Continuity Infrastructure',
+    description: 'Minneapolis-based Hyperion Industries builds governed, local-first continuity infrastructure that preserves state and routes action across fragmented operations.',
+    summary: PUBLIC_DOCTRINE.summary,
     maturity: 'PUBLIC EDGE · SOFT LAUNCH',
     schemaType: 'WebSite',
     sourceFiles: ['src/pages/HomePage.jsx', 'src/data/publicCity.js', 'src/data/seoRoutes.js'],
-    relatedPaths: ['/systems', '/forge', '/card-studio', '/founders'],
+    relatedPaths: ['/systems', '/forge', '/card-studio', '/contact'],
   },
   {
     path: '/systems',
-    title: 'Systems Directory | Hyperion Industries',
-    description: 'Public directory for Hyperion software, archive, memory, infrastructure, and local-first operating systems.',
-    summary: 'A public-safe directory of Hyperion systems and their current maturity.',
+    title: 'Continuity Systems and Maturity | Hyperion Industries',
+    description: 'Explore Hyperion continuity domains with explicit public proof, commercial, development, research, and authority boundaries.',
+    summary: 'Specialized systems that preserve state and context without collapsing domain authority.',
     maturity: 'PUBLIC-SAFE MAP',
     schemaType: 'CollectionPage',
     sourceFiles: ['src/pages/SystemsPage.jsx', 'site-content/collections/systems.json'],
@@ -84,10 +85,10 @@ const fixedRoutes = [
   },
   {
     path: '/contact',
-    title: 'Contact Hyperion Industries | Limited Scoped Requests',
-    description: 'Hyperion is preparing for soft launch and accepting a limited number of requests and contracting engagements after scope discussion.',
-    summary: 'An appointment-based contact surface for limited requests, support, partnerships, and scoped contracting.',
-    maturity: 'PUBLIC SIGNAL · LIMITED AVAILABILITY',
+    title: 'Start a Hyperion Assessment | Limited Scoped Requests',
+    description: 'Start with a continuity failure, workload, trust surface, support issue, or relationship question and route it to operator review.',
+    summary: 'An assessment-first entry for bounded continuity, Forge, identity, support, and relationship requests.',
+    maturity: 'PUBLIC INTAKE · OPERATOR REVIEW',
     schemaType: 'ContactPage',
     sourceFiles: ['src/pages/ContactPage.jsx'],
     relatedPaths: ['/intake', '/forge', '/chronos'],
@@ -241,9 +242,9 @@ const intakeRoutes = [
   },
   {
     path: '/intake',
-    title: 'Hyperion Intake OS | Limited Requests and Scoped Contracting',
-    description: 'Choose a truthful Hyperion intake lane for limited soft-launch requests, scoped contracting, support, identity, continuity, or partnership review.',
-    summary: 'Seven public routes, one operator-review boundary, and no automatic promise of acceptance or engagement.',
+    title: 'Hyperion Assessments and Intake | Operator Review',
+    description: 'Choose a bounded Hyperion intake lane for continuity, Forge systems, identity, support, infrastructure readiness, or relationship review.',
+    summary: 'Seven public assessment routes, one operator-review boundary, and no automatic promise of acceptance or engagement.',
     maturity: 'SOFT LAUNCH · LIMITED INTAKE',
     schemaType: 'ContactPage',
     sourceFiles: ['src/features/intake/IntakePage.jsx', 'shared/intake/model.ts', 'shared/intake/lane-seo.js'],
@@ -348,7 +349,7 @@ const organization = {
     contentUrl: `${SITE_ORIGIN}/assets/branding/hyperion/Hyblkvert.png`,
     caption: 'Hyperion Industries logo',
   },
-  description: 'Minneapolis-based local-first intelligent infrastructure, systems architecture, custom compute, identity, continuity, and scoped contracting.',
+  description: 'Minneapolis-based continuity infrastructure that preserves state, provenance, context, and human authority across fragmented operations.',
   founder: { '@id': `${SITE_ORIGIN}/founders/victor-amani#person` },
   areaServed: {
     '@type': 'AdministrativeArea',
