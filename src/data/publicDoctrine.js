@@ -9,6 +9,7 @@ export const PUBLIC_DOCTRINE = Object.freeze({
     Object.freeze({ id: 'context', label: 'Expose context', detail: 'Let each domain explain what the evidence means without erasing the source.' }),
     Object.freeze({ id: 'authority', label: 'Gate authority', detail: 'Make clear who may decide, approve, change, or publish.' }),
     Object.freeze({ id: 'route', label: 'Route action', detail: 'Move approved work into a bounded operating path with a handoff.' }),
+    Object.freeze({ id: 'learn', label: 'Learn from reality contact', detail: 'Compare the handoff with what actually happened, then update the evidence without rewriting history.' }),
   ]),
   contract: Object.freeze([
     Object.freeze({ id: 'source', label: 'Source-bound facts', status: 'SOURCE', detail: 'Evidence stays attached to its origin, freshness, and stated limits.' }),

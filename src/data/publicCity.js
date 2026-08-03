@@ -380,7 +380,7 @@ export const cityRoutes = [
       ['Protected authority', 'Relationships and public posture are visible. Source structure, private telemetry, credentials, and execution surfaces are not.'],
     ],
     proof: ['Maturity labels centralized', 'Future engines marked research', 'No private routes'],
-    diagram: ['Capture', 'Provenance', 'Context', 'Authority', 'Action'],
+    diagram: ['Capture', 'Provenance', 'Context', 'Authority', 'Action', 'Reality contact'],
     related: ['chronos', 'pandora', 'talos'],
   },
   {

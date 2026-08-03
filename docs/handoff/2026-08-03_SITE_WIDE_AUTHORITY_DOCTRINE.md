@@ -14,6 +14,7 @@ The public site now presents Hyperion as a continuity infrastructure company rat
 - Expose context.
 - Gate authority.
 - Route action.
+- Learn from reality contact.
 - Facts are source-bound. Meaning is context-bound. Actions are authority-bound.
 
 ## Changed surfaces

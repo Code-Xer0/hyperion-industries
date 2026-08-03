@@ -909,7 +909,7 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
         "title": "Operating doctrine",
         "route": "/alignment",
         "visibility": "public",
-        "content": "Hyperion's public doctrine is: facts are source-bound, meaning is context-bound, and actions are authority-bound. Each lane captures state, preserves provenance, exposes context, gates authority, and routes approved action. AI may assist, surface, and recommend; a public page cannot borrow private execution authority and the human operator decides."
+        "content": "Hyperion's public doctrine is: facts are source-bound, meaning is context-bound, and actions are authority-bound. Each lane captures state, preserves provenance, exposes context, gates authority, routes approved action, and learns from reality contact. AI may assist, surface, and recommend; a public page cannot borrow private execution authority and the human operator decides."
       },
       {
         "id": "forge",
@@ -948,5 +948,5 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
       }
     ]
   },
-  "sha256": "6daed992a109eb87d075fd89804e55357e1d7122f964e5fa8cb7dd5bc03220a5"
+  "sha256": "da0125d0174e0b08a666a453f7831d565bf9e2547a3e876af90328681605e291"
 } as const;

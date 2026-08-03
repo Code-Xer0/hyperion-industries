@@ -10,7 +10,7 @@ test('public doctrine preserves the authority-bound invariant', () => {
   );
   assert.deepEqual(
     PUBLIC_DOCTRINE.invariant.map((step) => step.id),
-    ['capture', 'provenance', 'context', 'authority', 'route'],
+    ['capture', 'provenance', 'context', 'authority', 'route', 'learn'],
   );
 });
 

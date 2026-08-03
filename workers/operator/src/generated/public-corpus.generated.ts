@@ -16,7 +16,7 @@ export const PUBLIC_CORPUS = {
       "title": "Operating doctrine",
       "sourcePath": "/alignment",
       "visibility": "public",
-      "content": "Hyperion's public doctrine is: facts are source-bound, meaning is context-bound, and actions are authority-bound. Each lane captures state, preserves provenance, exposes context, gates authority, and routes approved action. AI may assist, surface, and recommend; a public page cannot borrow private execution authority and the human operator decides."
+      "content": "Hyperion's public doctrine is: facts are source-bound, meaning is context-bound, and actions are authority-bound. Each lane captures state, preserves provenance, exposes context, gates authority, routes approved action, and learns from reality contact. AI may assist, surface, and recommend; a public page cannot borrow private execution authority and the human operator decides."
     },
     {
       "id": "forge",
@@ -54,5 +54,5 @@ export const PUBLIC_CORPUS = {
       "content": "Victor Amani is the founder and systems architect behind Hyperion Industries' local-first infrastructure direction. Keshawn Rowe is the founding operator focused on operations, deployment, field systems, build intake, and client handoff. Public profiles describe responsibility without exposing private records or operator controls."
     }
   ],
-  "sha256": "b172df087da005d0e07fe2393707cc10357612365348c86ac8de026435ac9abf"
+  "sha256": "f77e78a9fcf2b29b1b33ef108e67f5e3fc847cfc58ea2311389a32cfdb0f2fdd"
 } as const;

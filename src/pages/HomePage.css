@@ -44,7 +44,7 @@
 .gate-proof-room .city-proof img { min-height: 170px; max-height: 300px; }
 .gate-method-room,
 .gate-inquiry-room { display: grid; align-content: center; min-height: calc(100% - 32px); }
-.gate-method-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
+.gate-method-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
 .gate-method-grid article { min-height: 180px; display: flex; flex-direction: column; padding: 18px; border: 1px solid var(--glass-edge); border-top-color: var(--gold); background: var(--room-card-bg); }
 .gate-method-grid article > span { color: var(--gold); font-family: var(--font-display); font-size: 8px; }
 .gate-method-grid h3 { margin: auto 0 10px; color: var(--text); font-size: 17px; }
