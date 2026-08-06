@@ -1,0 +1,322 @@
+{ 
+  "status": {
+    "label": "Shopify posture",
+    "value": "Draft orders first",
+    "summary": "Pricing is public for card finishes, but payment still moves through operator-reviewed Shopify draft invoices. No public cart or checkout is live on the Hyperion site yet."
+  },
+  "currency": "USD",
+  "publicCheckoutEnabled": false,
+  "cardOrdering": {
+    "sourceArtifact": "C:\\Users\\Inf3r\\Git\\business-card-dx\\Business Card. Dx. (Final)",
+    "defaultTemplate": "ivory",
+    "defaultFinish": "pvc-matte",
+    "orderHref": "mailto:hello@hyperion-industries.dev?subject=Hyperion%20Card%20Order%20Request&body=Name%3A%0AEmail%3A%0ATemplate%3A%0AFinish%3A%0AQuantity%3A%0AProfile%20or%20website%20URL%3A%0AShipping%20city%20%2F%20state%3A%0ANotes%3A",
+    "primaryCta": "Request Draft Invoice",
+    "secondaryCta": "Open Studio",
+    "note": "Digital card is free forever. Physical NFC cards follow the final catalog: PVC from $39, metal from $89, Pro $9/mo or $90/yr, Team custom."
+  },
+  "templates": [
+    {
+      "key": "slate",
+      "name": "Slate",
+      "profession": "Operations & management",
+      "tag": "Universal minimal",
+      "swatch": "#9aa6bd",
+      "sample": {
+        "name": "Jordan Vale",
+        "role": "Operations Lead",
+        "org": "Northstar Works",
+        "initials": "JV",
+        "status": "LIVE",
+        "serial": "HYP-CARD-1102",
+        "credential": "NFC",
+        "capability": "Field ops, process, handoff",
+        "tagline": "Calm systems for busy teams.",
+        "website": "northstar.works/jordan",
+        "email": "jordan@northstar.works",
+        "phone": "+1 555 0102"
+      }
+    },
+    {
+      "key": "ivory",
+      "name": "Ivory",
+      "profession": "Consulting & advisory",
+      "tag": "Editorial serif",
+      "swatch": "#b06a45",
+      "sample": {
+        "name": "Mara Sol",
+        "role": "Strategic Advisor",
+        "org": "Sol Advisory",
+        "initials": "MS",
+        "status": "AVAILABLE",
+        "serial": "HYP-CARD-0319",
+        "credential": "NFC",
+        "capability": "Advisory, positioning, transition",
+        "tagline": "Clear decisions when the room is noisy.",
+        "website": "sol.advisory/mara",
+        "email": "mara@sol.advisory",
+        "phone": "+1 555 0139"
+      }
+    },
+    {
+      "key": "counsel",
+      "name": "Counsel",
+      "profession": "Law & mediation",
+      "tag": "Deep ink gold rule",
+      "swatch": "#c2a25a",
+      "sample": {
+        "name": "Elena Cross",
+        "role": "Mediator",
+        "org": "Cross Counsel",
+        "initials": "EC",
+        "status": "CONFIDENTIAL",
+        "serial": "HYP-CARD-0441",
+        "credential": "NFC",
+        "capability": "Disputes, intake, settlement",
+        "tagline": "Measured counsel for hard conversations.",
+        "website": "crosscounsel.law/elena",
+        "email": "elena@crosscounsel.law",
+        "phone": "+1 555 0141"
+      }
+    },
+    {
+      "key": "sterling",
+      "name": "Sterling",
+      "profession": "Finance & banking",
+      "tag": "Navy engraved",
+      "swatch": "#c8a657",
+      "sample": {
+        "name": "Theo Sterling",
+        "role": "Private Markets",
+        "org": "Sterling Capital",
+        "initials": "TS",
+        "status": "VERIFIED",
+        "serial": "HYP-CARD-0720",
+        "credential": "NFC",
+        "capability": "Capital, diligence, reporting",
+        "tagline": "Trust, receipts, and clean numbers.",
+        "website": "sterling.capital/theo",
+        "email": "theo@sterling.capital",
+        "phone": "+1 555 0172"
+      }
+    },
+    {
+      "key": "atelier",
+      "name": "Atelier",
+      "profession": "Art & creative",
+      "tag": "Cream expressive",
+      "swatch": "#b8412e",
+      "sample": {
+        "name": "Rin Calder",
+        "role": "Creative Director",
+        "org": "Calder Atelier",
+        "initials": "RC",
+        "status": "BOOKING",
+        "serial": "HYP-CARD-0905",
+        "credential": "NFC",
+        "capability": "Identity, campaign, editorial",
+        "tagline": "A visual system people can remember.",
+        "website": "calder.studio/rin",
+        "email": "rin@calder.studio",
+        "phone": "+1 555 0195"
+      }
+    },
+    {
+      "key": "meridian",
+      "name": "Meridian",
+      "profession": "Architecture & design",
+      "tag": "Blueprint mono",
+      "swatch": "#3a4a52",
+      "sample": {
+        "name": "Noah Vale",
+        "role": "Architect",
+        "org": "Meridian Office",
+        "initials": "NV",
+        "status": "SITE READY",
+        "serial": "HYP-CARD-0624",
+        "credential": "NFC",
+        "capability": "Residential, adaptive reuse, field notes",
+        "tagline": "Useful spaces with a documented trail.",
+        "website": "meridian.office/noah",
+        "email": "noah@meridian.office",
+        "phone": "+1 555 0164"
+      }
+    },
+    {
+      "key": "verdant",
+      "name": "Verdant",
+      "profession": "Health & wellness",
+      "tag": "Calm soft",
+      "swatch": "#6fb38a",
+      "sample": {
+        "name": "Iris Hale",
+        "role": "Care Coordinator",
+        "org": "Verdant Clinic",
+        "initials": "IH",
+        "status": "ACTIVE",
+        "serial": "HYP-CARD-0811",
+        "credential": "NFC",
+        "capability": "Care plans, referrals, follow-up",
+        "tagline": "The next step should be easy to find.",
+        "website": "verdant.care/iris",
+        "email": "iris@verdant.care",
+        "phone": "+1 555 0181"
+      }
+    },
+    {
+      "key": "operator",
+      "name": "Operator",
+      "profession": "Tech & product",
+      "tag": "Flagship maximal",
+      "swatch": "#ff2a36",
+      "sample": {
+        "name": "Victor Amani",
+        "role": "Founder · Systems Architect",
+        "org": "Hyperion Industries",
+        "initials": "DX",
+        "status": "ONLINE",
+        "serial": "HYP-Δ-0001",
+        "credential": "NFC",
+        "capability": "Systems, memory, local-first infrastructure",
+        "tagline": "Systems that remember, adapt, and survive contact with reality.",
+        "website": "hyperion-industries.dev/dxcard",
+        "email": "hello@hyperion-industries.dev",
+        "phone": "Operator card"
+      }
+    }
+  ],
+  "finishes": [
+    {
+      "key": "pvc-matte",
+      "name": "PVC NFC Card · Matte",
+      "note": "Low-glare, fingerprint-resistant",
+      "price": 39,
+      "sku": "HYP-CARD-PVC-MATTE",
+      "packagingProfile": "flat-card"
+    },
+    {
+      "key": "pvc-gloss",
+      "name": "PVC NFC Card · Gloss",
+      "note": "Vivid color, high shine",
+      "price": 39,
+      "sku": "HYP-CARD-PVC-GLOSS",
+      "packagingProfile": "flat-card"
+    },
+    {
+      "key": "pvc-soft",
+      "name": "PVC NFC Card · Soft-touch",
+      "note": "Velvet hand-feel",
+      "price": 49,
+      "sku": "HYP-CARD-PVC-SOFT",
+      "packagingProfile": "premium-card"
+    },
+    {
+      "key": "metal-brushed",
+      "name": "Metal NFC Card · Brushed steel",
+      "note": "Satin, directional grain",
+      "price": 89,
+      "sku": "HYP-CARD-METAL-BRUSHED",
+      "packagingProfile": "premium-card"
+    },
+    {
+      "key": "metal-matte",
+      "name": "Metal NFC Card · Matte black",
+      "note": "Stealth, anti-glare coat",
+      "price": 99,
+      "sku": "HYP-CARD-METAL-MATTE",
+      "packagingProfile": "premium-card"
+    },
+    {
+      "key": "metal-polished",
+      "name": "Metal NFC Card · Polished black",
+      "note": "Mirror, dramatic depth",
+      "price": 109,
+      "sku": "HYP-CARD-METAL-POLISHED",
+      "packagingProfile": "premium-card"
+    },
+    {
+      "key": "metal-gold",
+      "name": "Metal NFC Card · 24k gold accent",
+      "note": "Engraving filled in gold",
+      "price": 129,
+      "sku": "HYP-CARD-METAL-GOLD",
+      "packagingProfile": "premium-card"
+    }
+  ],
+  "plans": [
+    {
+      "key": "starter",
+      "name": "Starter",
+      "price": "$0",
+      "per": "free forever"
+    },
+    {
+      "key": "pro",
+      "name": "Pro",
+      "price": "$9",
+      "per": "/ month",
+      "note": "or $90/yr"
+    },
+    {
+      "key": "team",
+      "name": "Team",
+      "price": "Custom",
+      "per": "per seat"
+    }
+  ],
+  "orderStatuses": [
+    "submitted",
+    "operator_review",
+    "quoted",
+    "invoice_sent",
+    "paid",
+    "production_queue",
+    "packaging_ready",
+    "shipped",
+    "delivered",
+    "cancelled"
+  ],
+  "productLanes": [
+    "card_studio_physical",
+    "build_archive_card",
+    "forge_build",
+    "chronos_download",
+    "pilot_advisory"
+  ],
+  "packagingProfiles": [
+    {
+      "key": "flat-card",
+      "label": "Flat card",
+      "defaults": "Sleeve, rigid mailer, branded insert, tracking optional."
+    },
+    {
+      "key": "premium-card",
+      "label": "Premium card",
+      "defaults": "Sleeve, presentation envelope or box, rigid mailer, tracking recommended."
+    },
+    {
+      "key": "electronics-small",
+      "label": "Electronics small",
+      "defaults": "ESD bag, anti-static foam, double-wall carton, tracking and insurance."
+    },
+    {
+      "key": "forge-system",
+      "label": "Forge system",
+      "defaults": "ESD handling, foam and corner protection, double-boxing, insurance, signature, and operator photo proof before shipment."
+    }
+  ],
+  "shopify": {
+    "mode": "draft_order_first",
+    "requiredScopes": [
+      "write_draft_orders",
+      "read_draft_orders",
+      "read_orders"
+    ],
+    "draftOrderTags": [
+      "hyperion",
+      "card-studio",
+      "operator-reviewed"
+    ],
+    "publicCart": "staged"
+  }
+}

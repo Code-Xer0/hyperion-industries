@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hyperion-industries.dev/contracts/card-studio/card-order-command.v1.schema.json",
+  "title": "Hyperion Card Studio operator command",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "command_id", "proposal_id", "intent_id", "revision_hash", "decision", "reason_code", "issued_at"],
+  "properties": {
+    "contract_version": { "const": "card-order-command/1" },
+    "command_id": { "type": "string", "pattern": "^coc_[A-Za-z0-9_-]{12,64}$" },
+    "proposal_id": { "type": "string", "pattern": "^cdp_[A-Za-z0-9_-]{12,64}$" },
+    "intent_id": { "type": "string", "pattern": "^coi_[A-Za-z0-9_-]{12,64}$" },
+    "revision_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "decision": { "enum": ["request_changes", "approve_proof", "release_checkout", "hold", "decline"] },
+    "reason_code": { "type": "string", "pattern": "^[a-z0-9_.-]{2,80}$" },
+    "issued_at": { "type": "string", "format": "date-time" }
+  }
+}

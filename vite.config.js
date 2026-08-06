@@ -3,11 +3,21 @@ import react from '@vitejs/plugin-react'
 import mdx from '@mdx-js/rollup'
 import fs from 'fs'
 import path from 'path'
-import { exec } from 'child_process'
 import { fileURLToPath } from 'url'
 import { FORGE_GUIDE_FALLBACK } from './src/data/forgeGuideBundle.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const LEGACY_CONTENT_MODELS = new Map([
+  'commerce',
+  'content',
+  'destinations',
+  'gallery',
+  'navigation',
+  'operators',
+  'radio',
+  'showcase',
+  'systems',
+].map((model) => [model, path.resolve(__dirname, 'site-content', 'collections', `${model}.json`)]));
 
 const ALLOWED_UPLOAD_MIME = new Set([
   'image/png',
@@ -142,8 +152,6 @@ function localCmsPlugin() {
     configureServer(server) {
       server.middlewares.use(guideMiddleware);
       server.middlewares.use((req, res, next) => {
-        // Handle CORS just in case, though it's same-origin typically
-        res.setHeader('Access-Control-Allow-Origin', '*');
         res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
         res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
         
@@ -154,8 +162,14 @@ function localCmsPlugin() {
         }
 
         if (req.url.startsWith('/api/data/')) {
-          const model = req.url.replace('/api/data/', '');
-          const filePath = path.resolve(__dirname, `src/data/${model}.json`);
+          const model = req.url.replace('/api/data/', '').split('?')[0];
+          const filePath = LEGACY_CONTENT_MODELS.get(model);
+          if (!filePath) {
+            res.statusCode = 404;
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify({ error: 'Unknown content collection' }));
+            return;
+          }
 
           if (req.method === 'GET') {
             if (fs.existsSync(filePath)) {
@@ -251,25 +265,13 @@ function localCmsPlugin() {
         }
 
         if (req.url === '/api/commit' && req.method === 'POST') {
-          exec('git status --porcelain src/data/ public/assets/', (statusErr, statusStdout) => {
-            if (statusErr) {
-              res.setHeader('Content-Type', 'application/json');
-              return res.end(JSON.stringify({ success: false, error: statusErr.message }));
-            }
-            if (!statusStdout.trim()) {
-              // Nothing to commit
-              res.setHeader('Content-Type', 'application/json');
-              return res.end(JSON.stringify({ success: true, stdout: 'No changes to commit. Already up to date.' }));
-            }
-            exec('git add src/data/ public/assets/ && git commit -m "Content and assets updated via Editor" && git push', (error, stdout, stderr) => {
-              res.setHeader('Content-Type', 'application/json');
-              if (error) {
-                res.end(JSON.stringify({ success: false, error: error.message, stderr }));
-              } else {
-                res.end(JSON.stringify({ success: true, stdout }));
-              }
-            });
-          });
+          res.statusCode = 410;
+          res.setHeader('Content-Type', 'application/json');
+          res.end(JSON.stringify({
+            success: false,
+            error: 'Direct editor publishing has retired. Open Hyperion Site Builder to validate, preview, approve, and release this change.',
+            code: 'workbench_required',
+          }));
           return;
         }
 

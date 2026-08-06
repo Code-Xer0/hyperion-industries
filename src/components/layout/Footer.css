@@ -4,6 +4,23 @@
   padding: 52px 0 32px;
   margin-top: auto;
 }
+.footer-doctrine {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.82fr) minmax(0, 1.18fr);
+  gap: clamp(28px, 6vw, 82px);
+  padding: 0 0 32px;
+}
+.footer-doctrine > div > span { color: var(--gold); font-family: var(--font-display); font-size: 8px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; }
+.footer-doctrine h2 { max-width: 620px; margin: 12px 0 12px; color: var(--text); font-size: clamp(30px, 4vw, 54px); line-height: 0.98; }
+.footer-doctrine p { max-width: 640px; color: var(--text-muted); font-size: 13px; line-height: 1.7; }
+.footer-doctrine ol { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); align-self: end; list-style: none; }
+.footer-doctrine li { min-height: 92px; display: flex; flex-direction: column; justify-content: space-between; padding: 12px; border-top: 1px solid var(--gold); border-right: 1px solid var(--border-soft); background: var(--room-card-bg); }
+.footer-doctrine li:last-child { border-right: 0; }
+.footer-doctrine li span { color: var(--gold); font-family: var(--font-display); font-size: 7px; }
+.footer-doctrine li strong { color: var(--text-soft); font-size: 10px; line-height: 1.35; }
+.footer-principle { display: flex; align-items: center; justify-content: space-between; gap: 22px; margin-bottom: 38px; padding: 16px 0; border-top: 1px solid var(--border-soft); border-bottom: 1px solid var(--border-soft); }
+.footer-principle strong { color: var(--text-soft); font-size: clamp(13px, 1.5vw, 17px); font-weight: 500; }
+.footer-principle .btn { flex: 0 0 auto; }
 .footer-top {
   display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
   gap: 48px; margin-bottom: 40px;
@@ -41,8 +58,11 @@ body.theme-light .footer-mark { filter: drop-shadow(0 8px 18px rgba(55,43,19,0.1
 .footer-legal a:hover { color: var(--text-muted); }
 
 @media (max-width: 900px) {
+  .footer-doctrine { grid-template-columns: 1fr; }
+  .footer-doctrine ol { grid-template-columns: repeat(5, minmax(110px, 1fr)); overflow-x: auto; }
   .footer-top { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 640px) {
+  .footer-principle { align-items: flex-start; flex-direction: column; }
   .footer-top { grid-template-columns: 1fr; }
 }

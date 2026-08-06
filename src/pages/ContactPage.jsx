@@ -1,14 +1,15 @@
-import { ArrowUpRight, Mail } from 'lucide-react';
+import { Mail } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import PageShell from '../components/layout/PageShell';
 import RoomShell from '../components/portal/RoomShell';
-import content from '../data/content.json';
+import content from '../../site-content/collections/content.json';
 import './SubPage.css';
 
 const stations = [
   { id: 'route', label: 'Route' },
+  { id: 'continuity', label: 'Continuity' },
   { id: 'forge', label: 'Forge' },
-  { id: 'chronos', label: 'CHR0N.OS' },
+  { id: 'identity', label: 'Identity' },
   { id: 'alignment', label: 'Alignment' },
 ];
 
@@ -20,22 +21,22 @@ export default function ContactPage() {
   const panels = {
     route: (
       <div className="room-panel-grid">
-        <div className="room-panel-copy"><h2>Bring the problem. We will route the lane.</h2><p>Hyperion is preparing for soft launch and accepting a limited number of requests and contracting engagements. Availability is confirmed only after a scope and fit discussion.</p><p>{content.contact.instructions.desc}</p><div className="room-action-row"><MailAction href="mailto:hello@hyperion-industries.dev">Email Hyperion</MailAction></div></div>
+        <div className="room-panel-copy"><h2>Start with the failure, not the stack.</h2><p>Hyperion is accepting a limited number of assessment, build, identity, support, and scoped systems requests. A submitted signal begins review; it does not create a quote, contract, deployment, or access grant.</p><p>{content.contact.instructions.desc}</p><div className="room-action-row"><Link to="/intake" className="btn btn-gold">Choose an Intake Lane</Link><MailAction href="mailto:hello@hyperion-industries.dev" secondary>Email Hyperion</MailAction></div></div>
         <div className="signal-route-list">
+          <button type="button" onClick={() => { window.location.hash = 'continuity'; }}><strong>State or handoff keeps breaking</strong><span>Continuity assessment</span></button>
           <button type="button" onClick={() => { window.location.hash = 'forge'; }}><strong>Build or workstation</strong><span>Forge inquiry</span></button>
-          <button type="button" onClick={() => { window.location.hash = 'chronos'; }}><strong>Archive or recovery</strong><span>CHR0N.OS public lane</span></button>
+          <button type="button" onClick={() => { window.location.hash = 'identity'; }}><strong>Identity or trust surface</strong><span>Operator Identity</span></button>
           <button type="button" onClick={() => { window.location.hash = 'alignment'; }}><strong>Partnership or program</strong><span>Alignment hall</span></button>
         </div>
       </div>
     ),
+    continuity: <SignalPanel title="Capture the continuity failure." text="Map what is being lost, where handoffs break, which evidence exists, and what must remain under your control. The first output is a reviewable brief, not an automation promise." to="/intake/continuity" action="Start Continuity Assessment" />,
     forge: <SignalPanel title="Scope a Forge build." text="Share the workload, room, timeline, budget range, and what the machine must remain serviceable for." to="/forge/configurator" action="Open Forge Configurator" />,
-    chronos: (
-      <div className="room-panel-grid"><div className="room-panel-copy"><h2>Enter the public archive lane.</h2><p>Downloads and the stable beta preview live on the public CHR0N.OS surface. Private archives and support context stay outside this site.</p><div className="room-action-row"><a href="https://chr0nos.app" target="_blank" rel="noopener noreferrer" className="btn btn-gold">Open CHR0N.OS <ArrowUpRight size={15} /></a><MailAction href="mailto:hello@hyperion-industries.dev?subject=CHR0N.OS%20Inquiry" secondary>Contact Support</MailAction></div></div></div>
-    ),
-    alignment: <SignalPanel title="Start with fit and evidence." text="Aligned funders, grant programs, strategic partners, and early customers can begin with the problem, available role, and expected next step." href="mailto:hello@hyperion-industries.dev?subject=Hyperion%20Alignment%20Inquiry" action="Open Alignment Signal" />,
+    identity: <SignalPanel title="Define the trust surface." text="Describe who or what the card represents, the approved contact posture, the physical environment, and whether publication, NFC production, or both should be reviewed." to="/intake/operator-identity" action="Start Identity Intake" />,
+    alignment: <SignalPanel title="Start with fit and evidence." text="Aligned funders, grant programs, strategic partners, and early customers can begin with a narrow problem, their available role, and a useful first step." to="/intake/relationships" action="Open Alignment Intake" />,
   };
 
-  return <PageShell><RoomShell eyebrow="Alignment / Contact Signal" title="Contact Signal" summary={`${content.contact.hero.lead} Limited requests are reviewed by appointment after scope discussion.`} status="PUBLIC SIGNAL · LIMITED AVAILABILITY" tone="inquiry" stations={stations} panels={panels} defaultStation="route" /></PageShell>;
+  return <PageShell><RoomShell eyebrow="Assessment / Contact" title="Start Here" summary={`${content.contact.hero.lead} Limited requests are reviewed only after scope and fit are understood.`} status="PUBLIC INTAKE · OPERATOR REVIEW" tone="inquiry" stations={stations} panels={panels} defaultStation="route" /></PageShell>;
 }
 
 function SignalPanel({ title, text, href, to, action }) {

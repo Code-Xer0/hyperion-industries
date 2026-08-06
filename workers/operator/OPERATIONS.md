@@ -17,6 +17,15 @@ Configure the template bindings as follows:
 | `FOUNDER_COMMAND_PULL_KEY_ID` | Non-secret current key version identifier |
 | `FOUNDER_COMMAND_PULL_PREVIOUS_TOKEN_SHA256` | Optional previous digest during a bounded rotation overlap |
 | `FOUNDER_COMMAND_PULL_PREVIOUS_UNTIL` | ISO-8601 deadline after which the previous digest fails closed |
+| `CARD_STUDIO_RATE_LIMITER` | Abuse limit for project, revision, submit, and upload-session traffic |
+| `CARD_STUDIO_INVITE_REQUIRED` | Defaults to fail-closed invite enforcement; set `false` only for bounded local tests |
+| `CARD_STUDIO_ASSETS` | Private R2 quarantine bucket; absence disables artwork sessions |
+| `CARD_STUDIO_UPLOAD_SCANNER` | Internal upload/scanning broker; absence disables artwork sessions |
+| `CARD_STUDIO_SHOPIFY_STORE_DOMAIN` | Released `*.myshopify.com` store domain |
+| `CARD_STUDIO_SHOPIFY_STOREFRONT_API_VERSION` | Pinned quarterly Storefront API version |
+| `CARD_STUDIO_SHOPIFY_STOREFRONT_TOKEN` | Wrangler secret for Storefront cart creation |
+| `CARD_STUDIO_SHOPIFY_VARIANTS` | JSON map from fixed Card Studio SKU to released ProductVariant GID |
+| `CARD_STUDIO_SHOPIFY_WEBHOOK_SECRET` | Wrangler secret used to verify the exact raw webhook body |
 | `OPENROUTER_MODEL` | Server-only model override |
 | `SITE_ORIGIN` | Canonical HTTPS origin used by strict POST checks |
 | `INQUIRY_NOTIFY_TO` | Verified notification destination |
@@ -39,6 +48,29 @@ The intake operator feed is delivery-only and advertises `hyperion.intake.operat
 
 Intake acknowledgement delivery is post-commit and non-transactional with the immutable intake batch. Resend receives a deterministic idempotency key; D1 never stores the recipient or rendered message. The Resend webhook must be configured for `/api/intake/webhooks/resend` with `RESEND_WEBHOOK_SIGNING_SECRET`. Requests are verified against the raw request body and bounded timestamp before JSON parsing. Replayed `svix-id` values are acknowledged idempotently and never reapply delivery state.
 
+Card Studio uses the same authenticated feed and token rotation. Run migrations
+`0005_card_studio_v1.sql` and `0006_card_studio_shopify_v1.sql` before exposing Card Studio routes. Issue invite rows
+out of band; raw invite tokens are never stored, only SHA-256 digests. Project
+session tokens are returned once and stored only as digests.
+
+Artwork stays in a private quarantine lane. The scanner broker owns the actual
+upload target and scan transition; this Worker stores bounded metadata and
+opaque references. Do not bind a public R2 bucket. Until both bindings are
+healthy, `POST /api/card-studio/uploads/sessions` returns
+`503 secure_upload_unavailable`.
+
+`release_checkout` stages a `commerce-order-projection/1` record only. The
+authenticated `/api/card-studio/operator/checkout` action then verifies the
+released SKU mapping and creates a Storefront cart. The Worker writes a unique
+reserved attempt before network access; uncertain provider outcomes become
+`ambiguous` and require reconciliation instead of an unsafe automatic retry.
+Shopify webhooks are verified against the exact raw body, recorded by event ID
+and hash, and projected into local order state without retaining the raw body.
+Provider secrets are Wrangler secrets and never browser-visible.
+Released checkout URLs carry Shopify's `sso=silent` hint so an existing
+Customer Accounts session can be reused without making Hyperion a second
+credential authority.
+
 ## Public corpus updates
 
 Edit only `corpus/public-corpus.source.json`, keep every item explicitly public, and regenerate. CI or local verification should run `npm run corpus:check`; it compares the whole generated module and SHA-256 digest, so an unreviewed runtime corpus change cannot hide behind a stale artifact.
@@ -52,5 +84,10 @@ Edit only `corpus/public-corpus.source.json`, keep every item explicitly public,
 - `504 upstream_timeout`: provider did not establish the stream inside the bounded lifetime.
 - `503 inquiry_storage_unavailable`: nothing was accepted or emailed.
 - `202 notification_pending`: inquiry status is `submitted`, but notification delivery or state confirmation is incomplete.
+- `409 order_intent_conflict_quarantined`: a reused public intent identifier carried different content.
+- `409 checkout_not_eligible`: an operator attempted to release a review-required proposal.
+- `409 checkout_attempt_requires_reconciliation`: a prior provider call may have succeeded and cannot be retried automatically.
+- `503 shopify_not_configured`: provider secrets or store configuration are incomplete.
+- `503 secure_upload_unavailable`: R2 quarantine or the scanning broker is unavailable.
 
 Deployment is intentionally outside this package's test and verification commands.

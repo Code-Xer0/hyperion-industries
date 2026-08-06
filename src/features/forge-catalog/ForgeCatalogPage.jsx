@@ -91,7 +91,7 @@ function ProductCard({ product }) {
             <ShieldCheck size={16} aria-hidden="true" />
             Scoped after operator review
           </span>
-          <Link to="/forge/configurator">
+          <Link to={`/forge/configurator?lane=${encodeURIComponent(product.lane)}&source=catalog`}>
             Shape this lane <ArrowRight size={16} aria-hidden="true" />
           </Link>
         </div>

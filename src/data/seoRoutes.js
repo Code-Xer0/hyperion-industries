@@ -1,5 +1,7 @@
 import { INTAKE_LANE_SEO } from '../../shared/intake/lane-seo.js';
 import { cityRoutes } from './publicCity.js';
+import { SITE_CONTENT_PAGES } from '../generated/siteContent.js';
+import { PUBLIC_DOCTRINE } from './publicDoctrine.js';
 
 export const SITE_ORIGIN = 'https://hyperion-industries.dev';
 export const ENTITY_SPINE = 'Victor Amani is the professional name of Kushinda Furaha Zeleke, founder and systems architect of Hyperion Industries in Minneapolis.';
@@ -8,22 +10,22 @@ export const DEFAULT_OG_IMAGE = '/assets/branding/hyperion/hyperion-link-preview
 const fixedRoutes = [
   {
     path: '/',
-    title: 'Hyperion Industries | Local-First Intelligent Infrastructure',
-    description: 'Hyperion Industries is a Minneapolis systems company in soft launch, accepting limited local-first software, infrastructure, identity, and custom-systems requests after scope review.',
-    summary: 'A public city for local-first software, custom hardware, operator identity, continuity, and limited scoped contracting.',
+    title: 'Hyperion Industries | Continuity Infrastructure',
+    description: 'Minneapolis-based Hyperion Industries builds governed, local-first continuity infrastructure that preserves state and routes action across fragmented operations.',
+    summary: PUBLIC_DOCTRINE.summary,
     maturity: 'PUBLIC EDGE · SOFT LAUNCH',
     schemaType: 'WebSite',
     sourceFiles: ['src/pages/HomePage.jsx', 'src/data/publicCity.js', 'src/data/seoRoutes.js'],
-    relatedPaths: ['/systems', '/forge', '/founders/victor-amani', '/intake'],
+    relatedPaths: ['/systems', '/forge', '/card-studio', '/contact'],
   },
   {
     path: '/systems',
-    title: 'Systems Directory | Hyperion Industries',
-    description: 'Public directory for Hyperion software, archive, memory, infrastructure, and local-first operating systems.',
-    summary: 'A public-safe directory of Hyperion systems and their current maturity.',
+    title: 'Continuity Systems and Maturity | Hyperion Industries',
+    description: 'Explore Hyperion continuity domains with explicit public proof, commercial, development, research, and authority boundaries.',
+    summary: 'Specialized systems that preserve state and context without collapsing domain authority.',
     maturity: 'PUBLIC-SAFE MAP',
     schemaType: 'CollectionPage',
-    sourceFiles: ['src/pages/SystemsPage.jsx', 'src/data/systems.json'],
+    sourceFiles: ['src/pages/SystemsPage.jsx', 'site-content/collections/systems.json'],
     relatedPaths: ['/chronos', '/mnemos', '/software-estate'],
   },
   {
@@ -34,7 +36,7 @@ const fixedRoutes = [
     maturity: 'PUBLIC ARCHIVE',
     schemaType: 'CollectionPage',
     ogImage: '/assets/builds/20230803_133211.jpg',
-    sourceFiles: ['src/pages/BuildArchivePage.jsx', 'src/data/showcase.json'],
+    sourceFiles: ['src/pages/BuildArchivePage.jsx', 'site-content/collections/showcase.json'],
     relatedPaths: ['/forge', '/gallery', '/forge/catalog'],
   },
   {
@@ -56,7 +58,7 @@ const fixedRoutes = [
     maturity: 'PUBLIC ARCHIVE',
     schemaType: 'CollectionPage',
     ogImage: '/assets/operators/deus-x-portrait-complete.png',
-    sourceFiles: ['src/pages/GalleryPage.jsx', 'src/data/gallery.json'],
+    sourceFiles: ['src/pages/GalleryPage.jsx', 'site-content/collections/gallery.json'],
     relatedPaths: ['/build-archive', '/identity', '/founders'],
   },
   {
@@ -71,22 +73,22 @@ const fixedRoutes = [
   },
   {
     path: '/card-studio',
-    title: 'Hyperion Card Studio | Smart Operator Identity',
-    description: 'Compose and refine smart business cards, operator cards, NFC identity surfaces, and public profile handoffs.',
-    summary: 'A shipping studio for smart cards, NFC identity, and operator-controlled public profiles.',
-    maturity: 'SHIPPING',
+    title: 'Hyperion Card Studio Invite Preview | Smart Operator Identity',
+    description: 'Compose a guarded operator-card design brief with live front, back, and digital proofs in Hyperion\'s invite-only soft-launch lane.',
+    summary: 'An invite-only native studio for deterministic card proofs and operator-reviewed identity handoff.',
+    maturity: 'INVITE-ONLY PREVIEW',
     schemaType: 'SoftwareApplication',
     ogImage: '/assets/city/proof/card-studio-smoke.png',
     aliases: ['/card-studio/', '/card-studio/studio.html', '/assets/card-studio/studio.html', '/studio/card-studio'],
-    sourceFiles: ['src/pages/CardStudioPage.jsx', 'public/assets/card-studio/runtime.html'],
+    sourceFiles: ['src/pages/CardStudioPage.jsx', 'src/features/card-studio/CardStudioEditor.jsx'],
     relatedPaths: ['/identity', '/dxcard', '/intake/operator-identity'],
   },
   {
     path: '/contact',
-    title: 'Contact Hyperion Industries | Limited Scoped Requests',
-    description: 'Hyperion is preparing for soft launch and accepting a limited number of requests and contracting engagements after scope discussion.',
-    summary: 'An appointment-based contact surface for limited requests, support, partnerships, and scoped contracting.',
-    maturity: 'PUBLIC SIGNAL · LIMITED AVAILABILITY',
+    title: 'Start a Hyperion Assessment | Limited Scoped Requests',
+    description: 'Start with a continuity failure, workload, trust surface, support issue, or relationship question and route it to operator review.',
+    summary: 'An assessment-first entry for bounded continuity, Forge, identity, support, and relationship requests.',
+    maturity: 'PUBLIC INTAKE · OPERATOR REVIEW',
     schemaType: 'ContactPage',
     sourceFiles: ['src/pages/ContactPage.jsx'],
     relatedPaths: ['/intake', '/forge', '/chronos'],
@@ -118,7 +120,7 @@ const fixedRoutes = [
     summary: 'A truthful product-lane directory for systems currently available by scoped inquiry.',
     maturity: 'STAGED · NO CHECKOUT',
     schemaType: 'CollectionPage',
-    sourceFiles: ['src/pages/StorePage.jsx', 'src/data/commerce.json'],
+    sourceFiles: ['src/pages/StorePage.jsx', 'site-content/collections/commerce.json'],
     relatedPaths: ['/forge', '/identity', '/contact'],
   },
   {
@@ -128,7 +130,7 @@ const fixedRoutes = [
     summary: 'The public roster behind Hyperion Industries.',
     maturity: 'PUBLIC PROFILES',
     schemaType: 'CollectionPage',
-    sourceFiles: ['src/pages/FoundersPage.jsx', 'src/data/operators.json'],
+    sourceFiles: ['src/pages/FoundersPage.jsx', 'site-content/collections/operators.json'],
     relatedPaths: ['/founders/victor-amani', '/founders/keshawn-rowe', '/contact'],
   },
   {
@@ -139,7 +141,7 @@ const fixedRoutes = [
     maturity: 'FULL PUBLIC PROFILE',
     schemaType: 'ProfilePage',
     ogImage: '/assets/operators/victor-city-operating-edge.png',
-    sourceFiles: ['src/pages/FounderPage.jsx', 'src/data/operators.json'],
+    sourceFiles: ['src/pages/FounderPage.jsx', 'site-content/collections/operators.json'],
     relatedPaths: ['/', '/systems', '/contact'],
   },
   {
@@ -150,14 +152,14 @@ const fixedRoutes = [
     maturity: 'PROFILE IN PROGRESS',
     schemaType: 'ProfilePage',
     ogImage: '/assets/operators/keshawn-rowe-dossier.jpeg',
-    sourceFiles: ['src/pages/FounderPage.jsx', 'src/data/operators.json'],
+    sourceFiles: ['src/pages/FounderPage.jsx', 'site-content/collections/operators.json'],
     relatedPaths: ['/founders', '/forge', '/contact'],
   },
   {
     path: '/dxcard',
     title: 'Δeus χ | Victor Amani Operator Card',
-    description: 'Public operator card for Victor Amani, founder and systems architect of Hyperion Industries.',
-    summary: 'A compact public identity and contact surface for the Hyperion founding operator.',
+    description: 'Victor Amani is a founder and systems architect building continuity infrastructure for fragmented operations with provenance and operator control.',
+    summary: 'A compact public identity and contact surface for Hyperion continuity architecture.',
     maturity: 'SHIPPING',
     schemaType: 'ProfilePage',
     ogImage: '/assets/operators/deus-x-wide-brand.png',
@@ -209,10 +211,40 @@ const intakeRoutes = [
     aliases: ['/intake/forge'],
   },
   {
+    path: '/forge/configurator/build',
+    title: 'Forge PC Build Bench | Hyperion Industries',
+    description: 'Compare PC components, observe source-labeled price estimates and fit checks, and create an immutable Forge engineering draft.',
+    summary: 'An interactive PC build bench with explicit source posture, revision-safe drafts, and operator-reviewed authority.',
+    maturity: 'INTERACTIVE DRAFT · NOT A QUOTE',
+    schemaType: 'SoftwareApplication',
+    sourceFiles: ['src/features/configurator-workbench/ConfiguratorWorkbench.jsx'],
+    relatedPaths: ['/forge/configurator', '/forge/catalog', '/build-archive'],
+  },
+  {
+    path: '/pandora/configurator',
+    title: 'Pandora Rackworks Configurator | Hyperion Industries',
+    description: 'Plan rack nodes, accelerators, storage, fabric, power, and enclosure capacity with explicit site-review posture.',
+    summary: 'A deterministic Rackworks planning surface backed by immutable Pandora plan revisions.',
+    maturity: 'PLANNING PREVIEW · SITE REVIEW REQUIRED',
+    schemaType: 'SoftwareApplication',
+    sourceFiles: ['src/features/configurator-workbench/ConfiguratorWorkbench.jsx'],
+    relatedPaths: ['/pandora', '/talos', '/succession'],
+  },
+  {
+    path: '/pandora-lite/configurator',
+    title: 'Pandora Lite Grid Configurator | Hyperion Industries',
+    description: 'Compose a compact node grid with visible fabric, placement, circuit, acoustics, and review posture.',
+    summary: 'A deterministic Lite Grid planning surface backed by immutable Pandora plan revisions.',
+    maturity: 'PLANNING PREVIEW · SITE REVIEW REQUIRED',
+    schemaType: 'SoftwareApplication',
+    sourceFiles: ['src/features/configurator-workbench/ConfiguratorWorkbench.jsx'],
+    relatedPaths: ['/pandora-lite', '/pandora', '/alignment'],
+  },
+  {
     path: '/intake',
-    title: 'Hyperion Intake OS | Limited Requests and Scoped Contracting',
-    description: 'Choose a truthful Hyperion intake lane for limited soft-launch requests, scoped contracting, support, identity, continuity, or partnership review.',
-    summary: 'Seven public routes, one operator-review boundary, and no automatic promise of acceptance or engagement.',
+    title: 'Hyperion Assessments and Intake | Operator Review',
+    description: 'Choose a bounded Hyperion intake lane for continuity, Forge systems, identity, support, infrastructure readiness, or relationship review.',
+    summary: 'Seven public assessment routes, one operator-review boundary, and no automatic promise of acceptance or engagement.',
     maturity: 'SOFT LAUNCH · LIMITED INTAKE',
     schemaType: 'ContactPage',
     sourceFiles: ['src/features/intake/IntakePage.jsx', 'shared/intake/model.ts', 'shared/intake/lane-seo.js'],
@@ -239,6 +271,17 @@ const intakeRoutes = [
     indexable: false,
     sourceFiles: ['src/features/intake/IntakePage.jsx'],
   },
+  {
+    path: '/account',
+    title: 'Private Client Room | Hyperion Industries',
+    description: 'Open a private Hyperion client-history projection with a single-use email link.',
+    summary: 'A no-password, noindex client room backed by explicitly client-visible HypRM records.',
+    maturity: 'PRIVATE UTILITY · NOT INDEXED',
+    schemaType: 'WebPage',
+    indexable: false,
+    sourceFiles: ['src/features/client-account/ClientAccountPage.jsx'],
+    relatedPaths: ['/forge/configurator/build', '/pandora/configurator'],
+  },
 ];
 
 const legacyAliases = {
@@ -254,8 +297,21 @@ const legacyAliases = {
   '/store.html': '/store',
 };
 
+const governedContentRoutes = SITE_CONTENT_PAGES.map((page) => ({
+  path: page.path,
+  title: `${page.title} | Hyperion Industries`,
+  description: page.description,
+  summary: page.summary || page.description,
+  maturity: page.maturity,
+  schemaType: page.template === 'collection' ? 'CollectionPage' : 'WebPage',
+  indexable: page.indexable,
+  ogImage: page.og_asset || DEFAULT_OG_IMAGE,
+  sourceFiles: [`site-content/pages/${page.id.replace(/^page_/, '')}.json`],
+  relatedPaths: page.related_paths || [],
+}));
+
 export const SEO_ROUTES = Object.freeze(
-  [...fixedRoutes, ...districtRoutes, ...intakeRoutes].map((route) => ({
+  [...fixedRoutes, ...districtRoutes, ...intakeRoutes, ...governedContentRoutes].map((route) => ({
     indexable: true,
     ogImage: DEFAULT_OG_IMAGE,
     relatedPaths: [],
@@ -293,7 +349,7 @@ const organization = {
     contentUrl: `${SITE_ORIGIN}/assets/branding/hyperion/Hyblkvert.png`,
     caption: 'Hyperion Industries logo',
   },
-  description: 'Minneapolis-based local-first intelligent infrastructure, systems architecture, custom compute, identity, continuity, and scoped contracting.',
+  description: 'Minneapolis-based continuity infrastructure that preserves state, provenance, context, and human authority across fragmented operations.',
   founder: { '@id': `${SITE_ORIGIN}/founders/victor-amani#person` },
   areaServed: {
     '@type': 'AdministrativeArea',

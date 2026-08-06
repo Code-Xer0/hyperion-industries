@@ -4,7 +4,7 @@ import process from 'process';
 
 const root = process.cwd();
 const portal = JSON.parse(fs.readFileSync(path.join(root, 'src/data/portal.json'), 'utf8'));
-const commerce = JSON.parse(fs.readFileSync(path.join(root, 'src/data/commerce.json'), 'utf8'));
+const commerce = JSON.parse(fs.readFileSync(path.join(root, 'site-content/collections/commerce.json'), 'utf8'));
 
 // This audits the staged backend/data substrate contract only.
 // It does not assert that the current live-style React UI exposes these routes.

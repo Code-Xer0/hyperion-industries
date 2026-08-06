@@ -87,7 +87,7 @@ export const LANES: Record<LaneId, LaneDefinition> = {
     },
   },
   pandora: {
-    id: 'pandora', name: 'Pandora', short: 'Assess infrastructure readiness', accent: 'red', maturity: 'ENTERPRISE POC',
+    id: 'pandora', name: 'Pandora', short: 'Assess infrastructure readiness', accent: 'red', maturity: 'ARCHITECTURE REVIEW',
     operatorLine: 'Expose readiness, blockers, and custody constraints before hardware is proposed.',
     questions: {
       signal: [

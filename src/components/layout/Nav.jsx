@@ -5,15 +5,14 @@ import {
   ArrowUpRight,
   Bot,
   ChevronRight,
-  Command,
   Cpu,
   Fingerprint,
   Handshake,
   MapPinned,
+  Menu,
   Moon,
   Orbit,
   Search,
-  Send,
   Sun,
   UsersRound,
   Volume2,
@@ -31,7 +30,6 @@ import {
 import { useTheme } from '../../context/ThemeContext';
 import { useOperatorPilot } from '../../context/OperatorPilotContext';
 import { pickKairoScore } from '../../data/scores';
-import StatusChip from '../portal/StatusChip';
 import CityPreviewMedia from './CityPreviewMedia';
 import './Nav.css';
 
@@ -59,6 +57,7 @@ export default function Nav() {
   const { isLightMode, brandMark, toggleTheme } = useTheme();
   const operatorPilot = useOperatorPilot();
   const [launcherOpen, setLauncherOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [activeIndex, setActiveIndex] = useState(0);
   const [activeFamilyId, setActiveFamilyId] = useState('systems');
@@ -67,6 +66,8 @@ export default function Nav() {
   const [scoreTrack] = useState(pickKairoScore);
   const inputRef = useRef(null);
   const launcherRef = useRef(null);
+  const mobileMenuRef = useRef(null);
+  const mobileMenuButtonRef = useRef(null);
   const soundtrackRef = useRef(null);
   const feedbackContextRef = useRef(null);
   const feedbackTargetRef = useRef(null);
@@ -100,6 +101,11 @@ export default function Nav() {
     requestAnimationFrame(() => returnFocusRef.current?.focus?.());
   }, []);
 
+  const closeMobileMenu = useCallback(() => {
+    setMobileMenuOpen(false);
+    requestAnimationFrame(() => mobileMenuButtonRef.current?.focus());
+  }, []);
+
   useEffect(() => {
     const onKeyDown = (event) => {
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
@@ -110,22 +116,30 @@ export default function Nav() {
         event.preventDefault();
         closeLauncher();
       }
+      if (event.key === 'Escape' && mobileMenuOpen) {
+        event.preventDefault();
+        closeMobileMenu();
+      }
     };
 
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [closeLauncher, launcherOpen, openLauncher]);
+  }, [closeLauncher, closeMobileMenu, launcherOpen, mobileMenuOpen, openLauncher]);
 
   useEffect(() => {
-    if (!launcherOpen) return undefined;
+    if (!launcherOpen && !mobileMenuOpen) return undefined;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
-    requestAnimationFrame(() => inputRef.current?.focus());
+    requestAnimationFrame(() => {
+      if (launcherOpen) inputRef.current?.focus();
+      else mobileMenuRef.current?.querySelector('a,button')?.focus();
+    });
     return () => { document.body.style.overflow = previousOverflow; };
-  }, [launcherOpen]);
+  }, [launcherOpen, mobileMenuOpen]);
 
   useEffect(() => {
     setLauncherOpen(false);
+    setMobileMenuOpen(false);
     setQuery('');
     setActiveIndex(0);
   }, [location.pathname]);
@@ -245,6 +259,21 @@ export default function Nav() {
     }
   };
 
+  const trapMobileFocus = (event) => {
+    if (event.key !== 'Tab') return;
+    const focusable = [...mobileMenuRef.current.querySelectorAll('a[href], button:not([disabled])')];
+    if (!focusable.length) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  };
+
   const onSearchKeyDown = (event) => {
     if (event.key === 'ArrowDown') {
       event.preventDefault();
@@ -288,13 +317,6 @@ export default function Nav() {
     }
   };
 
-  const warmScore = () => {
-    const soundtrack = soundtrackRef.current;
-    if (!soundtrack || soundtrack.readyState >= 3) return;
-    soundtrack.preload = 'auto';
-    soundtrack.load();
-  };
-
   const routeLink = (destination, index = -1, cinematic = false) => (
     <Link
       key={destination.path}
@@ -327,82 +349,73 @@ export default function Nav() {
           </span>
         </Link>
 
-        <div className="nav-location" aria-label="Current location">
-          <span>Current location</span>
-          <strong>{current?.label || 'Public Edge'}</strong>
-        </div>
-
-        <div className="nav-city-slot">
+        <div className="nav-primary-links">
+          <Link to="/forge">Forge</Link>
+          <Link to="/card-studio">Card Studio</Link>
+          <Link to="/build-archive">Proof</Link>
           <button
             type="button"
-            className="nav-city-trigger"
+            className="nav-compact-city"
             onClick={openLauncher}
             aria-haspopup="dialog"
             aria-label={`Explore Hyperion City map, ${cityFamilies.length} public districts`}
           >
-            <span className="nav-city-beacon" aria-hidden="true">
-              <span className="nav-city-pulse" />
-              <MapPinned size={17} />
-            </span>
-            <span className="nav-city-copy">
-              <span className="nav-city-rest">City Map</span>
-              <span className="nav-city-expanded">
-                <strong>Explore Hyperion City</strong>
-                <small>{cityFamilies.length} public districts</small>
-              </span>
-            </span>
-            <ChevronRight className="nav-city-arrow" size={16} aria-hidden="true" />
-            <kbd><Command size={11} aria-hidden="true" />K</kbd>
+            <MapPinned size={15} aria-hidden="true" /> City Map
           </button>
         </div>
-
-        <div className="nav-status">
-          <StatusChip label={current?.status || 'PUBLIC ROUTE'} tone={current?.tone} compact />
-        </div>
-
-        <div className="nav-controls">
-          {operatorPilot.available && (
-            <button
-              type="button"
-              onClick={operatorPilot.toggle}
-              className="nav-score-button nav-operator-pilot"
-              aria-pressed={operatorPilot.enabled}
-              aria-label={operatorPilot.enabled ? 'Turn Operator Pilot off' : 'Turn experimental Operator Pilot on'}
-              title={operatorPilot.enabled ? 'Turn Operator Pilot off' : 'Turn experimental Operator Pilot on'}
-            >
-              <Bot size={16} aria-hidden="true" />
-              <span className="nav-score-copy"><strong>Operator</strong><small>{operatorPilot.enabled ? 'Pilot on' : 'Pilot off'}</small></span>
-            </button>
-          )}
-          <button
-            type="button"
-            onClick={toggleSoundtrack}
-            onPointerEnter={warmScore}
-            onPointerDown={warmScore}
-            onFocus={warmScore}
-            className="nav-score-button"
-            aria-pressed={soundEnabled}
-            aria-label={soundEnabled ? 'Turn City score off' : 'Turn City score on'}
-            title={soundEnabled ? 'Turn City score off' : 'Turn City score on'}
-          >
-            {soundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
-            <span className="nav-score-copy"><strong>Score</strong><small>{soundEnabled ? 'On' : 'Off'}</small></span>
-          </button>
-          <button
-            type="button"
-            onClick={toggleTheme}
-            className="nav-icon-button"
-            aria-label={isLightMode ? 'Switch to dark mode' : 'Switch to light mode'}
-            title={isLightMode ? 'Switch to dark mode' : 'Switch to light mode'}
-          >
-            {isLightMode ? <Moon size={17} /> : <Sun size={17} />}
-          </button>
-          <Link to="/intake" className="nav-signal-button">
-            <Send size={15} aria-hidden="true" />
-            <span>Start a signal</span>
-          </Link>
-        </div>
+        <Link to="/forge/configurator" className="nav-forge-action">Start a Forge Build</Link>
+        <Link to="/forge/configurator" className="nav-mobile-forge">Forge Inquiry</Link>
+        <button
+          ref={mobileMenuButtonRef}
+          type="button"
+          className="nav-mobile-menu-button"
+          aria-label="Open navigation menu"
+          aria-expanded={mobileMenuOpen}
+          aria-controls="mobile-navigation-menu"
+          onClick={() => setMobileMenuOpen(true)}
+        >
+          <Menu size={18} aria-hidden="true" /><span>Menu</span>
+        </button>
       </nav>
+
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div className="mobile-nav-backdrop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onMouseDown={(event) => event.target === event.currentTarget && closeMobileMenu()}>
+            <motion.section
+              id="mobile-navigation-menu"
+              ref={mobileMenuRef}
+              className="mobile-nav-menu"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="mobile-menu-title"
+              onKeyDown={trapMobileFocus}
+              initial={{ x: 36, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: 36, opacity: 0 }}
+            >
+              <header><div><span>PUBLIC TRANSIT</span><h2 id="mobile-menu-title">Navigate Hyperion</h2></div><button type="button" onClick={closeMobileMenu} aria-label="Close navigation menu"><X size={20} /></button></header>
+              <nav aria-label="Mobile navigation">
+                <Link to="/card-studio" onClick={closeMobileMenu}>Card Studio</Link>
+                <Link to="/forge" onClick={closeMobileMenu}>Forge District</Link>
+                <Link to="/forge/catalog" onClick={closeMobileMenu}>Forge Catalog</Link>
+                <Link to="/build-archive" onClick={closeMobileMenu}>Proof</Link>
+                <Link to="/systems" onClick={closeMobileMenu}>Systems</Link>
+                <Link to="/contact" onClick={closeMobileMenu}>Contact</Link>
+                <button type="button" onClick={() => { closeMobileMenu(); openLauncher(); }}>City Map</button>
+                <Link to="/intake" onClick={closeMobileMenu}>Other Inquiry</Link>
+              </nav>
+              <footer>
+                <span>City utilities</span>
+                <div>
+                  <button type="button" onClick={toggleSoundtrack} aria-pressed={soundEnabled}>{soundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />} Score {soundEnabled ? 'on' : 'off'}</button>
+                  <button type="button" onClick={toggleTheme}>{isLightMode ? <Moon size={16} /> : <Sun size={16} />} {isLightMode ? 'Dark mode' : 'Light mode'}</button>
+                  {operatorPilot.available && <button type="button" onClick={operatorPilot.toggle} aria-pressed={operatorPilot.enabled}><Bot size={16} /> Operator {operatorPilot.enabled ? 'on' : 'off'}</button>}
+                </div>
+              </footer>
+            </motion.section>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <audio
         ref={soundtrackRef}
@@ -483,6 +496,16 @@ export default function Nav() {
                   >
                     {soundEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
                     <span>{soundEnabled ? 'Score active' : 'Score off'}</span>
+                  </button>
+                  <button
+                    type="button"
+                    className="city-launcher-control"
+                    onClick={toggleTheme}
+                    aria-label={isLightMode ? 'Switch City to dark mode' : 'Switch City to light mode'}
+                    title={isLightMode ? 'Switch City to dark mode' : 'Switch City to light mode'}
+                  >
+                    {isLightMode ? <Moon size={18} /> : <Sun size={18} />}
+                    <span>{isLightMode ? 'Dark mode' : 'Light mode'}</span>
                   </button>
                   <button type="button" className="city-launcher-control is-close" onClick={closeLauncher} aria-label="Close City map" title="Close City map">
                     <X size={20} />

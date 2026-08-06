@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Embed canonical //H¥PE release metadata into the Hyperion Radio MP3s.
 
-Reads src/data/radio.json (the release registry) and writes ID3v2.3 tags +
+Reads site-content/collections/radio.json (the release registry) and writes ID3v2.3 tags +
 embedded cover art into each public/assets/radio/*.mp3, so files downloaded
 from the site carry full metadata. Idempotent — safe to re-run after adding
 tracks or editing the registry.

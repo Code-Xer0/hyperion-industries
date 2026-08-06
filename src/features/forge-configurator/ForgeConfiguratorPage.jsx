@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import {
   AlertTriangle, ArrowLeft, ArrowRight, Check, ChevronDown, CircleAlert, Compass,
   ExternalLink, KeyRound, LoaderCircle, Map, Search, ShieldCheck, Sparkles, X,
@@ -23,6 +23,13 @@ const LEGACY_KEY = 'hyperion-forge-configurator-v1';
 const LOCAL_RETENTION_MS = 14 * 24 * 60 * 60 * 1000;
 const LANDMARKS = ['destination', 'work', 'room', 'comfort', 'itinerary'];
 const LANDMARK_LABELS = { destination: 'Destination', work: 'Work', room: 'Room', comfort: 'Comfort', itinerary: 'Itinerary' };
+const CATALOG_LANE_PREFILLS = Object.freeze({
+  gaming: { destination: 'gaming', label: 'Gaming systems' },
+  creator: { destination: 'creator', label: 'Creator systems' },
+  'local-ai': { destination: 'local_ai', label: 'Local-AI systems' },
+  sff: { destination: 'gaming', footprint: 'compact', label: 'Small-form-factor systems' },
+  'custom-loop': { destination: 'gaming', label: 'Custom-loop systems' },
+});
 
 const makeId = (prefix) => {
   const value = globalThis.crypto?.randomUUID?.().replaceAll('-', '')
@@ -257,7 +264,7 @@ function Itinerary({ mode, requirements, recommendations, counterfactuals, onTog
       <div className="concierge-spots">{recommendations.items.map((item, index) => <ProductCard item={item} primary={index === 0} key={item.slug} />)}</div>
       <section className="concierge-counterfactuals"><span>Try another route</span><h3>What should we lean toward?</h3><div>{COUNTERFACTUALS.map(([id, label, help]) => <button type="button" key={id} className={counterfactuals.includes(id) ? 'is-selected' : ''} onClick={() => onToggle(id)}><strong>{label}</strong><small>{help}</small></button>)}</div><p>These controls preview the public guidance only. Formal Forge Brain scenarios begin after operator handoff.</p></section>
       <section className="concierge-projection"><div><span>Requirements draft</span><strong>{requirements.unresolved.length ? 'Review posture' : 'Ready for operator review'}</strong></div><dl><div><dt>Workload lane</dt><dd>{requirements.workload_profile?.replaceAll('_', ' ') || 'Unresolved'}</dd></div><div><dt>Operating lane</dt><dd>{requirements.operational_lane?.replaceAll('_', ' ') || 'Unresolved'}</dd></div><div><dt>Budget posture</dt><dd>{requirements.budget ? `Up to $${(requirements.budget.parts_ceiling_minor / 100).toLocaleString()}` : 'Operator guidance needed'}</dd></div><div><dt>Unknown policy</dt><dd>Review · never implicit pass</dd></div></dl>{requirements.unresolved.length > 0 && <p><AlertTriangle size={15} /> {requirements.unresolved.length} item{requirements.unresolved.length === 1 ? '' : 's'} remain explicit for operator clarification.</p>}</section>
-      <footer className="concierge-controls"><button type="button" className="forge-button is-ghost" onClick={onBack}><ArrowLeft size={15} />Back</button><div>{mode === 'express' && <button type="button" className="forge-button is-ghost" onClick={onDeepen}>Continue the full tour</button>}<button type="button" className="forge-button" onClick={onHandoff}>Prepare the handoff<ArrowRight size={15} /></button></div></footer>
+      <footer className="concierge-controls"><button type="button" className="forge-button is-ghost" onClick={onBack}><ArrowLeft size={15} />Back</button><div>{mode === 'express' && <button type="button" className="forge-button is-ghost" onClick={onDeepen}>Continue the full tour</button>}<Link className="forge-button is-ghost" to="/forge/configurator/build">Open the live build bench</Link><button type="button" className="forge-button" onClick={onHandoff}>Prepare the handoff<ArrowRight size={15} /></button></div></footer>
     </section>
   );
 }
@@ -286,6 +293,10 @@ function Handoff({ identity, setIdentity, consent, setConsent, reviewed, setRevi
 }
 
 export default function ForgeConfiguratorPage() {
+  const [searchParams] = useSearchParams();
+  const requestedLane = searchParams.get('lane') || '';
+  const navigationSource = searchParams.get('source') || '';
+  const catalogPrefill = navigationSource === 'catalog' ? CATALOG_LANE_PREFILLS[requestedLane] : null;
   const [bundle, setBundle] = useState(FORGE_GUIDE_FALLBACK);
   const [bundlePosture, setBundlePosture] = useState('bundled_verified');
   const [stage, setStage] = useState('welcome');
@@ -324,6 +335,12 @@ export default function ForgeConfiguratorPage() {
       .catch(() => { if (live) setBundlePosture('bundled_verified'); });
     return () => { live = false; };
   }, []);
+
+  useEffect(() => {
+    if (!catalogPrefill) return;
+    setAnswers((current) => ({ ...current, ...Object.fromEntries(Object.entries(catalogPrefill).filter(([key]) => key !== 'label')) }));
+    track('forge_navigation_source', { source: 'catalog', lane: requestedLane });
+  }, [catalogPrefill, requestedLane]);
 
   useEffect(() => {
     try {
@@ -543,7 +560,7 @@ export default function ForgeConfiguratorPage() {
           <section className="concierge-receipt"><Check size={34} /><span>SIGNAL RECEIVED · HELD FOR REVIEW</span><h2>Your itinerary is with the Forge desk.</h2><p>Reference <strong>{receipt.reference}</strong>. No quote, configuration, compatibility verdict, payment, or order was created.</p><div><button type="button" className="forge-button is-ghost" onClick={correct}>Correct with a new revision</button><Link className="forge-button" to="/forge">Return to the Forge</Link></div></section>
         ) : stage === 'welcome' ? (
           <section className="concierge-welcome" aria-labelledby="welcome-title">
-            <div><span><Compass size={15} /> YOUR GUIDE IS READY</span><h2 id="welcome-title">This should feel like a good shop tour, not a tax form.</h2><p>Start with what you want the system to make possible. The Concierge will explain the tradeoffs, show relevant Forge neighborhoods, and keep every unknown visible for a real operator.</p><div className="concierge-welcome-actions"><button type="button" className="forge-button" onClick={() => start('full')}>Take the guided itinerary<ArrowRight size={15} /></button><button type="button" className="forge-button is-ghost" onClick={() => start('express')}>Show me around · 3 questions</button></div><small>{migratedFrom ? 'Your earlier configurator draft was carried forward safely. ' : ''}Guide source: {bundlePosture.replaceAll('_', ' ')} · {bundle.sources.length} curated source lanes.</small></div><ol><li><b>01</b><span>Tell us the destination.</span></li><li><b>02</b><span>Get useful context as the route sharpens.</span></li><li><b>03</b><span>Preview several system neighborhoods.</span></li><li><b>04</b><span>Hand a source-opaque draft to an operator.</span></li></ol>
+            <div><span><Compass size={15} /> YOUR GUIDE IS READY</span><h2 id="welcome-title">This should feel like a good shop tour, not a tax form.</h2><p>Start with what you want the system to make possible. The Concierge will explain the tradeoffs, show relevant Forge neighborhoods, and keep every unknown visible for a real operator.</p>{catalogPrefill && <div className="concierge-catalog-prefill" role="status"><strong>Catalog starting lane: {catalogPrefill.label}</strong><span>This is visible and editable. The first Destination question lets you change it.</span></div>}<div className="concierge-welcome-actions"><button type="button" className="forge-button" onClick={() => start('full')}>Take the guided itinerary<ArrowRight size={15} /></button><button type="button" className="forge-button is-ghost" onClick={() => start('express')}>Show me around · 3 questions</button></div><small>{migratedFrom ? 'Your earlier configurator draft was carried forward safely. ' : ''}Guide source: {bundlePosture.replaceAll('_', ' ')} · {bundle.sources.length} curated source lanes.</small></div><ol><li><b>01</b><span>Tell us the destination.</span></li><li><b>02</b><span>Get useful context as the route sharpens.</span></li><li><b>03</b><span>Preview several system neighborhoods.</span></li><li><b>04</b><span>Hand a source-opaque draft to an operator.</span></li></ol>
           </section>
         ) : (
           <div className="concierge-layout">

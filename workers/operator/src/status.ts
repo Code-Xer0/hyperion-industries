@@ -12,6 +12,7 @@ import { CORPUS_METADATA } from "./corpus";
 import { isEmailAddress, jsonResponse, modelConfiguration, originConfiguration } from "./http";
 import type { Env } from "./types";
 import { publicContractManifest } from "../../../shared/intake/model";
+import { CARD_CATALOG } from "../../../shared/card-studio/catalog";
 
 export function handleStatus(env: Env): Response {
   const model = modelConfiguration(env);
@@ -38,6 +39,8 @@ export function handleStatus(env: Env): Response {
       /^[A-Za-z0-9._-]{3,80}$/.test(env.FOUNDER_COMMAND_PULL_KEY_ID?.trim() ?? "") &&
       /^[a-f0-9]{64}$/i.test(env.FOUNDER_COMMAND_PULL_TOKEN_SHA256?.trim() ?? ""),
   );
+  const cardStudioStorageReady = Boolean(env.DB && env.CARD_STUDIO_RATE_LIMITER && origin.valid);
+  const cardStudioUploadsReady = Boolean(cardStudioStorageReady && env.CARD_STUDIO_ASSETS && env.CARD_STUDIO_UPLOAD_SCANNER);
 
   return jsonResponse({
     service: SERVICE_NAME,
@@ -50,6 +53,8 @@ export function handleStatus(env: Env): Response {
       intake_storage: intakeStorageReady ? "ready" : "configuration_required",
       intake_resume: resumeReady ? "ready" : "configuration_required",
       intake_operator_feed: operatorFeedReady ? "ready" : "configuration_required",
+      card_studio_storage: cardStudioStorageReady ? "ready" : "configuration_required",
+      card_studio_secure_uploads: cardStudioUploadsReady ? "ready" : "configuration_required",
     },
     corpus: CORPUS_METADATA,
     privacy: {
@@ -70,5 +75,12 @@ export function handleStatus(env: Env): Response {
       inquiry_retention_days: INQUIRY_RETENTION_DAYS,
     },
     intake,
+    card_studio: {
+      contract_version: CARD_CATALOG.contract_version,
+      catalog_version: CARD_CATALOG.catalog_version,
+      release_state: CARD_CATALOG.release_state,
+      checkout_network: "disabled",
+      proposal_authority: "operator_review_only",
+    },
   });
 }

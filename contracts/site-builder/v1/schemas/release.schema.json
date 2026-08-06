@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hyperion-industries.dev/contracts/site-builder/v1/schemas/release.schema.json",
+  "title": "Hyperion Builder Release",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "release_id", "base_commit", "content_hash", "changes_hash", "risk", "state"],
+  "properties": {
+    "schema_version": { "const": "hyperion-release/1" },
+    "release_id": { "type": "string", "pattern": "^rel_[a-f0-9]{24,64}$" },
+    "base_commit": { "type": "string", "pattern": "^[a-f0-9]{40}$" },
+    "content_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "changes_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "risk": { "enum": ["low", "governed"] },
+    "state": { "enum": ["draft", "validating", "preview_ready", "approval_required", "approved", "publishing", "published", "failed", "stale", "canceled"] },
+    "preview_artifact_hash": { "type": ["string", "null"], "pattern": "^[a-f0-9]{64}$" },
+    "approval_receipt_id": { "type": ["string", "null"], "pattern": "^apr_[a-f0-9]{24,64}$" }
+  }
+}

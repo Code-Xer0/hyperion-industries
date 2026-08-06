@@ -4,7 +4,7 @@
     "name": "Hyperion Industries",
     "origin": "https://hyperion-industries.dev",
     "defaultTitle": "Hyperion Industries - Public Web Portal",
-    "defaultDescription": "A public portal for Hyperion systems, studio work, field services, doctrine, access lanes, and public-safe status.",
+    "defaultDescription": "The public edge of Hyperion continuity infrastructure: governed systems, maturity-labeled proof, and assessment-first access lanes.",
     "deployment": {
       "primaryRisk": "Pushes to main deploy GitHub Pages through .github/workflows/deploy.yml; public deployment is withheld without operator approval.",
       "publicApiPosture": "Vercel-style api functions are staged in-repo, but the live GitHub Pages surface does not currently serve JSON api routes.",
@@ -63,12 +63,12 @@
     "\/": {
       "zoneId": "gateway",
       "title": "Hyperion Industries - Gateway",
-      "description": "The public gateway into Hyperion systems, studio work, field services, doctrine, access lanes, and public-safe status.",
+      "description": "The public edge of Hyperion continuity infrastructure, with governed systems, evidence boundaries, and assessment-first entry.",
       "canonicalUrl": "https://hyperion-industries.dev/",
       "robots": "index,follow",
       "openGraph": {
         "title": "Hyperion Industries - Gateway",
-        "description": "Local-first intelligence infrastructure, organized as a public portal.",
+        "description": "Continuity infrastructure for fragmented operations, organized around source, context, and authority boundaries.",
         "image": "/assets/branding/hyperion/Hyblkstd.png",
         "type": "website"
       }
@@ -451,7 +451,7 @@
         "currency": "USD",
         "publicCheckoutEnabled": false,
         "pricingPosture": "public_prices_operator_review",
-        "activePricingSource": "src/data/commerce.json and public/assets/card-studio/catalog.jsx",
+        "activePricingSource": "site-content/collections/commerce.json",
         "digital": { "label": "Digital card", "price": 0, "note": "Free forever" },
         "physicalFinishes": [
           { "key": "pvc-matte", "label": "PVC NFC Card - Matte", "price": 39 },
@@ -816,7 +816,7 @@
       "posture": "preview",
       "access": "request_access",
       "summary": "Public pricing is visible; payment and fulfillment remain operator-reviewed via draft invoices.",
-      "truthSource": "src/data/commerce.json",
+      "truthSource": "site-content/collections/commerce.json",
       "lastVerified": "2026-06-25"
     },
     {

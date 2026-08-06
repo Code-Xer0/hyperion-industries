@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import PageShell from '../components/layout/PageShell';
 import RoomShell from '../components/portal/RoomShell';
 import HoverEditor from '../components/ui/HoverEditor';
-import content from '../data/content.json';
+import content from '../../site-content/collections/content.json';
 import './SubPage.css';
 
 const entries = [
@@ -40,7 +40,7 @@ export default function DevDiaryPage() {
       <div className="room-panel-copy">
         <h2>Known gaps stay visible.</h2>
         <p>Some product captures remain withheld until private state can be removed. Store and newsletter lanes remain staged. No public checkout, account system, or command surface is implied.</p>
-        <div className="room-action-row"><Link to="/contact" className="btn btn-gold">Send a Signal</Link></div>
+        <div className="room-action-row"><Link to="/intake" className="btn btn-gold">Start an Assessment</Link></div>
       </div>
     ),
   };

@@ -59,7 +59,7 @@ const COMPANY = Object.freeze({
   location: 'Minneapolis, Minnesota',
   serviceArea: 'Minneapolis-Saint Paul metropolitan area',
   availability: 'Soft launch; limited requests and contracting time are considered after scope discussion.',
-  summary: 'Hyperion Industries builds local-first software, custom compute, continuity systems, operator identity, and governed intelligent infrastructure.',
+  summary: 'Hyperion Industries builds governed, local-first continuity infrastructure that preserves state and routes action across fragmented operations.',
   logo: `${SITE_ORIGIN}/assets/branding/hyperion/Hyblkvert.png`,
   profiles: ['https://www.linkedin.com/company/hyperion-industries-llc/'],
 });

@@ -2,8 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
-import operators from '../data/operators.json';
-import radioTracks from '../data/radio.json';
+import operators from '../../site-content/collections/operators.json';
+import radioTracks from '../../site-content/collections/radio.json';
 import GravityLattice from '../components/ui/GravityLattice';
 import SingularityBackground from '../components/ui/SingularityBackground';
 import { RadioProvider } from '../components/radio/RadioContext';
@@ -624,7 +624,7 @@ export default function FounderPage() {
                 <div className="eyebrow gold" style={{ marginBottom: 20 }}>Background</div>
                 <div className="timeline">
                   {[
-                    ['NOW', 'Founder · Hyperion Industries LLC', 'Building sovereign AI, automation, identity, and infrastructure systems for operators, creators, and organizations moving into the next generation of work.'],
+                    ['NOW', 'Founder · Hyperion Industries LLC', 'Building continuity infrastructure that preserves state, provenance, context, and human authority across fragmented operations.'],
                     ['BUILDING', 'The .OS system family', 'CHR0N.OS, Mnem.OS, and the operator runtime — local-first workflows, continuity tooling, and identity-linked products.'],
                     ['FOCUS', 'Alignment · product · partner network', 'Non-dilutive funding, grant programs, strategic partners, early customers, and sovereignty-aligned technical growth.'],
                     ['PRACTICE', 'Architecture & deployment', 'Software architecture, local-first AI, deployment systems, NFC identity tools, and automation frameworks — practical systems people can actually use.'],

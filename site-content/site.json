@@ -1,0 +1,27 @@
+{
+  "schema_version": "hyperion-site/1",
+  "site_id": "hyperion-industries-public",
+  "origin": "https://hyperion-industries.dev",
+  "default_theme": "theme_hyperion-core",
+  "reserved_paths": [
+    "/api",
+    "/assets",
+    "/intake",
+    "/forge/catalog",
+    "/forge/configurator",
+    "/card-studio",
+    "/dxcard",
+    "/mcp"
+  ],
+  "collections": [
+    "commerce",
+    "content",
+    "destinations",
+    "gallery",
+    "navigation",
+    "operators",
+    "radio",
+    "showcase",
+    "systems"
+  ]
+}

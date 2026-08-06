@@ -1,8 +1,9 @@
 import { Link } from 'react-router-dom';
-import navData from '../../data/navigation.json';
+import navData from '../../../site-content/collections/navigation.json';
 import './Footer.css';
 import HoverEditor from '../ui/HoverEditor';
 import { useTheme } from '../../context/ThemeContext';
+import { PUBLIC_DOCTRINE } from '../../data/publicDoctrine';
 
 export default function Footer() {
   const { footer } = navData;
@@ -17,6 +18,25 @@ export default function Footer() {
   return (
     <footer className="hi-footer">
       <div className="shell">
+        <section className="footer-doctrine" aria-labelledby="footer-doctrine-title">
+          <div>
+            <span>Hyperion operating doctrine</span>
+            <h2 id="footer-doctrine-title">{PUBLIC_DOCTRINE.headline}</h2>
+            <p>{PUBLIC_DOCTRINE.summary}</p>
+          </div>
+          <ol>
+            {PUBLIC_DOCTRINE.invariant.map((step, index) => (
+              <li key={step.id}>
+                <span>{String(index + 1).padStart(2, '0')}</span>
+                <strong>{step.label}</strong>
+              </li>
+            ))}
+          </ol>
+        </section>
+        <div className="footer-principle">
+          <strong>{PUBLIC_DOCTRINE.principle}</strong>
+          <Link to="/intake" className="btn btn-gold">Start an assessment</Link>
+        </div>
         <div className="footer-top">
           <HoverEditor model="navigation">
             <div className="footer-brand">
@@ -24,7 +44,7 @@ export default function Footer() {
                 <img src={brandMark} alt="" className="footer-mark" />
                 <span className="footer-wm">Hyperion Industries</span>
               </div>
-              <p className="footer-desc">Local-first intelligence infrastructure. Built for people who need custody, continuity, and control.</p>
+              <p className="footer-desc">Governed, local-first systems that preserve state, protect authority, and help work continue across boundaries.</p>
               <a href="https://hyperion-industries.dev" className="footer-url">hyperion-industries.dev</a>
             </div>
           </HoverEditor>
@@ -42,7 +62,7 @@ export default function Footer() {
           </div>
         </div>
         <div className="footer-bottom">
-          <span className="footer-copy">© {year} Hyperion Industries — <span>Local-first. Always.</span></span>
+          <span className="footer-copy">© {year} Hyperion Industries — <span>Posture visible. Authority protected.</span></span>
           <div className="footer-legal">
             <a href="mailto:hello@hyperion-industries.dev">hello@hyperion-industries.dev</a>
           </div>

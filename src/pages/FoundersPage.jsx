@@ -4,7 +4,7 @@ import PageShell from '../components/layout/PageShell';
 import RoomShell from '../components/portal/RoomShell';
 import OperatorCard from '../components/cards/OperatorCard';
 import HoverEditor from '../components/ui/HoverEditor';
-import operators from '../data/operators.json';
+import operators from '../../site-content/collections/operators.json';
 import './FoundersPage.css';
 
 export default function FoundersPage() {
@@ -38,13 +38,13 @@ export default function FoundersPage() {
     ),
     doctrine: (
       <div className="room-note-grid">
-        <article className="room-note"><span>01</span><h3>Custody</h3><p>Public profiles describe responsibility without exposing private records or operator controls.</p></article>
-        <article className="room-note"><span>02</span><h3>Continuity</h3><p>The company is being built around durable handoff, records, and systems that survive interruption.</p></article>
-        <article className="room-note"><span>03</span><h3>Authority</h3><p>Intelligence may support the work. People remain accountable for decisions and outcomes.</p></article>
+        <article className="room-note"><span>01 · SOURCE</span><h3>Facts stay attributable.</h3><p>Public profiles describe company responsibility without exposing private records, source, or operator controls.</p></article>
+        <article className="room-note"><span>02 · CONTEXT</span><h3>Roles stay bounded.</h3><p>Each operator profile names a public responsibility without turning one person into the whole company.</p></article>
+        <article className="room-note"><span>03 · AUTHORITY</span><h3>Accountability stays human.</h3><p>Intelligence may support the work. People remain accountable for decisions, approvals, and outcomes.</p></article>
       </div>
     ),
     contact: (
-      <div className="room-panel-grid"><div className="room-panel-copy"><h2>Route the conversation through the work.</h2><p>Use the public Contact Signal for product, build, partnership, grant-program, or early-customer conversations.</p><div className="room-action-row"><Link to="/contact" className="btn btn-gold">Send a Signal</Link></div></div></div>
+      <div className="room-panel-grid"><div className="room-panel-copy"><h2>Route the conversation through the work.</h2><p>Start with the continuity failure, workload, trust surface, support issue, or relationship question. The company intake will route it to the right operator.</p><div className="room-action-row"><Link to="/intake" className="btn btn-gold">Start an Assessment</Link></div></div></div>
     ),
   };
 

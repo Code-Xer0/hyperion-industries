@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hyperion-industries.dev/contracts/card-studio/card-upload-session.v1.schema.json",
+  "title": "Hyperion Card Studio upload session metadata",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "project_id", "filename", "content_type", "byte_length", "sha256"],
+  "properties": {
+    "contract_version": { "const": "card-upload-session/1" },
+    "project_id": { "type": "string", "pattern": "^csp_[A-Za-z0-9_-]{12,64}$" },
+    "filename": { "type": "string", "minLength": 1, "maxLength": 120, "pattern": "^[^/\\\\\\u0000-\\u001f]+$" },
+    "content_type": { "enum": ["image/png", "image/jpeg", "image/webp", "image/svg+xml"] },
+    "byte_length": { "type": "integer", "minimum": 1, "maximum": 15728640 },
+    "sha256": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+  }
+}

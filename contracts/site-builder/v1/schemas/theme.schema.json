@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hyperion-industries.dev/contracts/site-builder/v1/schemas/theme.schema.json",
+  "title": "Hyperion Site Theme",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "id", "label", "tokens"],
+  "properties": {
+    "schema_version": { "const": "hyperion-theme/1" },
+    "id": { "type": "string", "pattern": "^theme_[a-z0-9-]{3,48}$" },
+    "label": { "type": "string", "minLength": 1, "maxLength": 80 },
+    "tokens": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["accent", "surface", "text", "radius", "motion"],
+      "properties": {
+        "accent": { "enum": ["gold", "cyan", "red", "purple", "gray"] },
+        "surface": { "enum": ["black", "charcoal", "glass"] },
+        "text": { "enum": ["warm", "neutral"] },
+        "radius": { "enum": ["sharp", "soft", "round"] },
+        "motion": { "enum": ["restrained", "cinematic", "none"] }
+      }
+    }
+  }
+}

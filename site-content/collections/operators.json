@@ -1,0 +1,54 @@
+[ 
+  {
+    "id": "HYP-OP-001",
+    "slug": "victor-amani",
+    "theme": "operator-red",
+    "name": "Δeus χ",
+    "attr": "Δ",
+    "attrTitle": "SYSTEMS",
+    "image": "/assets/operators/victor-amani-dossier.png",
+    "imageAlt": "Victor Amani as the Hyperion Operator in a red-lit systems portrait",
+    "mark": "/assets/operators/victor-operator-mark.png",
+    "markAlt": "Victor Amani Hyperion operator mark",
+    "previewImage": "/assets/operators/victor-transmission.gif",
+    "previewPosition": "center",
+    "heroImage": "/assets/operators/victor-city-operating-edge.png",
+    "heroImageAlt": "The Hyperion Operator at the threshold between fragmented records and a coherent systems city",
+    "artBackground": "#07080a",
+    "typeLine": "Founding Operator · Systems Architecture",
+    "description": "Founder and systems architect behind CHR0N.OS, Mnem.OS, and the local-first infrastructure direction.",
+    "focuses": [
+      "Founder / Systems Architecture",
+      "Local-first intelligence",
+      "Archive and continuity systems",
+      "Forge direction"
+    ],
+    "flavor": "\"Technology should augment human continuity and agency — not replace custody, understanding, or control.\"",
+    "serial": "HYP-OP-001 · PUBLIC DOSSIER · SYSTEMS"
+  },
+  {
+    "id": "HYP-OP-002",
+    "slug": "keshawn-rowe",
+    "theme": "operator-navy",
+    "name": "Keshawn Rowe",
+    "attr": "K",
+    "attrTitle": "OPERATIONS",
+    "image": "/assets/operators/keshawn-rowe-dossier.jpeg",
+    "imageAlt": "Keshawn Rowe in a blue and violet city at night",
+    "mark": "/assets/operators/keshawn-wraith-mark.jpeg",
+    "markAlt": "WRAITH — Ghostly & Lethal",
+    "previewImage": "/assets/operators/keshawn-rowe-dossier.jpeg",
+    "previewPosition": "center 30%",
+    "artBackground": "linear-gradient(135deg,#0a1628 0%,#1a2744 50%,#0d1f3c 100%)",
+    "typeLine": "Founding Operator · Operations & Deployment",
+    "description": "Operations lead focused on deployment, field systems, build intake, and translating Hyperion systems into real-world use.",
+    "focuses": [
+      "Operations / Deployment",
+      "Field systems",
+      "Build intake",
+      "Client handoff"
+    ],
+    "flavor": "\"Good infrastructure disappears. The best systems are the ones people trust without thinking twice.\"",
+    "serial": "HYP-OP-002 · PUBLIC DOSSIER · IN PROGRESS"
+  }
+]

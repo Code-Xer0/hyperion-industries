@@ -269,6 +269,14 @@
 .district-next-room .related-districts { margin-bottom: 24px; }
 .district-next-room .city-district-card { min-height: 190px; }
 .district-next-room .city-district-card h3 { margin-top: 26px; }
+.district-boundary-room { display: grid; gap: clamp(24px, 4vw, 42px); }
+.district-authority-contract { display: grid; grid-template-columns: minmax(220px, 0.58fr) minmax(0, 1.42fr); gap: clamp(20px, 4vw, 48px); padding-bottom: clamp(22px, 4vw, 38px); border-bottom: 1px solid var(--glass-edge); }
+.district-authority-contract header h2 { max-width: 520px; margin: 12px 0 0; color: var(--text); font-size: clamp(25px, 3.5vw, 44px); line-height: 1.04; }
+.district-authority-contract > div { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.district-authority-contract article { min-width: 0; padding: 16px; border: 1px solid var(--glass-edge); border-top-color: var(--accent, var(--gold)); background: var(--room-card-bg); }
+.district-authority-contract article > span { color: var(--accent, var(--gold)); font-family: var(--font-display); font-size: 7px; font-weight: 700; letter-spacing: 0.16em; }
+.district-authority-contract article h3 { margin: 18px 0 8px; color: var(--text); font-size: 14px; }
+.district-authority-contract article p { margin: 0; color: var(--text-muted); font-size: 10px; line-height: 1.6; }
 
 @media (max-width: 980px) {
   .city-map-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -281,6 +289,7 @@
   .district-proof-room { grid-template-columns: 1fr; }
   .forge-motion-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .forge-city-media-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .district-authority-contract { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 700px) {
@@ -309,4 +318,5 @@
   .forge-city-stills figure { width: min(184px, 42vw); }
   .forge-city-media-grid { grid-template-columns: 1fr; }
   .city-legend { justify-content: flex-start; }
+  .district-authority-contract > div { grid-template-columns: 1fr; }
 }

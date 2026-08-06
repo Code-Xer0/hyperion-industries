@@ -67,12 +67,12 @@ const FALLBACK_CONFIG = {
   alias:    "Δeus χ",
   role:     "FOUNDER · SYSTEMS ARCHITECT",
   brand:    "HYPERION INDUSTRIES",
-  capability: "INFRASTRUCTURE · CONTINUITY · AI SYSTEMS",
-  tagline:  "Building systems that remember, adapt, and survive contact with reality.",
-  footTag:  "SYSTEMS BUILT TO SURVIVE FAILURE",
+  capability: "CONTINUITY · PROVENANCE · OPERATOR CONTROL",
+  tagline:  "Continuity infrastructure for fragmented operations.",
+  footTag:  "PROVENANCE · OPERATOR CONTROL",
   teleMark: "HYPERION",
   glyph:    { top: "Δ", bottom: "X", label: "OPERATOR · I" },
-  status:   { front: "ONLINE", back: "ARCHIVE", cal: "NOMINAL" },
+  status:   { front: "ONLINE", back: "DOCTRINE", cal: "NOMINAL" },
   portrait: "/assets/operators/victor-portrait.mp4",
   portraitSources: [
     "/assets/operators/victor-portrait.webm",
@@ -86,27 +86,28 @@ const FALLBACK_CONFIG = {
   portraitBlend: true,
   qr: "/assets/card/qr.png",
   doctrine: {
-    label:          "HYPERION DOCTRINE",
-    vol:            "VOL · 01",
+    label:          "CONTINUITY DOCTRINE",
+    vol:            "REV · 2026.08",
     titlePre:       "Build systems that",
     titleHighlight: "survive",
     titlePost:      "contact with reality.",
-    body:           "Hyperion develops resilient infrastructure, continuity systems, and adaptive operational tooling — designed to remain functional under pressure, change, and uncertainty.",
+    body:           "Hyperion builds continuity infrastructure for fragmented operations — preserving state, provenance, context, and operator control across people, tools, hardware, documents, decisions, and service workflows.",
     website:        "hyperion-industries.dev",
     email:          "va@hyperion-industries.dev",
   },
   principles: [
-    "OBSERVE BEFORE YOU BUILD",
-    "OPTIMIZE FOR RECOVERY",
-    "SHIP TRUTH, NOT THEATRE",
-    "REDUCE OPERATIONAL FRICTION",
-    "DESIGN FOR CONTINUITY",
+    "CAPTURE STATE",
+    "PRESERVE PROVENANCE",
+    "EXPOSE CONTEXT",
+    "KEEP AUTHORITY EXPLICIT",
+    "ROUTE ACTION",
+    "LEARN FROM REALITY",
   ],
   availableFor: [
-    "Systems consulting",
-    "Deployment architecture",
-    "Infrastructure modernization",
-    "AI systems integration",
+    "Continuity assessments",
+    "Systems architecture",
+    "Local-first deployments",
+    "Operator identity systems",
     "Workflow continuity design",
   ],
   email:   "va@hyperion-industries.dev",
@@ -155,7 +156,7 @@ function StageMarks({ serial, index }) {
   return (
     <div className="stage-marks" aria-hidden="true">
       <div className="tl"><div className="hot">HYP · OPERATOR REGISTRY</div><span>NODE / {index} · FORGE DISTRICT</span></div>
-      <div className="tr"><div className="hot">CARD ID · {serial}</div><span>REV 2026.07</span></div>
+      <div className="tr"><div className="hot">CARD ID · {serial}</div><span>REV 2026.08</span></div>
       <div className="bl"><span>UPLINK NOMINAL</span><div className="hot">↳ READING</div></div>
       <div className="br"><span>HANDSHAKE · OK</span><div className="hot">∆ — SIGNED</div></div>
     </div>
@@ -189,7 +190,7 @@ function buildData(c) {
     principles:   c.principles   || F.principles,
     availableFor: c.availableFor || F.availableFor,
     systems: [
-      { name: "HYPERION",      tag: "PARENT · CONSULTING", href: c.links.hyperion, status: "live" },
+      { name: "HYPERION",      tag: "ECOSYSTEM · CONSULTING", href: c.links.hyperion, status: "live" },
       { name: "CHR0N.OS",      tag: "BETA · CONTINUITY",   href: c.links.chronos,  status: "live" },
       { name: "FORGE INQUIRY", tag: "REQUEST BUILD",       href: c.links.forge,    cta: true },
     ],

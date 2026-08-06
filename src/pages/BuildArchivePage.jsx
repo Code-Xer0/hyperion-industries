@@ -6,8 +6,8 @@ import Carousel3D from '../components/ui/Carousel3D';
 import HoverEditor from '../components/ui/HoverEditor';
 import MediaFrame from '../components/ui/MediaFrame';
 import { mediaSource } from '../utils/media';
-import content from '../data/content.json';
-import showcaseData from '../data/showcase.json';
+import content from '../../site-content/collections/content.json';
+import showcaseData from '../../site-content/collections/showcase.json';
 import './SubPage.css';
 
 const isDev = import.meta.env.DEV;

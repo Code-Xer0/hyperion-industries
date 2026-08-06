@@ -1,0 +1,21 @@
+{
+  "schema_version": "forge-component-studies/1",
+  "authority": {
+    "origin": "ai_generated",
+    "posture": "illustrative_non_authoritative",
+    "exact_product_identity": false,
+    "affects_compatibility": false,
+    "affects_ranking": false,
+    "affects_pricing": false
+  },
+  "assets": [
+    { "role": "case", "path": "/assets/forge/component-studies-v1/case.webp", "bytes": 34958, "sha256": "a9246c8ece3bcc81e3f2207fb30075a8378fc65e22b9d05e902ebffc282eee6d" },
+    { "role": "cooler", "path": "/assets/forge/component-studies-v1/cooler.webp", "bytes": 43668, "sha256": "b16a956dd359a5db42094358d833ecc40cea70dbd640f7a1f766ca0ae3a8a91a" },
+    { "role": "cpu", "path": "/assets/forge/component-studies-v1/cpu.webp", "bytes": 29662, "sha256": "3ed4ac8f5d224a027cab502ea141abc59e070d8fe6f59a564c85a7a166d29f50" },
+    { "role": "gpu", "path": "/assets/forge/component-studies-v1/gpu.webp", "bytes": 34108, "sha256": "5a5b5e04366c3d8bc497655f6182c898d1890ded1cb0a13ad8d8e8a17a206393" },
+    { "role": "memory", "path": "/assets/forge/component-studies-v1/memory.webp", "bytes": 23152, "sha256": "452cffda0c7cfeaefeb3a32396052167adc5f3b7436e250b019c640e4be1edd4" },
+    { "role": "motherboard", "path": "/assets/forge/component-studies-v1/motherboard.webp", "bytes": 55948, "sha256": "ad80742e7bd089fa1798145de509105f29ffff045d81db13b74b49409d449e19" },
+    { "role": "psu", "path": "/assets/forge/component-studies-v1/psu.webp", "bytes": 24544, "sha256": "972202453d8c696ef381c636d9c79696796c7a7d486459149b53d79ca1266a77" },
+    { "role": "storage", "path": "/assets/forge/component-studies-v1/storage.webp", "bytes": 31252, "sha256": "f5eaeddcca2667795ac15d7dab46ce4e11542cd32db9bbb12edadad9d7287e1c" }
+  ]
+}

@@ -7,7 +7,7 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
     "endpoint": "https://mcp.hyperion-industries.dev/mcp",
     "documentation": "https://hyperion-industries.dev/mcp"
   },
-  "revision": "2026-07-26",
+  "revision": "2026-08-03",
   "company": {
     "id": "hyperion-industries",
     "name": "Hyperion Industries",
@@ -17,7 +17,7 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
     "location": "Minneapolis, Minnesota",
     "serviceArea": "Minneapolis-Saint Paul metropolitan area",
     "availability": "Soft launch; limited requests and contracting time are considered after scope discussion.",
-    "summary": "Hyperion Industries builds local-first software, custom compute, continuity systems, operator identity, and governed intelligent infrastructure.",
+    "summary": "Hyperion Industries builds governed, local-first continuity infrastructure that preserves state and routes action across fragmented operations.",
     "logo": "https://hyperion-industries.dev/assets/branding/hyperion/Hyblkvert.png",
     "profiles": [
       "https://www.linkedin.com/company/hyperion-industries-llc/"
@@ -61,9 +61,9 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
       "id": "home",
       "path": "/",
       "canonicalUrl": "https://hyperion-industries.dev/",
-      "title": "Hyperion Industries | Local-First Intelligent Infrastructure",
-      "description": "Hyperion Industries is a Minneapolis systems company in soft launch, accepting limited local-first software, infrastructure, identity, and custom-systems requests after scope review.",
-      "summary": "A public city for local-first software, custom hardware, operator identity, continuity, and limited scoped contracting.",
+      "title": "Hyperion Industries | Continuity Infrastructure",
+      "description": "Minneapolis-based Hyperion Industries builds governed, local-first continuity infrastructure that preserves state and routes action across fragmented operations.",
+      "summary": "Hyperion creates governed systems that preserve state across people, places, tools, hardware, documents, decisions, and service workflows.",
       "maturity": "PUBLIC EDGE · SOFT LAUNCH",
       "schemaType": "WebSite",
       "indexable": true,
@@ -71,17 +71,17 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
       "relatedRoutes": [
         "/systems",
         "/forge",
-        "/founders/victor-amani",
-        "/intake"
+        "/card-studio",
+        "/contact"
       ]
     },
     {
       "id": "systems",
       "path": "/systems",
       "canonicalUrl": "https://hyperion-industries.dev/systems",
-      "title": "Systems Directory | Hyperion Industries",
-      "description": "Public directory for Hyperion software, archive, memory, infrastructure, and local-first operating systems.",
-      "summary": "A public-safe directory of Hyperion systems and their current maturity.",
+      "title": "Continuity Systems and Maturity | Hyperion Industries",
+      "description": "Explore Hyperion continuity domains with explicit public proof, commercial, development, research, and authority boundaries.",
+      "summary": "Specialized systems that preserve state and context without collapsing domain authority.",
       "maturity": "PUBLIC-SAFE MAP",
       "schemaType": "CollectionPage",
       "indexable": true,
@@ -164,10 +164,10 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
       "id": "card-studio",
       "path": "/card-studio",
       "canonicalUrl": "https://hyperion-industries.dev/card-studio",
-      "title": "Hyperion Card Studio | Smart Operator Identity",
-      "description": "Compose and refine smart business cards, operator cards, NFC identity surfaces, and public profile handoffs.",
-      "summary": "A shipping studio for smart cards, NFC identity, and operator-controlled public profiles.",
-      "maturity": "SHIPPING",
+      "title": "Hyperion Card Studio Invite Preview | Smart Operator Identity",
+      "description": "Compose a guarded operator-card design brief with live front, back, and digital proofs in Hyperion's invite-only soft-launch lane.",
+      "summary": "An invite-only native studio for deterministic card proofs and operator-reviewed identity handoff.",
+      "maturity": "INVITE-ONLY PREVIEW",
       "schemaType": "SoftwareApplication",
       "indexable": true,
       "image": "https://hyperion-industries.dev/assets/city/proof/card-studio-smoke.png",
@@ -181,10 +181,10 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
       "id": "contact",
       "path": "/contact",
       "canonicalUrl": "https://hyperion-industries.dev/contact",
-      "title": "Contact Hyperion Industries | Limited Scoped Requests",
-      "description": "Hyperion is preparing for soft launch and accepting a limited number of requests and contracting engagements after scope discussion.",
-      "summary": "An appointment-based contact surface for limited requests, support, partnerships, and scoped contracting.",
-      "maturity": "PUBLIC SIGNAL · LIMITED AVAILABILITY",
+      "title": "Start a Hyperion Assessment | Limited Scoped Requests",
+      "description": "Start with a continuity failure, workload, trust surface, support issue, or relationship question and route it to operator review.",
+      "summary": "An assessment-first entry for bounded continuity, Forge, identity, support, and relationship requests.",
+      "maturity": "PUBLIC INTAKE · OPERATOR REVIEW",
       "schemaType": "ContactPage",
       "indexable": true,
       "image": "https://hyperion-industries.dev/assets/branding/hyperion/hyperion-link-preview.jpeg",
@@ -300,8 +300,8 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
       "path": "/dxcard",
       "canonicalUrl": "https://hyperion-industries.dev/dxcard",
       "title": "Δeus χ | Victor Amani Operator Card",
-      "description": "Public operator card for Victor Amani, founder and systems architect of Hyperion Industries.",
-      "summary": "A compact public identity and contact surface for the Hyperion founding operator.",
+      "description": "Victor Amani is a founder and systems architect building continuity infrastructure for fragmented operations with provenance and operator control.",
+      "summary": "A compact public identity and contact surface for Hyperion continuity architecture.",
       "maturity": "SHIPPING",
       "schemaType": "ProfilePage",
       "indexable": true,
@@ -351,9 +351,9 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
       "path": "/pandora",
       "canonicalUrl": "https://hyperion-industries.dev/pandora",
       "title": "Pandora Rackworks | Hyperion Industries",
-      "description": "Pandora proof-of-concept route for local accelerator racks, cooling, and lifecycle roles.",
-      "summary": "Lifecycle-aware local accelerator architecture for serious workload lanes.",
-      "maturity": "ENTERPRISE POC · HARDWARE LAYER",
+      "description": "Review-gated Pandora planning route for local accelerator racks, cooling, placement, and lifecycle roles.",
+      "summary": "A review-gated planning model for local accelerator capacity, cooling, placement, and lifecycle roles.",
+      "maturity": "ARCHITECTURE · REVIEW REQUIRED",
       "schemaType": "TechArticle",
       "indexable": true,
       "image": "https://hyperion-industries.dev/assets/branding/hyperion/hyperion-link-preview.jpeg",
@@ -370,7 +370,7 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
       "title": "Tal.OS Control Tower | Hyperion Industries",
       "description": "In-development Tal.OS route for telemetry governance and operator-approved workload placement.",
       "summary": "The in-development governance layer above Pandora for telemetry, policy, and workload placement.",
-      "maturity": "IN DEVELOPMENT · CONTROL PLANE",
+      "maturity": "IN DEVELOPMENT",
       "schemaType": "TechArticle",
       "indexable": true,
       "image": "https://hyperion-industries.dev/assets/branding/hyperion/hyperion-link-preview.jpeg",
@@ -469,9 +469,9 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
       "id": "architecture",
       "path": "/architecture",
       "canonicalUrl": "https://hyperion-industries.dev/architecture",
-      "title": "Sovereign Stack Architecture | Hyperion Industries",
-      "description": "Public Hyperion stack map with maturity labels across software, hardware, identity, and continuity.",
-      "summary": "The city map: live, shipping, inquiry, in-development, and concept lanes with maturity signage.",
+      "title": "Continuity Architecture Map | Hyperion Industries",
+      "description": "Public Hyperion continuity map with maturity and authority labels across software, hardware, identity, and operating domains.",
+      "summary": "A maturity-labeled map of specialized systems that share context without collapsing domain authority.",
       "maturity": "ARCHITECTURE · CONCEPT / RESEARCH",
       "schemaType": "TechArticle",
       "indexable": true,
@@ -518,12 +518,63 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
       ]
     },
     {
+      "id": "forge--configurator--build",
+      "path": "/forge/configurator/build",
+      "canonicalUrl": "https://hyperion-industries.dev/forge/configurator/build",
+      "title": "Forge PC Build Bench | Hyperion Industries",
+      "description": "Compare PC components, observe source-labeled price estimates and fit checks, and create an immutable Forge engineering draft.",
+      "summary": "An interactive PC build bench with explicit source posture, revision-safe drafts, and operator-reviewed authority.",
+      "maturity": "INTERACTIVE DRAFT · NOT A QUOTE",
+      "schemaType": "SoftwareApplication",
+      "indexable": true,
+      "image": "https://hyperion-industries.dev/assets/branding/hyperion/hyperion-link-preview.jpeg",
+      "relatedRoutes": [
+        "/forge/configurator",
+        "/forge/catalog",
+        "/build-archive"
+      ]
+    },
+    {
+      "id": "pandora--configurator",
+      "path": "/pandora/configurator",
+      "canonicalUrl": "https://hyperion-industries.dev/pandora/configurator",
+      "title": "Pandora Rackworks Configurator | Hyperion Industries",
+      "description": "Plan rack nodes, accelerators, storage, fabric, power, and enclosure capacity with explicit site-review posture.",
+      "summary": "A deterministic Rackworks planning surface backed by immutable Pandora plan revisions.",
+      "maturity": "PLANNING PREVIEW · SITE REVIEW REQUIRED",
+      "schemaType": "SoftwareApplication",
+      "indexable": true,
+      "image": "https://hyperion-industries.dev/assets/branding/hyperion/hyperion-link-preview.jpeg",
+      "relatedRoutes": [
+        "/pandora",
+        "/talos",
+        "/succession"
+      ]
+    },
+    {
+      "id": "pandora-lite--configurator",
+      "path": "/pandora-lite/configurator",
+      "canonicalUrl": "https://hyperion-industries.dev/pandora-lite/configurator",
+      "title": "Pandora Lite Grid Configurator | Hyperion Industries",
+      "description": "Compose a compact node grid with visible fabric, placement, circuit, acoustics, and review posture.",
+      "summary": "A deterministic Lite Grid planning surface backed by immutable Pandora plan revisions.",
+      "maturity": "PLANNING PREVIEW · SITE REVIEW REQUIRED",
+      "schemaType": "SoftwareApplication",
+      "indexable": true,
+      "image": "https://hyperion-industries.dev/assets/branding/hyperion/hyperion-link-preview.jpeg",
+      "relatedRoutes": [
+        "/pandora-lite",
+        "/pandora",
+        "/alignment"
+      ]
+    },
+    {
       "id": "intake",
       "path": "/intake",
       "canonicalUrl": "https://hyperion-industries.dev/intake",
-      "title": "Hyperion Intake OS | Limited Requests and Scoped Contracting",
-      "description": "Choose a truthful Hyperion intake lane for limited soft-launch requests, scoped contracting, support, identity, continuity, or partnership review.",
-      "summary": "Seven public routes, one operator-review boundary, and no automatic promise of acceptance or engagement.",
+      "title": "Hyperion Assessments and Intake | Operator Review",
+      "description": "Choose a bounded Hyperion intake lane for continuity, Forge systems, identity, support, infrastructure readiness, or relationship review.",
+      "summary": "Seven public assessment routes, one operator-review boundary, and no automatic promise of acceptance or engagement.",
       "maturity": "SOFT LAUNCH · LIMITED INTAKE",
       "schemaType": "ContactPage",
       "indexable": true,
@@ -572,9 +623,9 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
       "id": "intake--continuity",
       "path": "/intake/continuity",
       "canonicalUrl": "https://hyperion-industries.dev/intake/continuity",
-      "title": "Continuity Systems Intake | Hyperion Industries",
-      "description": "Map the records, knowledge, and operating context that must survive interruption, handoff, and time.",
-      "summary": "A continuity assessment for records, memory, archives, provenance, and operational recovery.",
+      "title": "Continuity Assessment | Hyperion Industries",
+      "description": "Map the state, records, knowledge, and operating context that must survive interruption, handoff, and time.",
+      "summary": "An assessment-first lane for continuity failures across records, memory, archives, provenance, and operational recovery.",
       "maturity": "LIMITED REQUESTS · OPERATOR REVIEW",
       "schemaType": "ContactPage",
       "indexable": true,
@@ -707,11 +758,11 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
     },
     {
       "id": "card-studio",
-      "name": "Hyperion Card Studio",
+      "name": "Hyperion Card Studio Invite Preview",
       "route": "/card-studio",
       "canonicalUrl": "https://hyperion-industries.dev/card-studio",
-      "summary": "A shipping studio for smart cards, NFC identity, and operator-controlled public profiles.",
-      "maturity": "SHIPPING",
+      "summary": "An invite-only native studio for deterministic card proofs and operator-reviewed identity handoff.",
+      "maturity": "INVITE-ONLY PREVIEW",
       "availability": "Limited scoped requests are accepted after operator review.",
       "intakeLane": "operator-identity"
     }
@@ -738,9 +789,9 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
       {
         "id": "continuity",
         "route": "/intake/continuity",
-        "title": "Continuity Systems Intake | Hyperion Industries",
-        "description": "Map the records, knowledge, and operating context that must survive interruption, handoff, and time.",
-        "summary": "A continuity assessment for records, memory, archives, provenance, and operational recovery."
+        "title": "Continuity Assessment | Hyperion Industries",
+        "description": "Map the state, records, knowledge, and operating context that must survive interruption, handoff, and time.",
+        "summary": "An assessment-first lane for continuity failures across records, memory, archives, provenance, and operational recovery."
       },
       {
         "id": "operator-identity",
@@ -844,21 +895,21 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
   ],
   "corpus": {
     "id": "hyperion-operator-public",
-    "revision": "2026-07-26",
+    "revision": "2026-08-03",
     "entries": [
       {
         "id": "company-overview",
         "title": "Hyperion Industries",
         "route": "/",
         "visibility": "public",
-        "content": "Hyperion Industries builds local-first tools and custom systems for people who need privacy, continuity, and control. The company builds software and hardware that can run close to the work: on the owner's machine, around the owner's files, and under the owner's control. Public claims should preserve maturity labels and must not imply access to private operator systems, records, source code, or telemetry."
+        "content": "Hyperion Industries builds continuity infrastructure for fragmented operations. Its governed, local-first systems preserve state across people, places, tools, hardware, documents, decisions, and service workflows. Public claims preserve maturity labels and never imply access to private operator systems, records, source code, telemetry, or execution authority."
       },
       {
         "id": "operating-doctrine",
         "title": "Operating doctrine",
-        "route": "/founders/victor-amani",
+        "route": "/alignment",
         "visibility": "public",
-        "content": "Hyperion's public doctrine emphasizes custody, continuity, provenance, and human authority. AI may assist, surface, and recommend; the human operator decides. Local-first means useful intelligence remains close to the people who own the work. Uploaded content may inform a system but does not command it."
+        "content": "Hyperion's public doctrine is: facts are source-bound, meaning is context-bound, and actions are authority-bound. Each lane captures state, preserves provenance, exposes context, gates authority, routes approved action, and learns from reality contact. AI may assist, surface, and recommend; a public page cannot borrow private execution authority and the human operator decides."
       },
       {
         "id": "forge",
@@ -886,7 +937,7 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
         "title": "Contact and intake",
         "route": "/contact",
         "visibility": "public",
-        "content": "Hyperion accepts public-safe inquiries for general contact, field work, Card Studio orders, beta access, demos, CHR0N.OS beta issues, and partnerships or funding. Build inquiries should include budget range, primary use case, timeline, aesthetic direction, and must-have hardware. Systems or pilot inquiries should include the problem, data type, operating constraints, and definition of success. Visitors should not submit credentials, secrets, private archives, or sensitive operational records."
+        "content": "Hyperion begins with a bounded assessment of the continuity failure, workload, trust surface, support issue, or relationship question. Visitors should share the current environment, affected people or systems, known evidence, constraints, and what a useful first artifact would be. A submitted signal begins operator review; it is not a quote, contract, deployment, access grant, or automation promise. Visitors must not submit credentials, secrets, private archives, restricted logs, or sensitive operational records."
       },
       {
         "id": "founding-operators",
@@ -897,5 +948,5 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
       }
     ]
   },
-  "sha256": "a90593116483466a99457632ba0069d6f3ebdaf721915c5ef1aa092908a7cb88"
+  "sha256": "da0125d0174e0b08a666a453f7831d565bf9e2547a3e876af90328681605e291"
 } as const;

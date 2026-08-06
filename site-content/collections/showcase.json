@@ -1,0 +1,136 @@
+[ 
+  {
+    "codename": "Miles 1.0",
+    "generation": "Gen 2023",
+    "hardwareClass": "Production Rig",
+    "status": "Succeeded",
+    "image": "/assets/builds/20230803_133211.jpg",
+    "focalX": "50%",
+    "focalY": "44%",
+    "fit": "cover",
+    "specs": [
+      "Ryzen 5 3600",
+      "RTX 2070 Super",
+      "32GB DDR4",
+      "Sensor Panel"
+    ],
+    "description": ""
+  },
+  {
+    "codename": "Kuda R3",
+    "generation": "Gen 2024",
+    "hardwareClass": "Flagship",
+    "status": "Deployed",
+    "image": "/assets/builds/20240801_103114.jpg",
+    "focalX": "48%",
+    "focalY": "42%",
+    "fit": "cover",
+    "specs": [
+      "Ryzen X3D",
+      "6900XT",
+      "Superior Cooling",
+      "Active HUD",
+      "Gaming Focused"
+    ],
+    "description": ""
+  },
+  {
+    "codename": "Command Deck",
+    "generation": "Gen 2023",
+    "hardwareClass": "Artifact",
+    "status": "Cataloged",
+    "image": "/assets/builds/20230415_153654.jpg",
+    "focalX": "50%",
+    "focalY": "43%",
+    "fit": "cover",
+    "specs": [
+      "Full Tower",
+      "Service Path",
+      "Cable Discipline",
+      "Custom Deployment"
+    ],
+    "description": "Fully specced hand picked setup for gaming and creative work."
+  },
+  {
+    "codename": "Kuda R3 (2022)",
+    "generation": "Gen 2022",
+    "hardwareClass": "Artifact",
+    "status": "Succeeded",
+    "image": "/assets/builds/20220602_223426.jpg",
+    "focalX": "50%",
+    "focalY": "50%",
+    "fit": "cover",
+    "specs": [
+      "Display Array",
+      "Ambient Rail",
+      "Control Surface"
+    ],
+    "description": "Sensor Panel Custom deployment."
+  },
+  {
+    "codename": "Antimatter-UV",
+    "generation": "Gen 2022",
+    "hardwareClass": "Compact",
+    "status": "Sealed",
+    "image": "/assets/uploads/20230210_102609.jpg",
+    "focalX": "46%",
+    "focalY": "46%",
+    "fit": "cover",
+    "specs": [
+      "Compact Case",
+      "aRGB Fine Accents",
+      "Gaming Powerhouse"
+    ],
+    "description": "Whisper quiet screaming performace all day long."
+  },
+  {
+    "codename": "Obsidian Run)",
+    "generation": "Gen 2022",
+    "hardwareClass": "Gaming",
+    "status": "Burn-in",
+    "image": "/assets/builds/20221225_210223.jpg",
+    "focalX": "50%",
+    "focalY": "48%",
+    "fit": "cover",
+    "specs": [
+      "Godlike",
+      "X570",
+      "Airflow"
+    ],
+    "description": "R3 before the latest gen fan run."
+  },
+  {
+    "codename": "Kuda R3 (2023)",
+    "generation": "Gen 2023",
+    "hardwareClass": "Display",
+    "status": "Signal",
+    "image": "/assets/builds/20230122_141511.jpg",
+    "focalX": "50%",
+    "focalY": "45%",
+    "fit": "cover",
+    "specs": [
+      "RGB Lane",
+      "Side Panel",
+      "Clean Crop"
+    ],
+    "description": ""
+  },
+  {
+    "codename": "Kuda R3 (Current)",
+    "generation": "Gen 2024",
+    "hardwareClass": "Flagship",
+    "status": "Live",
+    "image": "/assets/builds/20240801_103140.jpg",
+    "focalX": "54%",
+    "focalY": "42%",
+    "fit": "cover",
+    "specs": [
+      "X570",
+      "5800X3D",
+      "Sapphire Toxic 6900XT",
+      "Lian Li",
+      "Nzxt"
+    ],
+    "description": "Flagship Gaming rig."
+  }
+]
