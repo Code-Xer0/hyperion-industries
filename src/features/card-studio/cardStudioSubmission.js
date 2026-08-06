@@ -1,9 +1,6 @@
 import { evaluateCardPreflight, stableFingerprint } from './cardStudioModel.js';
 
-const PRODUCTION_API_ORIGIN = import.meta.env?.PROD
-  ? 'https://hyperion-operator.hyperion-industries-intake.workers.dev'
-  : '';
-const DEFAULT_BASE_PATH = `${PRODUCTION_API_ORIGIN}/api/card-studio`;
+const DEFAULT_BASE_PATH = '/api/card-studio';
 const ACCOUNT_STORAGE_KEY = 'hyperion.card-studio.account-ref.v1';
 const ORDER_ACCESS_KEY = 'hyperion.card-studio.order-access.v1';
 

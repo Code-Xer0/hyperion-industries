@@ -32,7 +32,7 @@ Configure the template bindings as follows:
 | `INQUIRY_FROM_EMAIL` | Sender on the Email Service domain |
 | `INQUIRY_CONSENT_VERSION` | Server-stamped consent notice version |
 
-The Worker must be routed at `/api/operator/*` on `SITE_ORIGIN`. It emits no CORS allow-origin header, requires an exact `Origin` match for POSTs, and rejects cross-site `Sec-Fetch-Site` values. Local HTTP is accepted only for localhost addresses.
+The Worker must be routed at `/api/operator/*`, `/api/intake/*`, and `/api/card-studio/*` on `SITE_ORIGIN`. It emits no CORS allow-origin header, requires an exact `Origin` match for POSTs, and rejects cross-site `Sec-Fetch-Site` values. Local HTTP is accepted only for localhost addresses.
 
 ## Stream normalization
 
