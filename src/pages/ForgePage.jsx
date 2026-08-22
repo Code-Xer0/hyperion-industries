@@ -21,7 +21,7 @@ export default function ForgePage() {
           title={content.forge.hero.title}
           lead={content.forge.hero.lead}
         >
-          <a href="mailto:forge@hyperion-industries.dev?subject=Hyperion%20Forge%20Build%20Inquiry" className="btn btn-gold">Start a Build Inquiry</a>
+          <Link to="/forge/configurator?source=forge_district" className="btn btn-gold">Start a Build Inquiry</Link>
           <Link to="/build-archive" className="btn btn-ghost">View Build Archive</Link>
         </SectionHero>
       </HoverEditor>
@@ -59,7 +59,7 @@ export default function ForgePage() {
             </div>
             <div className="sp-actions" style={{ justifyContent: 'center', marginTop: '28px' }}>
               <Link to="/build-archive" className="btn btn-gold">Open Artifact Archive</Link>
-              <a href="mailto:forge@hyperion-industries.dev?subject=Hyperion%20Forge%20Build%20Inquiry" className="btn btn-ghost">Talk Through a Build</a>
+              <Link to="/forge/configurator?source=forge_archive" className="btn btn-ghost">Talk Through a Build</Link>
             </div>
           </HoverEditor>
         </div>

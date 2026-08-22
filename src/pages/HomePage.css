@@ -51,6 +51,13 @@
 .gate-method-grid p { margin: 0; color: var(--text-muted); font-size: 11px; line-height: 1.55; }
 .gate-method-room blockquote { margin: 22px 0 0; padding: 14px 16px; border-left: 2px solid var(--gold); background: var(--room-text-scrim); color: var(--text-soft); font-size: clamp(14px, 2vw, 20px); }
 .gate-inquiry-room .room-note a { display: inline-flex; margin-top: 16px; color: var(--gold); font-size: 11px; font-weight: 700; text-decoration: none; }
+.gate-intake-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.gate-intake-card { display: flex; min-width: 0; min-height: 116px; flex-direction: column; padding: 14px; border: 1px solid var(--glass-edge); border-top-color: var(--gold); background: var(--room-card-bg); backdrop-filter: blur(10px); }
+.gate-intake-card > span { color: var(--gold); font-family: var(--font-display); font-size: 7px; }
+.gate-intake-card h3 { margin: 12px 0 5px; color: var(--text); font-size: 15px; }
+.gate-intake-card p { margin: 0; color: var(--text-muted); font-size: 10px; line-height: 1.45; }
+.gate-intake-card a { display: inline-flex; margin-top: auto; padding-top: 9px; color: var(--gold); font-size: 10px; font-weight: 700; text-decoration: none; }
+.gate-intake-card a:hover { color: var(--text); }
 .gate-operators-room { min-height: calc(100% - 32px); }
 .gate-operators-room .gate-room-heading > div {
   padding: 10px 12px;
@@ -91,6 +98,7 @@ body.theme-light .gate-film-shade { background: linear-gradient(90deg, rgba(247,
   .gate-proof-room .city-proof-lane { grid-template-columns: 1fr 1fr; }
   .gate-directory-room .city-map-grid { grid-template-columns: 1fr 1fr; }
   .gate-method-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .gate-intake-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
 @media (max-width: 820px) {
@@ -106,6 +114,11 @@ body.theme-light .gate-film-shade { background: linear-gradient(90deg, rgba(247,
   body.theme-light .gate-copy {
     background: linear-gradient(90deg, rgba(247, 244, 236, 0.94), rgba(247, 244, 236, 0.86) 84%, rgba(247, 244, 236, 0.54));
   }
+}
+
+@media (max-width: 700px) {
+  .gate-intake-grid { grid-template-columns: 1fr; }
+  .gate-intake-card { min-height: auto; }
 }
 
 @media (max-width: 760px) {

@@ -58,7 +58,14 @@ function validSubmission(formId: string, answers: Record<string, unknown> = {}):
       { consent_id: "process_intake", notice_version: "1.0.1", granted: true, recorded_at: at },
       { consent_id: "automated_classification", notice_version: "1.0.1", granted: true, recorded_at: at },
     ],
-    client_context: { entry_url: "https://hyperion-industries.dev/intake", effects_mode: "static", save_resume_used: false },
+    client_context: {
+      entry_url: "https://hyperion-industries.dev/intake",
+      entry_path: "/intake",
+      source_surface: "public_intake",
+      referrer_category: "direct",
+      effects_mode: "static",
+      save_resume_used: false,
+    },
   };
 }
 
@@ -246,6 +253,54 @@ describe("intake evaluation and submission", () => {
     expect(proposalInsert?.sql).toContain("'active'");
     const outboxInsert = db.batches[0]?.find((statement) => statement.sql.includes("INSERT INTO intake_outbox"));
     expect(outboxInsert?.sql).toContain("revision_hash");
+  });
+
+  it("durably captures every public lane in the held review outbox", async () => {
+    const formsByLane = {
+      forge: "forge-build-profile",
+      pandora: "pandora-readiness",
+      continuity: "continuity-assessment",
+      "operator-identity": "operator-identity",
+      support: "support",
+      relationships: "relationship",
+      general: "general",
+    } as const;
+
+    for (const [lane, answers] of laneFixtures) {
+      const db = new MockD1().queueFirst(null);
+      const submission = validSubmission(formsByLane[lane], answers);
+      submission.client_context = {
+        ...submission.client_context,
+        entry_url: `https://hyperion-industries.dev/intake/${lane}`,
+        entry_path: `/intake/${lane}`,
+        source_surface: `lane_test_${lane}`,
+      };
+      const response = await worker().fetch(
+        postJson("/api/intake/submissions", submission, {
+          "idempotency-key": `all-lanes-${lane}-123456789`,
+        }),
+        baseEnv({ DB: db.binding() }),
+        executionContext().ctx,
+      );
+      const body = await response.json() as {
+        receipt: { primary_route: string; status: string };
+        duplicate: boolean;
+      };
+
+      expect(response.status, lane).toBe(201);
+      expect(body.receipt, lane).toMatchObject({
+        primary_route: lane,
+        status: "received for operator review",
+      });
+      expect(body.duplicate, lane).toBe(false);
+      expect(db.batches[0], lane).toHaveLength(4);
+      expect(db.batches[0]?.some((statement) => statement.sql.includes("'held_for_review'")), lane).toBe(true);
+
+      const submissionInsert = db.batches[0]?.find((statement) =>
+        statement.sql.includes("INSERT INTO intake_submissions"));
+      expect(JSON.stringify(submissionInsert?.values), lane).toContain(`lane_test_${lane}`);
+      expect(JSON.stringify(submissionInsert?.values), lane).not.toContain("?");
+    }
   });
 
   it("sends the deterministic acknowledgement only after immutable intake commits", async () => {

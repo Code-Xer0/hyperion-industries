@@ -103,7 +103,7 @@ function StubFounder({ operator, theme }) {
           <p className="founder-stub-note">The public dossier is still being assembled. This route remains deliberately limited until the written profile is approved.</p>
           <div className="hero-ctas">
             <Link to="/founders" className="btn btn-ghost btn-lg">← Back to founders</Link>
-            <a href="mailto:va@hyperion-industries.dev" className="btn btn-primary btn-lg">Start an inquiry</a>
+            <Link to="/intake/relationships?source=founder_profile" className="btn btn-primary btn-lg">Start an inquiry</Link>
           </div>
         </div>
       </section>
@@ -773,9 +773,9 @@ export default function FounderPage() {
                     <span className="cl-l"><span className="cl-k">{k}</span><span className="cl-v">{v}</span></span><span className="ar">{ar}</span>
                   </a>
                 ))}
-                <a className="clink" href="mailto:va@hyperion-industries.dev?subject=Inquiry%20%E2%80%94%20Hyperion%20Industries" style={{ background: 'var(--accent-muted)' }}>
+                <Link className="clink" to="/intake/relationships?source=founder_profile" style={{ background: 'var(--accent-muted)' }}>
                   <span className="cl-l"><span className="cl-k accent">Start</span><span className="cl-v">Open an inquiry →</span></span><span className="ar">✦</span>
-                </a>
+                </Link>
               </div>
             </div>
           </div>

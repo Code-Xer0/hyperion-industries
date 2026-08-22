@@ -135,7 +135,24 @@ describe("Founder Command operator intake feed", () => {
   });
 
   it("advertises a versioned transport-only contract without Founder workflow state", async () => {
-    const db = new MockD1().queueFirst({ count: 1 });
+    const db = new MockD1()
+      .queueFirst(
+        {
+          count: 2,
+          oldest_pending_at: "2026-07-13T11:55:00.000Z",
+          newest_pending_at: "2026-07-13T12:00:00.000Z",
+          acknowledgement_delivered: 1,
+          acknowledgement_in_flight: 0,
+          acknowledgement_failed: 1,
+          acknowledgement_missing: 0,
+        },
+        {
+          count: 1,
+          oldest_pending_at: "2026-07-13T11:58:00.000Z",
+          newest_pending_at: "2026-07-13T11:58:00.000Z",
+        },
+      )
+      .queueAll([{ lane: "forge", count: 1 }, { lane: "support", count: 1 }]);
     const response = await createWorker().fetch(
       new Request("https://hyperion-industries.dev/api/intake/operator/status", { headers: AUTH_HEADERS }),
       operatorEnv(db),
@@ -149,7 +166,18 @@ describe("Founder Command operator intake feed", () => {
 
     expect(response.status).toBe(200);
     expect(body.feed_contract).toBe(FEED_CONTRACT);
-    expect(body).toMatchObject({ compatible_feed_contracts: COMPATIBLE_FEED_CONTRACTS });
+    expect(body).toMatchObject({
+      compatible_feed_contracts: COMPATIBLE_FEED_CONTRACTS,
+      pending: 3,
+      pending_by_source: { intake: 2, card_studio: 1 },
+      queue_health: {
+        pending_total: 3,
+        pending_by_lane: { forge: 1, support: 1 },
+        oldest_pending_at: "2026-07-13T11:55:00.000Z",
+        visitor_acknowledgement: { delivered: 1, failed: 1 },
+        authority: "transport_observation_only",
+      },
+    });
     expect(body.authority).toBe("transport_delivery_only");
     expect(body.transport).toEqual({
       authority: "worker_delivery_outbox",
@@ -182,6 +210,7 @@ describe("Founder Command operator intake feed", () => {
       count: number;
       outbox_mutated: boolean;
       transport: Record<string, unknown>;
+      queue_health: { pending_total: number; pending_by_source: Record<string, number> };
       items: Array<{
         feed_contract: string;
         payload_hash: string;
@@ -212,6 +241,7 @@ describe("Founder Command operator intake feed", () => {
       acknowledgement_scope: "transport_receipt_only",
       business_review_state_included: false,
     });
+    expect(body.queue_health).toMatchObject({ pending_total: 0, pending_by_source: { intake: 0, card_studio: 0 } });
     expect(body.items[0]?.feed_contract).toBe(FEED_CONTRACT);
     expect(body.items[0]?.payload_hash).toMatch(/^[a-f0-9]{64}$/);
     expect(body.items[0]?.outbox).toMatchObject({

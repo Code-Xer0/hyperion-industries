@@ -203,6 +203,10 @@
 .intake-exit { display: inline-flex; align-items: center; gap: 7px; color: #fff; text-decoration: none; font-weight: 700; font-size: 0.78rem; }
 .intake-exit:hover { color: var(--intake-gold); }
 .intake-save-state { display: flex; align-items: center; justify-content: flex-end; gap: 7px; max-width: 60%; color: var(--intake-muted); font-size: 0.72rem; text-align: right; }
+.intake-service-dot { width: 8px; height: 8px; flex: 0 0 auto; border-radius: 50%; background: #7c8491; box-shadow: 0 0 0 4px rgba(124,132,145,0.1); }
+.intake-service-dot.is-ready { background: var(--intake-cyan); box-shadow: 0 0 0 4px rgba(83,221,255,0.1), 0 0 16px rgba(83,221,255,0.5); }
+.intake-service-dot.is-configuration_required { background: var(--intake-red); box-shadow: 0 0 0 4px rgba(255,93,93,0.1); }
+.intake-service-warning { max-width: 560px; margin: 10px 0 0; padding: 11px 13px; border-left: 3px solid var(--intake-red); color: #ffd6d6 !important; background: rgba(255,93,93,0.08); font-size: 0.76rem; }
 
 .intake-progress { margin-bottom: 30px; }
 .intake-progress ol { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); margin: 0; padding: 0; list-style: none; }

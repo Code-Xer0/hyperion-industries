@@ -18,6 +18,16 @@ const stations = [
   { id: 'inquiry', label: 'Inquiry' },
 ];
 
+const intakeLanes = [
+  { index: '01', name: 'Forge', detail: 'Custom PCs, workstations, local AI, upgrades, sim rigs, and deployment briefs.', to: '/forge/configurator?source=home_inquiry' },
+  { index: '02', name: 'Pandora', detail: 'Infrastructure, rack, power, network, site-control, and readiness review.', to: '/intake/pandora?source=home_inquiry' },
+  { index: '03', name: 'Continuity', detail: 'Protect records, operating context, handoffs, and recovery posture.', to: '/intake/continuity?source=home_inquiry' },
+  { index: '04', name: 'Operator Identity', detail: 'Define a physical or digital trust surface and issuance posture.', to: '/intake/operator-identity?source=home_inquiry' },
+  { index: '05', name: 'Support', detail: 'Route an active Hyperion product or service issue without exposing secrets.', to: '/intake/support?source=home_inquiry' },
+  { index: '06', name: 'Relationships', detail: 'Open a partnership, supplier, research, civic, or media conversation.', to: '/intake/relationships?source=home_inquiry' },
+  { index: '07', name: 'General', detail: 'Preserve a signal that does not yet fit a specialist lane.', to: '/intake/general?source=home_inquiry' },
+];
+
 export default function HomePage() {
   const featured = getFeaturedDistricts();
   const statusRail = getStatusRailDistricts();
@@ -34,8 +44,8 @@ export default function HomePage() {
           <p>When work crosses people, machines, records, and tools, state gets lost and authority gets blurry. Hyperion captures that break, preserves the evidence, and routes a bounded next action.</p>
           <p className="gate-principle">{PUBLIC_DOCTRINE.principle}</p>
           <div className="room-action-row">
-            <Link to="/intake" className="btn btn-gold">Start an Assessment</Link>
-            <Link to="/forge/configurator" className="btn btn-ghost">Start a Forge Build</Link>
+            <Link to="/intake?source=home_signal" className="btn btn-gold">Start an Inquiry</Link>
+            <Link to="/forge/configurator?source=home_signal" className="btn btn-ghost">Start a Forge Build</Link>
             <Link to="/#proof" className="btn btn-ghost">View Public Proof</Link>
           </div>
           <StatusRail districts={statusRail} compact />
@@ -100,13 +110,15 @@ export default function HomePage() {
           </div>
           <p>{PUBLIC_DOCTRINE.assessment}</p>
         </div>
-        <div className="room-note-grid">
-          <article className="room-note"><span>01 · ASSESS</span><h3>Continuity assessment</h3><p>Map the state, handoff, records, and recurring friction that must survive interruption.</p><Link to="/intake/continuity">Open continuity intake</Link></article>
-          <article className="room-note"><span>02 · BUILD</span><h3>Forge systems</h3><p>Turn a workload, room, budget posture, and service horizon into an operator-reviewed machine brief.</p><Link to="/forge/configurator">Meet the Forge Concierge</Link></article>
-          <article className="room-note"><span>03 · IDENTITY</span><h3>Operator identity</h3><p>Design a bounded physical and digital trust surface without assuming publication or production.</p><Link to="/card-studio">Open Card Studio</Link></article>
+        <div className="gate-intake-grid">
+          {intakeLanes.map((lane) => (
+            <article className="gate-intake-card" key={lane.name}>
+              <span>{lane.index} · INTAKE</span><h3>{lane.name}</h3><p>{lane.detail}</p><Link to={lane.to}>Open {lane.name} lane</Link>
+            </article>
+          ))}
         </div>
         <div className="room-action-row">
-          <Link to="/intake" className="btn btn-gold">Choose an Intake Lane</Link>
+          <Link to="/intake?source=home_inquiry" className="btn btn-gold">Choose an Intake Lane</Link>
           <Link to="/contact" className="btn btn-ghost">Contact Hyperion</Link>
           <a href="https://chr0nos.app" className="btn btn-ghost" target="_blank" rel="noopener noreferrer">CHR0N.OS <ArrowUpRight size={14} aria-hidden="true" /></a>
         </div>

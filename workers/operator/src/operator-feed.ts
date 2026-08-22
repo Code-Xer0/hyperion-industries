@@ -91,6 +91,27 @@ interface AckItem {
   accepted_business_truth: boolean;
 }
 
+interface IntakeQueueHealthRow {
+  count: number | string | null;
+  oldest_pending_at: string | null;
+  newest_pending_at: string | null;
+  acknowledgement_delivered: number | string | null;
+  acknowledgement_in_flight: number | string | null;
+  acknowledgement_failed: number | string | null;
+  acknowledgement_missing: number | string | null;
+}
+
+interface CardQueueHealthRow {
+  count: number | string | null;
+  oldest_pending_at: string | null;
+  newest_pending_at: string | null;
+}
+
+interface LaneQueueHealthRow {
+  lane: string;
+  count: number | string | null;
+}
+
 function feedTransportMetadata(): Record<string, unknown> {
   return {
     authority: "worker_delivery_outbox",
@@ -112,6 +133,81 @@ function acknowledgementTransportMetadata(): Record<string, unknown> {
     accepted_business_truth: false,
     source_outbox_mutation_allowed: false,
     business_review_state_included: false,
+  };
+}
+
+function canonicalLane(value: string): string {
+  return value === "operator-identity" ? "identity" : value === "relationships" ? "relationship" : value;
+}
+
+function earlier(left: string | null, right: string | null): string | null {
+  if (!left) return right;
+  if (!right) return left;
+  return left.localeCompare(right) <= 0 ? left : right;
+}
+
+function later(left: string | null, right: string | null): string | null {
+  if (!left) return right;
+  if (!right) return left;
+  return left.localeCompare(right) >= 0 ? left : right;
+}
+
+async function queueHealth(db: D1Database, consumerId: string, now: Date): Promise<Record<string, unknown>> {
+  const [intake, cards, laneResult] = await Promise.all([
+    db.prepare(
+      `SELECT COUNT(*) AS count, MIN(o.created_at) AS oldest_pending_at, MAX(o.created_at) AS newest_pending_at,
+              SUM(CASE WHEN a.delivery_state = 'delivered' THEN 1 ELSE 0 END) AS acknowledgement_delivered,
+              SUM(CASE WHEN a.delivery_state IN ('pending', 'sent') THEN 1 ELSE 0 END) AS acknowledgement_in_flight,
+              SUM(CASE WHEN a.delivery_state IN ('failed', 'bounced') THEN 1 ELSE 0 END) AS acknowledgement_failed,
+              SUM(CASE WHEN a.delivery_state IS NULL THEN 1 ELSE 0 END) AS acknowledgement_missing
+         FROM intake_outbox o
+         LEFT JOIN intake_consumer_receipts r ON r.outbox_id = o.outbox_id AND r.consumer_id = ?
+         LEFT JOIN intake_acknowledgement_deliveries a ON a.submission_id = o.submission_id
+        WHERE o.state = 'held_for_review' AND r.outbox_id IS NULL`,
+    ).bind(consumerId).first<IntakeQueueHealthRow>(),
+    db.prepare(
+      `SELECT COUNT(*) AS count, MIN(o.created_at) AS oldest_pending_at, MAX(o.created_at) AS newest_pending_at
+         FROM card_studio_proposal_outbox o
+         LEFT JOIN card_studio_consumer_receipts r ON r.outbox_id = o.outbox_id AND r.consumer_id = ?
+        WHERE o.state = 'held_for_review' AND r.outbox_id IS NULL`,
+    ).bind(consumerId).first<CardQueueHealthRow>(),
+    db.prepare(
+      `SELECT d.primary_route AS lane, COUNT(*) AS count
+         FROM intake_outbox o
+         JOIN intake_routing_decisions d ON d.submission_id = o.submission_id
+         LEFT JOIN intake_consumer_receipts r ON r.outbox_id = o.outbox_id AND r.consumer_id = ?
+        WHERE o.state = 'held_for_review' AND r.outbox_id IS NULL
+        GROUP BY d.primary_route`,
+    ).bind(consumerId).all<LaneQueueHealthRow>(),
+  ]);
+  const intakeCount = Number(intake?.count ?? 0);
+  const cardCount = Number(cards?.count ?? 0);
+  const oldestPendingAt = earlier(intake?.oldest_pending_at ?? null, cards?.oldest_pending_at ?? null);
+  const newestPendingAt = later(intake?.newest_pending_at ?? null, cards?.newest_pending_at ?? null);
+  const oldestTimestamp = oldestPendingAt ? Date.parse(oldestPendingAt) : Number.NaN;
+  const pendingByLane: Record<string, number> = {};
+  for (const row of laneResult.results ?? []) {
+    const lane = canonicalLane(String(row.lane || "general"));
+    pendingByLane[lane] = (pendingByLane[lane] ?? 0) + Number(row.count ?? 0);
+  }
+
+  return {
+    generated_at: now.toISOString(),
+    pending_total: intakeCount + cardCount,
+    pending_by_source: { intake: intakeCount, card_studio: cardCount },
+    pending_by_lane: pendingByLane,
+    oldest_pending_at: oldestPendingAt,
+    newest_pending_at: newestPendingAt,
+    oldest_pending_age_seconds: Number.isFinite(oldestTimestamp)
+      ? Math.max(0, Math.floor((now.getTime() - oldestTimestamp) / 1000))
+      : null,
+    visitor_acknowledgement: {
+      delivered: Number(intake?.acknowledgement_delivered ?? 0),
+      in_flight: Number(intake?.acknowledgement_in_flight ?? 0),
+      failed: Number(intake?.acknowledgement_failed ?? 0),
+      missing_or_not_configured: Number(intake?.acknowledgement_missing ?? 0),
+    },
+    authority: "transport_observation_only",
   };
 }
 
@@ -201,7 +297,7 @@ async function envelope(
   feedContract: FeedContract = OPERATOR_FEED_CONTRACT,
 ): Promise<Record<string, unknown>> {
   const sourceLane = row.primary_route;
-  const canonicalLane = sourceLane === "operator-identity" ? "identity" : sourceLane === "relationships" ? "relationship" : sourceLane;
+  const normalizedLane = canonicalLane(sourceLane);
   const body: Record<string, unknown> = {
     feed_contract: feedContract,
     outbox: {
@@ -244,7 +340,7 @@ async function envelope(
       minimized_projection_hash: row.minimized_projection_hash,
       proposal_state: row.proposal_state,
       source_lane: sourceLane,
-      canonical_lane: canonicalLane,
+      canonical_lane: normalizedLane,
       classification: row.classification,
       created_at: row.decision_created_at,
       decision: parseJson(row.decision_json, {}),
@@ -358,16 +454,7 @@ export async function handleOperatorStatus(request: Request, env: Env, deps: Run
   const feedContract = requestedFeedContract(request);
   const { consumerId } = authorization;
   const db = requireDb(env);
-  const pending = await db.prepare(
-    `SELECT COUNT(*) AS count FROM intake_outbox o
-       LEFT JOIN intake_consumer_receipts r ON r.outbox_id = o.outbox_id AND r.consumer_id = ?
-      WHERE o.state = 'held_for_review' AND r.outbox_id IS NULL`,
-  ).bind(consumerId).first<{ count: number }>();
-  const cardPending = await db.prepare(
-    `SELECT COUNT(*) AS count FROM card_studio_proposal_outbox o
-       LEFT JOIN card_studio_consumer_receipts r ON r.outbox_id = o.outbox_id AND r.consumer_id = ?
-      WHERE o.state = 'held_for_review' AND r.outbox_id IS NULL`,
-  ).bind(consumerId).first<{ count: number }>();
+  const health = await queueHealth(db, consumerId, deps.now());
   return jsonResponse({
     feed_contract: feedContract,
     latest_feed_contract: OPERATOR_FEED_CONTRACT,
@@ -377,11 +464,9 @@ export async function handleOperatorStatus(request: Request, env: Env, deps: Run
     consumer_id: consumerId,
     key_id: authorization.keyId,
     key_version: authorization.keyVersion,
-    pending: Number(pending?.count ?? 0) + Number(cardPending?.count ?? 0),
-    pending_by_source: {
-      intake: Number(pending?.count ?? 0),
-      card_studio: Number(cardPending?.count ?? 0),
-    },
+    pending: health.pending_total,
+    pending_by_source: health.pending_by_source,
+    queue_health: health,
     authority: "transport_delivery_only",
     outbox_mutation_allowed: false,
     transport: feedTransportMetadata(),
@@ -409,6 +494,7 @@ export async function handleOperatorFeed(request: Request, env: Env, deps: Runti
   const items = await Promise.all(rows.map((row) => "intake_id" in row
     ? envelope(row, feedContract)
     : cardEnvelope(row, env.SITE_ORIGIN)));
+  const health = await queueHealth(db, consumerId, deps.now());
   const last = rows.at(-1);
   return jsonResponse({
     feed_contract: feedContract,
@@ -422,6 +508,7 @@ export async function handleOperatorFeed(request: Request, env: Env, deps: Runti
     next_cursor: last ? encodeCursor(last.created_at, last.outbox_id) : url.searchParams.get("cursor") ?? "",
     has_more: intakeRows.length + cardRows.length > rows.length,
     outbox_mutated: false,
+    queue_health: health,
     transport: feedTransportMetadata(),
   });
 }

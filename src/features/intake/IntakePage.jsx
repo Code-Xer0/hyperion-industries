@@ -1,11 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import {
   ArrowLeft,
   ArrowRight,
   Check,
   CircleAlert,
-  Clock3,
   KeyRound,
   Radio,
   RotateCcw,
@@ -19,6 +18,7 @@ import {
   LANES,
   LANE_IDS,
 } from '../../../shared/intake/model';
+import { publicIntakeAttribution } from '../../../shared/intake/attribution';
 import './IntakePage.css';
 
 const STEPS = ['Aperture', 'Handshake', 'Signal', 'Load / Limits', 'Fit', 'Review', 'Dispatch'];
@@ -198,6 +198,7 @@ function DecisionCard({ decision, source }) {
 
 export default function IntakePage({ resumeMode = false }) {
   const params = useParams();
+  const location = useLocation();
   const navigate = useNavigate();
   const directLane = isLaneId(params.lane) ? params.lane : null;
   const [lane, setLane] = useState(directLane);
@@ -214,6 +215,7 @@ export default function IntakePage({ resumeMode = false }) {
   const [resumeStatus, setResumeStatus] = useState('idle');
   const [cloudEnabled, setCloudEnabled] = useState(false);
   const [receipt, setReceipt] = useState(null);
+  const [serviceReadiness, setServiceReadiness] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [revision, setRevision] = useState(1);
   const [supersedes, setSupersedes] = useState(null);
@@ -225,6 +227,14 @@ export default function IntakePage({ resumeMode = false }) {
   const errorRef = useRef(null);
 
   const laneDefinition = lane ? LANES[lane] : null;
+
+  useEffect(() => {
+    let active = true;
+    api('/api/intake/status')
+      .then((result) => { if (active) setServiceReadiness(result?.readiness || {}); })
+      .catch(() => { if (active) setServiceReadiness({ storage: 'unverified' }); });
+    return () => { active = false; };
+  }, []);
 
   useEffect(() => {
     if (directLane && directLane !== lane) setLane(directLane);
@@ -335,7 +345,7 @@ export default function IntakePage({ resumeMode = false }) {
     setDecision(null);
     setReceipt(null);
     restoreKey.current = null;
-    navigate(`/intake/${nextLane}`, { replace: params.lane === undefined });
+    navigate({ pathname: `/intake/${nextLane}`, search: location.search }, { replace: params.lane === undefined });
   };
 
   const visibleQuestions = useCallback((section) => {
@@ -446,7 +456,9 @@ export default function IntakePage({ resumeMode = false }) {
         { consent_id: 'save_resume', notice_version: CONTRACT_VERSION, granted: consents.save_resume, recorded_at: now },
       ],
       client_context: {
-        entry_url: window.location.href, referrer_category: null, effects_mode: effects, save_resume_used: cloudEnabled,
+        ...publicIntakeAttribution(window.location, document.referrer),
+        effects_mode: effects,
+        save_resume_used: cloudEnabled,
       },
     };
     try {
@@ -539,6 +551,7 @@ export default function IntakePage({ resumeMode = false }) {
           <p className="intake-kicker">Signal received</p>
           <h2>Received for operator review.</h2>
           <p>Reference <strong>{receipt.reference}</strong> · Revision {receipt.revision}</p>
+          <p>The Worker is holding this immutable revision in the operator feed. Founder Command can receive it on its next configured pull; that delivery is not approval.</p>
           <p>No CRM, order, ticket, payment, memory, CHR0N, or command action was created automatically.</p>
           <div className="intake-actions"><button type="button" className="intake-button" onClick={correct}><RotateCcw size={15} />Correct with a new revision</button><Link className="intake-button is-primary" to="/">Return to City</Link></div>
         </div>
@@ -550,7 +563,8 @@ export default function IntakePage({ resumeMode = false }) {
         <p className="intake-kicker">Authority boundary</p>
         <h2>Dispatch to the review queue.</h2>
         <p>This creates one immutable submission revision, one evidence-linked routing decision, one receipt, one metadata-only audit event, and a held-for-review outbox record.</p>
-        <button type="button" className="intake-button is-primary is-large" onClick={submit} disabled={submitting}>{submitting ? 'Receiving signal…' : 'Dispatch for operator review'}</button>
+        {serviceReadiness?.storage === 'configuration_required' && <p className="intake-service-warning" role="alert">The receiving service is not ready. Your local draft is safe; dispatch is paused.</p>}
+        <button type="button" className="intake-button is-primary is-large" onClick={submit} disabled={submitting || serviceReadiness?.storage === 'configuration_required'}>{submitting ? 'Receiving signal…' : 'Dispatch for operator review'}</button>
       </div>
     );
   };
@@ -581,7 +595,7 @@ export default function IntakePage({ resumeMode = false }) {
         <section className="intake-form-panel" aria-labelledby="intake-step-title">
           <header className="intake-form-head">
             <Link to="/" className="intake-exit"><ArrowLeft size={15} aria-hidden="true" />City Gate</Link>
-            <div className="intake-save-state"><Clock3 size={14} aria-hidden="true" /><span>{serviceNote}</span></div>
+            <div className="intake-save-state"><span className={`intake-service-dot is-${serviceReadiness?.storage || 'checking'}`} aria-hidden="true" /><span>{serviceReadiness?.storage === 'ready' ? 'Receiving service ready' : serviceReadiness?.storage === 'configuration_required' ? 'Receiving service paused' : serviceReadiness?.storage === 'unverified' ? 'Receiving service unverified' : 'Checking receiving service'} · {serviceNote}</span></div>
           </header>
           <nav className="intake-progress" aria-label="Intake progress">
             <ol>{STEPS.map((label, index) => <li key={label} aria-current={index === step ? 'step' : undefined} className={index < step ? 'is-complete' : index === step ? 'is-current' : ''}><span>{index < step ? <Check size={12} /> : index + 1}</span><small>{label}</small></li>)}</ol>

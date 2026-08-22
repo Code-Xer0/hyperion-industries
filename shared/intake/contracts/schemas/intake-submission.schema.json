@@ -56,7 +56,9 @@
       "additionalProperties": false,
       "properties": {
         "entry_url": { "type": ["string", "null"], "format": "uri" },
+        "entry_path": { "type": ["string", "null"], "pattern": "^/[A-Za-z0-9/_-]*$", "maxLength": 200 },
         "referrer_category": { "type": ["string", "null"], "maxLength": 80 },
+        "source_surface": { "type": ["string", "null"], "pattern": "^[a-z0-9][a-z0-9._-]{1,79}$" },
         "effects_mode": { "enum": ["full", "reduced", "static"] },
         "save_resume_used": { "type": "boolean" },
         "guide_mode": { "enum": ["full", "express"] },

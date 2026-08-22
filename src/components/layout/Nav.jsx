@@ -402,7 +402,7 @@ export default function Nav() {
                 <Link to="/systems" onClick={closeMobileMenu}>Systems</Link>
                 <Link to="/contact" onClick={closeMobileMenu}>Contact</Link>
                 <button type="button" onClick={() => { closeMobileMenu(); openLauncher(); }}>City Map</button>
-                <Link to="/intake" onClick={closeMobileMenu}>Other Inquiry</Link>
+                <Link to="/intake?source=mobile_menu" onClick={closeMobileMenu}>All Inquiry Lanes</Link>
               </nav>
               <footer>
                 <span>City utilities</span>

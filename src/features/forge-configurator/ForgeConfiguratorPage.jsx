@@ -16,6 +16,7 @@ import {
   nextQuestionIndex, sha256Document, visibleQuestions,
 } from './forgeGuideModel.js';
 import './ForgeConfiguratorPage.css';
+import { publicIntakeAttribution } from '../../../shared/intake/attribution';
 
 const API_ORIGIN = '';
 const LOCAL_KEY = 'hyperion-forge-concierge-v2';
@@ -519,7 +520,8 @@ export default function ForgeConfiguratorPage() {
         { consent_id: 'automated_classification', notice_version: CONTRACT_VERSION, granted: true, recorded_at: now },
       ],
       client_context: {
-        entry_url: window.location.href, effects_mode: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'reduced' : 'full',
+        ...publicIntakeAttribution(window.location, document.referrer),
+        effects_mode: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'reduced' : 'full',
         save_resume_used: true, guide_mode: mode, guide_bundle_hash: bundle.bundle_hash,
         question_graph_version: bundle.graph.version, guide_session_hash: sessionHash,
         guide_requirements_projection: projection, recommendation_reason_codes: recommendations.reason_codes,
