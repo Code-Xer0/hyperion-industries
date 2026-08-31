@@ -1,14 +1,19 @@
 # Production binding for the Hyperion public intake Worker.
 name = "hyperion-operator"
 main = "src/index.ts"
-compatibility_date = "2026-07-13"
+compatibility_date = "2026-08-30"
+compatibility_flags = ["nodejs_compat"]
 workers_dev = false
 preview_urls = false
 routes = [
   { pattern = "hyperion-industries.dev/api/operator/*", zone_name = "hyperion-industries.dev" },
   { pattern = "hyperion-industries.dev/api/intake/*", zone_name = "hyperion-industries.dev" },
   { pattern = "hyperion-industries.dev/api/card-studio/*", zone_name = "hyperion-industries.dev" },
+  { pattern = "hyperion-industries.dev/api/commerce/*", zone_name = "hyperion-industries.dev" },
 ]
+
+[observability]
+enabled = true
 
 [vars]
 SITE_ORIGIN = "https://hyperion-industries.dev"
@@ -20,7 +25,9 @@ INTAKE_RESUME_FROM = "signal@intake.hyperion-industries.dev"
 INTAKE_ACKNOWLEDGEMENT_FROM = "signal@intake.hyperion-industries.dev"
 INTAKE_COOKIE_NAME = "hyperion_resume"
 FOUNDER_COMMAND_PULL_KEY_ID = "fc-intake-v1"
-CARD_STUDIO_INVITE_REQUIRED = "true"
+CARD_STUDIO_INVITE_REQUIRED = "false"
+PAYPAL_ENVIRONMENT = "sandbox"
+FOUNDER_COMMAND_COMMERCE_KEY_ID = "fc-commerce-v1"
 
 [[d1_databases]]
 binding = "DB"
@@ -81,6 +88,14 @@ namespace_id = "41006"
   limit = 30
   period = 60
 
+[[ratelimits]]
+name = "COMMERCE_OPERATOR_RATE_LIMITER"
+namespace_id = "41007"
+
+  [ratelimits.simple]
+  limit = 30
+  period = 60
+
 # Bind CARD_STUDIO_ASSETS to the private quarantine R2 bucket and
 # CARD_STUDIO_UPLOAD_SCANNER to the scanning broker before enabling uploads.
 # The Worker intentionally fails closed when either binding is unavailable.
@@ -95,6 +110,11 @@ namespace_id = "41006"
 # Add FOUNDER_COMMAND_PULL_TOKEN_SHA256 with `wrangler secret put FOUNDER_COMMAND_PULL_TOKEN_SHA256`.
 # Add CARD_STUDIO_SHOPIFY_STOREFRONT_TOKEN with `wrangler secret put CARD_STUDIO_SHOPIFY_STOREFRONT_TOKEN`.
 # Add CARD_STUDIO_SHOPIFY_WEBHOOK_SECRET with `wrangler secret put CARD_STUDIO_SHOPIFY_WEBHOOK_SECRET`.
+# Add PAYPAL_CLIENT_ID and PAYPAL_CLIENT_SECRET as Worker secrets for sandbox first.
+# Add PAYPAL_WEBHOOK_ID only after the sandbox webhook endpoint is registered.
+# Add STRIPE_RESTRICTED_KEY and STRIPE_WEBHOOK_SECRET as Worker secrets for sandbox first.
+# Add FOUNDER_COMMAND_COMMERCE_TOKEN_SHA256 as a dedicated capability secret.
+# Do not set either *_LIVE_PAYMENTS_ENABLED flag without a separately authorized live charge/refund smoke.
 # Configure CARD_STUDIO_SHOPIFY_STORE_DOMAIN, a pinned Storefront API version,
 # and CARD_STUDIO_SHOPIFY_VARIANTS only after catalog mappings are reviewed.
 # During rotation, add FOUNDER_COMMAND_PULL_PREVIOUS_TOKEN_SHA256 as a secret and set

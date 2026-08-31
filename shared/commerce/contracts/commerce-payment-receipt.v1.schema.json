@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hyperion-industries.dev/contracts/commerce-payment-receipt.v1.schema.json",
+  "title": "Commerce payment receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "receipt_id", "proposal_ref", "provider", "provider_event_id", "state", "occurred_at", "payload_hash"],
+  "properties": {
+    "contract_version": { "const": "commerce-payment-receipt/1" },
+    "receipt_id": { "type": "string", "pattern": "^cpr_[A-Za-z0-9_-]{12,80}$" },
+    "proposal_ref": { "type": "string", "pattern": "^[A-Za-z0-9_-]{12,96}$" },
+    "provider": { "const": "shopify" },
+    "provider_event_id": { "type": "string", "minLength": 8, "maxLength": 160 },
+    "state": { "enum": ["paid", "cancelled", "refunded", "fulfilled", "conflict_quarantined"] },
+    "amount_minor": { "type": ["integer", "null"], "minimum": 0 },
+    "currency": { "type": ["string", "null"], "pattern": "^[A-Z]{3}$" },
+    "occurred_at": { "type": "string", "format": "date-time" },
+    "payload_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" }
+  }
+}

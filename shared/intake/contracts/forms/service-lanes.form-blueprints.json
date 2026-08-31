@@ -7,6 +7,7 @@
       "title": "Trace where the thread breaks",
       "estimated_minutes": 7,
       "questions": [
+        { "id": "continuity_service", "type": "single_select", "label": "Which continuity starting point fits best?", "required": true, "options": ["assessment", "setup", "migration", "team", "unknown"] },
         { "id": "continuity.break", "type": "long_text", "label": "What repeatedly breaks, disappears, or has to be rediscovered?", "required": true },
         { "id": "continuity.trigger", "type": "multi_select", "label": "When does it happen?", "required": true, "options": ["person_change", "device_change", "desk_or_site_move", "vendor_change", "handoff", "incident", "audit", "growth", "other"] },
         { "id": "continuity.state", "type": "multi_select", "label": "What state must survive?", "required": true, "options": ["files", "decisions", "approvals", "device_profile", "support_history", "client_context", "process_steps", "evidence", "access", "other"] },
@@ -19,6 +20,19 @@
         { "id": "continuity.files", "type": "file_upload", "label": "Add a safe example, workflow, screenshot, or policy.", "required": false }
       ],
       "conversion": { "crm": "intake_activity", "order": "assessment_intent", "arg": "pain_point_proposal", "command": "decision_card" }
+    },
+    {
+      "form_id": "live-site-project",
+      "title": "Launch a public business surface",
+      "estimated_minutes": 5,
+      "questions": [
+        { "id": "live_site_package", "type": "single_select", "label": "Which Live Site starting point fits best?", "required": true, "options": ["signal", "presence", "system", "infrastructure", "unknown"] },
+        { "id": "business_outcome", "type": "long_text", "label": "What should the site help the business accomplish?", "required": true },
+        { "id": "current_surface", "type": "long_text", "label": "What site, brand material, or operating process exists today?", "required": true },
+        { "id": "conversion_action", "type": "text", "label": "What should a serious visitor be able to do next?", "required": true },
+        { "id": "launch_window", "type": "timeline_posture", "label": "Is there a meaningful launch date or decision window?", "required": false }
+      ],
+      "conversion": { "crm": "held_intake", "order": "proposal_only", "command": "site_intake_proposal" }
     },
     {
       "form_id": "operator-identity",

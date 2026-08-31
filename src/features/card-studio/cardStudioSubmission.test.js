@@ -71,7 +71,6 @@ test('submission stages project, immutable revision, and proposal in order', asy
     const result = await submitCardStudioBrief(createCardDocument(), {
       consent: true,
       proofApproved: true,
-      inviteToken: 'invite-token-with-at-least-24-characters',
       productSku: 'card_pvc_standard',
       quantity: 1,
     }, {
@@ -84,6 +83,7 @@ test('submission stages project, immutable revision, and proposal in order', asy
     assert.match(calls[0].url, /\/projects$/);
     assert.match(calls[1].url, /\/revisions$/);
     assert.match(calls[2].url, /\/submit$/);
+    assert.deepEqual(JSON.parse(calls[0].init.body), { account_ref: 'acct_abcdefghijkl' });
     assert.equal(calls[1].init.headers['x-card-session'], 'css_abcdefghijkl');
     assert.equal(calls[2].init.headers['idempotency-key'], 'idempotency-key-abcdefghijkl');
     assert.equal(result.reference, 'cdp_abcdefghijkl');

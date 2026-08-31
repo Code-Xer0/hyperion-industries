@@ -39,7 +39,7 @@
 .hcs-library-intro { max-width: 760px; color: #aeb2b7; font-size: clamp(14px, 1.25vw, 18px); line-height: 1.7; }
 .hcs-library-posture {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   border: 1px solid rgba(255,199,44,.28);
   background: rgba(9,11,14,.7);
 }
@@ -61,6 +61,19 @@
   background: rgba(5,6,8,.92);
   backdrop-filter: blur(18px);
 }
+.hcs-product-shelf { max-width: 1440px; margin: 0 auto; padding: 64px 0 44px; }
+.hcs-product-shelf .hcs-library-section-head { margin-bottom: 24px; }
+.hcs-payment-readiness { display: flex; align-items: center; gap: 7px; margin: 10px 0 0; color: #f0b95e; font: 700 7px var(--font-display); letter-spacing: .06em; }
+.hcs-product-offers { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 16px; }
+.hcs-product-offers > article { min-width: 0; border: 1px solid rgba(255,255,255,.12); background: #0d1014; }
+.hcs-product-offers > article > div:nth-child(2) { padding: 20px; }
+.hcs-product-offers span { display: flex; align-items: center; gap: 7px; color: #ffc72c; font: 700 7px var(--font-display); }
+.hcs-product-offers h3 { margin: 12px 0 7px; font-size: 24px; }
+.hcs-product-offers p { min-height: 52px; margin: 0; color: #92989f; font-size: 11px; line-height: 1.6; }
+.hcs-product-offers strong { display: block; margin-top: 17px; color: #fff; font-size: 20px; }
+.hcs-product-offers strong small { color: #717880; font: 500 8px var(--font-display); text-transform: uppercase; }
+.hcs-product-offers > article > button { display: flex; width: 100%; min-height: 48px; align-items: center; justify-content: space-between; padding: 0 20px; border: 0; border-top: 1px solid rgba(255,255,255,.1); background: transparent; color: #fff; font: 700 8px var(--font-display); text-transform: uppercase; cursor: pointer; }
+.hcs-product-offers > article > button:hover, .hcs-product-offers > article > button:focus-visible { background: #ffc72c; color: #080a0d; outline: none; }
 .hcs-library-tabs { display: flex; gap: 6px; }
 .hcs-library-tabs button,
 .hcs-library-new,
@@ -161,6 +174,8 @@
   .hcs-draft-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
   .hcs-library-section-head, .hcs-artifact-note { grid-template-columns: 1fr; }
   .hcs-library-command { top: 56px; }
+  .hcs-product-shelf { padding: 44px 0 30px; }
+  .hcs-product-offers { grid-template-columns: 1fr; }
 }
 @media (max-width: 560px) {
   .hcs-library-hero h1 { font-size: 46px; }

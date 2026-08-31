@@ -102,15 +102,6 @@ function randomDraftId() {
   return `draft_${suffix}`;
 }
 
-function initialsFor(name) {
-  return String(name || '')
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase())
-    .join('') || 'ID';
-}
-
 function artifactLayer(artifact, index, side = artifact.compatible_sides[0]) {
   return {
     id: `layer_${artifact.id.replace('csa_builtin_', '')}_${index}`,
@@ -158,29 +149,30 @@ export function createCardDocument(starterId = 'ivory') {
     applyTemplate(document, starter.template_id);
     document.starter_id = starter.id;
     document.starter_checksum = starter.checksum;
-    document.draft_name = `${starter.name} demo`;
+    document.draft_name = `${starter.fields.organization} inspired card`;
     document.identity = {
       ...document.identity,
-      name: starter.name,
-      role: starter.label,
-      organization: starter.fields.organization,
-      initials: initialsFor(starter.name),
-      tagline: starter.operator_demo ? 'Public operator profile demonstration.' : 'Fictional Card Studio demonstration.',
+      name: '',
+      role: '',
+      organization: '',
+      initials: 'ID',
+      tagline: '',
     };
     document.contact = {
-      email: starter.fields.email,
-      phone: starter.fields.phone,
-      website: starter.fields.website,
+      email: '',
+      phone: '',
+      website: '',
     };
     document.visibility = {
       ...document.visibility,
-      email: Boolean(starter.fields.email),
-      phone: Boolean(starter.fields.phone),
-      website: Boolean(starter.fields.website),
+      email: false,
+      phone: false,
+      website: false,
+      tagline: false,
     };
     document.sharing = {
-      profile_path: starter.id,
-      destination: `https://${starter.fields.website}`,
+      profile_path: '',
+      destination: '',
     };
     const additions = starter.artifact_ids
       .filter((id) => !document.layers.some((layer) => layer.artifact_id === id))

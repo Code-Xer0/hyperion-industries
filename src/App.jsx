@@ -6,6 +6,7 @@ import HomePage from './pages/HomePage';
 const FoundersPage = lazy(() => import('./pages/FoundersPage'));
 const FounderPage = lazy(() => import('./pages/FounderPage'));
 const DistrictPage = lazy(() => import('./pages/DistrictPage'));
+const ForgePage = lazy(() => import('./pages/ForgePage'));
 const CardStudioPage = lazy(() => import('./pages/CardStudioPage'));
 const CardStudioDesignPage = lazy(() => import('./pages/CardStudioDesignPage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
@@ -29,6 +30,8 @@ const DevDiaryPage = lazy(() => import('./pages/DevDiaryPage'));
 const ContactPage = lazy(() => import('./pages/ContactPage'));
 const NewsletterPage = lazy(() => import('./pages/NewsletterPage'));
 const StorePage = lazy(() => import('./pages/StorePage'));
+const ChronosPage = lazy(() => import('./pages/ChronosPage'));
+const ServicesPage = lazy(() => import('./pages/ServicesPage'));
 const EditorPage = import.meta.env.DEV ? lazy(() => import('./pages/EditorPage')) : () => null;
 const CardStudioSpecimensPage = import.meta.env.DEV ? lazy(() => import('./pages/CardStudioSpecimensPage')) : () => null;
 import { HelmetProvider } from 'react-helmet-async';
@@ -140,8 +143,8 @@ export default function App() {
               <Route path="/pandora/configurator" element={<PandoraRackworksPage />} />
               <Route path="/pandora-lite/configurator" element={<PandoraLiteGridPage />} />
               <Route path="/account" element={<ClientAccountPage />} />
-              <Route path="/chronos" element={<DistrictPage districtId="chronos" />} />
-              <Route path="/forge" element={<DistrictPage districtId="forge" />} />
+              <Route path="/chronos" element={<ChronosPage />} />
+              <Route path="/forge" element={<ForgePage />} />
               <Route path="/pandora" element={<DistrictPage districtId="pandora" />} />
               <Route path="/talos" element={<DistrictPage districtId="talos" />} />
               <Route path="/identity" element={<DistrictPage districtId="identity" />} />
@@ -168,6 +171,8 @@ export default function App() {
               <Route path="/mcp" element={<McpPage />} />
               <Route path="/newsletter" element={<NewsletterPage />} />
               <Route path="/store" element={<StorePage />} />
+              <Route path="/services" element={<ServicesPage />} />
+              <Route path="/live-site-series" element={<StaticRedirect to="/services" />} />
               <Route path="*" element={<ContentOrNotFoundRoute />} />
             </Routes>
             </Suspense>

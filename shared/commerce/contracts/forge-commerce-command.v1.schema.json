@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hyperion-industries.dev/contracts/forge-commerce-command.v1.schema.json",
+  "title": "Forge commerce command",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "proposal_ref", "intake_ref", "revision_hash", "action", "idempotency_key"],
+  "properties": {
+    "contract_version": { "const": "forge-commerce-command/1" },
+    "proposal_ref": { "type": "string", "pattern": "^sip_[A-Za-z0-9_-]{12,80}$" },
+    "intake_ref": { "type": "string", "pattern": "^sub_[A-Za-z0-9_-]{12,80}$" },
+    "revision_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "action": { "enum": ["stage_invoice", "release_invoice", "reconcile"] },
+    "idempotency_key": { "type": "string", "pattern": "^[A-Za-z0-9._:-]{16,120}$" }
+  }
+}

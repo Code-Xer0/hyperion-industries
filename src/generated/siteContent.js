@@ -12,6 +12,7 @@ export const SITE_CONTENT_BUNDLE = Object.freeze({
       "/forge/catalog",
       "/forge/configurator",
       "/card-studio",
+      "/services",
       "/dxcard",
       "/mcp"
     ],
@@ -42,7 +43,7 @@ export const SITE_CONTENT_BUNDLE = Object.freeze({
     }
   ],
   "pages": [],
-  "bundle_hash": "60b04e08ccb0227dc455ab1627033d3bec6c18737014ea60fafc55e793489c33"
+  "bundle_hash": "8183dcdef9dc58f34099263fa746d8af5aa9c850b1ce150481c8102d53df84cb"
 });
 export const SITE_CONTENT_PAGES = SITE_CONTENT_BUNDLE.pages;
 export const SITE_CONTENT_PAGE_BY_PATH = new Map(SITE_CONTENT_PAGES.map((page) => [page.path, page]));

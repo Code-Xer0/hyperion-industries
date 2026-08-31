@@ -61,7 +61,7 @@ describe("Card Studio public order spine", () => {
     expect(response.status).toBe(200);
     expect(body).toMatchObject({
       contract_version: "card-catalog/1",
-      release_state: "invite_only",
+      release_state: "public",
       authority: "catalog_estimate_only",
       checkout_created: false,
     });

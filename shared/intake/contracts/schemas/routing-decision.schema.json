@@ -17,7 +17,7 @@
     "ruleset_version": { "type": "string" },
     "agent_contract_version": { "type": "string" },
     "created_at": { "type": "string", "format": "date-time" },
-    "primary_route": { "enum": ["forge", "pandora", "continuity", "identity", "support", "relationship", "general", "security_review"] },
+    "primary_route": { "enum": ["forge", "pandora", "continuity", "live-sites", "identity", "support", "relationship", "general", "security_review"] },
     "secondary_routes": { "type": "array", "uniqueItems": true, "items": { "type": "string" } },
     "diagnostic": {
       "type": ["object", "null"],

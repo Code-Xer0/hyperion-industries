@@ -11,7 +11,7 @@
     "trace_id": { "type": "string" },
     "created_at": { "type": "string", "format": "date-time" },
     "title": { "type": "string", "maxLength": 180 },
-    "lane": { "enum": ["forge", "pandora", "continuity", "identity", "support", "relationship", "general", "security_review"] },
+    "lane": { "enum": ["forge", "pandora", "continuity", "live-sites", "identity", "support", "relationship", "general", "security_review"] },
     "summary": { "type": "string", "maxLength": 2500 },
     "client_ref": { "type": ["string", "null"] },
     "account_ref": { "type": ["string", "null"] },

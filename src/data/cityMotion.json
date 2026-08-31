@@ -15,8 +15,8 @@
     },
     "systems": {
       "type": "image",
-      "src": "/assets/city/navigation/city-transit.jpg",
-      "poster": "/assets/city/navigation/city-transit.jpg",
+      "src": "/assets/city/navigation/city-transit.webp",
+      "poster": "/assets/city/navigation/city-transit.webp",
       "alt": "Public Hyperion City transit lines behind the Systems district",
       "objectPosition": "center",
       "source": "Hyperion City transit artwork",
@@ -48,8 +48,8 @@
     },
     "record": {
       "type": "image",
-      "src": "/assets/city/navigation/city-transit.jpg",
-      "poster": "/assets/city/navigation/city-transit.jpg",
+      "src": "/assets/city/navigation/city-transit.webp",
+      "poster": "/assets/city/navigation/city-transit.webp",
       "alt": "Public archive lines in the Hyperion City record district",
       "objectPosition": "center",
       "source": "Hyperion City transit artwork",

@@ -3,11 +3,12 @@ import { Link } from 'react-router-dom';
 import { ArrowUpRight } from 'lucide-react';
 import PageShell from '../components/layout/PageShell';
 import HeroCanvas from '../components/ui/HeroCanvas';
-import OperatorMascot from '../components/portal/OperatorMascot';
+import CinematicBackdrop from '../components/ui/CinematicBackdrop';
 import RoomShell from '../components/portal/RoomShell';
 import { CityMap, ForgeBuildNavigation, MaturityLegend, ProofLane, StatusRail } from '../components/portal/PortalPrimitives';
 import { cityRoutes, getDistrict, getFeaturedDistricts, getStatusRailDistricts } from '../data/publicCity';
 import { PUBLIC_DOCTRINE } from '../data/publicDoctrine';
+import { HYPERION_MEDIA_MANIFEST } from '../data/mediaManifest';
 import './HomePage.css';
 
 const stations = [
@@ -26,6 +27,7 @@ const intakeLanes = [
   { index: '05', name: 'Support', detail: 'Route an active Hyperion product or service issue without exposing secrets.', to: '/intake/support?source=home_inquiry' },
   { index: '06', name: 'Relationships', detail: 'Open a partnership, supplier, research, civic, or media conversation.', to: '/intake/relationships?source=home_inquiry' },
   { index: '07', name: 'General', detail: 'Preserve a signal that does not yet fit a specialist lane.', to: '/intake/general?source=home_inquiry' },
+  { index: '08', name: 'Live Sites', detail: 'Launch an offer, proof surface, conversion path, and governed operating handoff.', to: '/intake/live-sites?source=home_inquiry' },
 ];
 
 export default function HomePage() {
@@ -36,22 +38,29 @@ export default function HomePage() {
 
   const panels = {
     signal: (
-      <div className="gate-signal-room">
+      <div className="gate-signal-room gate-flagship-room">
         <div className="gate-copy">
-          <p className="gate-kicker">Hyperion Industries · Public Edge · Soft Launch</p>
-          <h2>{PUBLIC_DOCTRINE.headline}</h2>
-          <p className="gate-lead">{PUBLIC_DOCTRINE.summary}</p>
-          <p>When work crosses people, machines, records, and tools, state gets lost and authority gets blurry. Hyperion captures that break, preserves the evidence, and routes a bounded next action.</p>
-          <p className="gate-principle">{PUBLIC_DOCTRINE.principle}</p>
+          <p className="gate-kicker">Hyperion Industries · Systems built for the work</p>
+          <h2>Build the machine.<br /><em>Keep the advantage.</em></h2>
+          <p className="gate-lead">Custom computers, durable identity, and continuity systems designed around the way people actually work—not a generic cart or a disposable stack.</p>
+          <div className="gate-offer-strip" aria-label="Hyperion flagship offers">
+            <span><strong>FORGE</strong> Custom systems</span>
+            <span><strong>CARD STUDIO</strong> Physical + digital identity</span>
+            <span><strong>CHR0N.OS</strong> Local-first continuity</span>
+            <span><strong>LIVE SITES</strong> Conversion + governed intake</span>
+          </div>
           <div className="room-action-row">
-            <Link to="/intake?source=home_signal" className="btn btn-gold">Start an Inquiry</Link>
-            <Link to="/forge/configurator?source=home_signal" className="btn btn-ghost">Start a Forge Build</Link>
-            <Link to="/#proof" className="btn btn-ghost">View Public Proof</Link>
+            <Link to="/store?source=home_signal" className="btn btn-gold">Start a Project</Link>
+            <Link to="/forge/configurator?source=home_signal" className="btn btn-ghost">Configure a Forge Build</Link>
+            <Link to="/#proof" className="btn btn-ghost">See the Work</Link>
           </div>
           <StatusRail districts={statusRail} compact />
         </div>
-        <div className="gate-operator" aria-label="Hyperion City guide">
-          <OperatorMascot />
+        <div className="gate-company-proof" aria-label="Hyperion commercial posture">
+          <span>PUBLIC EDGE · SOFT LAUNCH</span>
+          <strong>Assessment first.</strong>
+          <p>Every build, card, and continuity engagement begins with a visible scope and ends with a reviewable handoff.</p>
+          <Link to="/systems">Explore Hyperion systems <ArrowUpRight size={14} aria-hidden="true" /></Link>
         </div>
       </div>
     ),
@@ -119,8 +128,8 @@ export default function HomePage() {
         </div>
         <div className="room-action-row">
           <Link to="/intake?source=home_inquiry" className="btn btn-gold">Choose an Intake Lane</Link>
+          <Link to="/store?source=home_inquiry" className="btn btn-ghost">View Project Packages</Link>
           <Link to="/contact" className="btn btn-ghost">Contact Hyperion</Link>
-          <a href="https://chr0nos.app" className="btn btn-ghost" target="_blank" rel="noopener noreferrer">CHR0N.OS <ArrowUpRight size={14} aria-hidden="true" /></a>
         </div>
       </div>
     ),
@@ -129,11 +138,11 @@ export default function HomePage() {
   return (
     <PageShell className="home city-gate-page">
       <Helmet>
-        <title>Hyperion Industries | Continuity Infrastructure</title>
-        <meta name="description" content="Hyperion builds continuity infrastructure that preserves state, provenance, context, and human authority across fragmented operations." />
+        <title>Hyperion Industries | Custom Systems, Identity, and Live Sites</title>
+        <meta name="description" content="Hyperion builds custom computers, operator identity, local-first continuity systems, and premium live sites with proposal-first delivery." />
         <link rel="canonical" href="https://hyperion-industries.dev/" />
-        <meta property="og:title" content="Hyperion Industries | Continuity Infrastructure" />
-        <meta property="og:description" content="Governed, local-first systems that preserve state and route action without borrowing operator authority." />
+        <meta property="og:title" content="Hyperion Industries | Systems Built for the Work" />
+        <meta property="og:description" content="Custom systems, durable identity, continuity software, and premium live sites with visible scope and operator review." />
         <meta property="og:type" content="website" />
       </Helmet>
 
@@ -149,8 +158,7 @@ export default function HomePage() {
         className="gate-city-room"
         backdrop={(
           <>
-            <video className="gate-film" src="/assets/city/hyperion-city-mark.mp4" autoPlay muted loop playsInline preload="metadata" />
-            <video className="gate-brand-film" src="/assets/city/hyperion-logo-sequence.mp4" autoPlay muted loop playsInline preload="metadata" />
+            <CinematicBackdrop asset={HYPERION_MEDIA_MANIFEST.assets.city_gate} className="gate-film" label="Play Hyperion City cinematic" />
             <div className="gate-film-shade" />
             <HeroCanvas />
           </>

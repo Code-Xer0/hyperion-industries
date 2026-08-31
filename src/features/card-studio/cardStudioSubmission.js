@@ -194,7 +194,6 @@ export function buildWorkerOrderIntent(projectId, revisionId, document, order, o
 
 export async function submitCardStudioBrief(document, order, options = {}) {
   if (!order?.consent) throw Object.assign(new Error('Consent is required.'), { status: 400 });
-  if (!order?.inviteToken?.trim()) throw Object.assign(new Error('A Card Studio invitation is required.'), { status: 403 });
 
   const basePath = resolveBasePath(options.endpoint);
   const accountRef = options.accountRef || readAccountRef();
@@ -204,7 +203,6 @@ export async function submitCardStudioBrief(document, order, options = {}) {
     credentials: 'same-origin',
     body: JSON.stringify({
       account_ref: accountRef,
-      invite_token: order.inviteToken.trim(),
     }),
   });
   const projectId = projectResult.project?.project_id;

@@ -164,9 +164,12 @@ function routeForForm(formId: string): LaneId {
   if (formId === "forge-configurator") return "forge";
   if (formId === "pandora-readiness") return "pandora";
   if (formId === "continuity-assessment") return "continuity";
+  if (formId === "live-site-project") return "live-sites";
   if (formId === "relationship") return "relationships";
   return isLaneId(formId) ? formId : "general";
 }
+
+const SUPPORTED_FORM_VERSIONS = new Set(["1.0.1", CONTRACT_VERSION]);
 
 function answersToMap(answers: SubmissionShape["answers"]): AnswerMap {
   const mapped: AnswerMap = {};
@@ -412,7 +415,7 @@ export async function handleDraft(
 
   const body = requireObject(await readJsonBody(request, INTAKE_DRAFT_MAX_BODY_BYTES));
   rejectUnknownFields(body, ["lane", "form_version", "answers", "identity", "consents", "effects_mode", "expected_version"]);
-  if (!isLaneId(body.lane) || typeof body.form_version !== "string" || body.form_version !== CONTRACT_VERSION) {
+  if (!isLaneId(body.lane) || typeof body.form_version !== "string" || !SUPPORTED_FORM_VERSIONS.has(body.form_version)) {
     throw new HttpError(400, "invalid_draft", "Draft lane or form version is invalid.");
   }
   const expectedVersion = Number(body.expected_version);

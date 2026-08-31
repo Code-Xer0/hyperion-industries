@@ -29,6 +29,7 @@ const FORM_IDS = {
   forge: 'forge-build-profile',
   pandora: 'pandora-readiness',
   continuity: 'continuity-assessment',
+  'live-sites': 'live-site-project',
   'operator-identity': 'operator-identity',
   support: 'support',
   relationships: 'relationship',
@@ -223,6 +224,7 @@ export default function IntakePage({ resumeMode = false }) {
   const cloudVersion = useRef(0);
   const restoreKey = useRef(null);
   const exchangeStarted = useRef(false);
+  const prefillApplied = useRef(null);
   const headingRef = useRef(null);
   const errorRef = useRef(null);
 
@@ -239,6 +241,22 @@ export default function IntakePage({ resumeMode = false }) {
   useEffect(() => {
     if (directLane && directLane !== lane) setLane(directLane);
   }, [directLane, lane]);
+
+  useEffect(() => {
+    const prefillByLane = {
+      'live-sites': { answerId: 'live_site_package', values: ['signal', 'presence', 'system', 'infrastructure'] },
+      continuity: { answerId: 'continuity_service', values: ['assessment', 'setup', 'migration', 'team'] },
+    };
+    const definition = prefillByLane[directLane];
+    if (!definition) return;
+    const value = new URLSearchParams(window.location.search).get('service');
+    const prefillKey = `${directLane}:${value || ''}`;
+    if (prefillApplied.current === prefillKey) return;
+    prefillApplied.current = prefillKey;
+    if (definition.values.includes(value)) {
+      setAnswers((current) => ({ ...current, [definition.answerId]: current[definition.answerId] || value }));
+    }
+  }, [directLane]);
 
   useEffect(() => {
     if (!lane || restoreKey.current === lane) return;

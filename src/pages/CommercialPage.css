@@ -1,0 +1,46 @@
+.commercial-page { min-height: 100vh; padding-top: 64px; background: #05070a; color: #f7f5ef; }
+.commercial-hero { position: relative; isolation: isolate; display: grid; min-height: min(780px, 88vh); grid-template-columns: minmax(0,1.2fr) minmax(290px,.8fr); align-items: end; gap: clamp(32px,6vw,88px); overflow: hidden; padding: clamp(110px,13vw,190px) clamp(20px,6vw,92px) clamp(58px,8vw,110px); }
+.commercial-hero::before { position: absolute; z-index: -3; inset: 0; background: var(--commercial-hero-image, radial-gradient(circle at 78% 28%, rgba(0,200,255,.22), transparent 34%)); background-position: center; background-size: cover; content: ''; }
+.commercial-hero::after { position: absolute; z-index: -2; inset: 0; background: linear-gradient(90deg, rgba(3,5,8,.98), rgba(3,5,8,.76) 50%, rgba(3,5,8,.34)), linear-gradient(0deg,#05070a 0%,transparent 56%); content: ''; }
+.commercial-hero-copy { max-width: 960px; }
+.commercial-kicker, .commercial-section-heading span, .commercial-card > span, .commercial-status { color: var(--commercial-accent,#ffc72c); font: 700 8px var(--font-display); letter-spacing: .12em; text-transform: uppercase; }
+.commercial-hero h1 { max-width: 1050px; margin: 20px 0; font-size: clamp(56px,8.1vw,132px); line-height: .84; letter-spacing: -.06em; }
+.commercial-hero h1 em { color: var(--commercial-accent,#ffc72c); font-style: normal; }
+.commercial-hero-copy > p:not(.commercial-kicker) { max-width: 760px; color: #bac0c6; font-size: clamp(15px,1.35vw,20px); line-height: 1.7; }
+.commercial-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 30px; }
+.commercial-actions .btn { display: inline-flex; align-items: center; gap: 8px; }
+.commercial-rail { display: grid; align-self: end; border: 1px solid color-mix(in srgb,var(--commercial-accent,#ffc72c) 45%,transparent); background: rgba(4,7,10,.76); backdrop-filter: blur(18px); }
+.commercial-rail header { padding: 16px 18px; border-bottom: 1px solid rgba(255,255,255,.1); }
+.commercial-rail header strong { display: block; margin-top: 7px; font-size: 18px; }
+.commercial-rail article { padding: 16px 18px; border-bottom: 1px solid rgba(255,255,255,.08); }
+.commercial-rail article:last-child { border-bottom: 0; }
+.commercial-rail article span { color: #737b84; font: 700 7px var(--font-display); text-transform: uppercase; }
+.commercial-rail article strong { display: block; margin-top: 7px; color: #f7f5ef; font-size: 13px; }
+.commercial-section { padding: clamp(70px,9vw,132px) clamp(20px,5vw,76px); }
+.commercial-section.is-tinted { border-block: 1px solid rgba(255,255,255,.1); background: radial-gradient(circle at 80% 0,color-mix(in srgb,var(--commercial-accent,#ffc72c) 12%,transparent),transparent 36%),#090c10; }
+.commercial-section-heading { display: grid; grid-template-columns: minmax(0,1.2fr) minmax(260px,.8fr); align-items: end; gap: 44px; max-width: 1440px; margin: 0 auto 40px; }
+.commercial-section-heading h2 { max-width: 970px; margin: 11px 0 0; font-size: clamp(38px,5.5vw,80px); line-height: .92; letter-spacing: -.045em; }
+.commercial-section-heading p { margin: 0; color: #969da5; font-size: 13px; line-height: 1.7; }
+.commercial-grid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 14px; max-width: 1440px; margin: 0 auto; }
+.commercial-card { position: relative; display: flex; min-height: 360px; flex-direction: column; padding: 27px; overflow: hidden; border: 1px solid rgba(255,255,255,.12); background: linear-gradient(155deg,rgba(255,255,255,.045),rgba(255,255,255,.012)); }
+.commercial-card::after { position: absolute; top: 0; right: 0; width: 46%; height: 1px; background: linear-gradient(90deg,transparent,var(--commercial-accent,#ffc72c)); content: ''; }
+.commercial-card h3 { margin: 26px 0 12px; font-size: clamp(24px,2.3vw,36px); }
+.commercial-card .commercial-price { margin: 0 0 22px; color: var(--commercial-accent,#ffc72c); font: 600 clamp(21px,2.2vw,32px) var(--font-display); }
+.commercial-card p { color: #9ba2a9; font-size: 12px; line-height: 1.65; }
+.commercial-card ul { display: grid; gap: 9px; margin: 16px 0 26px; padding: 0; color: #c1c5c9; font-size: 10px; list-style: none; }
+.commercial-card li::before { margin-right: 8px; color: var(--commercial-accent,#ffc72c); content: '◆'; }
+.commercial-card a { display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 15px; border-top: 1px solid rgba(255,255,255,.1); color: #fff; font: 700 8px var(--font-display); text-decoration: none; text-transform: uppercase; }
+.commercial-card a:hover,.commercial-card a:focus-visible { color: var(--commercial-accent,#ffc72c); outline: none; }
+.commercial-proof { display: grid; grid-template-columns: repeat(3,1fr); max-width: 1440px; margin: 0 auto; border: 1px solid rgba(255,255,255,.12); }
+.commercial-proof article { min-height: 210px; padding: 28px; border-right: 1px solid rgba(255,255,255,.1); }
+.commercial-proof article:last-child { border-right: 0; }
+.commercial-proof img { width: 100%; aspect-ratio: 16/9; margin-bottom: 20px; object-fit: cover; border: 1px solid rgba(255,255,255,.1); }
+.commercial-proof h3 { margin: 10px 0; font-size: 22px; }
+.commercial-proof p { color: #959ca3; font-size: 11px; line-height: 1.65; }
+.commercial-final { display: grid; grid-template-columns: minmax(0,1.2fr) minmax(300px,.8fr); align-items: end; gap: 58px; max-width: 1440px; margin: 0 auto; }
+.commercial-final h2 { margin: 12px 0 0; font-size: clamp(42px,6vw,88px); line-height: .9; }
+.commercial-final p { color: #a0a7ae; line-height: 1.7; }
+.commercial-boundary { margin-top: 18px; padding: 14px 16px; border: 1px solid rgba(255,255,255,.12); color: #8c949d; font: 700 7px var(--font-display); text-transform: uppercase; }
+@media (max-width:1050px){.commercial-grid{grid-template-columns:1fr 1fr}.commercial-hero,.commercial-section-heading,.commercial-final{grid-template-columns:1fr}.commercial-rail{max-width:620px}.commercial-proof{grid-template-columns:1fr}.commercial-proof article{border-right:0;border-bottom:1px solid rgba(255,255,255,.1)}}
+@media (max-width:700px){.commercial-page{padding-top:56px}.commercial-hero{min-height:auto;padding-top:115px}.commercial-hero h1{font-size:54px}.commercial-grid{grid-template-columns:1fr}.commercial-card{min-height:310px}}
+@media (prefers-reduced-motion:reduce){.commercial-card,.commercial-card a{scroll-behavior:auto}}

@@ -33,6 +33,25 @@ function parseVariants(value: string | undefined): Record<string, string> {
   }
 }
 
+export function shopifyConfigurationPosture(env: Env): {
+  storefront: boolean;
+  pvcVariant: boolean;
+  metalVariant: boolean;
+  mappedSkus: number;
+} {
+  try {
+    const value = config(env);
+    return {
+      storefront: true,
+      pvcVariant: Boolean(value.variants.card_pvc_standard),
+      metalVariant: Boolean(value.variants.card_metal_standard),
+      mappedSkus: Object.keys(value.variants).length,
+    };
+  } catch {
+    return { storefront: false, pvcVariant: false, metalVariant: false, mappedSkus: 0 };
+  }
+}
+
 function config(env: Env): ShopifyConfig {
   const domain = env.CARD_STUDIO_SHOPIFY_STORE_DOMAIN?.trim().toLowerCase() ?? "";
   const apiVersion = env.CARD_STUDIO_SHOPIFY_STOREFRONT_API_VERSION?.trim() || "2026-07";

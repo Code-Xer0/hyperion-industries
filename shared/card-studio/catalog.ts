@@ -2,7 +2,7 @@ export const CARD_CATALOG = Object.freeze({
   contract_version: "card-catalog/1",
   catalog_version: "card-catalog.2026-07-27",
   currency: "USD",
-  release_state: "invite_only",
+  release_state: "public",
   items: [
     {
       sku: "card_digital",

@@ -13,6 +13,7 @@ import { isEmailAddress, jsonResponse, modelConfiguration, originConfiguration }
 import type { Env } from "./types";
 import { publicContractManifest } from "../../../shared/intake/model";
 import { CARD_CATALOG } from "../../../shared/card-studio/catalog";
+import { commerceReadiness } from "./commerce-readiness";
 
 export function handleStatus(env: Env): Response {
   const model = modelConfiguration(env);
@@ -82,5 +83,6 @@ export function handleStatus(env: Env): Response {
       checkout_network: "disabled",
       proposal_authority: "operator_review_only",
     },
+    commerce: commerceReadiness(env),
   });
 }

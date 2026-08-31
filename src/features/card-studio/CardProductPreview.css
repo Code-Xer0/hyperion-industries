@@ -1,0 +1,24 @@
+.hcs-product-preview { position: relative; min-height: 250px; overflow: hidden; padding: 22px 20px 30px; background: radial-gradient(circle at 12% 8%, color-mix(in srgb, var(--card-accent) 20%, transparent), transparent 44%), #080a0d; perspective: 1100px; }
+.hcs-product-card { position: absolute; width: 74%; aspect-ratio: 1.586 / 1; overflow: hidden; border: 1px solid color-mix(in srgb, var(--card-accent) 48%, transparent); border-radius: 7px; background: var(--card-surface); color: var(--card-ink); box-shadow: 0 24px 38px rgba(0,0,0,.48); }
+.hcs-product-card::after { position: absolute; inset: 7%; border: 1px solid color-mix(in srgb, var(--card-accent) 42%, transparent); content: ''; pointer-events: none; }
+.hcs-product-card.is-front { z-index: 2; top: 24px; left: 8%; transform: rotateX(4deg) rotateY(-8deg) rotateZ(-2deg); }
+.hcs-product-card.is-back { z-index: 1; right: 2%; bottom: 25px; transform: rotateX(5deg) rotateY(11deg) rotateZ(3deg); opacity: .78; }
+.hcs-product-card img { position: absolute; inset: 0 48% 0 0; width: 52%; height: 100%; object-fit: cover; filter: saturate(.86) contrast(1.04); }
+.hcs-product-card img + .hcs-product-card-copy { left: 47%; width: 47%; padding-left: 8%; }
+.hcs-product-monogram { position: absolute; top: 14%; left: 9%; display: grid; width: 28%; aspect-ratio: 1; place-items: center; border: 1px solid var(--card-accent); color: var(--card-accent); font: 800 clamp(15px, 2vw, 28px) var(--font-display); }
+.hcs-product-card-copy { position: absolute; z-index: 2; right: 7%; bottom: 14%; left: 9%; }
+.hcs-product-card-copy small { display: block; margin-bottom: 7px; color: var(--card-accent); font: 700 6px var(--font-display); letter-spacing: .11em; }
+.hcs-product-card-copy strong { display: block; overflow: hidden; font-size: clamp(13px, 1.5vw, 23px); line-height: 1; text-overflow: ellipsis; white-space: nowrap; }
+.hcs-product-card-copy span, .hcs-product-card-copy b { display: block; margin-top: 4px; overflow: hidden; font-size: 7px; font-weight: 500; opacity: .7; text-overflow: ellipsis; white-space: nowrap; }
+.hcs-product-card-copy b { color: var(--card-accent); font-family: var(--font-display); letter-spacing: .06em; opacity: 1; }
+.hcs-product-card > i { position: absolute; z-index: 3; right: 8%; top: 8%; color: var(--card-accent); font: 700 5px var(--font-display); letter-spacing: .1em; }
+.hcs-product-card.is-back { display: grid; grid-template-columns: auto 1fr auto; gap: 9px; align-content: center; align-items: center; padding: 10%; }
+.hcs-product-brandmark { display: grid; width: 34px; height: 34px; place-items: center; border: 1px solid var(--card-accent); color: var(--card-accent); font: 800 8px var(--font-display); }
+.hcs-product-card.is-back div { display: grid; gap: 2px; min-width: 0; }
+.hcs-product-card.is-back strong, .hcs-product-card.is-back span { overflow: hidden; font-size: 5px; text-overflow: ellipsis; white-space: nowrap; }
+.hcs-product-card.is-back strong { color: var(--card-accent); font-size: 6px; }
+.hcs-product-nfc { color: var(--card-accent); font: 700 11px var(--font-display) !important; }
+.hcs-product-card.is-back > small { position: absolute; right: 9%; bottom: 9%; color: var(--card-accent); font: 700 4px var(--font-display); }
+.hcs-product-material { position: absolute; right: 16px; bottom: 9px; color: #71777d; font: 700 6px var(--font-display); letter-spacing: .1em; }
+.hcs-product-preview.is-compact { min-height: 205px; }
+@media (max-width: 560px) { .hcs-product-preview { min-height: 270px; } .hcs-product-card { width: 78%; } }

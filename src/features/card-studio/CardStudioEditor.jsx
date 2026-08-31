@@ -47,6 +47,7 @@ import {
   updateDocumentPath,
   updateLayer,
 } from './cardStudioModel.js';
+import ConciergeNarration from '../../components/ui/ConciergeNarration';
 import {
   createDraft,
   getActiveDraft,
@@ -500,7 +501,7 @@ function PlusGlyph() {
   return <span className="hcs-plus-glyph" aria-hidden="true">+</span>;
 }
 
-function ProofSummary({ document, preflight }) {
+function ProofSummary({ document, preflight, product, quantity }) {
   return (
     <section className="hcs-proof-summary" aria-labelledby="proof-summary-title">
       <div><span>Build profile</span><strong id="proof-summary-title">{stableFingerprint(document)}</strong></div>
@@ -510,6 +511,7 @@ function ProofSummary({ document, preflight }) {
         <div><dt>Revision</dt><dd>{document.revision}</dd></div>
         <div><dt>Layers</dt><dd>{document.layers.length}</dd></div>
         <div><dt>Status</dt><dd>{preflight.status}</dd></div>
+        <div><dt>Product</dt><dd>{product.name} × {quantity}</dd></div>
         <div><dt>Commerce</dt><dd>NOT A QUOTE</dd></div>
       </dl>
     </section>
@@ -532,7 +534,6 @@ export default function CardStudioEditor({ starterId = '' }) {
   const [overlays, setOverlays] = useState({ safe: true, bleed: false });
   const [consent, setConsent] = useState(false);
   const [proofApproved, setProofApproved] = useState(false);
-  const [inviteToken, setInviteToken] = useState('');
   const [productSku, setProductSku] = useState(CARD_CATALOG.items[0].sku);
   const [quantity, setQuantity] = useState(CARD_CATALOG.items[0].minimum_quantity);
   const [submission, setSubmission] = useState({ state: 'idle', message: '', checkoutUrl: '' });
@@ -540,7 +541,6 @@ export default function CardStudioEditor({ starterId = '' }) {
   const preflight = useMemo(() => evaluateCardPreflight(document), [document]);
   const selectedProduct = CARD_CATALOG.items.find((item) => item.sku === productSku) || CARD_CATALOG.items[0];
   const boundedQuantity = Math.min(selectedProduct.maximum_quantity, Math.max(selectedProduct.minimum_quantity, Number(quantity) || selectedProduct.minimum_quantity));
-  const inviteReady = inviteToken.trim().length >= 24;
 
   const apply = useCallback((next) => dispatch({ type: 'APPLY', document: next }), []);
   const setField = useCallback((section, key, value) => apply(updateDocumentPath(document, section, key, value)), [apply, document]);
@@ -592,7 +592,6 @@ export default function CardStudioEditor({ starterId = '' }) {
       const result = await submitCardStudioBrief(document, {
         consent,
         proofApproved,
-        inviteToken,
         productSku,
         quantity: boundedQuantity,
       });
@@ -633,9 +632,9 @@ export default function CardStudioEditor({ starterId = '' }) {
       <section className="hcs-editor-header" aria-labelledby="card-studio-title">
         <div>
           <Link to="/card-studio" className="hcs-back-link"><ArrowLeft size={15} /> Card Studio library</Link>
-          <p className="hcs-kicker">HYPERION IDENTITY FABRICATION · INVITE-ONLY HANDOFF</p>
+          <p className="hcs-kicker">HYPERION IDENTITY FABRICATION · PUBLIC DESIGN HANDOFF</p>
           <h1 id="card-studio-title">Compose the signal.<br /><span>Keep authority visible.</span></h1>
-          <p>Design freely on this device. The operator handoff remains invitation-bound, immutable, held for review, and never a quote.</p>
+          <p>Design freely on this device. Submission is public, immutable, held for operator review, and never a quote.</p>
         </div>
         <div className="hcs-status-stack" aria-label="Studio posture">
           <span data-tone={preflight.ready ? 'ready' : 'draft'}>{preflight.status}</span>
@@ -699,6 +698,7 @@ export default function CardStudioEditor({ starterId = '' }) {
               <button type="button" disabled={!history.past.length} onClick={() => dispatch({ type: 'UNDO' })} aria-label="Undo last edit"><Undo2 size={16} /></button>
               <button type="button" disabled={!history.future.length} onClick={() => dispatch({ type: 'REDO' })} aria-label="Redo edit"><Redo2 size={16} /></button>
             </div>
+            <div className="hcs-order-chip"><span>{selectedProduct.name}</span><strong>× {boundedQuantity}</strong><small>NOT A QUOTE</small></div>
           </div>
           <div className="hcs-stage-heading">
             <div><p>02 · Live proof</p><h2 id="proof-heading">{document.active_mode === 'digital' ? 'Digital profile' : `${document.active_mode} artboard`}</h2></div>
@@ -707,7 +707,7 @@ export default function CardStudioEditor({ starterId = '' }) {
               <button type="button" aria-pressed={overlays.bleed} onClick={() => setOverlays((value) => ({ ...value, bleed: !value.bleed }))}>Bleed</button>
             </div>
           </div>
-          <div className="hcs-proof-deck">
+          <div className="hcs-proof-deck" data-material={selectedProduct.production_profile}>
             {document.active_mode === 'digital' ? <DigitalProfile document={document} /> : (
               <Artboard
                 document={document}
@@ -745,7 +745,7 @@ export default function CardStudioEditor({ starterId = '' }) {
           {preflight.blockers.map((item) => <div className="hcs-preflight-item is-blocker" key={item}><CircleAlert size={17} /><span>{item}</span></div>)}
           {preflight.warnings.map((item) => <div className="hcs-preflight-item is-warning" key={item}><CircleAlert size={17} /><span>{item}</span></div>)}
         </section>
-        <ProofSummary document={document} preflight={preflight} />
+        <ProofSummary document={document} preflight={preflight} product={selectedProduct} quantity={boundedQuantity} />
       </div>
 
       <section className="hcs-submit-panel" aria-labelledby="submit-heading">
@@ -753,6 +753,7 @@ export default function CardStudioEditor({ starterId = '' }) {
           <p>04 · Operator handoff</p>
           <h2 id="submit-heading">Stage the design and order intent</h2>
           <p>This creates an immutable review proposal. It does not publish a profile, generate production artwork, charge a card, reserve a price, or create checkout.</p>
+          <ConciergeNarration cue="card-checkout" compact />
         </div>
         <div className="hcs-submit-actions">
           <div className="hcs-order-fields">
@@ -770,9 +771,6 @@ export default function CardStudioEditor({ starterId = '' }) {
             <Field label="Quantity" hint={`${selectedProduct.minimum_quantity}–${selectedProduct.maximum_quantity} in this lane`}>
               <input type="number" min={selectedProduct.minimum_quantity} max={selectedProduct.maximum_quantity} value={quantity} onChange={(event) => setQuantity(event.target.value)} onBlur={() => setQuantity(boundedQuantity)} />
             </Field>
-            <Field label="Invitation code" hint="The invitation is sent only when you stage this proposal.">
-              <input type="password" autoComplete="one-time-code" value={inviteToken} onChange={(event) => setInviteToken(event.target.value)} placeholder="Enter your Card Studio invite" />
-            </Field>
           </div>
           <div className="hcs-commerce-posture" role="note">
             <span>{selectedProduct.checkout_mode === 'fixed_checkout' ? 'FIXED-SKU LANE' : 'REVIEW LANE'}</span>
@@ -781,11 +779,11 @@ export default function CardStudioEditor({ starterId = '' }) {
           </div>
           <label className="hcs-consent"><input type="checkbox" checked={proofApproved} onChange={(event) => setProofApproved(event.target.checked)} /><span>I reviewed the front, back, and digital proof and approve this revision for production review. This is not approval of a charge.</span></label>
           <label className="hcs-consent"><input type="checkbox" checked={consent} onChange={(event) => setConsent(event.target.checked)} /><span>I understand the selected visible fields are intended for a public identity surface and require operator review before publication.</span></label>
-          <button className="hcs-submit-button" type="button" disabled={!preflight.ready || !consent || !proofApproved || !inviteReady || submission.state === 'submitting'} onClick={submitBrief}>
+          <button className="hcs-submit-button" type="button" disabled={!preflight.ready || !consent || !proofApproved || submission.state === 'submitting'} onClick={submitBrief}>
             {submission.state === 'submitting' ? 'Staging brief…' : 'Stage for review'} <Send size={16} />
           </button>
           {submission.message && <p className={`hcs-submit-message is-${submission.state}`} role={submission.state === 'error' ? 'alert' : 'status'}>{submission.message}</p>}
-          {submission.checkoutUrl && <a className="hcs-checkout-link" href={submission.checkoutUrl} rel="nofollow noopener">Continue to secure Shopify checkout <ChevronRight size={14} /></a>}
+          {submission.checkoutUrl && <a className="hcs-checkout-link" href={submission.checkoutUrl} rel="nofollow noopener">Continue to secure provider checkout <ChevronRight size={14} /></a>}
           {submission.state === 'submitted' && <button className="hcs-status-button" type="button" onClick={refreshOrderStatus}>Refresh proposal status</button>}
           <button className="hcs-reset-button" type="button" onClick={() => dispatch({ type: 'RESET' })}>Reset from starter <ChevronRight size={14} /></button>
         </div>

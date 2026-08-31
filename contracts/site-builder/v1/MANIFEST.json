@@ -1,6 +1,6 @@
 {
   "schema_version": "hyperion-site-builder-manifest/1",
-  "bundle_sha256": "60b04e08ccb0227dc455ab1627033d3bec6c18737014ea60fafc55e793489c33",
+  "bundle_sha256": "8183dcdef9dc58f34099263fa746d8af5aa9c850b1ce150481c8102d53df84cb",
   "page_count": 0,
   "theme_count": 1,
   "files": [
@@ -70,7 +70,7 @@
     },
     {
       "path": "site-content/site.json",
-      "sha256": "6a46d89ed5101699c58ab2decee6ef6fb91cb24c2e87a565f78cc98289b3c769"
+      "sha256": "67e153637431869aa91e2e37a6d4d260e2f243a6a190b580855fd47979c1e7a9"
     },
     {
       "path": "site-content/themes/hyperion-core.json",

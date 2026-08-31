@@ -13,6 +13,16 @@ import {
   handleUploadSession,
 } from "./card-studio";
 import { browserCorsOrigin, enforceSameOrigin, errorResponse, finalizeResponse, HttpError, jsonResponse } from "./http";
+import { handleCommerceReadiness } from "./commerce-readiness";
+import {
+  handleCommerceCommand,
+  handleCommerceReceiptAck,
+  handleCommerceReceiptFeed,
+  handlePayPalCancel,
+  handlePayPalReturn,
+  handlePayPalWebhook,
+  handleStripeWebhook,
+} from "./commerce";
 import { handleInquiry, purgeExpiredInquiries } from "./inquiries";
 import { handleResendWebhook } from "./intake-acknowledgement";
 import {
@@ -49,6 +59,14 @@ const ROUTES = new Map([
   ["/api/card-studio/operator/decisions", "POST"],
   ["/api/card-studio/operator/checkout", "POST"],
   ["/api/card-studio/webhooks/shopify", "POST"],
+  ["/api/commerce/readiness", "GET"],
+  ["/api/commerce/operator/commands", "POST"],
+  ["/api/commerce/paypal/return", "GET"],
+  ["/api/commerce/paypal/cancel", "GET"],
+  ["/api/commerce/operator/feed", "GET"],
+  ["/api/commerce/operator/ack", "POST"],
+  ["/api/commerce/webhooks/paypal", "POST"],
+  ["/api/commerce/webhooks/stripe", "POST"],
 ]);
 
 const DRAFT_ROUTE = /^\/api\/intake\/drafts\/(drf_[A-Za-z0-9_-]{12,64})$/;
@@ -75,7 +93,8 @@ export function createWorker(overrides: Partial<RuntimeDependencies> = {}): Oper
       const url = new URL(request.url);
       const operatorOwnedPath = url.pathname.startsWith("/api/operator")
         || url.pathname.startsWith("/api/intake")
-        || url.pathname.startsWith("/api/card-studio");
+        || url.pathname.startsWith("/api/card-studio")
+        || url.pathname.startsWith("/api/commerce");
 
       // This Worker is the zone's edge owner. Preserve every unrelated public
       // route by forwarding it to the configured origin without inspection.
@@ -130,11 +149,13 @@ export function createWorker(overrides: Partial<RuntimeDependencies> = {}): Oper
         }
 
         const shopifyWebhookRoute = url.pathname === "/api/card-studio/webhooks/shopify";
+        const commerceWebhookRoute = url.pathname.startsWith("/api/commerce/webhooks/");
         const providerWebhookRoute = url.pathname === "/api/intake/webhooks/resend";
         const operatorFeedRoute = url.pathname.startsWith("/api/intake/operator/")
-          || url.pathname.startsWith("/api/card-studio/operator/");
+          || url.pathname.startsWith("/api/card-studio/operator/")
+          || url.pathname.startsWith("/api/commerce/operator/");
         if (["POST", "PUT", "DELETE"].includes(request.method)
-          && !operatorFeedRoute && !providerWebhookRoute && !shopifyWebhookRoute) {
+          && !operatorFeedRoute && !providerWebhookRoute && !shopifyWebhookRoute && !commerceWebhookRoute) {
           enforceSameOrigin(request, env);
         }
 
@@ -161,6 +182,14 @@ export function createWorker(overrides: Partial<RuntimeDependencies> = {}): Oper
         else if (url.pathname === "/api/card-studio/operator/status") response = await handleCardOperatorStatus(request, env, deps);
         else if (url.pathname === "/api/card-studio/operator/checkout") response = await handleCardOperatorCheckout(request, env, requestId, deps);
         else if (url.pathname === "/api/card-studio/webhooks/shopify") response = await handleCardShopifyWebhook(request, env, deps);
+        else if (url.pathname === "/api/commerce/readiness") response = handleCommerceReadiness(env);
+        else if (url.pathname === "/api/commerce/operator/commands") response = await handleCommerceCommand(request, env, requestId, deps);
+        else if (url.pathname === "/api/commerce/paypal/return") response = await handlePayPalReturn(request, env, deps);
+        else if (url.pathname === "/api/commerce/paypal/cancel") response = await handlePayPalCancel(request, env);
+        else if (url.pathname === "/api/commerce/operator/feed") response = await handleCommerceReceiptFeed(request, env);
+        else if (url.pathname === "/api/commerce/operator/ack") response = await handleCommerceReceiptAck(request, env, deps);
+        else if (url.pathname === "/api/commerce/webhooks/paypal") response = await handlePayPalWebhook(request, env, deps);
+        else if (url.pathname === "/api/commerce/webhooks/stripe") response = await handleStripeWebhook(request, env, deps);
         else response = await handleCardOperatorDecision(request, env, requestId, deps);
       } catch (error) {
         if (error instanceof HttpError) {

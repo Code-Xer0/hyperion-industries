@@ -1,5 +1,5 @@
 .city-gate-page { min-height: 100dvh; }
-.gate-city-room { background: var(--room-shell-bg); }
+.gate-city-room { background: transparent; }
 .gate-city-room .room-heading { background: var(--room-heading-bg); }
 .gate-city-room .room-station-rail { background: var(--room-rail-bg); }
 .gate-city-room .room-panel-stage { background: linear-gradient(90deg, var(--room-panel-bg), transparent 72%); }
@@ -10,7 +10,8 @@
 .gate-brand-film,
 .gate-film-shade,
 .gate-city-room .hero-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
-.gate-film { z-index: -4; object-fit: cover; object-position: center; }
+.gate-film { z-index: -4; }
+.gate-film.cinematic-backdrop > button { right: 20px; bottom: 20px; }
 .gate-brand-film { z-index: -3; object-fit: contain; object-position: 78% 36%; opacity: 0.3; mix-blend-mode: screen; filter: saturate(0.9) contrast(1.1); }
 .gate-film-shade { z-index: -2; background: linear-gradient(90deg, rgba(2, 5, 8, 0.68) 0%, rgba(2, 5, 8, 0.36) 48%, rgba(2, 5, 8, 0.18) 100%), linear-gradient(0deg, rgba(2, 5, 8, 0.48), transparent 54%); }
 .gate-city-room .hero-canvas { z-index: -1; opacity: 0.86; }
@@ -20,8 +21,18 @@
 .gate-kicker,
 .city-label { color: var(--gold); font-family: var(--font-display); font-size: 8px; font-weight: 700; text-transform: uppercase; }
 .gate-copy h2 { max-width: 900px; margin: 14px 0 18px; color: #f7f4ed; font-size: clamp(42px, 5vw, 70px); font-weight: 600; line-height: 0.9; }
+.gate-copy h2 em { color: var(--gold); font-style: normal; }
 .gate-lead { max-width: 700px; margin: 0; color: #c7c8c7; font-size: 15px; line-height: 1.7; }
 .gate-principle { max-width: 760px; margin-top: 12px; padding-left: 14px; border-left: 1px solid var(--gold); color: var(--text-soft); font-size: 12px; line-height: 1.6; }
+.gate-offer-strip { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); max-width: 920px; margin: 28px 0; border: 1px solid rgba(255, 199, 44, 0.24); background: rgba(2, 5, 8, 0.56); backdrop-filter: blur(14px); }
+.gate-offer-strip span { min-height: 66px; padding: 14px; border-right: 1px solid rgba(255,255,255,.09); color: #aeb2b5; font-size: 10px; line-height: 1.45; }
+.gate-offer-strip span:last-child { border-right: 0; }
+.gate-offer-strip strong { display: block; margin-bottom: 5px; color: #f7f4ed; font: 700 8px var(--font-display); letter-spacing: .08em; }
+.gate-company-proof { align-self: end; max-width: 310px; margin: 0 0 22px auto; padding: 22px; border: 1px solid rgba(255, 199, 44, .32); border-top: 2px solid var(--gold); background: rgba(2, 5, 8, .7); backdrop-filter: blur(18px); }
+.gate-company-proof > span { color: var(--gold); font: 700 7px var(--font-display); letter-spacing: .1em; }
+.gate-company-proof strong { display: block; margin: 30px 0 8px; color: #fff; font-size: 24px; }
+.gate-company-proof p { color: #aeb2b5; font-size: 11px; line-height: 1.6; }
+.gate-company-proof a { display: inline-flex; align-items: center; gap: 7px; margin-top: 14px; color: var(--gold); font: 700 8px var(--font-display); text-decoration: none; text-transform: uppercase; }
 .gate-copy .city-status-rail { max-width: 920px; margin-top: clamp(24px, 5vh, 54px); background: rgba(2, 5, 8, 0.46); backdrop-filter: blur(12px); }
 .gate-copy .city-status-stop { padding: 9px 10px; }
 .gate-copy .city-status-stop:nth-child(n + 4) { display: none; }
@@ -58,6 +69,7 @@
 .gate-intake-card p { margin: 0; color: var(--text-muted); font-size: 10px; line-height: 1.45; }
 .gate-intake-card a { display: inline-flex; margin-top: auto; padding-top: 9px; color: var(--gold); font-size: 10px; font-weight: 700; text-decoration: none; }
 .gate-intake-card a:hover { color: var(--text); }
+.gate-inquiry-room .room-note-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .gate-operators-room { min-height: calc(100% - 32px); }
 .gate-operators-room .gate-room-heading > div {
   padding: 10px 12px;
@@ -92,13 +104,18 @@ body.theme-light .gate-city-room .room-station-rail { background: var(--room-rai
 body.theme-light .gate-city-room .room-panel-stage { background: linear-gradient(90deg, var(--room-panel-bg), transparent 72%); }
 body.theme-light .gate-copy h2 { color: #171510; }
 body.theme-light .gate-lead { color: #454136; }
-body.theme-light .gate-film-shade { background: linear-gradient(90deg, rgba(247, 244, 236, 0.7), rgba(247, 244, 236, 0.38), rgba(247, 244, 236, 0.18)); }
+body.theme-light .gate-film-shade { background: linear-gradient(90deg, rgba(4, 6, 9, 0.78), rgba(4, 6, 9, 0.5), rgba(4, 6, 9, 0.24)); }
+body.theme-light .gate-city-room .room-heading h1,
+body.theme-light .gate-city-room .room-heading p,
+body.theme-light .gate-copy h2 { color: #f7f4ed; }
+body.theme-light .gate-lead { color: #c5c8ca; }
 
 @media (max-width: 1100px) {
   .gate-proof-room .city-proof-lane { grid-template-columns: 1fr 1fr; }
   .gate-directory-room .city-map-grid { grid-template-columns: 1fr 1fr; }
   .gate-method-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .gate-intake-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .gate-inquiry-room .room-note-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 820px) {
@@ -112,8 +129,9 @@ body.theme-light .gate-film-shade { background: linear-gradient(90deg, rgba(247,
     backdrop-filter: blur(10px);
   }
   body.theme-light .gate-copy {
-    background: linear-gradient(90deg, rgba(247, 244, 236, 0.94), rgba(247, 244, 236, 0.86) 84%, rgba(247, 244, 236, 0.54));
+    background: linear-gradient(90deg, rgba(2, 5, 8, 0.94), rgba(2, 5, 8, 0.84) 84%, rgba(2, 5, 8, 0.38));
   }
+  .gate-company-proof { display: none; }
 }
 
 @media (max-width: 700px) {
@@ -135,6 +153,8 @@ body.theme-light .gate-film-shade { background: linear-gradient(90deg, rgba(247,
   .gate-directory-room .city-map-grid { grid-template-columns: 1fr; }
   .gate-directory-room .city-district-card { min-height: 136px; }
   .gate-method-grid { grid-template-columns: 1fr; }
+  .gate-offer-strip,
+  .gate-inquiry-room .room-note-grid { grid-template-columns: 1fr; }
   .gate-method-grid article { min-height: auto; }
   .gate-method-grid h3 { margin-top: 28px; }
 }
@@ -149,7 +169,10 @@ body.theme-light .gate-film-shade { background: linear-gradient(90deg, rgba(247,
   .gate-city-room .room-heading p { display: none; }
   .gate-copy h2 { max-width: 92%; font-size: 36px; }
   .gate-lead { max-width: 88%; font-size: 14px; }
-  .gate-copy .room-action-row { max-width: 76%; }
-  .gate-copy .btn { width: 100%; justify-content: center; }
+  .gate-copy .room-action-row { display: grid; grid-template-columns: 1fr 1fr; max-width: 100%; margin-top: 16px; }
+  .gate-copy .btn { width: 100%; min-width: 0; justify-content: center; padding-right: 10px; padding-left: 10px; }
+  .gate-copy .btn:first-child { grid-column: 1 / -1; }
+  .gate-offer-strip { grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: 100%; margin: 18px 0; }
+  .gate-offer-strip span { min-height: 66px; padding: 10px 8px; border-right: 1px solid rgba(255,255,255,.09); border-bottom: 0; font-size: 8px; }
   .gate-operator { right: -3%; width: 136px; }
 }

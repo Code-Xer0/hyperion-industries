@@ -135,7 +135,7 @@ export const CARD_TEMPLATE_CATALOG = Object.freeze({
   ]),
 });
 
-const example = (id, name, label, templateId, fields, artifactIds, operator = false) => Object.freeze({
+const example = (id, name, label, templateId, fields, artifactIds, operator = false, demoAssets = null) => Object.freeze({
   id: `example-${id}`,
   name,
   label,
@@ -144,12 +144,13 @@ const example = (id, name, label, templateId, fields, artifactIds, operator = fa
   artifact_ids: artifactIds,
   demo: true,
   operator_demo: operator,
-  checksum: checksum(id, name, label, templateId, fields, artifactIds, operator),
+  demo_assets: demoAssets,
+  checksum: checksum(id, name, label, templateId, fields, artifactIds, operator, demoAssets),
 });
 
 export const CARD_EXAMPLE_CATALOG = Object.freeze({
-  contract_version: 'card-example-catalog/1',
-  catalog_version: '2026.07.28',
+  contract_version: 'card-example-catalog/2',
+  catalog_version: '2026.08.27',
   privacy_posture: 'fictional_or_existing_public_profile_fields_only',
   items: Object.freeze([
     example('axis-consulting', 'Avery Stone', 'Strategy Consultant', 'axis', { organization: 'Northstar Advisory', email: 'avery@northstar.example', phone: '+1 555 010 1101', website: 'northstar.example' }, ['csa_builtin_mark_axis']),
@@ -162,8 +163,26 @@ export const CARD_EXAMPLE_CATALOG = Object.freeze({
     example('relay-creator', 'Kai Rivers', 'Creator & Producer', 'relay', { organization: 'Relay Signal', email: 'kai@relay.example', phone: '+1 555 010 1108', website: 'relay.example' }, ['csa_builtin_badge_verified']),
     example('summit-realty', 'Quinn Hale', 'Property Advisor', 'summit', { organization: 'Summit & Field', email: 'quinn@summit.example', phone: '+1 555 010 1109', website: 'summit.example' }, ['csa_builtin_surface_contour']),
     example('pulse-health', 'Dr. Taylor Wynn', 'Clinical Director', 'pulse', { organization: 'Pulse Collaborative', email: 'taylor@pulse.example', phone: '+1 555 010 1110', website: 'pulse.example' }, ['csa_builtin_badge_verified']),
-    example('hyperion-systems', 'Δeus χ', 'Founding Operator · Systems Architecture', 'operator', { organization: 'Hyperion Industries', email: '', phone: '', website: 'hyperion-industries.dev/founders/victor-amani' }, ['csa_builtin_badge_operator', 'csa_builtin_mark_core'], true),
+    example('hyperion-systems', 'Victor Amani', 'Founder · Systems Architect', 'operator', { organization: 'Hyperion Industries', email: '', phone: '', website: 'hyperion-industries.dev/founders/victor-amani' }, ['csa_builtin_badge_operator', 'csa_builtin_mark_core'], true, { portrait: '/assets/operators/victor-city-operating-edge.png', provenance: 'existing_public_operator_asset', submittable: false }),
     example('hyperion-operations', 'Keshawn Rowe', 'Founding Operator · Operations & Deployment', 'axis', { organization: 'Hyperion Industries', email: '', phone: '', website: 'hyperion-industries.dev/founders/keshawn-rowe' }, ['csa_builtin_badge_operator', 'csa_builtin_mark_beacon'], true),
+    example('aster-loom-stylist', 'Talia Monroe', 'Editorial Stylist', 'gallery', { organization: 'Aster & Loom Styling', email: 'talia@asterloom.example', phone: '+1 202-555-0123', website: 'asterloom.example' }, ['csa_builtin_surface_radiant', 'csa_builtin_mark_axis'], false, {
+      portrait: '/assets/card-studio/demos-v2/talia-monroe.png',
+      portrait_sha256: 'AF8CCBBE66E3CF6E6E13055F4E55A65DFE983F50AEB01BF43751715F8B8A62EC',
+      provenance: 'generated_fictional_editorial_portrait',
+      submittable: false,
+    }),
+    example('redline-ridge-roofing', 'Marcus Hale', 'Owner · Roofing Contractor', 'foundry', { organization: 'Redline Ridge Roofing', email: 'marcus@redlineridge.example', phone: '+1 202-555-0164', website: 'redlineridge.example' }, ['csa_builtin_surface_grain', 'csa_builtin_badge_forge'], false, {
+      portrait: '/assets/card-studio/demos-v2/marcus-hale.png',
+      portrait_sha256: '78C20753428DA777EC9DBCA83D14CCB438265AE501AE5B349E84E89B7BBD76F0',
+      provenance: 'generated_fictional_editorial_portrait',
+      submittable: false,
+    }),
+    example('morrow-vale-legal', 'Priya Bennett', 'Principal Attorney', 'vanguard', { organization: 'Morrow Vale Legal', email: 'priya@morrowvale.example', phone: '+1 202-555-0192', website: 'morrowvale.example' }, ['csa_builtin_mark_core', 'csa_builtin_layout_credential_bar'], false, {
+      portrait: '/assets/card-studio/demos-v2/priya-bennett.png',
+      portrait_sha256: '8275D061122EF3885D515783B06A72E6B75FA4FC840FCFFB921DDAED4C68BE66',
+      provenance: 'generated_fictional_editorial_portrait',
+      submittable: false,
+    }),
   ]),
 });
 

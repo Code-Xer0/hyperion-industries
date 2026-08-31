@@ -260,12 +260,17 @@
 .forge-city-media-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
 .forge-city-media-card { position: relative; min-height: 240px; overflow: hidden; border: 1px solid var(--glass-edge); background: #050608; color: inherit; text-decoration: none; transition: transform 0.28s var(--ease-out), border-color 0.28s ease; }
 .forge-city-media-card:hover, .forge-city-media-card:focus-visible { transform: translateY(-4px); border-color: color-mix(in srgb, var(--gold) 54%, transparent); }
-.forge-city-media-card video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: saturate(0.82) contrast(1.08); transition: transform 0.7s var(--ease-out), filter 0.28s ease; }
-.forge-city-media-card:hover video, .forge-city-media-card:focus-visible video { transform: scale(1.055); filter: saturate(1) contrast(1.12); }
+.forge-city-media-card video, .forge-city-media-card > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: saturate(0.82) contrast(1.08); transition: transform 0.7s var(--ease-out), filter 0.28s ease; }
+.forge-city-media-card:hover video, .forge-city-media-card:hover > img { transform: scale(1.055); filter: saturate(1) contrast(1.12); }
 .forge-city-media-card::after { position: absolute; inset: 0; background: linear-gradient(0deg, rgba(2, 4, 7, 0.9), rgba(2, 4, 7, 0.06) 68%); content: ''; }
 .forge-city-media-card > div { position: absolute; z-index: 1; right: 14px; bottom: 14px; left: 14px; }
 .forge-city-media-card span { color: var(--gold); font-family: var(--font-display); font-size: 8px; font-weight: 700; text-transform: uppercase; }
 .forge-city-media-card p { margin: 6px 0 0; color: #e9e4d9; font-size: 11px; line-height: 1.45; }
+.forge-city-media-card a { color: inherit; text-decoration: none; }
+.forge-city-media-card button { margin-top: 9px; border: 0; padding: 0; color: #fff0c5; background: transparent; font: 700 8px var(--font-display); letter-spacing: .08em; text-transform: uppercase; cursor: pointer; }
+.forge-city-media-card button:focus-visible { outline: 2px solid var(--gold); outline-offset: 4px; }
+.city-card-outcome { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.city-card-outcome > span:last-child { color: var(--muted); font: 700 7px var(--font-display); letter-spacing: .06em; text-transform: uppercase; }
 .district-next-room .related-districts { margin-bottom: 24px; }
 .district-next-room .city-district-card { min-height: 190px; }
 .district-next-room .city-district-card h3 { margin-top: 26px; }

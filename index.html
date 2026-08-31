@@ -60,7 +60,26 @@
     <!-- Founder page (operator profile) type system -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=Orbitron:wght@400;500;700;800;900&family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+    <script>
+      const isHomeEntry = window.location.pathname === '/';
+      document.documentElement.classList.toggle('home-entry', isHomeEntry);
+      if (isHomeEntry) {
+        const cityPosterPreload = document.createElement('link');
+        cityPosterPreload.rel = 'preload';
+        cityPosterPreload.as = 'image';
+        cityPosterPreload.href = '/assets/city/navigation/city-transit.webp';
+        cityPosterPreload.type = 'image/webp';
+        cityPosterPreload.fetchPriority = 'high';
+        document.head.append(cityPosterPreload);
+      }
+    </script>
+    <style>
+      #city-gate-boot-poster { display: none; }
+      html.home-entry #city-gate-boot-poster { position: fixed; z-index: 0; inset: 0; display: block; background: #03070b url('/assets/city/navigation/city-transit.webp') center / cover no-repeat; }
+      html.home-entry #root { position: relative; z-index: 1; }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=Orbitron:wght@400;500;700;800;900&family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=Orbitron:wght@400;500;700;800;900&family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" /></noscript>
     <!-- Hyperion Signal Continuity — GA4 Base Tag -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-9RVGM6Q4T7"></script>
     <script>
@@ -74,6 +93,7 @@
     </script>
   </head>
   <body>
+    <div id="city-gate-boot-poster" aria-hidden="true"></div>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
     <!-- Hyperion Signal Continuity — GA4 Custom Events -->

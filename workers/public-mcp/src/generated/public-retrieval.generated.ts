@@ -164,10 +164,10 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
       "id": "card-studio",
       "path": "/card-studio",
       "canonicalUrl": "https://hyperion-industries.dev/card-studio",
-      "title": "Hyperion Card Studio Invite Preview | Smart Operator Identity",
-      "description": "Compose a guarded operator-card design brief with live front, back, and digital proofs in Hyperion's invite-only soft-launch lane.",
-      "summary": "An invite-only native studio for deterministic card proofs and operator-reviewed identity handoff.",
-      "maturity": "INVITE-ONLY PREVIEW",
+      "title": "Hyperion Card Studio | Smart Operator Identity",
+      "description": "Compose a guarded operator-card design brief with live front, back, and digital proofs, then stage it for Hyperion operator review.",
+      "summary": "A public native studio for deterministic card proofs and operator-reviewed identity handoff.",
+      "maturity": "PUBLIC DESIGN · REVIEW GATED",
       "schemaType": "SoftwareApplication",
       "indexable": true,
       "image": "https://hyperion-industries.dev/assets/city/proof/card-studio-smoke.png",
@@ -231,16 +231,34 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
       "id": "store",
       "path": "/store",
       "canonicalUrl": "https://hyperion-industries.dev/store",
-      "title": "Hyperion Store Status | Products by Inquiry",
-      "description": "Current Hyperion product and service lanes without invented inventory, payment capture, or public checkout.",
-      "summary": "A truthful product-lane directory for systems currently available by scoped inquiry.",
-      "maturity": "STAGED · NO CHECKOUT",
+      "title": "Work with Hyperion | Products and Services",
+      "description": "Explore Hyperion Forge builds, Card Studio, CHR0N.OS services, and the Live Site Series. Every paid engagement remains proposal-first.",
+      "summary": "Four commercial lanes with visible starting points, operator review, and no automatic ordering.",
+      "maturity": "COMMERCIAL DIRECTORY · PROPOSAL FIRST",
       "schemaType": "CollectionPage",
       "indexable": true,
       "image": "https://hyperion-industries.dev/assets/branding/hyperion/hyperion-link-preview.jpeg",
       "relatedRoutes": [
         "/forge",
-        "/identity",
+        "/card-studio",
+        "/chronos",
+        "/services"
+      ]
+    },
+    {
+      "id": "services",
+      "path": "/services",
+      "canonicalUrl": "https://hyperion-industries.dev/services",
+      "title": "Hyperion Services | Live Site Series",
+      "description": "Conversion-focused sites and governed intake systems from a focused launch page through durable public-and-operator infrastructure.",
+      "summary": "Cinematic public sites connected to clear conversion and governed operating handoff.",
+      "maturity": "COMMERCIAL LANE · PROPOSAL FIRST",
+      "schemaType": "Service",
+      "indexable": true,
+      "image": "https://hyperion-industries.dev/assets/branding/hyperion/hyperion-link-preview.jpeg",
+      "relatedRoutes": [
+        "/intake/live-sites",
+        "/build-archive",
         "/contact"
       ]
     },
@@ -637,6 +655,23 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
       "intakeLane": "continuity"
     },
     {
+      "id": "intake--live-sites",
+      "path": "/intake/live-sites",
+      "canonicalUrl": "https://hyperion-industries.dev/intake/live-sites",
+      "title": "Live Site Project Intake | Hyperion Industries",
+      "description": "Scope a conversion site, governed intake surface, or public-and-operator infrastructure through the Hyperion Live Site Series.",
+      "summary": "A proposal-first lane for launch sites, company presence, connected intake, and public operating infrastructure.",
+      "maturity": "LIMITED REQUESTS · OPERATOR REVIEW",
+      "schemaType": "ContactPage",
+      "indexable": true,
+      "image": "https://hyperion-industries.dev/assets/branding/hyperion/hyperion-link-preview.jpeg",
+      "relatedRoutes": [
+        "/intake",
+        "/contact"
+      ],
+      "intakeLane": "live-sites"
+    },
+    {
       "id": "intake--operator-identity",
       "path": "/intake/operator-identity",
       "canonicalUrl": "https://hyperion-industries.dev/intake/operator-identity",
@@ -758,17 +793,17 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
     },
     {
       "id": "card-studio",
-      "name": "Hyperion Card Studio Invite Preview",
+      "name": "Hyperion Card Studio",
       "route": "/card-studio",
       "canonicalUrl": "https://hyperion-industries.dev/card-studio",
-      "summary": "An invite-only native studio for deterministic card proofs and operator-reviewed identity handoff.",
-      "maturity": "INVITE-ONLY PREVIEW",
+      "summary": "A public native studio for deterministic card proofs and operator-reviewed identity handoff.",
+      "maturity": "PUBLIC DESIGN · REVIEW GATED",
       "availability": "Limited scoped requests are accepted after operator review.",
       "intakeLane": "operator-identity"
     }
   ],
   "intake": {
-    "contractVersion": "1.0.1",
+    "contractVersion": "1.1.0",
     "reviewBoundary": "Operator review is required. Submission does not imply acceptance, contracting, or response time.",
     "uploadsSupported": false,
     "lanes": [
@@ -792,6 +827,13 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
         "title": "Continuity Assessment | Hyperion Industries",
         "description": "Map the state, records, knowledge, and operating context that must survive interruption, handoff, and time.",
         "summary": "An assessment-first lane for continuity failures across records, memory, archives, provenance, and operational recovery."
+      },
+      {
+        "id": "live-sites",
+        "route": "/intake/live-sites",
+        "title": "Live Site Project Intake | Hyperion Industries",
+        "description": "Scope a conversion site, governed intake surface, or public-and-operator infrastructure through the Hyperion Live Site Series.",
+        "summary": "A proposal-first lane for launch sites, company presence, connected intake, and public operating infrastructure."
       },
       {
         "id": "operator-identity",
@@ -839,6 +881,10 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
     {
       "from": "/studio/card-studio",
       "to": "/card-studio"
+    },
+    {
+      "from": "/live-site-series",
+      "to": "/services"
     },
     {
       "from": "/dxcard/",
@@ -948,5 +994,5 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
       }
     ]
   },
-  "sha256": "da0125d0174e0b08a666a453f7831d565bf9e2547a3e876af90328681605e291"
+  "sha256": "f256f5fe52cb0b07326a9ff4888c6a205c0cc5d929aab67cfdad1349e92ed493"
 } as const;

@@ -239,12 +239,13 @@ export async function handleProjectCreate(
   const projectId = generatedId("csp", deps);
   const sessionToken = generatedId("css", deps);
   const now = deps.now().toISOString();
+  const accountStatus = env.CARD_STUDIO_INVITE_REQUIRED === "false" ? "active" : "invited";
   const statements = [
     db.prepare(
       `INSERT INTO card_studio_accounts (account_ref, external_customer_ref, status, created_at, updated_at)
-       VALUES (?, NULL, 'invited', ?, ?)
+       VALUES (?, NULL, ?, ?, ?)
        ON CONFLICT(account_ref) DO UPDATE SET updated_at = excluded.updated_at`,
-    ).bind(accountRef, now, now),
+    ).bind(accountRef, accountStatus, now, now),
     db.prepare(
       `INSERT INTO card_studio_projects
        (project_id, account_ref, invite_id, session_hash, status, latest_revision, created_at, updated_at)
@@ -265,7 +266,7 @@ export async function handleProjectCreate(
   try {
     await db.batch(statements);
   } catch {
-    throw new HttpError(409, "project_create_conflict", "The project could not be created. The invitation may already be in use.");
+    throw new HttpError(409, "project_create_conflict", "The project could not be created because its durable state conflicted with another request.");
   }
   return jsonResponse({
     ok: true,

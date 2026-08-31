@@ -21,10 +21,15 @@
 }
 
 .operator-mascot img {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: contain;
   filter: drop-shadow(0 22px 40px rgba(0, 0, 0, 0.62)) drop-shadow(0 0 22px rgba(224, 82, 82, 0.26));
+  opacity: 0;
+  animation: operator-frame-cycle 720ms steps(1, end) infinite;
+  animation-delay: calc(var(--operator-frame) * -180ms);
 }
 
 .operator-mascot {
@@ -34,6 +39,17 @@
 @keyframes operator-float {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-8px); }
+}
+
+@keyframes operator-frame-cycle {
+  0%, 24.9% { opacity: 1; }
+  25%, 100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .operator-mascot { animation: none; }
+  .operator-mascot img { animation: none; opacity: 0; }
+  .operator-mascot img:first-child { opacity: 1; }
 }
 
 @media (max-width: 720px) {

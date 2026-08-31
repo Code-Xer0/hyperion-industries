@@ -297,7 +297,7 @@ export default function ForgeConfiguratorPage() {
   const [searchParams] = useSearchParams();
   const requestedLane = searchParams.get('lane') || '';
   const navigationSource = searchParams.get('source') || '';
-  const catalogPrefill = navigationSource === 'catalog' ? CATALOG_LANE_PREFILLS[requestedLane] : null;
+  const lanePrefill = ['catalog', 'forge'].includes(navigationSource) ? CATALOG_LANE_PREFILLS[requestedLane] : null;
   const [bundle, setBundle] = useState(FORGE_GUIDE_FALLBACK);
   const [bundlePosture, setBundlePosture] = useState('bundled_verified');
   const [stage, setStage] = useState('welcome');
@@ -338,12 +338,6 @@ export default function ForgeConfiguratorPage() {
   }, []);
 
   useEffect(() => {
-    if (!catalogPrefill) return;
-    setAnswers((current) => ({ ...current, ...Object.fromEntries(Object.entries(catalogPrefill).filter(([key]) => key !== 'label')) }));
-    track('forge_navigation_source', { source: 'catalog', lane: requestedLane });
-  }, [catalogPrefill, requestedLane]);
-
-  useEffect(() => {
     try {
       const draft = JSON.parse(localStorage.getItem(LOCAL_KEY) || 'null');
       if (draft?.expires_at > Date.now()) {
@@ -365,6 +359,13 @@ export default function ForgeConfiguratorPage() {
       }
     } catch { /* Local recovery is best-effort and never blocks the guide. */ }
   }, []);
+
+  useEffect(() => {
+    if (!lanePrefill) return;
+    const prefilledAnswers = Object.fromEntries(Object.entries(lanePrefill).filter(([key]) => key !== 'label'));
+    setAnswers((current) => ({ ...current, ...prefilledAnswers }));
+    track('forge_navigation_source', { source: navigationSource, lane: requestedLane });
+  }, [lanePrefill, navigationSource, requestedLane]);
 
   useEffect(() => {
     if (receipt) return;
@@ -562,7 +563,7 @@ export default function ForgeConfiguratorPage() {
           <section className="concierge-receipt"><Check size={34} /><span>SIGNAL RECEIVED · HELD FOR REVIEW</span><h2>Your itinerary is with the Forge desk.</h2><p>Reference <strong>{receipt.reference}</strong>. No quote, configuration, compatibility verdict, payment, or order was created.</p><div><button type="button" className="forge-button is-ghost" onClick={correct}>Correct with a new revision</button><Link className="forge-button" to="/forge">Return to the Forge</Link></div></section>
         ) : stage === 'welcome' ? (
           <section className="concierge-welcome" aria-labelledby="welcome-title">
-            <div><span><Compass size={15} /> YOUR GUIDE IS READY</span><h2 id="welcome-title">This should feel like a good shop tour, not a tax form.</h2><p>Start with what you want the system to make possible. The Concierge will explain the tradeoffs, show relevant Forge neighborhoods, and keep every unknown visible for a real operator.</p>{catalogPrefill && <div className="concierge-catalog-prefill" role="status"><strong>Catalog starting lane: {catalogPrefill.label}</strong><span>This is visible and editable. The first Destination question lets you change it.</span></div>}<div className="concierge-welcome-actions"><button type="button" className="forge-button" onClick={() => start('full')}>Take the guided itinerary<ArrowRight size={15} /></button><button type="button" className="forge-button is-ghost" onClick={() => start('express')}>Show me around · 3 questions</button></div><small>{migratedFrom ? 'Your earlier configurator draft was carried forward safely. ' : ''}Guide source: {bundlePosture.replaceAll('_', ' ')} · {bundle.sources.length} curated source lanes.</small></div><ol><li><b>01</b><span>Tell us the destination.</span></li><li><b>02</b><span>Get useful context as the route sharpens.</span></li><li><b>03</b><span>Preview several system neighborhoods.</span></li><li><b>04</b><span>Hand a source-opaque draft to an operator.</span></li></ol>
+            <div><span><Compass size={15} /> YOUR GUIDE IS READY</span><h2 id="welcome-title">This should feel like a good shop tour, not a tax form.</h2><p>Start with what you want the system to make possible. The Concierge will explain the tradeoffs, show relevant Forge neighborhoods, and keep every unknown visible for a real operator.</p>{lanePrefill && <div className="concierge-catalog-prefill" role="status"><strong>Starting lane: {lanePrefill.label}</strong><span>This is visible and editable. The first Destination question lets you change it.</span></div>}<div className="concierge-welcome-actions"><button type="button" className="forge-button" onClick={() => start('full')}>Take the guided itinerary<ArrowRight size={15} /></button><button type="button" className="forge-button is-ghost" onClick={() => start('express')}>Show me around · 3 questions</button></div><small>{migratedFrom ? 'Your earlier configurator draft was carried forward safely. ' : ''}Guide source: {bundlePosture.replaceAll('_', ' ')} · {bundle.sources.length} curated source lanes.</small></div><ol><li><b>01</b><span>Tell us the destination.</span></li><li><b>02</b><span>Get useful context as the route sharpens.</span></li><li><b>03</b><span>Preview several system neighborhoods.</span></li><li><b>04</b><span>Hand a source-opaque draft to an operator.</span></li></ol>
           </section>
         ) : (
           <div className="concierge-layout">

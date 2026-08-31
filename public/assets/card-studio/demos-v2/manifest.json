@@ -1,0 +1,37 @@
+{
+  "contract": "hyperion.card-demo-media/1",
+  "version": "2026.08.27",
+  "policy": {
+    "fictional_adults": true,
+    "modeled_on_real_people": false,
+    "public_showcase_only": true,
+    "identity_transfer_allowed": false,
+    "submission_allowed": false
+  },
+  "assets": [
+    {
+      "id": "talia-monroe-portrait",
+      "path": "/assets/card-studio/demos-v2/talia-monroe.png",
+      "sha256": "AF8CCBBE66E3CF6E6E13055F4E55A65DFE983F50AEB01BF43751715F8B8A62EC",
+      "generator": "OpenAI ImageGen",
+      "prompt_summary": "Original editorial portrait of a fictional adult personal stylist, warm luxury studio, not based on a real person.",
+      "submittable": false
+    },
+    {
+      "id": "marcus-hale-portrait",
+      "path": "/assets/card-studio/demos-v2/marcus-hale.png",
+      "sha256": "78C20753428DA777EC9DBCA83D14CCB438265AE501AE5B349E84E89B7BBD76F0",
+      "generator": "OpenAI ImageGen",
+      "prompt_summary": "Original editorial portrait of a fictional adult roofing company owner, premium architectural setting, not based on a real person.",
+      "submittable": false
+    },
+    {
+      "id": "priya-bennett-portrait",
+      "path": "/assets/card-studio/demos-v2/priya-bennett.png",
+      "sha256": "8275D061122EF3885D515783B06A72E6B75FA4FC840FCFFB921DDAED4C68BE66",
+      "generator": "OpenAI ImageGen",
+      "prompt_summary": "Original editorial portrait of a fictional adult attorney, restrained modern office, not based on a real person.",
+      "submittable": false
+    }
+  ]
+}

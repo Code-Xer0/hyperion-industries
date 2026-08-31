@@ -1,4 +1,4 @@
-export const INTAKE_PUBLIC_CONTRACT_VERSION = '1.0.1';
+export const INTAKE_PUBLIC_CONTRACT_VERSION = '1.1.0';
 
 export const INTAKE_LANE_SEO = Object.freeze([
   {
@@ -18,6 +18,12 @@ export const INTAKE_LANE_SEO = Object.freeze([
     title: 'Continuity Assessment | Hyperion Industries',
     description: 'Map the state, records, knowledge, and operating context that must survive interruption, handoff, and time.',
     summary: 'An assessment-first lane for continuity failures across records, memory, archives, provenance, and operational recovery.',
+  },
+  {
+    id: 'live-sites',
+    title: 'Live Site Project Intake | Hyperion Industries',
+    description: 'Scope a conversion site, governed intake surface, or public-and-operator infrastructure through the Hyperion Live Site Series.',
+    summary: 'A proposal-first lane for launch sites, company presence, connected intake, and public operating infrastructure.',
   },
   {
     id: 'operator-identity',

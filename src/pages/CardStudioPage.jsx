@@ -8,6 +8,8 @@ import {
   Search,
   ShieldCheck,
   Trash2,
+  CreditCard,
+  Nfc,
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
@@ -26,7 +28,9 @@ import {
   renameDraft,
   writeDraftShelf,
 } from '../features/card-studio/cardStudioDrafts.js';
-import { CARD_TEMPLATES } from '../features/card-studio/cardStudioModel.js';
+import CardProductPreview from '../features/card-studio/CardProductPreview.jsx';
+import ConciergeNarration from '../components/ui/ConciergeNarration';
+import { CARD_CATALOG } from '../../shared/card-studio/catalog.ts';
 import './CardStudioPage.css';
 
 const VIEWS = [
@@ -35,22 +39,11 @@ const VIEWS = [
   { id: 'drafts', label: 'My Drafts', count: null },
 ];
 
-function MiniCard({ templateId, name, role, demo = false }) {
-  const template = CARD_TEMPLATES.find((item) => item.id === templateId) || CARD_TEMPLATES[0];
-  return (
-    <div
-      className="hcs-library-proof"
-      style={{ '--proof-surface': template.surface, '--proof-ink': template.ink, '--proof-accent': template.tone }}
-      aria-hidden="true"
-    >
-      <span className="hcs-library-proof-line" />
-      <small>{demo ? 'DEMO' : template.lane}</small>
-      <strong>{name || template.name}</strong>
-      <p>{role || `${template.lane} identity system`}</p>
-      <i>{template.name.toUpperCase()}</i>
-    </div>
-  );
-}
+const productDetails = {
+  card_digital: { note: 'A reviewable digital identity surface for sharing approved contact context.', template: 'axis', tag: 'DIGITAL' },
+  card_pvc_standard: { note: 'Durable matte PVC with NFC and QR posture for everyday introductions.', template: 'pulse', tag: 'PVC · NFC' },
+  card_metal_standard: { note: 'A weightier metal NFC card for executive and premium field identity.', template: 'vanguard', tag: 'METAL · NFC' },
+};
 
 function ConfirmDelete({ draft, onCancel, onConfirm }) {
   const cancelRef = useRef(null);
@@ -148,7 +141,7 @@ export default function CardStudioPage() {
         <title>Card Studio Library | Hyperion Industries</title>
         <meta
           name="description"
-          content="Explore 20 guarded card templates, 12 privacy-safe demonstrations, and device-local Card Studio drafts."
+          content="Explore 20 guarded card templates, 15 privacy-safe demonstrations, and device-local Card Studio drafts."
         />
         <link rel="canonical" href="https://hyperion-industries.dev/card-studio" />
       </Helmet>
@@ -159,14 +152,39 @@ export default function CardStudioPage() {
           <h1>Choose the signal.<br /><em>Shape it locally.</em></h1>
           <p className="hcs-library-intro">
             Start from a bounded system, explore fictional demonstrations, or resume a private device-local draft.
-            Designing is public. Submission remains invitation-bound and held for operator review.
+            Designing and submission are public. Every proposal remains immutable and held for operator review.
           </p>
         </div>
         <div className="hcs-library-posture" aria-label="Card Studio posture">
           <span><strong>20</strong> templates</span>
+          <span><strong>15</strong> product demos</span>
           <span><strong>48</strong> artifacts</span>
           <span><strong>LOCAL</strong> drafts</span>
           <small>NOT A QUOTE · NO CHECKOUT CREATED</small>
+        </div>
+      </section>
+
+      <section className="hcs-product-shelf" aria-labelledby="hcs-products-title">
+        <div className="hcs-library-section-head">
+          <div><span>00 · CHOOSE THE OBJECT</span><h2 id="hcs-products-title">A real card, a digital twin, and a governed handoff.</h2></div>
+          <div><ConciergeNarration cue="card-checkout" compact /><p className="hcs-payment-readiness"><CreditCard size={13} /> PAYMENTS NOT YET ACTIVE · PAYPAL SANDBOX SETUP · CHECKOUT FOLLOWS APPROVED PROOF</p></div>
+        </div>
+        <div className="hcs-product-offers">
+          {CARD_CATALOG.items.filter((item) => productDetails[item.sku]).map((item) => {
+            const detail = productDetails[item.sku];
+            return (
+              <article key={item.sku}>
+                <CardProductPreview templateId={detail.template} compact />
+                <div>
+                  <span><Nfc size={13} /> {detail.tag}</span>
+                  <h3>{item.name}</h3>
+                  <p>{detail.note}</p>
+                  <strong>{item.unit_amount ? `$${(item.unit_amount / 100).toFixed(0)}` : 'Included'} <small>{item.unit_amount ? 'catalog estimate' : 'reviewed profile'}</small></strong>
+                </div>
+                <button type="button" onClick={() => startDraft(detail.template)}>Design this card <ArrowRight size={15} /></button>
+              </article>
+            );
+          })}
         </div>
       </section>
 
@@ -205,7 +223,7 @@ export default function CardStudioPage() {
           <div className="hcs-library-grid">
             {templates.map((template) => (
               <article className="hcs-library-card" key={template.id}>
-                <MiniCard templateId={template.id} />
+                <CardProductPreview templateId={template.id} compact />
                 <div>
                   <span>{template.status}</span>
                   <h3>{template.name}</h3>
@@ -225,12 +243,12 @@ export default function CardStudioPage() {
         <section className="hcs-library-section" role="tabpanel" aria-labelledby="hcs-examples-title">
           <div className="hcs-library-section-head">
             <div><span>02 · PRIVACY-SAFE DEMONSTRATIONS</span><h2 id="hcs-examples-title">Examples, never implied client work.</h2></div>
-            <p>Ten profiles are explicitly fictional and use reserved <code>.example</code> contact data. Two Hyperion demos use only existing public operator profile fields.</p>
+            <p>Thirteen profiles are explicitly fictional and use reserved <code>.example</code> contact data. Two Hyperion demos use only existing public operator profile fields.</p>
           </div>
           <div className="hcs-library-grid">
             {examples.map((example) => (
               <article className="hcs-library-card is-demo" key={example.id}>
-                <MiniCard templateId={example.template_id} name={example.name} role={example.label} demo />
+                <CardProductPreview templateId={example.template_id} source={example} compact />
                 <div>
                   <span>DEMO · {example.operator_demo ? 'PUBLIC OPERATOR' : 'FICTIONAL'}</span>
                   <h3>{example.name}</h3>
@@ -263,7 +281,7 @@ export default function CardStudioPage() {
           <div className="hcs-draft-grid">
             {drafts.map((draft) => (
               <article className="hcs-draft-card" key={draft.draft_id}>
-                <MiniCard templateId={draft.template_id} name={draft.identity.name} role={draft.identity.role} />
+                <CardProductPreview templateId={draft.template_id} source={draft} compact />
                 <label>
                   <span>Draft name</span>
                   <input value={draft.draft_name} onChange={(event) => setShelf(renameDraft(shelf, draft.draft_id, event.target.value))} />

@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hyperion-industries.dev/contracts/commerce-readiness.v2.schema.json",
+  "title": "hyperion.commerce-readiness/2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "generated_at", "release_state", "providers", "card_studio", "forge", "operations"],
+  "properties": {
+    "contract_version": { "const": "hyperion.commerce-readiness/2" },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "release_state": { "enum": ["payments_not_yet_active", "sandbox_ready_for_operator_test"] },
+    "providers": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["paypal", "stripe", "shopify", "admin_api_exposed_to_browser"],
+      "properties": {
+        "paypal": { "$ref": "#/$defs/provider" },
+        "stripe": { "$ref": "#/$defs/provider" },
+        "shopify": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["role", "storefront"],
+          "properties": {
+            "role": { "const": "disabled_until_reviewed" },
+            "storefront": { "enum": ["configured", "configuration_required"] }
+          }
+        },
+        "admin_api_exposed_to_browser": { "const": false }
+      }
+    },
+    "card_studio": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fixed_price_products", "product_mappings", "mapped_sku_count", "checkout_sequence", "webhook"],
+      "properties": {
+        "fixed_price_products": { "type": "array", "const": ["card_pvc_standard", "card_metal_standard"] },
+        "product_mappings": { "enum": ["ready", "configuration_required"] },
+        "mapped_sku_count": { "type": "integer", "minimum": 0 },
+        "checkout_sequence": { "const": "proof_approved_quote_staged_checkout_released_provider_checkout_created" },
+        "webhook": { "enum": ["ready", "configuration_required"] }
+      }
+    },
+    "forge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["checkout_mode", "public_cart", "draft_order_release", "provider_adapter"],
+      "properties": {
+        "checkout_mode": { "const": "proposal_first_draft_order_invoice" },
+        "public_cart": { "const": false },
+        "draft_order_release": { "const": "operator_authorization_required" },
+        "provider_adapter": { "enum": ["configuration_required", "sandbox_configured"] }
+      }
+    },
+    "operations": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["shipping", "tax", "founder_command_intake", "founder_command_commerce", "payments_live", "live_charge_refund_smoke"],
+      "properties": {
+        "shipping": { "enum": ["reviewed", "configuration_required"] },
+        "tax": { "enum": ["operator_confirmed", "operator_confirmation_required"] },
+        "founder_command_intake": { "enum": ["connected", "configuration_required"] },
+        "founder_command_commerce": { "enum": ["connected", "configuration_required"] },
+        "payments_live": { "const": "not_active" },
+        "live_charge_refund_smoke": { "const": "separate_authorization_required" }
+      }
+    }
+  },
+  "$defs": {
+    "provider": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["role", "environment", "configuration", "live_capture"],
+      "properties": {
+        "role": { "enum": ["primary_interim", "standby"] },
+        "environment": { "enum": ["sandbox", "live"] },
+        "configuration": { "enum": ["configured", "configuration_required"] },
+        "live_capture": { "enum": ["enabled", "separate_authorization_required"] }
+      }
+    }
+  }
+}

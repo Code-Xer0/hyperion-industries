@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hyperion-industries.dev/contracts/commerce-checkout-command.v2.schema.json",
+  "title": "Proposal-bound commerce checkout command",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "proposal_ref", "source_type", "source_ref", "revision_hash", "provider", "action", "amount_minor", "currency", "description", "idempotency_key"],
+  "properties": {
+    "contract_version": { "const": "commerce-checkout-command/2" },
+    "proposal_ref": { "type": "string", "pattern": "^[A-Za-z0-9_-]{12,96}$" },
+    "source_type": { "enum": ["card_studio", "forge", "chronos", "live_site"] },
+    "source_ref": { "type": "string", "pattern": "^[A-Za-z0-9_-]{12,96}$" },
+    "revision_hash": { "type": "string", "pattern": "^[a-f0-9]{64}$" },
+    "provider": { "enum": ["paypal", "stripe"] },
+    "action": { "enum": ["stage_checkout", "create_checkout", "reconcile"] },
+    "amount_minor": { "type": "integer", "minimum": 50, "maximum": 10000000 },
+    "currency": { "const": "USD" },
+    "description": { "type": "string", "minLength": 3, "maxLength": 160 },
+    "idempotency_key": { "type": "string", "pattern": "^[A-Za-z0-9._:-]{16,120}$" }
+  }
+}

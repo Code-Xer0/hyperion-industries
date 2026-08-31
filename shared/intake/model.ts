@@ -25,6 +25,7 @@ export const LANE_IDS = [
   'forge',
   'pandora',
   'continuity',
+  'live-sites',
   'operator-identity',
   'support',
   'relationships',
@@ -110,12 +111,39 @@ export const LANES: Record<LaneId, LaneDefinition> = {
     operatorLine: 'Map what must survive interruption, handoff, and time.',
     questions: {
       signal: [
+        { id: 'continuity_service', label: 'Which continuity starting point fits best?', type: 'select', required: true, options: [
+          { value: 'assessment', label: 'Continuity Assessment · map risks and recovery priorities' },
+          { value: 'setup', label: 'Continuity Setup · establish a durable local-first baseline' },
+          { value: 'migration', label: 'Continuity Migration · move operating context with custody intact' },
+          { value: 'team', label: 'Team Continuity · protect shared decisions, handoffs, and access' },
+          { value: 'unknown', label: 'Help me choose' },
+        ] },
         { id: 'continuity_scope', label: 'What knowledge, records, or operating context must remain usable?', type: 'textarea', required: true },
         { id: 'current_state', label: 'Where does it live today?', type: 'text', required: true },
       ],
       load: [
         { id: 'recovery_priority', label: 'What failure or handoff concerns you most?', type: 'textarea', required: true },
         { id: 'existing_tooling', label: 'Existing tools or repositories involved', type: 'text' },
+      ],
+    },
+  },
+  'live-sites': {
+    id: 'live-sites', name: 'Live Sites', short: 'Launch a public business surface', accent: 'gold', maturity: 'COMMERCIAL LANE',
+    operatorLine: 'Connect the public offer, conversion path, and operating handoff without inventing automation.',
+    questions: {
+      signal: [
+        { id: 'live_site_package', label: 'Which starting point fits best?', type: 'select', required: true, options: [
+          { value: 'signal', label: 'Live Signal · focused launch page' }, { value: 'presence', label: 'Live Presence · complete company site' },
+          { value: 'system', label: 'Live System · site plus governed intake' }, { value: 'infrastructure', label: 'Live Infrastructure · public and operator system' },
+          { value: 'unknown', label: 'Help me choose' },
+        ] },
+        { id: 'business_outcome', label: 'What should the site help the business accomplish?', type: 'textarea', required: true },
+      ],
+      load: [
+        { id: 'current_surface', label: 'What site, brand material, or operating process exists today?', type: 'textarea', required: true },
+        { id: 'conversion_action', label: 'What should a serious visitor be able to do next?', type: 'text', required: true },
+        { id: 'launch_window', label: 'Is there a meaningful launch date or decision window?', type: 'text' },
+        { id: 'site_notice', label: 'Do not send credentials, private analytics, customer exports, or production access here. Secure evidence follows operator review.', type: 'notice' },
       ],
     },
   },

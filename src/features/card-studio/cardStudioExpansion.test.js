@@ -35,14 +35,25 @@ class MemoryStorage {
 
 test('the public studio ships the approved catalog counts and privacy posture', () => {
   assert.equal(CARD_TEMPLATE_CATALOG.items.length, 20);
-  assert.equal(CARD_EXAMPLE_CATALOG.items.length, 12);
+  assert.equal(CARD_EXAMPLE_CATALOG.items.length, 15);
   assert.equal(CARD_ARTIFACT_CATALOG.items.length, 48);
   assert.deepEqual(CARD_ARTIFACT_CATALOG.packs.map((pack) => pack.count), [12, 8, 8, 8, 6, 6]);
   assert.ok(CARD_EXAMPLE_CATALOG.items.every((item) => item.demo));
   assert.equal(CARD_EXAMPLE_CATALOG.items.filter((item) => item.operator_demo).length, 2);
   for (const item of CARD_EXAMPLE_CATALOG.items.filter((example) => !example.operator_demo)) {
     assert.match(`${item.fields.email} ${item.fields.website}`, /\.example/);
+    assert.match(item.fields.phone, /\+1 (?:202-555-01\d{2}|555 010 \d{4})/);
   }
+});
+
+test('demo starters transfer design language but strip fictional identity data', () => {
+  const example = CARD_EXAMPLE_CATALOG.items.find((item) => item.id === 'example-aster-loom-stylist');
+  const document = createCardDocument(example.id);
+  assert.equal(document.template_id, example.template_id);
+  assert.equal(document.identity.name, '');
+  assert.equal(document.contact.email, '');
+  assert.equal(document.visibility.email, false);
+  assert.ok(evaluateCardPreflight(document).blockers.some((item) => item.includes('cardholder name')));
 });
 
 test('all twenty templates compile to front and back durable artboards', () => {
