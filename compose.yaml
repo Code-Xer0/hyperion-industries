@@ -1,0 +1,56 @@
+name: hyperion-flagship-local
+
+services:
+  operator-worker:
+    build:
+      context: .
+      dockerfile: workers/operator/Dockerfile
+    environment:
+      HOME: /tmp
+      WRANGLER_PERSIST_DIR: /var/lib/hyperion-worker
+      WRANGLER_SEND_METRICS: "false"
+      WRANGLER_HIDE_BANNER: "true"
+      HYPERION_SITE_ORIGIN: http://localhost:${HYPERION_SITE_PORT:-8080}
+    init: true
+    ports:
+      - "127.0.0.1:${HYPERION_WORKER_PORT:-8790}:8787"
+    volumes:
+      - operator-local-state:/var/lib/hyperion-worker
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:8787/api/intake/status').then(async r=>{const s=await r.json();process.exit(r.ok&&s.readiness?.storage==='ready'?0:1)}).catch(()=>process.exit(1))"
+      interval: 10s
+      timeout: 4s
+      start_period: 45s
+      retries: 9
+    restart: unless-stopped
+
+  flagship:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      operator-worker:
+        condition: service_healthy
+    init: true
+    ports:
+      - "127.0.0.1:${HYPERION_SITE_PORT:-8080}:8080"
+    read_only: true
+    tmpfs:
+      - /tmp
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    restart: unless-stopped
+
+volumes:
+  operator-local-state:
+    name: hyperion-operator-local-state

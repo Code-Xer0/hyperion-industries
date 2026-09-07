@@ -14,7 +14,7 @@ dist-ssr
 .playwright-cli/
 output/
 public/assets/card-studio/.thumbnail
-workers/operator/.wrangler/
+**/.wrangler/
 
 # Editor directories and files
 .vscode/*

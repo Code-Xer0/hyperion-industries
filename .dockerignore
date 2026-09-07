@@ -1,0 +1,24 @@
+.git
+.github
+.playwright-cli
+**/node_modules
+**/dist
+**/.wrangler
+**/coverage
+**/.env*
+**/.dev.vars*
+**/.mcp.json*
+**/*.local
+**/*.log
+output
+telemetry
+private
+cowork-assets
+Hyperion Investor Diligence
+.builder-preview
+src_snapshot
+legacy-static
+assets
+AGENTS.md
+CLAUDE.md
+HYPERION_POSTURE.md

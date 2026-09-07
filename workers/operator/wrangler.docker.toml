@@ -1,0 +1,80 @@
+name = "hyperion-operator-local"
+main = "docker-worker.js"
+compatibility_date = "2026-08-30"
+compatibility_flags = ["nodejs_compat"]
+
+[vars]
+SITE_ORIGIN = "http://localhost:8080"
+OPENROUTER_MODEL = "openai/gpt-5.2"
+INQUIRY_NOTIFY_TO = "local-only@hyperion.example"
+INQUIRY_FROM_EMAIL = "local-only@hyperion.example"
+INQUIRY_CONSENT_VERSION = "2026-07-13"
+INTAKE_RESUME_FROM = "local-only@hyperion.example"
+INTAKE_ACKNOWLEDGEMENT_FROM = "local-only@hyperion.example"
+INTAKE_COOKIE_NAME = "hyperion_resume_local"
+FOUNDER_COMMAND_PULL_KEY_ID = "local-disabled"
+CARD_STUDIO_INVITE_REQUIRED = "false"
+PAYPAL_ENVIRONMENT = "sandbox"
+FOUNDER_COMMAND_COMMERCE_KEY_ID = "local-disabled"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "hyperion-operator-local"
+database_id = "00000000-0000-0000-0000-000000000001"
+migrations_dir = "migrations"
+
+[[ratelimits]]
+name = "CHAT_RATE_LIMITER"
+namespace_id = "51001"
+
+  [ratelimits.simple]
+  limit = 12
+  period = 60
+
+[[ratelimits]]
+name = "INQUIRY_RATE_LIMITER"
+namespace_id = "51002"
+
+  [ratelimits.simple]
+  limit = 5
+  period = 60
+
+[[ratelimits]]
+name = "INTAKE_RESUME_RATE_LIMITER"
+namespace_id = "51003"
+
+  [ratelimits.simple]
+  limit = 5
+  period = 60
+
+[[ratelimits]]
+name = "INTAKE_SUBMISSION_RATE_LIMITER"
+namespace_id = "51004"
+
+  [ratelimits.simple]
+  limit = 8
+  period = 60
+
+[[ratelimits]]
+name = "INTAKE_OPERATOR_RATE_LIMITER"
+namespace_id = "51005"
+
+  [ratelimits.simple]
+  limit = 120
+  period = 60
+
+[[ratelimits]]
+name = "CARD_STUDIO_RATE_LIMITER"
+namespace_id = "51006"
+
+  [ratelimits.simple]
+  limit = 30
+  period = 60
+
+[[ratelimits]]
+name = "COMMERCE_OPERATOR_RATE_LIMITER"
+namespace_id = "51007"
+
+  [ratelimits.simple]
+  limit = 30
+  period = 60

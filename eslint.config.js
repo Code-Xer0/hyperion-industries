@@ -7,11 +7,12 @@ import { defineConfig, globalIgnores } from 'eslint/config'
 export default defineConfig([
   globalIgnores([
     'dist',
+    'output',
     'src_snapshot',
     'public/assets/card',
     'public/assets/card-studio',
     'public/operator-resident',
-    'workers/operator/.wrangler',
+    '**/.wrangler',
     'workers/operator/node_modules',
   ]),
   {
