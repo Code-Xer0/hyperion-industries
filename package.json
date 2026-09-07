@@ -21,7 +21,11 @@
     "operator:check": "npm run check --prefix workers/operator",
     "check": "npm run lint && npm run site-content:check && npm run card-studio:check && npm run configurator:check && npm run doctrine:check && npm run intake:check && npm run build && npm run public:compiled-check && npm run seo:verify && npm run seo:edge-test && npm run operator:check && npm run mcp:check",
     "substrate:audit": "node scripts/audit-portal.mjs",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "docker:config": "docker compose config",
+    "docker:up": "docker compose up --build --wait",
+    "docker:smoke": "node scripts/smoke-local-docker.mjs",
+    "docker:down": "docker compose down"
   },
   "dependencies": {
     "@mdx-js/rollup": "^3.1.1",
@@ -46,6 +50,6 @@
     "vite": "^8.1.5"
   },
   "overrides": {
-    "brace-expansion": "5.0.8"
+    "brace-expansion": "5.0.9"
   }
 }
