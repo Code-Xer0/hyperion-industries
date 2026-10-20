@@ -3,8 +3,8 @@
   "site": {
     "name": "Hyperion Industries",
     "origin": "https://hyperion-industries.dev",
-    "defaultTitle": "Hyperion Industries - Public Web Portal",
-    "defaultDescription": "The public edge of Hyperion continuity infrastructure: governed systems, maturity-labeled proof, and assessment-first access lanes.",
+    "defaultTitle": "Hyperion Industries - Stratified Systems",
+    "defaultDescription": "Hyperion integrates people, AI, software, data, infrastructure, hardware, workflow, and governance into coherent operational systems with continuity through change.",
     "deployment": {
       "primaryRisk": "Pushes to main deploy GitHub Pages through .github/workflows/deploy.yml; public deployment is withheld without operator approval.",
       "publicApiPosture": "Vercel-style api functions are staged in-repo, but the live GitHub Pages surface does not currently serve JSON api routes.",
@@ -63,12 +63,12 @@
     "\/": {
       "zoneId": "gateway",
       "title": "Hyperion Industries - Gateway",
-      "description": "The public edge of Hyperion continuity infrastructure, with governed systems, evidence boundaries, and assessment-first entry.",
+      "description": "Stratified operational systems with governed layers, evidence boundaries, and assessment-first entry.",
       "canonicalUrl": "https://hyperion-industries.dev/",
       "robots": "index,follow",
       "openGraph": {
         "title": "Hyperion Industries - Gateway",
-        "description": "Continuity infrastructure for fragmented operations, organized around source, context, and authority boundaries.",
+        "description": "Stratified systems for fragmented operations, organized around source, context, and authority boundaries.",
         "image": "/assets/branding/hyperion/Hyblkstd.png",
         "type": "website"
       }

@@ -34,7 +34,7 @@
     },
     {
       "path": "site-content/collections/content.json",
-      "sha256": "13c2425f35dae5ad42aa21cd667f90ca07355021ddff429c1dabb245b765e9a7"
+      "sha256": "45472da3bd5237e3c8663157e97d4a7f937471e973333d3fa33fac8443f19719"
     },
     {
       "path": "site-content/collections/destinations.json",
@@ -46,7 +46,7 @@
     },
     {
       "path": "site-content/collections/navigation.json",
-      "sha256": "7786339c5ffb73769f7cbc26999257ac23bc15bdd92e456ca71bf3697ac2970e"
+      "sha256": "e36ddde37c86125456513ed1d2e108f4788d2b41a6bbea710060711a5ea395cf"
     },
     {
       "path": "site-content/collections/operators.json",

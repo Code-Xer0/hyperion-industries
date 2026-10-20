@@ -157,7 +157,7 @@ export const cityFamilies = [
       route('/alignment', 'Alignment Hall', 'alignment', { keywords: ['partners', 'grants', 'customers'] }),
       route('/contact', 'Contact Signal', 'alignment', { status: 'PUBLIC SIGNAL', keywords: ['inquiry', 'support', 'email'] }),
       route('/newsletter', 'Newsletter', 'alignment', { status: 'STAGED', tone: 'concept', utility: true }),
-      route('/store', 'Store', 'alignment', { status: 'STAGED · NO CHECKOUT', tone: 'concept', utility: true }),
+      route('/store', 'Products', 'alignment', { status: 'SANDBOX PREPARATION', tone: 'concept', utility: true }),
     ],
   },
   {
@@ -217,12 +217,12 @@ export const cityDestinations = cityFamilies.flatMap((family) => family.routes);
 export const cityMotionManifest = cityMotion;
 
 export const cityUtilities = [
-  { label: 'Gate', path: '/' },
-  { label: 'Client room', path: '/account' },
-  { label: 'Architecture', path: '/architecture' },
-  { label: 'Gallery', path: '/gallery' },
-  { label: 'Founders', path: '/founders' },
-  { label: 'Email', href: 'mailto:hello@hyperion-industries.dev' },
+  { label: 'Start', path: '/intake' },
+  { label: 'Resume', path: '/intake/resume' },
+  { label: 'My Projects', path: '/account' },
+  { label: 'Products', path: '/store' },
+  { label: 'Forge', path: '/forge' },
+  { label: 'Card Studio', path: '/card-studio' },
 ];
 
 export function getCityDestination(pathname) {

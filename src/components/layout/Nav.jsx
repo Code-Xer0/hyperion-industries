@@ -395,14 +395,26 @@ export default function Nav() {
             >
               <header><div><span>PUBLIC TRANSIT</span><h2 id="mobile-menu-title">Navigate Hyperion</h2></div><button type="button" onClick={closeMobileMenu} aria-label="Close navigation menu"><X size={20} /></button></header>
               <nav aria-label="Mobile navigation">
-                <Link to="/card-studio" onClick={closeMobileMenu}>Card Studio</Link>
-                <Link to="/forge" onClick={closeMobileMenu}>Forge District</Link>
-                <Link to="/forge/catalog" onClick={closeMobileMenu}>Forge Catalog</Link>
-                <Link to="/build-archive" onClick={closeMobileMenu}>Proof</Link>
-                <Link to="/systems" onClick={closeMobileMenu}>Systems</Link>
-                <Link to="/contact" onClick={closeMobileMenu}>Contact</Link>
-                <button type="button" onClick={() => { closeMobileMenu(); openLauncher(); }}>City Map</button>
-                <Link to="/intake?source=mobile_menu" onClick={closeMobileMenu}>All Inquiry Lanes</Link>
+                <div className="mobile-nav-group">
+                  <span>Your work</span>
+                  <div className="mobile-nav-quick-links">
+                    <Link to="/intake" onClick={closeMobileMenu}>Start</Link>
+                    <Link to="/intake/resume" onClick={closeMobileMenu}>Resume</Link>
+                    <Link to="/account" onClick={closeMobileMenu}>My Projects</Link>
+                  </div>
+                </div>
+                <div className="mobile-nav-group">
+                  <span>Explore</span>
+                  <Link to="/store" onClick={closeMobileMenu}>Buy something useful now · Products</Link>
+                  <Link to="/forge" onClick={closeMobileMenu}>The Forge</Link>
+                  <Link to="/card-studio" onClick={closeMobileMenu}>Card Studio</Link>
+                  <Link to="/forge/catalog" onClick={closeMobileMenu}>Forge Catalog</Link>
+                  <Link to="/build-archive" onClick={closeMobileMenu}>Proof</Link>
+                  <Link to="/systems" onClick={closeMobileMenu}>Stratified Systems</Link>
+                  <Link to="/contact" onClick={closeMobileMenu}>Contact</Link>
+                  <button type="button" onClick={() => { closeMobileMenu(); openLauncher(); }}>City Map</button>
+                  <Link to="/intake?source=mobile_menu" onClick={closeMobileMenu}>All Inquiry Lanes</Link>
+                </div>
               </nav>
               <footer>
                 <span>City utilities</span>

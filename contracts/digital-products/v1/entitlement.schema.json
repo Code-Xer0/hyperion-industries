@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hyperion-industries.dev/contracts/digital-products/v1/entitlement.schema.json",
+  "title": "Hyperion digital product entitlement",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "entitlement_id", "purchase_id", "account_id", "product_id", "product_version", "license_scope", "state", "granted_at"],
+  "properties": {
+    "contract_version": { "const": "hyperion.digital-product-entitlement/1" },
+    "entitlement_id": { "type": "string", "pattern": "^ent_[A-Za-z0-9_-]{12,80}$" },
+    "purchase_id": { "type": "string", "pattern": "^pur_[A-Za-z0-9_-]{12,80}$" },
+    "account_id": { "type": "string", "pattern": "^acct_[A-Za-z0-9_-]{8,80}$" },
+    "product_id": { "enum": ["agent-policy", "flight-pack", "routing-kit"] },
+    "product_version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+    "license_scope": { "const": "purchasing_business_own_projects" },
+    "state": { "enum": ["active", "refund_revoked", "dispute_suspended"] },
+    "granted_at": { "type": "string", "format": "date-time" },
+    "revoked_at": { "type": "string", "format": "date-time" }
+  }
+}

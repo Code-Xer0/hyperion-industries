@@ -1,6 +1,16 @@
 export const PUBLIC_DOCTRINE = Object.freeze({
-  headline: 'Continuity infrastructure for fragmented operations.',
-  summary: 'Hyperion creates governed systems that preserve state across people, places, tools, hardware, documents, decisions, and service workflows.',
+  category: 'Stratified Systems',
+  headline: 'STRATIFIED SYSTEMS. BUILT TO SURVIVE CONTACT WITH REALITY.',
+  summary: 'Hyperion integrates people, AI, software, data, infrastructure, hardware, workflow, and governance into coherent operational systems.',
+  method: 'Deliberate integration across business logic, human workflow, agents, applications and data, identity and governance, infrastructure, and physical operations.',
+  continuity: 'A properly stratified system preserves state and operating capability across changes in people, vendors, devices, models, locations, and failures.',
+  economicPromise: 'More useful capability from the people and infrastructure an organization already has.',
+  operatingRange: 'Intervention can be one small automation or a complete deployment. The product is knowing which layers need attention and making them cohere.',
+  configurations: Object.freeze([
+    Object.freeze({ id: 'regulated-enterprise', title: 'Regulated Enterprise', detail: 'Identity · governance · workflow · institutional knowledge' }),
+    Object.freeze({ id: 'owner-operated', title: 'Owner-Operated', detail: 'Customer operations · scheduling · communications · automation' }),
+    Object.freeze({ id: 'institutional', title: 'Institutional', detail: 'Grants · records · stakeholder coordination · continuity' }),
+  ]),
   principle: 'Facts are source-bound. Meaning is context-bound. Actions are authority-bound.',
   assessment: 'Begin with the continuity failure. Capture the current state. Produce a useful artifact. Expand only after scope, evidence, permissions, and rollback paths are understood.',
   invariant: Object.freeze([

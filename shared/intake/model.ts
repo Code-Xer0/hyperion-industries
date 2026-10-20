@@ -177,14 +177,32 @@ export const LANES: Record<LaneId, LaneDefinition> = {
   },
   general: {
     id: 'general', name: 'General', short: 'Route a signal manually', accent: 'cyan', maturity: 'MANUAL ROUTING',
-    operatorLine: 'Keep the signal intact when no specialist lane is yet justified.',
+    operatorLine: 'Establish the objective, environment, constraints, and needed kind of help before an operator review.',
     questions: {
       signal: [
-        { id: 'signal_summary', label: 'What are you trying to move forward?', type: 'textarea', required: true },
-        { id: 'outcome_needed', label: 'What would a useful next step look like?', type: 'textarea', required: true },
+        { id: 'general.outcome', label: 'What objective are you trying to achieve?', type: 'textarea', required: true },
+        { id: 'general.current_state', label: 'What system, workflow, or operating environment exists today?', type: 'textarea', required: true },
+        { id: 'general.existing_tools', label: 'Which tools, applications, data sources, or hardware are already involved? Write “none” or “unknown” if needed.', type: 'textarea', required: true },
+        { id: 'general.blocker', label: 'What is broken, blocked, or costing the most effort?', type: 'textarea', required: true },
+        { id: 'general.success_criteria', label: 'What observable result would make this successful?', type: 'textarea', required: true },
       ],
       load: [
-        { id: 'urgency', label: 'Is there a meaningful timing constraint?', type: 'text' },
+        { id: 'general.budget', label: 'What budget range should shape the first step? “Unknown” is acceptable.', type: 'text', required: true },
+        { id: 'general.deadline', label: 'What deadline or decision window matters? “None” or “unknown” is acceptable.', type: 'text', required: true },
+        { id: 'general.help_needed', label: 'What kind of help do you need?', type: 'select', required: true, options: [
+          { value: 'strategy', label: 'Strategy or assessment' },
+          { value: 'implementation', label: 'Implementation' },
+          { value: 'both', label: 'Strategy and implementation' },
+          { value: 'unsure', label: 'Help me determine that' },
+        ] },
+        { id: 'general.scope', label: 'Who or what is affected?', type: 'select', required: true, options: [
+          { value: 'self', label: 'Me' }, { value: 'team', label: 'A team' }, { value: 'organization', label: 'An organization' },
+          { value: 'site', label: 'One site' }, { value: 'multiple_sites', label: 'Multiple sites' }, { value: 'unknown', label: 'Not sure yet' },
+        ] },
+        { id: 'general.next_step', label: 'What would help next?', type: 'select', required: true, options: [
+          { value: 'recommendation', label: 'A recommendation' }, { value: 'assessment', label: 'An assessment' }, { value: 'quote', label: 'A scoped quote' },
+          { value: 'support', label: 'Support' }, { value: 'conversation', label: 'A conversation' }, { value: 'unknown', label: 'Not sure yet' },
+        ] },
         { id: 'referral', label: 'How did you reach Hyperion?', type: 'text' },
       ],
     },

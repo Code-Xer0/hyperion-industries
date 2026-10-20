@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hyperion-industries.dev/contracts/digital-products/v1/product-configuration.schema.json",
+  "title": "Hyperion digital product configuration",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "product_id", "configuration"],
+  "properties": {
+    "contract_version": { "const": "hyperion.digital-product-configuration/1" },
+    "product_id": { "enum": ["agent-policy", "flight-pack", "routing-kit"] },
+    "configuration": { "type": "object" },
+    "projections": { "type": "array", "uniqueItems": true, "items": { "enum": ["codex", "claude-code", "gemini-cli", "generic"] } }
+  },
+  "allOf": [
+    { "if": { "properties": { "product_id": { "const": "agent-policy" } } }, "then": { "properties": { "configuration": { "type": "object", "additionalProperties": false, "required": ["business", "project", "canonical", "authorityOwner"], "properties": { "business": { "type": "string", "minLength": 1, "maxLength": 180 }, "project": { "type": "string", "minLength": 1, "maxLength": 800 }, "canonical": { "type": "string", "minLength": 1, "maxLength": 240 }, "authorityOwner": { "type": "string", "minLength": 1, "maxLength": 240 }, "existingRules": { "type": "string", "maxLength": 800 } } } } } },
+    { "if": { "properties": { "product_id": { "const": "flight-pack" } } }, "then": { "properties": { "configuration": { "type": "object", "additionalProperties": false, "required": ["project", "objective", "scope", "acceptance", "verification"], "properties": { "project": { "type": "string", "minLength": 1, "maxLength": 180 }, "objective": { "type": "string", "minLength": 1, "maxLength": 800 }, "scope": { "type": "string", "minLength": 1, "maxLength": 800 }, "acceptance": { "type": "string", "minLength": 1, "maxLength": 800 }, "verification": { "type": "string", "minLength": 1, "maxLength": 240 } } } } } },
+    { "if": { "properties": { "product_id": { "const": "routing-kit" } } }, "then": { "properties": { "configuration": { "type": "object", "additionalProperties": false, "required": ["hardware", "subscriptions", "workloads", "monthlyBudget", "constraints"], "properties": { "hardware": { "type": "string", "minLength": 1, "maxLength": 300 }, "localRuntime": { "type": "string", "maxLength": 180 }, "subscriptions": { "type": "string", "minLength": 1, "maxLength": 300 }, "workloads": { "type": "string", "minLength": 1, "maxLength": 500 }, "monthlyBudget": { "type": "string", "minLength": 1, "maxLength": 20 }, "constraints": { "type": "string", "minLength": 1, "maxLength": 500 } } } } } }
+  ]
+}

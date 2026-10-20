@@ -44,7 +44,7 @@ export default function Footer() {
                 <img src={brandMark} alt="" className="footer-mark" />
                 <span className="footer-wm">Hyperion Industries</span>
               </div>
-              <p className="footer-desc">Governed, local-first systems that preserve state, protect authority, and help work continue across boundaries.</p>
+              <p className="footer-desc">Stratified operational systems that turn existing people and infrastructure into useful capability, with continuity across change.</p>
               <a href="https://hyperion-industries.dev" className="footer-url">hyperion-industries.dev</a>
             </div>
           </HoverEditor>

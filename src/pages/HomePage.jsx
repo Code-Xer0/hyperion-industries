@@ -2,12 +2,13 @@ import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import { ArrowUpRight } from 'lucide-react';
 import PageShell from '../components/layout/PageShell';
+import CinematicBackdrop from '../components/ui/CinematicBackdrop';
 import HeroCanvas from '../components/ui/HeroCanvas';
-import OperatorMascot from '../components/portal/OperatorMascot';
 import RoomShell from '../components/portal/RoomShell';
 import { CityMap, ForgeBuildNavigation, MaturityLegend, ProofLane, StatusRail } from '../components/portal/PortalPrimitives';
 import { cityRoutes, getDistrict, getFeaturedDistricts, getStatusRailDistricts } from '../data/publicCity';
 import { PUBLIC_DOCTRINE } from '../data/publicDoctrine';
+import { HYPERION_MEDIA_MANIFEST } from '../data/mediaManifest';
 import './HomePage.css';
 
 const stations = [
@@ -36,22 +37,37 @@ export default function HomePage() {
 
   const panels = {
     signal: (
-      <div className="gate-signal-room">
+      <div className="gate-signal-room gate-flagship-room">
         <div className="gate-copy">
-          <p className="gate-kicker">Hyperion Industries · Public Edge · Soft Launch</p>
-          <h2>{PUBLIC_DOCTRINE.headline}</h2>
-          <p className="gate-lead">{PUBLIC_DOCTRINE.summary}</p>
-          <p>When work crosses people, machines, records, and tools, state gets lost and authority gets blurry. Hyperion captures that break, preserves the evidence, and routes a bounded next action.</p>
-          <p className="gate-principle">{PUBLIC_DOCTRINE.principle}</p>
-          <div className="room-action-row">
-            <Link to="/intake?source=home_signal" className="btn btn-gold">Start an Inquiry</Link>
-            <Link to="/forge/configurator?source=home_signal" className="btn btn-ghost">Start a Forge Build</Link>
-            <Link to="/#proof" className="btn btn-ghost">View Public Proof</Link>
+          <p className="gate-kicker">Hyperion Industries · {PUBLIC_DOCTRINE.category}</p>
+          <h2>STRATIFIED SYSTEMS.<br /><em>BUILT TO SURVIVE CONTACT WITH REALITY.</em></h2>
+          <p className="gate-lead">Hyperion integrates people, AI, software, data, infrastructure, hardware, workflow, and governance into coherent operational systems.</p>
+          <p className="gate-promise">We don’t sell seats or hours. We build the system that turns capability into useful output.</p>
+          <div className="gate-doors-grid" aria-label="Two ways to work with Hyperion">
+            <Link to="/store#products" className="gate-door-card is-product">
+              <span className="door-tag">PERSONALIZED PRODUCT PREVIEWS · CHECKOUT PREPARING</span>
+              <strong className="door-title">Buy something useful now</strong>
+              <p className="door-desc">Agent Policy · Flight Pack · Local + Frontier Routing</p>
+              <span className="door-cta">Three compiled products · $19–49 <ArrowUpRight size={13} aria-hidden="true" /></span>
+            </Link>
+            <Link to="/intake" className="gate-door-card is-custom">
+              <span className="door-tag">SCOPED · OPERATOR-REVIEWED</span>
+              <strong className="door-title">Build something serious with Hyperion</strong>
+              <p className="door-desc">Connect the layers that need to work together, from one small automation to a complete deployment.</p>
+              <span className="door-cta">Start an assessment <ArrowUpRight size={13} aria-hidden="true" /></span>
+            </Link>
           </div>
+          <nav className="gate-quick-links" aria-label="Quick access">
+            <Link to="/intake">Start</Link><Link to="/intake/resume">Resume</Link>
+            <Link to="/account">My Projects</Link><Link to="/forge/configurator">Forge</Link>
+            <Link to="/card-studio">Card Studio</Link>
+          </nav>
           <StatusRail districts={statusRail} compact />
         </div>
-        <div className="gate-operator" aria-label="Hyperion City guide">
-          <OperatorMascot />
+          <div className="gate-company-proof" aria-label="Hyperion continuity property">
+          <span>ENGINEERING PROPERTY · CONTINUITY</span>
+          <strong>Built to keep working through change.</strong>
+          <p>{PUBLIC_DOCTRINE.continuity}</p>
         </div>
       </div>
     ),
@@ -59,10 +75,10 @@ export default function HomePage() {
       <div className="gate-method-room">
         <div className="gate-room-heading">
           <div>
-            <span className="city-label">Continuity method</span>
-            <h2>One operating grammar.</h2>
+            <span className="city-label">Stratified Systems · Method</span>
+            <h2>Connect the layers that matter.</h2>
           </div>
-          <p>Specialized systems stay distinct. The same rules govern how they capture evidence, preserve meaning, and request action.</p>
+          <p>{PUBLIC_DOCTRINE.method}</p>
         </div>
         <div className="gate-method-grid">
           {PUBLIC_DOCTRINE.invariant.map((step, index) => (
@@ -74,6 +90,12 @@ export default function HomePage() {
           ))}
         </div>
         <blockquote>{PUBLIC_DOCTRINE.principle}</blockquote>
+        <div className="gate-configurations" aria-label="Illustrative operating configurations">
+          {PUBLIC_DOCTRINE.configurations.map((configuration) => (
+            <article key={configuration.id}><span>ILLUSTRATIVE CONFIGURATION</span><h3>{configuration.title}</h3><p>{configuration.detail}</p></article>
+          ))}
+        </div>
+        <p className="gate-operating-range">{PUBLIC_DOCTRINE.operatingRange}</p>
       </div>
     ),
     city: (
@@ -129,28 +151,28 @@ export default function HomePage() {
   return (
     <PageShell className="home city-gate-page">
       <Helmet>
-        <title>Hyperion Industries | Continuity Infrastructure</title>
-        <meta name="description" content="Hyperion builds continuity infrastructure that preserves state, provenance, context, and human authority across fragmented operations." />
+        <title>Hyperion Industries | Stratified Systems</title>
+        <meta name="description" content="Hyperion integrates people, AI, software, data, infrastructure, hardware, workflow, and governance into coherent operational systems built to survive contact with reality." />
         <link rel="canonical" href="https://hyperion-industries.dev/" />
-        <meta property="og:title" content="Hyperion Industries | Continuity Infrastructure" />
-        <meta property="og:description" content="Governed, local-first systems that preserve state and route action without borrowing operator authority." />
+        <meta property="og:title" content="Hyperion Industries | Stratified Systems" />
+        <meta property="og:description" content="Hyperion integrates the layers that turn capability into useful output, with continuity across tools, people, and change." />
         <meta property="og:type" content="website" />
       </Helmet>
 
       <RoomShell
         eyebrow="Hyperion City / Gate"
         title="City Gate"
-        summary="The public edge of a governed continuity company: evidence, maturity, operating domains, and assessment-first entry."
+        summary="People, AI, software, data, infrastructure, hardware, workflow, and governance, composed into useful operational systems."
         status="PUBLIC EDGE · SOFT LAUNCH"
         tone="live"
         stations={stations}
         panels={panels}
         defaultStation="signal"
         className="gate-city-room"
+        actions={<div className="gate-cinematic-actions"><div id="gate-film-controls" className="gate-film-controls" /><small>Hyperion City concept film</small></div>}
         backdrop={(
           <>
-            <video className="gate-film" src="/assets/city/hyperion-city-mark.mp4" autoPlay muted loop playsInline preload="metadata" />
-            <video className="gate-brand-film" src="/assets/city/hyperion-logo-sequence.mp4" autoPlay muted loop playsInline preload="metadata" />
+            <CinematicBackdrop asset={HYPERION_MEDIA_MANIFEST.assets.city_gate} className="gate-film" label="Play Hyperion City cinematic" controlTarget="gate-film-controls" autoplay />
             <div className="gate-film-shade" />
             <HeroCanvas />
           </>

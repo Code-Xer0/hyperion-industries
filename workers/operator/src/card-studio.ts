@@ -55,6 +55,7 @@ interface RevisionRow {
 
 interface ExistingIntentRow {
   intent_id: string;
+  project_id: string;
   payload_hash: string;
   receipt_json: string;
 }
@@ -397,11 +398,6 @@ export async function handleOrderSubmit(
   const db = requireDb(env);
   await requireProjectSession(request, db, projectId);
   const keyHash = await sha256(idempotencyKey(request));
-  const duplicate = await db.prepare(
-    "SELECT intent_id, payload_hash, receipt_json FROM card_studio_order_intents WHERE idempotency_key_hash = ? LIMIT 1",
-  ).bind(keyHash).first<ExistingIntentRow>();
-  if (duplicate) return jsonResponse({ ok: true, receipt: parseJson(duplicate.receipt_json), duplicate: true });
-
   const value = await readJsonBody(request, 64 * 1024);
   if (!validateOrderIntent(value)) validationError(validateOrderIntent);
   const intent = value as OrderIntent;
@@ -409,8 +405,34 @@ export async function handleOrderSubmit(
     throw new HttpError(400, "order_intent_invalid", "The order intent does not match this project.");
   }
   const payloadHash = await sha256(canonical(intent));
+  const duplicate = await db.prepare(
+    "SELECT intent_id, project_id, payload_hash, receipt_json FROM card_studio_order_intents WHERE idempotency_key_hash = ? LIMIT 1",
+  ).bind(keyHash).first<ExistingIntentRow>();
+  if (duplicate) {
+    if (constantTimeEqual(duplicate.payload_hash, payloadHash)) {
+      return jsonResponse({ ok: true, receipt: parseJson(duplicate.receipt_json), duplicate: true });
+    }
+    const now = deps.now().toISOString();
+    try {
+      await db.batch([
+        db.prepare(
+          `INSERT INTO card_studio_revision_conflicts
+           (conflict_id, intent_id, existing_hash, received_hash, state, request_id, created_at)
+           VALUES (?, ?, ?, ?, 'quarantined', ?, ?)`,
+        ).bind(generatedId("csc", deps), duplicate.intent_id, duplicate.payload_hash, payloadHash, requestId, now),
+        db.prepare(
+          `INSERT INTO card_studio_audit_events
+           (audit_id, project_id, intent_id, proposal_id, event_type, actor_class, request_id, created_at)
+           VALUES (?, ?, ?, NULL, 'idempotency_payload_conflict_quarantined', 'system', ?, ?)`,
+        ).bind(generatedId("csaud", deps), duplicate.project_id, duplicate.intent_id, requestId, now),
+      ]);
+    } catch {
+      throw new HttpError(503, "conflict_storage_unavailable", "The conflicting submission could not be quarantined.");
+    }
+    throw new HttpError(409, "idempotency_payload_conflict", "This idempotency key is already bound to different submission content.");
+  }
   const existing = await db.prepare(
-    "SELECT intent_id, payload_hash, receipt_json FROM card_studio_order_intents WHERE intent_id = ? LIMIT 1",
+    "SELECT intent_id, project_id, payload_hash, receipt_json FROM card_studio_order_intents WHERE intent_id = ? LIMIT 1",
   ).bind(intent.intent_id).first<ExistingIntentRow>();
   if (existing) {
     if (constantTimeEqual(existing.payload_hash, payloadHash)) {
@@ -428,7 +450,7 @@ export async function handleOrderSubmit(
           `INSERT INTO card_studio_audit_events
            (audit_id, project_id, intent_id, proposal_id, event_type, actor_class, request_id, created_at)
            VALUES (?, ?, ?, NULL, 'intent_conflict_quarantined', 'system', ?, ?)`,
-        ).bind(generatedId("csaud", deps), projectId, intent.intent_id, requestId, now),
+      ).bind(generatedId("csaud", deps), existing.project_id, intent.intent_id, requestId, now),
       ]);
     } catch {
       throw new HttpError(503, "conflict_storage_unavailable", "The conflicting order intent could not be quarantined.");
@@ -534,11 +556,32 @@ export async function handleOrderSubmit(
     ]);
   } catch {
     const raced = await db.prepare(
-      "SELECT intent_id, payload_hash, receipt_json FROM card_studio_order_intents WHERE idempotency_key_hash = ? LIMIT 1",
+      "SELECT intent_id, project_id, payload_hash, receipt_json FROM card_studio_order_intents WHERE idempotency_key_hash = ? LIMIT 1",
     ).bind(keyHash).first<ExistingIntentRow>();
-    if (raced) return jsonResponse({ ok: true, receipt: parseJson(raced.receipt_json), duplicate: true });
+    if (raced && constantTimeEqual(raced.payload_hash, payloadHash)) {
+      return jsonResponse({ ok: true, receipt: parseJson(raced.receipt_json), duplicate: true });
+    }
+    if (raced) {
+      try {
+        await db.batch([
+          db.prepare(
+            `INSERT INTO card_studio_revision_conflicts
+             (conflict_id, intent_id, existing_hash, received_hash, state, request_id, created_at)
+             VALUES (?, ?, ?, ?, 'quarantined', ?, ?)`,
+          ).bind(generatedId("csc", deps), raced.intent_id, raced.payload_hash, payloadHash, requestId, now),
+          db.prepare(
+            `INSERT INTO card_studio_audit_events
+             (audit_id, project_id, intent_id, proposal_id, event_type, actor_class, request_id, created_at)
+             VALUES (?, ?, ?, NULL, 'idempotency_payload_conflict_quarantined', 'system', ?, ?)`,
+          ).bind(generatedId("csaud", deps), raced.project_id, raced.intent_id, requestId, now),
+        ]);
+      } catch {
+        throw new HttpError(503, "conflict_storage_unavailable", "The raced submission conflict could not be quarantined.");
+      }
+      throw new HttpError(409, "idempotency_payload_conflict", "This idempotency key is already bound to different submission content.");
+    }
     const racedIntent = await db.prepare(
-      "SELECT intent_id, payload_hash, receipt_json FROM card_studio_order_intents WHERE intent_id = ? LIMIT 1",
+      "SELECT intent_id, project_id, payload_hash, receipt_json FROM card_studio_order_intents WHERE intent_id = ? LIMIT 1",
     ).bind(intent.intent_id).first<ExistingIntentRow>();
     if (racedIntent && !constantTimeEqual(racedIntent.payload_hash, payloadHash)) {
       try {
@@ -552,7 +595,7 @@ export async function handleOrderSubmit(
             `INSERT INTO card_studio_audit_events
              (audit_id, project_id, intent_id, proposal_id, event_type, actor_class, request_id, created_at)
              VALUES (?, ?, ?, NULL, 'intent_conflict_quarantined', 'system', ?, ?)`,
-          ).bind(generatedId("csaud", deps), projectId, intent.intent_id, requestId, now),
+          ).bind(generatedId("csaud", deps), racedIntent.project_id, intent.intent_id, requestId, now),
         ]);
       } catch {
         throw new HttpError(503, "conflict_storage_unavailable", "The raced order conflict could not be quarantined.");
@@ -747,6 +790,9 @@ export async function handleCardOperatorDecision(
   }
   if (command.decision === "release_checkout" && proposal.eligibility !== "instant_checkout_eligible") {
     throw new HttpError(409, "checkout_not_eligible", "This proposal requires review and cannot enter the fixed-SKU checkout lane.");
+  }
+  if (command.decision === "release_checkout" && proposal.proposal_state !== "proof_approved") {
+    throw new HttpError(409, "proof_approval_required", "An operator must approve the exact proof revision before checkout can be released.");
   }
   const states = decisionStates(command.decision);
   const now = deps.now().toISOString();

@@ -1,4 +1,5 @@
 import { handleChat } from "./chat";
+import { handleCommerceReadiness, handleDigitalProductPreview } from "./digital-commerce";
 import {
   handleCardCatalog,
   handleCardOperatorCheckout,
@@ -49,6 +50,8 @@ const ROUTES = new Map([
   ["/api/card-studio/operator/decisions", "POST"],
   ["/api/card-studio/operator/checkout", "POST"],
   ["/api/card-studio/webhooks/shopify", "POST"],
+  ["/api/commerce/readiness", "GET"],
+  ["/api/commerce/products/preview", "POST"],
 ]);
 
 const DRAFT_ROUTE = /^\/api\/intake\/drafts\/(drf_[A-Za-z0-9_-]{12,64})$/;
@@ -75,7 +78,8 @@ export function createWorker(overrides: Partial<RuntimeDependencies> = {}): Oper
       const url = new URL(request.url);
       const operatorOwnedPath = url.pathname.startsWith("/api/operator")
         || url.pathname.startsWith("/api/intake")
-        || url.pathname.startsWith("/api/card-studio");
+        || url.pathname.startsWith("/api/card-studio")
+        || url.pathname.startsWith("/api/commerce");
 
       // This Worker is the zone's edge owner. Preserve every unrelated public
       // route by forwarding it to the configured origin without inspection.
@@ -161,6 +165,8 @@ export function createWorker(overrides: Partial<RuntimeDependencies> = {}): Oper
         else if (url.pathname === "/api/card-studio/operator/status") response = await handleCardOperatorStatus(request, env, deps);
         else if (url.pathname === "/api/card-studio/operator/checkout") response = await handleCardOperatorCheckout(request, env, requestId, deps);
         else if (url.pathname === "/api/card-studio/webhooks/shopify") response = await handleCardShopifyWebhook(request, env, deps);
+        else if (url.pathname === "/api/commerce/readiness") response = handleCommerceReadiness();
+        else if (url.pathname === "/api/commerce/products/preview") response = await handleDigitalProductPreview(request);
         else response = await handleCardOperatorDecision(request, env, requestId, deps);
       } catch (error) {
         if (error instanceof HttpError) {

@@ -29,6 +29,7 @@ const DevDiaryPage = lazy(() => import('./pages/DevDiaryPage'));
 const ContactPage = lazy(() => import('./pages/ContactPage'));
 const NewsletterPage = lazy(() => import('./pages/NewsletterPage'));
 const StorePage = lazy(() => import('./pages/StorePage'));
+const ProductConfiguratorPage = lazy(() => import('./features/digital-products/ProductConfiguratorPage'));
 const EditorPage = import.meta.env.DEV ? lazy(() => import('./pages/EditorPage')) : () => null;
 const CardStudioSpecimensPage = import.meta.env.DEV ? lazy(() => import('./pages/CardStudioSpecimensPage')) : () => null;
 import { HelmetProvider } from 'react-helmet-async';
@@ -167,6 +168,7 @@ export default function App() {
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/mcp" element={<McpPage />} />
               <Route path="/newsletter" element={<NewsletterPage />} />
+              <Route path="/store/configure/:productId" element={<ProductConfiguratorPage />} />
               <Route path="/store" element={<StorePage />} />
               <Route path="*" element={<ContentOrNotFoundRoute />} />
             </Routes>

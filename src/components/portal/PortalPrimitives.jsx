@@ -1,10 +1,12 @@
-import { useEffect, useRef } from 'react';
+import { lazy, Suspense, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { cityRoutes, getDistrict } from '../../data/publicCity';
 import RoomShell from './RoomShell';
 import StatusChip from './StatusChip';
 import { PUBLIC_DOCTRINE } from '../../data/publicDoctrine';
 import './PortalPrimitives.css';
+
+const ForgeCinematicBackdrop = lazy(() => import('../ui/ForgeCinematicBackdrop'));
 
 function PortalLink({ action, className }) {
   if (!action) return null;
@@ -375,6 +377,8 @@ export function DistrictLayout({ district }) {
       stations={stations}
       panels={panels}
       defaultStation="overview"
+      backdrop={district.id === 'forge' ? <Suspense fallback={null}><ForgeCinematicBackdrop controlTarget="forge-cinematic-control" /></Suspense> : undefined}
+      actions={district.id === 'forge' ? <div id="forge-cinematic-control" className="forge-cinematic-control-host" /> : undefined}
       className={`district-room-shell city-accent-${district.accent}`}
     />
   );

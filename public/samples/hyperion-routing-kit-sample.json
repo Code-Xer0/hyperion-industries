@@ -1,0 +1,21 @@
+{
+  "sample": true,
+  "notice": "Illustrative routing policy only. It does not configure provider credentials or permissions.",
+  "workloads": [
+    {
+      "name": "Private classification",
+      "route": "local only when runtime and data handling are verified",
+      "require_human_review_for_external_effects": true
+    },
+    {
+      "name": "General drafting",
+      "route": "declared subscription provider, then frontier API only within the configured budget",
+      "require_human_review_for_external_effects": true
+    }
+  ],
+  "budget_rules": {
+    "stop_at_monthly_ceiling": true,
+    "allow_undeclared_provider": false,
+    "silent_provider_change": false
+  }
+}

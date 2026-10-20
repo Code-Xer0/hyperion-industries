@@ -7,8 +7,8 @@
   "alias": "Δeus χ",
   "role": "FOUNDER · SYSTEMS ARCHITECT",
   "brand": "HYPERION INDUSTRIES",
-  "capability": "CONTINUITY · PROVENANCE · OPERATOR CONTROL",
-  "tagline": "Continuity infrastructure for fragmented operations.",
+  "capability": "STRATIFIED SYSTEMS · CONTINUITY · OPERATOR CONTROL",
+  "tagline": "Stratified operational systems, built to survive contact with reality.",
   "footTag": "PROVENANCE · OPERATOR CONTROL",
   "teleMark": "HYPERION",
   "glyph": {
@@ -29,12 +29,12 @@
   "portraitBlend": true,
   "qr": "/assets/card/qr.png",
   "doctrine": {
-    "label": "CONTINUITY DOCTRINE",
+    "label": "STRATIFIED SYSTEMS",
     "vol": "REV · 2026.08",
     "titlePre": "Build systems that",
     "titleHighlight": "survive",
     "titlePost": "contact with reality.",
-    "body": "Hyperion builds continuity infrastructure for fragmented operations — preserving state, provenance, context, and operator control across people, tools, hardware, documents, decisions, and service workflows.",
+    "body": "Hyperion integrates people, AI, software, data, infrastructure, hardware, workflow, and governance into coherent operational systems, preserving continuity through change.",
     "website": "hyperion-industries.dev",
     "email": "va@hyperion-industries.dev"
   },

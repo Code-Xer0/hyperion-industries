@@ -84,7 +84,7 @@ describe("POST /api/operator/chat", () => {
     expect(events[2]?.data).toEqual({ text: " world" });
     expect(events[4]?.data).toEqual({ status: "complete" });
     const sourceData = events[3]?.data as { sources: Array<{ id: string; title: string; href: string }> };
-    expect(sourceData.sources).toHaveLength(7);
+    expect(sourceData.sources).toHaveLength(8);
     expect(sourceData.sources.every((source) => source.href.startsWith("https://hyperion-industries.dev/"))).toBe(true);
     expect(sourceData.sources.map((source) => source.id)).toContain("company-overview");
     expect(stream).not.toContain("OPENROUTER PROCESSING");

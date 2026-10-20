@@ -1,0 +1,43 @@
+.product-config-page { min-height: 100vh; padding: 112px clamp(18px, 5vw, 72px) 72px; background: #05070a; color: #f7f5ef; }
+.product-back-link { display: inline-flex; align-items: center; gap: 8px; color: #b8bdc2; font-size: 12px; text-decoration: none; }
+.product-back-link:hover { color: #ffc72c; }
+.product-config-heading { max-width: 900px; margin: 34px auto 30px; }
+.product-config-heading > span, .product-config-summary > span, .product-preview-result > span { color: #ffc72c; font: 700 8px var(--font-display); letter-spacing: .12em; text-transform: uppercase; }
+.product-config-heading h1 { margin: 12px 0 10px; font-size: clamp(38px, 6vw, 74px); line-height: .98; }
+.product-config-heading > p { max-width: 720px; color: #b8bdc2; font-size: 15px; line-height: 1.65; }
+.product-price-row { display: flex; align-items: center; gap: 12px; margin-top: 17px; }
+.product-price-row strong { color: #ffc72c; font-size: 26px; }
+.product-price-row span { color: #939ba2; font-size: 11px; }
+.product-config-layout { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(280px, .7fr); gap: 24px; max-width: 1200px; margin: auto; align-items: start; }
+.product-config-form, .product-config-summary { border: 1px solid rgba(255,255,255,.13); background: #0a0d11; }
+.product-config-form { padding: clamp(18px, 3vw, 32px); }
+.product-config-form fieldset { min-width: 0; margin: 0 0 26px; padding: 0; border: 0; }
+.product-config-form legend { margin-bottom: 16px; color: #fff; font-size: 16px; font-weight: 700; }
+.product-config-field { display: grid; gap: 8px; margin: 13px 0; }
+.product-config-field > span { color: #d9dbdc; font-size: 12px; }
+.product-config-field b { color: #ffc72c; }
+.product-config-field input, .product-config-field textarea { width: 100%; min-height: 44px; padding: 11px 12px; border: 1px solid rgba(255,255,255,.18); border-radius: 0; background: #05070a; color: #f7f5ef; font: inherit; font-size: 13px; }
+.product-config-field textarea { min-height: 88px; resize: vertical; }
+.product-config-field input:focus-visible, .product-config-field textarea:focus-visible, .product-projection-list input:focus-visible { outline: 2px solid #ffc72c; outline-offset: 2px; }
+.product-config-form fieldset > p { color: #9ea5aa; font-size: 11px; line-height: 1.55; }
+.product-projection-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.product-projection-list label { display: flex; min-height: 46px; align-items: center; gap: 9px; padding: 10px; border: 1px solid rgba(255,255,255,.12); color: #d9dbdc; font-size: 11px; }
+.product-projection-list input { width: 17px; height: 17px; accent-color: #ffc72c; }
+.product-preview-button { min-height: 46px; display: inline-flex; align-items: center; gap: 9px; }
+.product-config-message { min-height: 1.4em; margin: 12px 0 0; color: #9ea5aa; font-size: 11px; }
+.product-config-message.is-error { color: #ff9c91; }
+.product-config-message.is-ready { color: #b3e3c0; }
+.product-config-summary { position: sticky; top: 82px; padding: 22px; }
+.product-config-summary h2 { margin: 9px 0 17px; font-size: 21px; }
+.product-config-summary ul { display: grid; gap: 11px; margin: 0; padding: 0; list-style: none; }
+.product-config-summary li { display: flex; align-items: start; gap: 9px; color: #c0c5c9; font-size: 11px; line-height: 1.45; }
+.product-config-summary li svg { flex: 0 0 auto; color: #ffc72c; }
+.product-preview-result { margin-top: 22px; padding: 14px; border: 1px solid rgba(117,211,146,.42); background: rgba(117,211,146,.06); }
+.product-preview-result p { color: #d6eadb; font-size: 12px; line-height: 1.55; }
+.product-preview-result code { color: #bac4bd; font-size: 10px; overflow-wrap: anywhere; }
+.product-config-terms { margin-top: 22px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,.12); }
+.product-config-terms strong { color: #ffc72c; font-size: 12px; }
+.product-config-terms p { color: #9ea5aa; font-size: 10px; line-height: 1.6; }
+@media (max-width: 800px) { .product-config-layout { grid-template-columns: 1fr; } .product-config-summary { position: static; } }
+@media (max-width: 520px) { .product-config-page { padding: 84px 16px 48px; } .product-projection-list { grid-template-columns: 1fr; } .product-config-heading { margin-top: 24px; } }
+@media (prefers-reduced-motion: reduce) { .product-config-page * { scroll-behavior: auto !important; } }

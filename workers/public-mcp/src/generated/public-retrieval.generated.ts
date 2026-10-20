@@ -7,7 +7,7 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
     "endpoint": "https://mcp.hyperion-industries.dev/mcp",
     "documentation": "https://hyperion-industries.dev/mcp"
   },
-  "revision": "2026-08-03",
+  "revision": "2026-10-20",
   "company": {
     "id": "hyperion-industries",
     "name": "Hyperion Industries",
@@ -61,27 +61,28 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
       "id": "home",
       "path": "/",
       "canonicalUrl": "https://hyperion-industries.dev/",
-      "title": "Hyperion Industries | Continuity Infrastructure",
-      "description": "Minneapolis-based Hyperion Industries builds governed, local-first continuity infrastructure that preserves state and routes action across fragmented operations.",
-      "summary": "Hyperion creates governed systems that preserve state across people, places, tools, hardware, documents, decisions, and service workflows.",
+      "title": "Hyperion Industries | Stratified Systems",
+      "description": "Minneapolis-based Hyperion Industries integrates people, AI, software, data, infrastructure, hardware, workflow, and governance into coherent operational systems.",
+      "summary": "Hyperion integrates people, AI, software, data, infrastructure, hardware, workflow, and governance into coherent operational systems.",
       "maturity": "PUBLIC EDGE · SOFT LAUNCH",
       "schemaType": "WebSite",
       "indexable": true,
       "image": "https://hyperion-industries.dev/assets/branding/hyperion/hyperion-link-preview.jpeg",
       "relatedRoutes": [
+        "/store",
+        "/intake",
         "/systems",
         "/forge",
-        "/card-studio",
-        "/contact"
+        "/card-studio"
       ]
     },
     {
       "id": "systems",
       "path": "/systems",
       "canonicalUrl": "https://hyperion-industries.dev/systems",
-      "title": "Continuity Systems and Maturity | Hyperion Industries",
-      "description": "Explore Hyperion continuity domains with explicit public proof, commercial, development, research, and authority boundaries.",
-      "summary": "Specialized systems that preserve state and context without collapsing domain authority.",
+      "title": "Stratified Systems and Operating Configurations | Hyperion Industries",
+      "description": "Explore how Hyperion integrates workflow, agents, applications, data, identity, governance, infrastructure, and physical operations.",
+      "summary": "Deliberate integration across business logic, human workflow, agents, applications and data, identity and governance, infrastructure, and physical operations.",
       "maturity": "PUBLIC-SAFE MAP",
       "schemaType": "CollectionPage",
       "indexable": true,
@@ -231,17 +232,62 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
       "id": "store",
       "path": "/store",
       "canonicalUrl": "https://hyperion-industries.dev/store",
-      "title": "Hyperion Store Status | Products by Inquiry",
-      "description": "Current Hyperion product and service lanes without invented inventory, payment capture, or public checkout.",
-      "summary": "A truthful product-lane directory for systems currently available by scoped inquiry.",
-      "maturity": "STAGED · NO CHECKOUT",
+      "title": "Hyperion Storefront | Personalized Operational Products",
+      "description": "Three personalized, compiled Hyperion products: Agent Policy, Flight Pack, and Local + Frontier Routing Starter Kit.",
+      "summary": "Deterministic product packages with clear commercial terms and private account delivery.",
+      "maturity": "SANDBOX PREPARATION · CHECKOUT NOT ACTIVE",
       "schemaType": "CollectionPage",
       "indexable": true,
       "image": "https://hyperion-industries.dev/assets/branding/hyperion/hyperion-link-preview.jpeg",
       "relatedRoutes": [
+        "/intake",
         "/forge",
-        "/identity",
-        "/contact"
+        "/account"
+      ]
+    },
+    {
+      "id": "store--configure--agent-policy",
+      "path": "/store/configure/agent-policy",
+      "canonicalUrl": "https://hyperion-industries.dev/store/configure/agent-policy",
+      "title": "Configure Hyperion Agent Policy | Hyperion Industries",
+      "description": "Prepare a personalized, deterministic agent policy package for preview. Checkout remains in sandbox preparation.",
+      "summary": "Agent Policy configuration preview.",
+      "maturity": "SANDBOX PREPARATION · CHECKOUT NOT ACTIVE",
+      "schemaType": "WebPage",
+      "indexable": true,
+      "image": "https://hyperion-industries.dev/assets/branding/hyperion/hyperion-link-preview.jpeg",
+      "relatedRoutes": [
+        "/store"
+      ]
+    },
+    {
+      "id": "store--configure--flight-pack",
+      "path": "/store/configure/flight-pack",
+      "canonicalUrl": "https://hyperion-industries.dev/store/configure/flight-pack",
+      "title": "Configure Hyperion Flight Pack | Hyperion Industries",
+      "description": "Prepare a personalized project brief, bounded work order, execution plan, and review package for preview.",
+      "summary": "Flight Pack configuration preview.",
+      "maturity": "SANDBOX PREPARATION · CHECKOUT NOT ACTIVE",
+      "schemaType": "WebPage",
+      "indexable": true,
+      "image": "https://hyperion-industries.dev/assets/branding/hyperion/hyperion-link-preview.jpeg",
+      "relatedRoutes": [
+        "/store"
+      ]
+    },
+    {
+      "id": "store--configure--routing-kit",
+      "path": "/store/configure/routing-kit",
+      "canonicalUrl": "https://hyperion-industries.dev/store/configure/routing-kit",
+      "title": "Configure Local + Frontier Routing Kit | Hyperion Industries",
+      "description": "Prepare a provider and workload routing profile with explicit cost, local-runtime, and escalation constraints.",
+      "summary": "Routing Starter Kit configuration preview.",
+      "maturity": "SANDBOX PREPARATION · CHECKOUT NOT ACTIVE",
+      "schemaType": "WebPage",
+      "indexable": true,
+      "image": "https://hyperion-industries.dev/assets/branding/hyperion/hyperion-link-preview.jpeg",
+      "relatedRoutes": [
+        "/store"
       ]
     },
     {
@@ -300,8 +346,8 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
       "path": "/dxcard",
       "canonicalUrl": "https://hyperion-industries.dev/dxcard",
       "title": "Δeus χ | Victor Amani Operator Card",
-      "description": "Victor Amani is a founder and systems architect building continuity infrastructure for fragmented operations with provenance and operator control.",
-      "summary": "A compact public identity and contact surface for Hyperion continuity architecture.",
+      "description": "Victor Amani is a founder and systems architect building stratified operational systems with provenance, governance, and operator control.",
+      "summary": "A compact public identity and contact surface for Hyperion Stratified Systems.",
       "maturity": "SHIPPING",
       "schemaType": "ProfilePage",
       "indexable": true,
@@ -895,14 +941,14 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
   ],
   "corpus": {
     "id": "hyperion-operator-public",
-    "revision": "2026-08-03",
+    "revision": "2026-10-20",
     "entries": [
       {
         "id": "company-overview",
         "title": "Hyperion Industries",
         "route": "/",
         "visibility": "public",
-        "content": "Hyperion Industries builds continuity infrastructure for fragmented operations. Its governed, local-first systems preserve state across people, places, tools, hardware, documents, decisions, and service workflows. Public claims preserve maturity labels and never imply access to private operator systems, records, source code, telemetry, or execution authority."
+        "content": "Hyperion Industries builds Stratified Systems: coherent operational systems across business logic, human workflow, agents, applications and data, identity and governance, infrastructure, and physical operations. Continuity is an engineering property across changes in people, vendors, devices, models, locations, and failures. The economic promise is more useful capability from the people and infrastructure an organization already has. Public claims preserve maturity labels and never imply access to private operator systems, records, source code, telemetry, or execution authority."
       },
       {
         "id": "operating-doctrine",
@@ -937,7 +983,7 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
         "title": "Contact and intake",
         "route": "/contact",
         "visibility": "public",
-        "content": "Hyperion begins with a bounded assessment of the continuity failure, workload, trust surface, support issue, or relationship question. Visitors should share the current environment, affected people or systems, known evidence, constraints, and what a useful first artifact would be. A submitted signal begins operator review; it is not a quote, contract, deployment, access grant, or automation promise. Visitors must not submit credentials, secrets, private archives, restricted logs, or sensitive operational records."
+        "content": "Hyperion begins with a bounded assessment of the objective, current system, existing tools, failure, budget, deadline, success criteria, and whether strategy, implementation, or both are needed. A submitted signal begins operator review; it is not a quote, contract, deployment, access grant, or automation promise. Visitors must not submit credentials, secrets, private archives, restricted logs, or sensitive operational records."
       },
       {
         "id": "founding-operators",
@@ -945,8 +991,15 @@ export const PUBLIC_RETRIEVAL_MANIFEST = {
         "route": "/founders",
         "visibility": "public",
         "content": "Victor Amani is the founder and systems architect behind Hyperion Industries' local-first infrastructure direction. Keshawn Rowe is the founding operator focused on operations, deployment, field systems, build intake, and client handoff. Public profiles describe responsibility without exposing private records or operator controls."
+      },
+      {
+        "id": "digital-products",
+        "title": "Personalized digital products",
+        "route": "/store",
+        "visibility": "public",
+        "content": "Hyperion is preparing three deterministic products: Agent Policy ($19), Flight Pack ($29), and Local + Frontier Routing Starter Kit ($49), with free representative samples. Each package is configured from buyer-supplied constraints. Checkout, payment, entitlement, and fulfillment remain disabled while sandbox preparation is incomplete; the site does not currently take payment for these products."
       }
     ]
   },
-  "sha256": "da0125d0174e0b08a666a453f7831d565bf9e2547a3e876af90328681605e291"
+  "sha256": "51c0ac21c40f919a76c32ca4dbd6d4b530640ba2bd56a4668cae1e16c84eccd9"
 } as const;
