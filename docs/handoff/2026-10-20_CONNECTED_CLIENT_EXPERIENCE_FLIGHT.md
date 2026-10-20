@@ -2,7 +2,19 @@
 
 Updated: 2026-10-20
 
-This ledger tracks the recovered flight in the current repository checkout. The original `E:\HyperionWorktrees\connected-client-experience\site` and `founder-command` directories were not present during this pass. No production service activation, payment, deployment, or release was performed.
+This ledger tracks the recovered flight in the current repository checkout and distinguishes its pushed branch from the public production site. The current feature branch is `codex/intake-lead-visibility` at `72c3cbace2133e2c73d44d07d5f5b3421b2acfac`. No production deployment, service activation, payment, or release was performed.
+
+## Public site observed on 2026-10-20
+
+The public site was opened directly at [hyperion-industries.dev](https://hyperion-industries.dev/) and its live City Gate, Store, Forge, and Account routes were inspected in the browser. This is the production experience at observation time; a pushed source branch does not establish that its changes are deployed.
+
+- **City Gate (`/`)** is live with five selectable stations (Signal, Method, City, Proof, Inquiry), the City Gate title, and the current Signal panel headed “Build the machine. Keep the advantage.” The panel describes custom computers, identity, and continuity systems and links to Start a Project, Configure a Forge Build, and See the Work. A cinematic background/poster is visible, but its control reads “Play film,” so motion is user-started on entry. The footer still leads with “Continuity infrastructure for fragmented operations.”
+- **Forge (`/forge`)** is live with a cinematic workstation hero and a guided five-step Forge sequence. Its performance, creator, local-AI, small-footprint, and custom-loop lanes each expose an explicit “Play … cinematic” control. The experience remains assessment-first and directs customers to a reviewed build profile/proposal.
+- **Store (`/store`)** is live as “Choose the work. Keep the gate.” It lists Forge Builds, Card Studio, CHR0N.OS, and Live Site Series. The page explicitly says “Sandbox setup · payments not yet active,” requires an approved proposal or proof, and states “No live capture · no one-click order.” The $19 Agent Policy, $29 Flight Pack, and $49 Routing Starter Kit are not visible in the production Store.
+- **Account (`/account`)** is live as Private Client Room with a private magic-link entry. Its copy says links expire after 15 minutes and work once, sessions are HttpOnly and last 14 days, and HypRM owns identity and relationship truth. This is the currently deployed HypRM-owned identity/projection design; it does not prove the planned edge-owned account cutover or full My Projects room is complete.
+- The live route titles and copy remain continuity/Forge/City-Gate oriented. The Stratified Systems hero and the two new commercial doors in the pushed branch are not reflected in the inspected production home page.
+
+**Deployment status:** The restored City Gate/Forge treatments and Stratified Systems/product-preview changes are present in the pushed feature branch, but are not confirmed on the production site. In particular, production has cinematic visuals and explicit playback controls, while the new homepage language and three-product storefront remain branch-only. The public site was inspected read-only; no deployment or payment action was taken.
 
 ## Completed in this checkout
 
@@ -29,6 +41,6 @@ This ledger tracks the recovered flight in the current repository checkout. The 
 - Complete the planned Wave 1 and follow-on connector receipts, then verify Founder Command against the installed service and complete its soak.
 - Implement sandbox payment creation and reconciliation, entitlement issuance, sealed private package storage and delivery, account recovery, refund/dispute handling, and the payment race/failure acceptance cases. Current product pages and APIs remain preview-only; checkout is disabled.
 - Run the remaining keyboard/mobile flow matrix, real mobile-lab LCP/CLS checks, scanner/outage recovery checks, and installed-service acceptance.
-- After all release acceptance passes, present the concrete deployment and commercial terms for the separately required production activation authorization. Only then commit and push the completed flight.
+- The current feature branch has already been pushed as an incomplete handoff. After all release acceptance passes, prepare the concrete deployment and commercial terms and present the separately required production activation authorization before deploying or activating live commerce. The branch push is not a production release.
 
 Founder Command check, packaged-resource, and installed-service evidence is tracked separately in `C:\HYPERION\02_REPOS\HypRM-Founder-Command\docs\handoff\2026-10-20_FOUNDER_COMMAND_FLIGHT_EVIDENCE.md`.
