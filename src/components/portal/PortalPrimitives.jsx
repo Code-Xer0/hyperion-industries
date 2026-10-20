@@ -1,10 +1,12 @@
-import { useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { cityRoutes, getDistrict } from '../../data/publicCity';
 import RoomShell from './RoomShell';
 import StatusChip from './StatusChip';
 import { PUBLIC_DOCTRINE } from '../../data/publicDoctrine';
 import './PortalPrimitives.css';
+
+const ForgeCinematicBackdrop = lazy(() => import('../ui/ForgeCinematicBackdrop'));
 
 function PortalLink({ action, className }) {
   if (!action) return null;
@@ -38,7 +40,7 @@ export function DistrictCard({ district, featured = false }) {
       </div>
       <h3>{district.title}</h3>
       <p>{district.summary}</p>
-      <div className="city-card-outcome"><StatusChip label={district.status} tone={district.tone} compact /><span>{district.primaryCta?.label || 'Open district'} →</span></div>
+      <StatusChip label={district.status} tone={district.tone} compact />
     </Link>
   );
 }
@@ -172,37 +174,69 @@ function ForgeMotionShelf({ items }) {
   );
 }
 
-function ForgeNavigationVideoCard({ item, activeId, onActivate }) {
+function ForgeNavigationVideoCard({ item }) {
   const videoRef = useRef(null);
-  const [playing, setPlaying] = useState(false);
-  const active = activeId === item.id;
-  const toggle = async (event) => {
-    event.preventDefault();
-    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches || navigator.connection?.saveData) return;
-    if (!active) onActivate(item.id);
-    requestAnimationFrame(async () => {
-      const video = videoRef.current;
-      if (!video) return;
-      if (!video.paused) { video.pause(); setPlaying(false); return; }
-      try { await video.play(); } catch { /* Poster remains the truthful fallback. */ }
-    });
-  };
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return undefined;
+
+    const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)');
+    let visible = false;
+    const syncPlayback = () => {
+      if (!visible || document.hidden || reducedMotion?.matches) {
+        video.pause();
+        return;
+      }
+      video.play().catch(() => {});
+    };
+    document.addEventListener('visibilitychange', syncPlayback);
+    reducedMotion?.addEventListener?.('change', syncPlayback);
+    if (!('IntersectionObserver' in window)) {
+      visible = true;
+      syncPlayback();
+      return () => {
+        document.removeEventListener('visibilitychange', syncPlayback);
+        reducedMotion?.removeEventListener?.('change', syncPlayback);
+        video.pause();
+      };
+    }
+
+    const observer = new IntersectionObserver(([entry]) => {
+      visible = Boolean(entry?.isIntersecting);
+      syncPlayback();
+    }, { threshold: 0.2 });
+
+    observer.observe(video);
+    return () => {
+      observer.disconnect();
+      document.removeEventListener('visibilitychange', syncPlayback);
+      reducedMotion?.removeEventListener?.('change', syncPlayback);
+      video.pause();
+    };
+  }, []);
 
   return (
-    <article className="forge-city-media-card">
-      <img src={item.poster} alt="" loading="lazy" decoding="async" />
-      {active && <video ref={videoRef} src={item.src} poster={item.poster} muted loop playsInline preload="metadata" aria-hidden="true" onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} />}
+    <Link to="/forge" className="forge-city-media-card" aria-label={`Open Forge: ${item.title}`}>
+      <video
+        ref={videoRef}
+        src={item.src}
+        poster={item.poster}
+        muted
+        loop
+        playsInline
+        preload="metadata"
+        aria-hidden="true"
+      />
       <div>
-        <Link to="/forge" aria-label={`Open Forge: ${item.title}`}><span>{item.title}</span></Link>
+        <span>{item.title}</span>
         <p>{item.description}</p>
-        <button type="button" onClick={toggle}>{active && playing ? 'Pause film' : 'Play build film'}</button>
       </div>
-    </article>
+    </Link>
   );
 }
 
 export function ForgeBuildNavigation({ motion }) {
-  const [activeId, setActiveId] = useState(null);
   if (!motion?.cards?.length) return null;
 
   return (
@@ -225,7 +259,7 @@ export function ForgeBuildNavigation({ motion }) {
         ) : null}
       </header>
       <div className="forge-city-media-grid">
-        {motion.cards.map((item) => <ForgeNavigationVideoCard key={item.id} item={item} activeId={activeId} onActivate={setActiveId} />)}
+        {motion.cards.map((item) => <ForgeNavigationVideoCard key={item.id} item={item} />)}
       </div>
     </section>
   );
@@ -343,6 +377,8 @@ export function DistrictLayout({ district }) {
       stations={stations}
       panels={panels}
       defaultStation="overview"
+      backdrop={district.id === 'forge' ? <Suspense fallback={null}><ForgeCinematicBackdrop controlTarget="forge-cinematic-control" /></Suspense> : undefined}
+      actions={district.id === 'forge' ? <div id="forge-cinematic-control" className="forge-cinematic-control-host" /> : undefined}
       className={`district-room-shell city-accent-${district.accent}`}
     />
   );

@@ -1,8 +1,28 @@
 .city-gate-page { min-height: 100dvh; }
-.gate-city-room { background: transparent; }
+.gate-city-room {
+  background: #03070b;
+  --text: #f5f5f2;
+  --text-soft: #d8d9d3;
+  --text-muted: #b9bec2;
+  --text-dim: #92999f;
+  --gold: #ffc72c;
+  --room-heading-bg: rgba(3, 6, 9, .76);
+  --room-rail-bg: rgba(3, 6, 9, .56);
+  --room-panel-bg: rgba(3, 6, 9, .10);
+  --room-card-bg: rgba(3, 6, 9, .72);
+  --room-text-scrim: rgba(3, 6, 9, .68);
+  --room-glass-blur: 4px;
+}
+.gate-city-room .room-backdrop { z-index: 0; pointer-events: none; }
+.gate-city-room .room-workspace { position: relative; z-index: 1; }
+.gate-city-room .room-panel-stage { background: linear-gradient(90deg, rgba(3, 6, 9, .12), transparent 72%); }
+.gate-city-room .room-panel-label { display: none; }
 .gate-city-room .room-heading { background: var(--room-heading-bg); }
+.gate-city-room .room-heading { align-items: center; padding: 12px 24px; }
+.gate-city-room .room-heading-meta { margin-bottom: 5px; }
+.gate-city-room .room-heading h1 { font-size: clamp(24px, 2.6vw, 34px); }
+.gate-city-room .room-heading p { display: none; }
 .gate-city-room .room-station-rail { background: var(--room-rail-bg); }
-.gate-city-room .room-panel-stage { background: linear-gradient(90deg, var(--room-panel-bg), transparent 72%); }
 .gate-city-room .room-heading h1,
 .gate-city-room .room-heading p { color: #f4f1e8; }
 
@@ -10,29 +30,39 @@
 .gate-brand-film,
 .gate-film-shade,
 .gate-city-room .hero-canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
-.gate-film { z-index: -4; }
-.gate-film.cinematic-backdrop > button { right: 20px; bottom: 20px; }
-.gate-brand-film { z-index: -3; object-fit: contain; object-position: 78% 36%; opacity: 0.3; mix-blend-mode: screen; filter: saturate(0.9) contrast(1.1); }
-.gate-film-shade { z-index: -2; background: linear-gradient(90deg, rgba(2, 5, 8, 0.68) 0%, rgba(2, 5, 8, 0.36) 48%, rgba(2, 5, 8, 0.18) 100%), linear-gradient(0deg, rgba(2, 5, 8, 0.48), transparent 54%); }
-.gate-city-room .hero-canvas { z-index: -1; opacity: 0.86; }
+.gate-film { z-index: 0; }
+.gate-film-shade { z-index: 1; background: linear-gradient(90deg, rgba(2, 5, 8, .70) 0%, rgba(2, 5, 8, .38) 46%, rgba(2, 5, 8, .08) 100%), linear-gradient(0deg, rgba(2, 5, 8, .30), transparent 50%); }
+.gate-city-room .hero-canvas { z-index: 1; opacity: 0.42; }
 
-.gate-signal-room { position: relative; display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(260px, 0.55fr); align-items: center; gap: 28px; min-height: calc(100% - 32px); }
+.gate-cinematic-actions { display: grid; justify-items: end; gap: 4px; }
+.gate-film-controls { min-width: 122px; min-height: 44px; }
+.gate-cinematic-actions small { color: #a8b0b7; font-size: 9px; }
+
+.gate-signal-room { position: relative; display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(220px, .55fr); align-items: center; gap: 24px; min-height: calc(100% - 32px); }
+.gate-flagship-room { align-content: center; }
 .gate-copy { min-width: 0; }
 .gate-kicker,
 .city-label { color: var(--gold); font-family: var(--font-display); font-size: 8px; font-weight: 700; text-transform: uppercase; }
-.gate-copy h2 { max-width: 900px; margin: 14px 0 18px; color: #f7f4ed; font-size: clamp(42px, 5vw, 70px); font-weight: 600; line-height: 0.9; }
+.gate-copy h2 { max-width: 920px; margin: 14px 0 18px; color: #f7f4ed; font-size: clamp(36px, 4vw, 54px); font-weight: 700; line-height: 0.98; letter-spacing: -.02em; }
 .gate-copy h2 em { color: var(--gold); font-style: normal; }
 .gate-lead { max-width: 700px; margin: 0; color: #c7c8c7; font-size: 15px; line-height: 1.7; }
+.gate-promise { max-width: 720px; margin: 10px 0 0; color: #f7f4ed; font-size: 14px; font-weight: 700; line-height: 1.55; }
+.gate-doors-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; max-width: 920px; margin: 20px 0 12px; }
+.gate-door-card { display: flex; min-width: 0; flex-direction: column; min-height: 148px; padding: 15px 17px; border: 1px solid rgba(255, 199, 44, .28); background: rgba(3, 6, 10, .74); color: inherit; text-decoration: none; backdrop-filter: blur(12px); transition: border-color .24s ease, transform .35s var(--motion-ease-cinematic), background .24s ease; }
+.gate-door-card:hover, .gate-door-card:focus-visible { transform: translateY(-3px); border-color: var(--gold); background: rgba(3, 6, 10, .9); }
+.gate-door-card:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+.door-tag { color: var(--gold); font: 700 8px var(--font-display); letter-spacing: .1em; text-transform: uppercase; }
+.door-title { display: block; margin-top: 12px; font-size: clamp(16px, 1.55vw, 21px); line-height: 1.14; }
+.door-desc { margin: 7px 0 10px; color: #c7c8c7; font-size: 11px; line-height: 1.5; }
+.door-cta { display: inline-flex; align-items: center; gap: 7px; margin-top: auto; color: var(--gold); font-size: 10px; font-weight: 700; }
+.gate-quick-links { display: flex; flex-wrap: wrap; gap: 14px; padding: 5px 0; }
+.gate-quick-links a { color: #e3e5e4; font-size: 10px; text-decoration-color: rgba(255, 199, 44, .48); text-underline-offset: 4px; }
+.gate-quick-links a:hover { color: var(--gold); }
+.gate-company-proof { align-self: end; max-width: 300px; margin-bottom: 26px; padding: 18px; border: 1px solid rgba(255,255,255,.16); background: rgba(3,6,10,.62); backdrop-filter: blur(12px); }
+.gate-company-proof > span { color: var(--gold); font: 700 8px var(--font-display); letter-spacing: .1em; }
+.gate-company-proof strong { display: block; margin: 15px 0 7px; color: #fff; font-size: 19px; line-height: 1.15; }
+.gate-company-proof p { margin: 0; color: #c7c8c7; font-size: 11px; line-height: 1.55; }
 .gate-principle { max-width: 760px; margin-top: 12px; padding-left: 14px; border-left: 1px solid var(--gold); color: var(--text-soft); font-size: 12px; line-height: 1.6; }
-.gate-offer-strip { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); max-width: 920px; margin: 28px 0; border: 1px solid rgba(255, 199, 44, 0.24); background: rgba(2, 5, 8, 0.56); backdrop-filter: blur(14px); }
-.gate-offer-strip span { min-height: 66px; padding: 14px; border-right: 1px solid rgba(255,255,255,.09); color: #aeb2b5; font-size: 10px; line-height: 1.45; }
-.gate-offer-strip span:last-child { border-right: 0; }
-.gate-offer-strip strong { display: block; margin-bottom: 5px; color: #f7f4ed; font: 700 8px var(--font-display); letter-spacing: .08em; }
-.gate-company-proof { align-self: end; max-width: 310px; margin: 0 0 22px auto; padding: 22px; border: 1px solid rgba(255, 199, 44, .32); border-top: 2px solid var(--gold); background: rgba(2, 5, 8, .7); backdrop-filter: blur(18px); }
-.gate-company-proof > span { color: var(--gold); font: 700 7px var(--font-display); letter-spacing: .1em; }
-.gate-company-proof strong { display: block; margin: 30px 0 8px; color: #fff; font-size: 24px; }
-.gate-company-proof p { color: #aeb2b5; font-size: 11px; line-height: 1.6; }
-.gate-company-proof a { display: inline-flex; align-items: center; gap: 7px; margin-top: 14px; color: var(--gold); font: 700 8px var(--font-display); text-decoration: none; text-transform: uppercase; }
 .gate-copy .city-status-rail { max-width: 920px; margin-top: clamp(24px, 5vh, 54px); background: rgba(2, 5, 8, 0.46); backdrop-filter: blur(12px); }
 .gate-copy .city-status-stop { padding: 9px 10px; }
 .gate-copy .city-status-stop:nth-child(n + 4) { display: none; }
@@ -61,6 +91,12 @@
 .gate-method-grid h3 { margin: auto 0 10px; color: var(--text); font-size: 17px; }
 .gate-method-grid p { margin: 0; color: var(--text-muted); font-size: 11px; line-height: 1.55; }
 .gate-method-room blockquote { margin: 22px 0 0; padding: 14px 16px; border-left: 2px solid var(--gold); background: var(--room-text-scrim); color: var(--text-soft); font-size: clamp(14px, 2vw, 20px); }
+.gate-configurations { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 16px; }
+.gate-configurations article { padding: 14px; border: 1px solid var(--glass-edge); background: var(--room-card-bg); }
+.gate-configurations article > span { color: var(--gold); font: 700 7px var(--font-display); letter-spacing: .08em; }
+.gate-configurations h3 { margin: 10px 0 6px; color: var(--text); font-size: 14px; }
+.gate-configurations p, .gate-operating-range { margin: 0; color: var(--text-muted); font-size: 10px; line-height: 1.5; }
+.gate-operating-range { margin-top: 12px; }
 .gate-inquiry-room .room-note a { display: inline-flex; margin-top: 16px; color: var(--gold); font-size: 11px; font-weight: 700; text-decoration: none; }
 .gate-intake-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
 .gate-intake-card { display: flex; min-width: 0; min-height: 116px; flex-direction: column; padding: 14px; border: 1px solid var(--glass-edge); border-top-color: var(--gold); background: var(--room-card-bg); backdrop-filter: blur(10px); }
@@ -69,7 +105,6 @@
 .gate-intake-card p { margin: 0; color: var(--text-muted); font-size: 10px; line-height: 1.45; }
 .gate-intake-card a { display: inline-flex; margin-top: auto; padding-top: 9px; color: var(--gold); font-size: 10px; font-weight: 700; text-decoration: none; }
 .gate-intake-card a:hover { color: var(--text); }
-.gate-inquiry-room .room-note-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .gate-operators-room { min-height: calc(100% - 32px); }
 .gate-operators-room .gate-room-heading > div {
   padding: 10px 12px;
@@ -103,19 +138,19 @@ body.theme-light .gate-city-room .room-heading p { color: #171510; }
 body.theme-light .gate-city-room .room-station-rail { background: var(--room-rail-bg); }
 body.theme-light .gate-city-room .room-panel-stage { background: linear-gradient(90deg, var(--room-panel-bg), transparent 72%); }
 body.theme-light .gate-copy h2 { color: #171510; }
+body.theme-light .gate-copy h2 em,
+body.theme-light .gate-kicker { color: #8a6000; }
 body.theme-light .gate-lead { color: #454136; }
-body.theme-light .gate-film-shade { background: linear-gradient(90deg, rgba(4, 6, 9, 0.78), rgba(4, 6, 9, 0.5), rgba(4, 6, 9, 0.24)); }
-body.theme-light .gate-city-room .room-heading h1,
-body.theme-light .gate-city-room .room-heading p,
-body.theme-light .gate-copy h2 { color: #f7f4ed; }
-body.theme-light .gate-lead { color: #c5c8ca; }
+body.theme-light .gate-promise { color: #29271f; }
+body.theme-light .gate-quick-links a { color: #37352e; }
+body.theme-light .gate-quick-links a:hover { color: #8a6000; }
+body.theme-light .gate-film-shade { background: linear-gradient(90deg, rgba(247, 244, 236, 0.7), rgba(247, 244, 236, 0.38), rgba(247, 244, 236, 0.18)); }
 
 @media (max-width: 1100px) {
   .gate-proof-room .city-proof-lane { grid-template-columns: 1fr 1fr; }
   .gate-directory-room .city-map-grid { grid-template-columns: 1fr 1fr; }
   .gate-method-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .gate-intake-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .gate-inquiry-room .room-note-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 820px) {
@@ -125,13 +160,9 @@ body.theme-light .gate-lead { color: #c5c8ca; }
     z-index: 1;
     padding: 16px;
     border-left: 1px solid rgba(255, 190, 0, 0.72);
-    background: linear-gradient(90deg, rgba(2, 5, 8, 0.9), rgba(2, 5, 8, 0.72) 84%, rgba(2, 5, 8, 0.28));
-    backdrop-filter: blur(10px);
+    background: linear-gradient(90deg, rgba(2, 5, 8, .70), rgba(2, 5, 8, .38) 76%, rgba(2, 5, 8, .08));
+    backdrop-filter: blur(3px);
   }
-  body.theme-light .gate-copy {
-    background: linear-gradient(90deg, rgba(2, 5, 8, 0.94), rgba(2, 5, 8, 0.84) 84%, rgba(2, 5, 8, 0.38));
-  }
-  .gate-company-proof { display: none; }
 }
 
 @media (max-width: 700px) {
@@ -141,7 +172,11 @@ body.theme-light .gate-lead { color: #c5c8ca; }
 
 @media (max-width: 760px) {
   .gate-copy h2 { font-size: clamp(36px, 10vw, 58px); }
-  .gate-operator { position: absolute; right: 4%; bottom: 54px; width: 150px; opacity: 0.42; }
+  .gate-doors-grid { grid-template-columns: 1fr; gap: 7px; margin: 14px 0 8px; }
+  .gate-door-card { min-height: 112px; padding: 12px 14px; }
+  .door-title { margin-top: 8px; }
+  .door-desc { margin: 5px 0 7px; }
+  .gate-company-proof { display: none; }
   .gate-copy .city-status-rail { display: none; }
   .gate-room-heading { align-items: flex-start; flex-direction: column; }
   .gate-operators-intro { align-items: flex-start; flex-direction: column; }
@@ -153,14 +188,13 @@ body.theme-light .gate-lead { color: #c5c8ca; }
   .gate-directory-room .city-map-grid { grid-template-columns: 1fr; }
   .gate-directory-room .city-district-card { min-height: 136px; }
   .gate-method-grid { grid-template-columns: 1fr; }
-  .gate-offer-strip,
-  .gate-inquiry-room .room-note-grid { grid-template-columns: 1fr; }
   .gate-method-grid article { min-height: auto; }
   .gate-method-grid h3 { margin-top: 28px; }
+  .gate-configurations { grid-template-columns: 1fr; }
 }
 
 @media (max-height: 800px) and (min-width: 761px) {
-  .gate-copy h2 { max-width: 760px; font-size: clamp(42px, 5vw, 62px); }
+  .gate-copy h2 { max-width: 820px; font-size: clamp(38px, 3.8vw, 48px); }
   .gate-copy .city-status-rail { display: none; }
   .gate-operator { width: min(100%, 270px); }
 }
@@ -168,11 +202,43 @@ body.theme-light .gate-lead { color: #c5c8ca; }
 @media (max-width: 520px) {
   .gate-city-room .room-heading p { display: none; }
   .gate-copy h2 { max-width: 92%; font-size: 36px; }
-  .gate-lead { max-width: 88%; font-size: 14px; }
-  .gate-copy .room-action-row { display: grid; grid-template-columns: 1fr 1fr; max-width: 100%; margin-top: 16px; }
-  .gate-copy .btn { width: 100%; min-width: 0; justify-content: center; padding-right: 10px; padding-left: 10px; }
-  .gate-copy .btn:first-child { grid-column: 1 / -1; }
-  .gate-offer-strip { grid-template-columns: repeat(3, minmax(0, 1fr)); max-width: 100%; margin: 18px 0; }
-  .gate-offer-strip span { min-height: 66px; padding: 10px 8px; border-right: 1px solid rgba(255,255,255,.09); border-bottom: 0; font-size: 8px; }
-  .gate-operator { right: -3%; width: 136px; }
+  .gate-lead { max-width: 100%; font-size: 13px; }
+  .gate-promise { font-size: 12px; }
+  .gate-copy .room-action-row { max-width: 100%; }
+  .gate-copy .btn { width: 100%; justify-content: center; }
+  .gate-quick-links { gap: 11px; }
+  .gate-quick-links a { font-size: 9px; }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .gate-door-card { transition: none; }
+}
+
+/* The gate is a cinematic surface in either global theme. Keep the city film
+   visible under the copy instead of washing it out in light mode. */
+body.theme-light .gate-city-room {
+  --text: #f5f5f2;
+  --text-soft: #d8d9d3;
+  --text-muted: #b9bec2;
+  --text-dim: #92999f;
+  --gold: #ffc72c;
+  --room-heading-bg: rgba(3, 6, 9, .76);
+  --room-rail-bg: rgba(3, 6, 9, .64);
+  --room-panel-bg: rgba(3, 6, 9, .10);
+  --room-card-bg: rgba(3, 6, 9, .72);
+  --room-text-scrim: rgba(3, 6, 9, .68);
+  color-scheme: dark;
+}
+body.theme-light .gate-city-room .room-heading { background: var(--room-heading-bg); }
+body.theme-light .gate-city-room .room-heading h1,
+body.theme-light .gate-city-room .room-heading p { color: #f4f1e8; }
+body.theme-light .gate-city-room .room-station-rail { background: var(--room-rail-bg); }
+body.theme-light .gate-city-room .room-panel-stage { background: linear-gradient(90deg, rgba(3, 6, 9, .12), transparent 72%); }
+body.theme-light .gate-copy h2 { color: #f7f4ed; }
+body.theme-light .gate-copy h2 em,
+body.theme-light .gate-kicker { color: var(--gold); }
+body.theme-light .gate-lead { color: #d0d1cf; }
+body.theme-light .gate-promise { color: #f7f4ed; }
+body.theme-light .gate-quick-links a { color: #e3e5e4; }
+body.theme-light .gate-quick-links a:hover { color: var(--gold); }
+body.theme-light .gate-film-shade { background: linear-gradient(90deg, rgba(2, 5, 8, .70), rgba(2, 5, 8, .38) 56%, rgba(2, 5, 8, .08)), linear-gradient(0deg, rgba(2, 5, 8, .30), transparent 54%); }

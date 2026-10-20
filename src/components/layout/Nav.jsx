@@ -19,6 +19,7 @@ import {
   VolumeX,
   X,
 } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
   cityDestinations,
   cityFamilies,
@@ -351,8 +352,7 @@ export default function Nav() {
         <div className="nav-primary-links">
           <Link to="/forge">Forge</Link>
           <Link to="/card-studio">Card Studio</Link>
-          <Link to="/chronos">CHR0N.OS</Link>
-          <Link to="/services">Services</Link>
+          <Link to="/build-archive">Proof</Link>
           <button
             type="button"
             className="nav-compact-city"
@@ -363,8 +363,8 @@ export default function Nav() {
             <MapPinned size={15} aria-hidden="true" /> City Map
           </button>
         </div>
-        <Link to="/store?source=nav" className="nav-forge-action">Start a Project</Link>
-        <Link to="/forge/configurator?source=nav" className="nav-mobile-forge">Forge Inquiry</Link>
+        <Link to="/forge/configurator" className="nav-forge-action">Start a Forge Build</Link>
+        <Link to="/forge/configurator" className="nav-mobile-forge">Forge Inquiry</Link>
         <button
           ref={mobileMenuButtonRef}
           type="button"
@@ -378,9 +378,10 @@ export default function Nav() {
         </button>
       </nav>
 
-      {mobileMenuOpen && (
-          <div className="mobile-nav-backdrop" onMouseDown={(event) => event.target === event.currentTarget && closeMobileMenu()}>
-            <section
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div className="mobile-nav-backdrop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onMouseDown={(event) => event.target === event.currentTarget && closeMobileMenu()}>
+            <motion.section
               id="mobile-navigation-menu"
               ref={mobileMenuRef}
               className="mobile-nav-menu"
@@ -388,19 +389,32 @@ export default function Nav() {
               aria-modal="true"
               aria-labelledby="mobile-menu-title"
               onKeyDown={trapMobileFocus}
+              initial={{ x: 36, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: 36, opacity: 0 }}
             >
               <header><div><span>PUBLIC TRANSIT</span><h2 id="mobile-menu-title">Navigate Hyperion</h2></div><button type="button" onClick={closeMobileMenu} aria-label="Close navigation menu"><X size={20} /></button></header>
               <nav aria-label="Mobile navigation">
-                <Link to="/card-studio" onClick={closeMobileMenu}>Card Studio</Link>
-                <Link to="/chronos" onClick={closeMobileMenu}>CHR0N.OS</Link>
-                <Link to="/services" onClick={closeMobileMenu}>Services</Link>
-                <Link to="/forge" onClick={closeMobileMenu}>Forge District</Link>
-                <Link to="/forge/catalog" onClick={closeMobileMenu}>Forge Catalog</Link>
-                <Link to="/build-archive" onClick={closeMobileMenu}>Proof</Link>
-                <Link to="/systems" onClick={closeMobileMenu}>Systems</Link>
-                <Link to="/contact" onClick={closeMobileMenu}>Contact</Link>
-                <button type="button" onClick={() => { closeMobileMenu(); openLauncher(); }}>City Map</button>
-                <Link to="/intake?source=mobile_menu" onClick={closeMobileMenu}>All Inquiry Lanes</Link>
+                <div className="mobile-nav-group">
+                  <span>Your work</span>
+                  <div className="mobile-nav-quick-links">
+                    <Link to="/intake" onClick={closeMobileMenu}>Start</Link>
+                    <Link to="/intake/resume" onClick={closeMobileMenu}>Resume</Link>
+                    <Link to="/account" onClick={closeMobileMenu}>My Projects</Link>
+                  </div>
+                </div>
+                <div className="mobile-nav-group">
+                  <span>Explore</span>
+                  <Link to="/store" onClick={closeMobileMenu}>Buy something useful now · Products</Link>
+                  <Link to="/forge" onClick={closeMobileMenu}>The Forge</Link>
+                  <Link to="/card-studio" onClick={closeMobileMenu}>Card Studio</Link>
+                  <Link to="/forge/catalog" onClick={closeMobileMenu}>Forge Catalog</Link>
+                  <Link to="/build-archive" onClick={closeMobileMenu}>Proof</Link>
+                  <Link to="/systems" onClick={closeMobileMenu}>Stratified Systems</Link>
+                  <Link to="/contact" onClick={closeMobileMenu}>Contact</Link>
+                  <button type="button" onClick={() => { closeMobileMenu(); openLauncher(); }}>City Map</button>
+                  <Link to="/intake?source=mobile_menu" onClick={closeMobileMenu}>All Inquiry Lanes</Link>
+                </div>
               </nav>
               <footer>
                 <span>City utilities</span>
@@ -410,9 +424,10 @@ export default function Nav() {
                   {operatorPilot.available && <button type="button" onClick={operatorPilot.toggle} aria-pressed={operatorPilot.enabled}><Bot size={16} /> Operator {operatorPilot.enabled ? 'on' : 'off'}</button>}
                 </div>
               </footer>
-            </section>
-          </div>
-      )}
+            </motion.section>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <audio
         ref={soundtrackRef}
@@ -423,18 +438,27 @@ export default function Nav() {
         onPause={() => setSoundEnabled(false)}
       />
 
-      {launcherOpen && (
-          <div
+      <AnimatePresence>
+        {launcherOpen && (
+          <motion.div
             className="city-launcher-backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.18 }}
             onMouseDown={(event) => { if (event.target === event.currentTarget) closeLauncher(); }}
           >
-            <section
+            <motion.section
               ref={launcherRef}
               className="city-launcher"
               role="dialog"
               aria-modal="true"
               aria-labelledby="city-launcher-title"
               onKeyDown={trapFocus}
+              initial={{ opacity: 0, y: -18, scale: 0.985 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -12, scale: 0.99 }}
+              transition={{ duration: 0.24, ease: [0.2, 0, 0, 1] }}
             >
               <div className="city-launcher-scene" aria-hidden="true">
                 {previewMedia.type !== 'video' && (
@@ -633,9 +657,10 @@ export default function Nav() {
                 </div>
                 <span>Posture visible. Authority protected.</span>
               </footer>
-            </section>
-          </div>
-      )}
+            </motion.section>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }

@@ -1,11 +1,11 @@
 import assert from 'node:assert/strict';
-import { statSync } from 'node:fs';
+import { readFileSync, statSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 import { HYPERION_MEDIA_MANIFEST } from './mediaManifest.js';
 
-const publicRoot = fileURLToPath(new URL('../../public/', import.meta.url));
-const localAsset = (path) => `${publicRoot}${path.replaceAll('/', '\\')}`;
+const localAsset = (path) => fileURLToPath(new URL(`../../public${path}`, import.meta.url));
 
 test('media manifest stays same-origin, measured, and poster-first', () => {
   const manifest = HYPERION_MEDIA_MANIFEST;
@@ -13,7 +13,7 @@ test('media manifest stays same-origin, measured, and poster-first', () => {
   assert.equal(manifest.policy.autoplay_audio, false);
   assert.equal(manifest.policy.concurrent_active_cinematics, 1);
 
-  const assets = [manifest.assets.city_gate, ...manifest.assets.forge];
+  const assets = [manifest.assets.city_gate, manifest.assets.forge_hero, ...manifest.assets.forge];
   for (const asset of assets) {
     assert.match(asset.route, /^\//);
     assert.match(asset.poster, /^\/assets\//);
@@ -30,8 +30,21 @@ test('media manifest stays same-origin, measured, and poster-first', () => {
 
 test('City Gate initial media remains within the route budget', () => {
   const { city_gate: cityGate } = HYPERION_MEDIA_MANIFEST.assets;
-  assert.ok(cityGate.poster_bytes <= HYPERION_MEDIA_MANIFEST.policy.initial_route_media_budget_bytes);
-  assert.equal(cityGate.activation, 'explicit_intent');
+  assert.ok(cityGate.poster_bytes + cityGate.video_bytes <= HYPERION_MEDIA_MANIFEST.policy.initial_route_media_budget_bytes);
+  assert.equal(cityGate.activation, 'visible_after_first_paint');
+});
+
+test('automatic cinematic derivatives are measured and fit the route media budget', () => {
+  const { assets, policy } = HYPERION_MEDIA_MANIFEST;
+  for (const asset of [assets.city_gate, assets.forge_hero]) {
+    assert.equal(createHash('sha256').update(readFileSync(localAsset(asset.video))).digest('hex'), asset.sha256);
+    assert.ok(statSync(localAsset(asset.source_master)).size > asset.video_bytes);
+  }
+  assert.equal(assets.city_gate.role, 'cinematic_concept_not_product_evidence');
+  assert.equal(assets.forge_hero.role, 'existing_forge_field_media');
+  assert.equal(assets.forge_hero.poster_role, 'cinematic_concept_not_product_evidence');
+  const forgePosters = assets.forge.reduce((total, asset) => total + asset.poster_bytes, 0);
+  assert.ok(assets.forge_hero.video_bytes + assets.forge_hero.poster_bytes + forgePosters <= policy.initial_route_media_budget_bytes);
 });
 
 test('generated posters remain measured concept media rather than product proof', () => {

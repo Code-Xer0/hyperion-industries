@@ -119,6 +119,12 @@
 .systems-room-shell .sp-sys-head h3 { font-size: 16px; }
 .systems-room-shell .sp-system-card p,
 .systems-room-shell .sp-lane-card p { font-size: 11px; line-height: 1.6; }
+.systems-configurations { display: grid; gap: 18px; }
+.systems-configurations header h2 { max-width: 800px; margin: 10px 0; color: var(--text); font-size: clamp(28px, 4vw, 48px); line-height: .98; }
+.systems-configurations header p { max-width: 820px; color: var(--text-muted); font-size: 12px; line-height: 1.65; }
+.systems-configurations .sp-lane-card > span { color: var(--gold); font: 700 8px var(--font-display); text-transform: uppercase; }
+.systems-configurations .sp-lane-card h3 { margin: 14px 0 8px; color: var(--text); font-size: 19px; text-transform: none; }
+.systems-configurations-range { margin: 0; padding: 12px 15px; border-left: 2px solid var(--gold); background: var(--room-card-bg); color: var(--text-soft); font-size: 11px; line-height: 1.6; }
 .systems-active-room,
 .systems-lane-room { align-content: start; }
 

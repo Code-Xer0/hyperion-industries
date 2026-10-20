@@ -14,6 +14,7 @@ import {
 } from "./card-studio";
 import { browserCorsOrigin, enforceSameOrigin, errorResponse, finalizeResponse, HttpError, jsonResponse } from "./http";
 import { handleCommerceReadiness } from "./commerce-readiness";
+import { handleDigitalProductPreview } from "./digital-commerce";
 import {
   handleCommerceCommand,
   handleCommerceReceiptAck,
@@ -60,6 +61,7 @@ const ROUTES = new Map([
   ["/api/card-studio/operator/checkout", "POST"],
   ["/api/card-studio/webhooks/shopify", "POST"],
   ["/api/commerce/readiness", "GET"],
+  ["/api/commerce/products/preview", "POST"],
   ["/api/commerce/operator/commands", "POST"],
   ["/api/commerce/paypal/return", "GET"],
   ["/api/commerce/paypal/cancel", "GET"],
@@ -183,6 +185,7 @@ export function createWorker(overrides: Partial<RuntimeDependencies> = {}): Oper
         else if (url.pathname === "/api/card-studio/operator/checkout") response = await handleCardOperatorCheckout(request, env, requestId, deps);
         else if (url.pathname === "/api/card-studio/webhooks/shopify") response = await handleCardShopifyWebhook(request, env, deps);
         else if (url.pathname === "/api/commerce/readiness") response = handleCommerceReadiness(env);
+        else if (url.pathname === "/api/commerce/products/preview") response = await handleDigitalProductPreview(request);
         else if (url.pathname === "/api/commerce/operator/commands") response = await handleCommerceCommand(request, env, requestId, deps);
         else if (url.pathname === "/api/commerce/paypal/return") response = await handlePayPalReturn(request, env, deps);
         else if (url.pathname === "/api/commerce/paypal/cancel") response = await handlePayPalCancel(request, env);

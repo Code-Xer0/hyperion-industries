@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hyperion-industries.dev/contracts/digital-products/v1/purchase-receipt.schema.json",
+  "title": "Hyperion digital product purchase receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contract_version", "purchase_id", "product_id", "price_minor", "currency", "state", "created_at"],
+  "properties": {
+    "contract_version": { "const": "hyperion.digital-product-receipt/1" },
+    "purchase_id": { "type": "string", "pattern": "^pur_[A-Za-z0-9_-]{12,80}$" },
+    "product_id": { "enum": ["agent-policy", "flight-pack", "routing-kit"] },
+    "price_minor": { "type": "integer", "minimum": 1 },
+    "currency": { "const": "USD" },
+    "state": { "enum": ["prepared", "checkout_pending", "paid", "refunded", "disputed", "reconciliation_required"] },
+    "provider": { "enum": ["paypal", "stripe"] },
+    "provider_reference": { "type": "string", "minLength": 1 },
+    "created_at": { "type": "string", "format": "date-time" },
+    "paid_at": { "type": "string", "format": "date-time" }
+  }
+}

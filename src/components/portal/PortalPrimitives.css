@@ -325,3 +325,25 @@
   .city-legend { justify-content: flex-start; }
   .district-authority-contract > div { grid-template-columns: 1fr; }
 }
+.district-page-forge .room-shell {
+  --room-shell-bg: rgba(3, 6, 9, .24);
+  --room-heading-bg: rgba(3, 6, 9, .68);
+  --room-rail-bg: rgba(3, 6, 9, .50);
+  --room-card-bg: rgba(3, 6, 9, .70);
+  --room-glass-blur: 5px;
+}
+.district-page-forge .room-backdrop { z-index: 0; pointer-events: none; }
+.district-page-forge .room-heading,
+.district-page-forge .room-workspace { position: relative; }
+.district-page-forge .room-heading { z-index: 2; }
+.district-page-forge .room-workspace { z-index: 1; }
+.district-page-forge .room-panel-stage { background: linear-gradient(90deg, rgba(3, 6, 9, .08), rgba(3, 6, 9, .30)); }
+.forge-room-cinematic::after {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(3, 6, 9, .52), rgba(3, 6, 9, .12) 60%, rgba(3, 6, 9, .08)), linear-gradient(0deg, rgba(3, 6, 9, .44), transparent 55%);
+  content: '';
+  pointer-events: none;
+}
+.forge-cinematic-control-host:empty { display: none; }
+.district-page-forge .room-heading-actions { min-height: 44px; }

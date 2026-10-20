@@ -1,3 +1,54 @@
+export const HYPERION_DIGITAL_PRODUCTS = Object.freeze([
+  Object.freeze({
+    id: 'agent-policy',
+    sample: '/samples/hyperion-agent-policy-sample.md',
+    name: 'Hyperion Agent Policy',
+    tagline: 'Agent Guardrails & Authority Boundaries Pack',
+    price: '$19',
+    priceMinor: 1900,
+    summary: 'A personalized policy that guides agents on repository safety, authority boundaries, duplication prevention, and model alignment. Runtime permissions remain controlled by the agent environment.',
+    deliverables: Object.freeze([
+      'One canonical policy with selected Codex, Claude Code, Gemini CLI, and generic projections',
+      'Authority matrix and review-before-publish example',
+      'Repository safety, duplication prevention, and completion rules',
+      'Installation and verification checklist',
+    ]),
+    formats: Object.freeze(['AGENTS.md', 'CLAUDE.md', 'GEMINI.md', 'authority-matrix.md', 'INSTALL.md', 'manifest.json']),
+  }),
+  Object.freeze({
+    id: 'flight-pack',
+    sample: '/samples/hyperion-flight-pack-sample.md',
+    name: 'Hyperion Flight Pack',
+    tagline: 'Autonomous AI Workflow & Execution Framework',
+    price: '$29',
+    priceMinor: 2900,
+    summary: 'The operational method for taking agents from brief to verified artifact without drift or context corruption.',
+    deliverables: Object.freeze([
+      'Project brief & bounded work order contract',
+      'Flight plan & execution checkpoint templates',
+      'Context handoff & acceptance criteria format',
+      'Review, verification & handoff documents',
+    ]),
+    formats: Object.freeze(['PROJECT_BRIEF.md', 'WORK_ORDER.md', 'FLIGHT_PLAN.md', 'ACCEPTANCE.md', 'CHECKPOINTS.md', 'HANDOFF.md']),
+  }),
+  Object.freeze({
+    id: 'routing-kit',
+    sample: '/samples/hyperion-routing-kit-sample.json',
+    name: 'Local + Frontier Routing Starter Kit',
+    tagline: 'Tiered Inference Architecture & Policy Files',
+    price: '$49',
+    priceMinor: 4900,
+    summary: 'Architecture and provider policy rules for splitting workloads between local inference, subscriptions, and frontier APIs.',
+    deliverables: Object.freeze([
+      'Workload & provider routing profile matrix',
+      'Local vs. subscription vs. API escalation rules',
+      'Cost-ceiling & token budget governance templates',
+      'Local prerequisite & hardware verification guide',
+    ]),
+    formats: Object.freeze(['routing-policy.json', 'escalation-rules.md', 'budget-gates.env', 'LOCAL_READINESS.md', 'setup-guide.md']),
+  }),
+]);
+
 export const CHRONOS_SERVICES = Object.freeze([
   Object.freeze({
     id: 'assessment',

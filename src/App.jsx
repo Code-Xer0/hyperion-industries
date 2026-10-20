@@ -30,6 +30,7 @@ const DevDiaryPage = lazy(() => import('./pages/DevDiaryPage'));
 const ContactPage = lazy(() => import('./pages/ContactPage'));
 const NewsletterPage = lazy(() => import('./pages/NewsletterPage'));
 const StorePage = lazy(() => import('./pages/StorePage'));
+const ProductConfiguratorPage = lazy(() => import('./features/digital-products/ProductConfiguratorPage'));
 const ChronosPage = lazy(() => import('./pages/ChronosPage'));
 const ServicesPage = lazy(() => import('./pages/ServicesPage'));
 const EditorPage = import.meta.env.DEV ? lazy(() => import('./pages/EditorPage')) : () => null;
@@ -170,6 +171,7 @@ export default function App() {
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/mcp" element={<McpPage />} />
               <Route path="/newsletter" element={<NewsletterPage />} />
+              <Route path="/store/configure/:productId" element={<ProductConfiguratorPage />} />
               <Route path="/store" element={<StorePage />} />
               <Route path="/services" element={<ServicesPage />} />
               <Route path="/live-site-series" element={<StaticRedirect to="/services" />} />

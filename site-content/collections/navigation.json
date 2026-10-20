@@ -1,7 +1,7 @@
 {
   "main": [
-    { "label": "Doctrine", "path": "/#method" },
-    { "label": "Continuity Domains", "path": "/systems" },
+    { "label": "Method", "path": "/#method" },
+    { "label": "Stratified Systems", "path": "/systems" },
     { "label": "Forge", "path": "/forge" },
     { "label": "Identity", "path": "/identity" },
     { "label": "Archive", "path": "/build-archive" },
@@ -21,7 +21,7 @@
     ],
     "explore": [
       { "label": "Continuity Architecture", "path": "/architecture" },
-      { "label": "Continuity Domains", "path": "/systems" },
+      { "label": "Stratified Systems", "path": "/systems" },
       { "label": "The Forge", "path": "/forge" },
       { "label": "Operator Identity", "path": "/identity" },
       { "label": "Build Archive", "path": "/build-archive" },
@@ -34,7 +34,7 @@
       { "label": "Card Studio", "path": "/card-studio" },
       { "label": "Gallery", "path": "/gallery" },
       { "label": "Dev Diary", "path": "/dev-diary" },
-      { "label": "Store", "path": "/store", "note": "Staged" }
+      { "label": "Products", "path": "/store", "note": "Sandbox prep" }
     ]
   }
 }

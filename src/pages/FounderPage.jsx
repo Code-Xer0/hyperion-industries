@@ -49,7 +49,7 @@ const BUILD_CARDS = [
   { title: 'Governed Memory', sub: '03 · Memory', body: 'Memory is not context bloat. It is source-anchored recall, provenance, and controlled retrieval.', more: 'Surfaces: MNEM.OS continuity engine · CHRON.OS archive intelligence.', icon: <><ellipse cx="12" cy="5.5" rx="8" ry="3" /><path d="M4 5.5v13c0 1.7 3.6 3 8 3s8-1.3 8-3v-13M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3" /></> },
   { title: 'Local-First Custody', sub: '04 · Custody', body: 'The operator should know what is local, what is remote, what is remembered, what is approved, and what is allowed to leave.', more: 'Doctrine: the classification ladder below — Sovereign through Public.', icon: <><path d="M12 2 4 6v6c0 5 3.4 8.6 8 10 4.6-1.4 8-5 8-10V6l-8-4z" /><path d="M9.5 12l1.8 1.8L15 10" /></> },
   { title: 'Agentic Governance', sub: '05 · Governance', body: 'AI can assist, propose, route, and accelerate. High-consequence mutation belongs behind gates.', more: 'Doctrine: read ≠ write · write ≠ run · run ≠ publish.', icon: <><circle cx="6" cy="6" r="2.5" /><circle cx="6" cy="18" r="2.5" /><circle cx="18" cy="12" r="2.5" /><path d="M8.5 6H13a3 3 0 0 1 3 3v0M8.5 18H13a3 3 0 0 0 3-3v0" /></> },
-  { title: 'Continuity Infrastructure', sub: '06 · Continuity', body: 'Systems for preserving the thread across devices, documents, agents, people, and time.', more: 'Surfaces: archive recovery · governed memory · the thread across devices.', icon: <><path d="M7 9a3 3 0 1 0 0 6h2.5M17 9a3 3 0 1 1 0 6h-2.5M9.5 12h5" /></> },
+  { title: 'Stratified Systems', sub: '06 · Systems', body: 'Integrated operating systems across people, workflow, AI, applications, data, identity, governance, infrastructure, and physical operations.', more: 'Engineering property: continuity across changes in people, vendors, devices, models, locations, and failures.', icon: <><path d="M7 9a3 3 0 1 0 0 6h2.5M17 9a3 3 0 1 1 0 6h-2.5M9.5 12h5" /></> },
 ];
 const STAGE_SPRING = { type: 'spring', stiffness: 230, damping: 27, mass: 0.9 };
 
@@ -624,7 +624,7 @@ export default function FounderPage() {
                 <div className="eyebrow gold" style={{ marginBottom: 20 }}>Background</div>
                 <div className="timeline">
                   {[
-                    ['NOW', 'Founder · Hyperion Industries LLC', 'Building continuity infrastructure that preserves state, provenance, context, and human authority across fragmented operations.'],
+                    ['NOW', 'Founder · Hyperion Industries LLC', 'Building Stratified Systems across people, software, AI, infrastructure, workflow, and governance, with continuity through change.'],
                     ['BUILDING', 'The .OS system family', 'CHR0N.OS, Mnem.OS, and the operator runtime — local-first workflows, continuity tooling, and identity-linked products.'],
                     ['FOCUS', 'Alignment · product · partner network', 'Non-dilutive funding, grant programs, strategic partners, early customers, and sovereignty-aligned technical growth.'],
                     ['PRACTICE', 'Architecture & deployment', 'Software architecture, local-first AI, deployment systems, NFC identity tools, and automation frameworks — practical systems people can actually use.'],
@@ -751,11 +751,11 @@ export default function FounderPage() {
                   <div className="eyebrow">Collaboration &amp; inquiries</div>
                   <h2 className="section-title">Start an inquiry.</h2>
                 </div>
-                <p className="section-lead">Hyperion is currently focused on early infrastructure, protected-source maturation, public doctrine, and selected consulting or collaboration lanes.</p>
+                <p className="section-lead">Hyperion builds integrated operational systems, from focused interventions to complete deployments, with public doctrine and clear operator authority.</p>
                 <div style={{ marginTop: 26 }}>
                   <div className="eyebrow" style={{ marginBottom: 0 }}>Good-fit inquiries</div>
                   <div className="fit-list">
-                    {['Local-first AI infrastructure', 'Custom systems & hardware', 'Agentic workflow governance', 'Archive & memory systems', 'Operator dashboards', 'Technical strategy', 'AI infrastructure consulting', 'Founder / operator collaboration', 'Writing / interview / media'].map((p) => (
+                    {['Local-first AI systems', 'Custom systems & hardware', 'Agent workflow governance', 'Archive & memory systems', 'Operator dashboards', 'Technical strategy', 'Stratified Systems engagements', 'Founder / operator collaboration', 'Writing / interview / media'].map((p) => (
                       <span className="pill" key={p}>{p}</span>
                     ))}
                   </div>

@@ -16,6 +16,17 @@ async function digest(value: string): Promise<string> {
   return Array.from(new Uint8Array(result), (byte) => byte.toString(16).padStart(2, "0")).join("");
 }
 
+function canonical(value: unknown): string {
+  const stable = (item: unknown): unknown => {
+    if (Array.isArray(item)) return item.map(stable);
+    if (!item || typeof item !== "object") return item;
+    return Object.fromEntries(Object.entries(item as Record<string, unknown>)
+      .sort(([left], [right]) => left.localeCompare(right))
+      .map(([key, child]) => [key, stable(child)]));
+  };
+  return JSON.stringify(stable(value));
+}
+
 async function projectRow(overrides: Record<string, unknown> = {}) {
   return {
     project_id: PROJECT,
@@ -202,14 +213,15 @@ describe("Card Studio public order spine", () => {
 
   it("returns an idempotent receipt without creating a second proposal", async () => {
     const receipt = { intent_id: "coi_existingrecord", status: "received for operator review" };
+    const intent = orderFixture({ project_id: PROJECT, revision_id: REVISION });
     const db = new MockD1().queueFirst(
       await projectRow(),
-      { intent_id: "coi_existingrecord", payload_hash: "a".repeat(64), receipt_json: JSON.stringify(receipt) },
+      { intent_id: "coi_existingrecord", project_id: PROJECT, payload_hash: await digest(canonical(intent)), receipt_json: JSON.stringify(receipt) },
     );
     const response = await worker().fetch(
       cardRequest(
         `/api/card-studio/projects/${PROJECT}/submit`,
-        orderFixture({ project_id: PROJECT, revision_id: REVISION }),
+        intent,
         "card-submit-duplicate-key",
       ),
       cardEnv(db),
@@ -218,6 +230,24 @@ describe("Card Studio public order spine", () => {
     expect(response.status).toBe(200);
     expect(await response.json()).toMatchObject({ duplicate: true, receipt });
     expect(db.batch).not.toHaveBeenCalled();
+  });
+
+  it("quarantines changed content and cross-project reuse of an idempotency key", async () => {
+    const intent = orderFixture({ project_id: PROJECT, revision_id: REVISION });
+    const db = new MockD1().queueFirst(
+      await projectRow(),
+      { intent_id: "coi_existingrecord", project_id: "csp_otherproject01", payload_hash: "a".repeat(64), receipt_json: "{}" },
+    );
+    const response = await worker().fetch(
+      cardRequest(`/api/card-studio/projects/${PROJECT}/submit`, intent, "card-submit-duplicate-key"),
+      cardEnv(db),
+      executionContext().ctx,
+    );
+    expect(response.status).toBe(409);
+    expect(await response.json()).toMatchObject({ error: { code: "idempotency_payload_conflict" } });
+    const sql = db.batches[0]?.map((statement) => statement.sql).join("\n") ?? "";
+    expect(sql).toContain("INSERT INTO card_studio_revision_conflicts");
+    expect(sql).toContain("idempotency_payload_conflict_quarantined");
   });
 
   it("quarantines conflicting intent identifiers and never emits another outbox event", async () => {
@@ -307,7 +337,7 @@ describe("Card Studio operator decisions", () => {
       intent_id: "coi_abcdefghijkl",
       revision_hash: "a".repeat(64),
       eligibility: "instant_checkout_eligible",
-      proposal_state: "active",
+      proposal_state: "proof_approved",
     });
     const response = await worker().fetch(
       commandRequest("release_checkout"),
@@ -341,6 +371,24 @@ describe("Card Studio operator decisions", () => {
     );
     expect(response.status).toBe(409);
     expect(await response.json()).toMatchObject({ error: { code: "checkout_not_eligible" } });
+    expect(db.batch).not.toHaveBeenCalled();
+  });
+
+  it("rejects checkout release until the exact proof revision has operator approval", async () => {
+    const db = new MockD1().queueFirst(null, {
+      proposal_id: "cdp_abcdefghijkl",
+      intent_id: "coi_abcdefghijkl",
+      revision_hash: "a".repeat(64),
+      eligibility: "instant_checkout_eligible",
+      proposal_state: "active",
+    });
+    const response = await worker().fetch(
+      commandRequest("release_checkout"),
+      operatorEnv(db),
+      executionContext().ctx,
+    );
+    expect(response.status).toBe(409);
+    expect(await response.json()).toMatchObject({ error: { code: "proof_approval_required" } });
     expect(db.batch).not.toHaveBeenCalled();
   });
 

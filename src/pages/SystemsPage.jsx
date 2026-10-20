@@ -230,6 +230,15 @@ export default function SystemsPage() {
         <div className="sp-grid-3">{systems.map((system) => <SystemCard key={system.id} system={system} compact />)}</div>
       </div>
     ),
+    configurations: (
+      <section className="systems-configurations">
+        <header><span className="sp-label">Illustrative operating configurations</span><h2>Different environments. The same systems problem.</h2><p>{PUBLIC_DOCTRINE.method}</p></header>
+        <div className="sp-grid-3">
+          {PUBLIC_DOCTRINE.configurations.map((configuration) => <article className="sp-lane-card" key={configuration.id}><span>{configuration.id.replaceAll('-', ' ')}</span><h3>{configuration.title}</h3><p>{configuration.detail}</p></article>)}
+        </div>
+        <p className="systems-configurations-range">{PUBLIC_DOCTRINE.operatingRange} Continuity preserves operating state across changes in people, vendors, devices, models, locations, and failures.</p>
+      </section>
+    ),
     proof: <div className="sp-grid-2 systems-active-room">{primary.map((system) => <SystemCard key={system.id} system={system} />)}</div>,
     research: <div className="sp-grid-3 systems-lane-room">{secondary.map((system) => <SystemCard key={system.id} system={system} compact />)}</div>,
     authority: (
@@ -242,7 +251,7 @@ export default function SystemsPage() {
   return (
     <PageShell>
       <HoverEditor model="content">
-        <RoomShell eyebrow="Systems / Continuity Domains" title="Systems" summary={content.systems.hero.lead} status="MATURITY-LABELED PUBLIC MAP" tone="map" stations={[{ id: 'directory', label: 'Domains' }, { id: 'proof', label: 'Public Proof' }, { id: 'research', label: 'Research' }, { id: 'authority', label: 'Authority' }]} panels={panels} defaultStation="directory" className="systems-room-shell" />
+        <RoomShell eyebrow="Stratified Systems / Operating configurations" title="Systems" summary={content.systems.hero.lead} status="MATURITY-LABELED PUBLIC MAP" tone="map" stations={[{ id: 'directory', label: 'Domains' }, { id: 'configurations', label: 'Configurations' }, { id: 'proof', label: 'Public Proof' }, { id: 'research', label: 'Research' }, { id: 'authority', label: 'Authority' }]} panels={panels} defaultStation="directory" className="systems-room-shell" />
       </HoverEditor>
 
       {/* Dev-only inline systems manager */}

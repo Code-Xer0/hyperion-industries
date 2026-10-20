@@ -2,14 +2,14 @@
 export const PUBLIC_CORPUS = {
   "schemaVersion": 1,
   "corpusId": "hyperion-operator-public",
-  "revision": "2026-08-03",
+  "revision": "2026-10-20",
   "entries": [
     {
       "id": "company-overview",
       "title": "Hyperion Industries",
       "sourcePath": "/",
       "visibility": "public",
-      "content": "Hyperion Industries builds continuity infrastructure for fragmented operations. Its governed, local-first systems preserve state across people, places, tools, hardware, documents, decisions, and service workflows. Public claims preserve maturity labels and never imply access to private operator systems, records, source code, telemetry, or execution authority."
+      "content": "Hyperion Industries builds Stratified Systems: coherent operational systems across business logic, human workflow, agents, applications and data, identity and governance, infrastructure, and physical operations. Continuity is an engineering property across changes in people, vendors, devices, models, locations, and failures. The economic promise is more useful capability from the people and infrastructure an organization already has. Public claims preserve maturity labels and never imply access to private operator systems, records, source code, telemetry, or execution authority."
     },
     {
       "id": "operating-doctrine",
@@ -44,7 +44,7 @@ export const PUBLIC_CORPUS = {
       "title": "Contact and intake",
       "sourcePath": "/contact",
       "visibility": "public",
-      "content": "Hyperion begins with a bounded assessment of the continuity failure, workload, trust surface, support issue, or relationship question. Visitors should share the current environment, affected people or systems, known evidence, constraints, and what a useful first artifact would be. A submitted signal begins operator review; it is not a quote, contract, deployment, access grant, or automation promise. Visitors must not submit credentials, secrets, private archives, restricted logs, or sensitive operational records."
+      "content": "Hyperion begins with a bounded assessment of the objective, current system, existing tools, failure, budget, deadline, success criteria, and whether strategy, implementation, or both are needed. A submitted signal begins operator review; it is not a quote, contract, deployment, access grant, or automation promise. Visitors must not submit credentials, secrets, private archives, restricted logs, or sensitive operational records."
     },
     {
       "id": "founding-operators",
@@ -52,7 +52,14 @@ export const PUBLIC_CORPUS = {
       "sourcePath": "/founders",
       "visibility": "public",
       "content": "Victor Amani is the founder and systems architect behind Hyperion Industries' local-first infrastructure direction. Keshawn Rowe is the founding operator focused on operations, deployment, field systems, build intake, and client handoff. Public profiles describe responsibility without exposing private records or operator controls."
+    },
+    {
+      "id": "digital-products",
+      "title": "Personalized digital products",
+      "sourcePath": "/store",
+      "visibility": "public",
+      "content": "Hyperion is preparing three deterministic products: Agent Policy ($19), Flight Pack ($29), and Local + Frontier Routing Starter Kit ($49), with free representative samples. Each package is configured from buyer-supplied constraints. Checkout, payment, entitlement, and fulfillment remain disabled while sandbox preparation is incomplete; the site does not currently take payment for these products."
     }
   ],
-  "sha256": "f77e78a9fcf2b29b1b33ef108e67f5e3fc847cfc58ea2311389a32cfdb0f2fdd"
+  "sha256": "22648400a344350015796fa2757225311af2dac392d95a4af2fadff6b751935f"
 } as const;

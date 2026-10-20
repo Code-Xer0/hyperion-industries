@@ -90,11 +90,16 @@
     {
       "form_id": "general",
       "title": "Tell us what you are carrying",
-      "estimated_minutes": 3,
+      "estimated_minutes": 7,
       "questions": [
-        { "id": "general.outcome", "type": "long_text", "label": "What outcome are you trying to reach?", "required": true },
-        { "id": "general.current_state", "type": "long_text", "label": "What exists today?", "required": true },
-        { "id": "general.blocker", "type": "long_text", "label": "What is blocking or breaking?", "required": true },
+        { "id": "general.outcome", "type": "long_text", "label": "What objective are you trying to achieve?", "required": true },
+        { "id": "general.current_state", "type": "long_text", "label": "What system, workflow, or operating environment exists today?", "required": true },
+        { "id": "general.existing_tools", "type": "long_text", "label": "Which tools, applications, data sources, or hardware are already involved? Write none or unknown if needed.", "required": true },
+        { "id": "general.blocker", "type": "long_text", "label": "What is broken, blocked, or costing the most effort?", "required": true },
+        { "id": "general.success_criteria", "type": "long_text", "label": "What observable result would make this successful?", "required": true },
+        { "id": "general.budget", "type": "text", "label": "What budget range should shape the first step? Unknown is acceptable.", "required": true },
+        { "id": "general.deadline", "type": "text", "label": "What deadline or decision window matters? None or unknown is acceptable.", "required": true },
+        { "id": "general.help_needed", "type": "single_select", "label": "What kind of help do you need?", "required": true, "options": ["strategy", "implementation", "both", "unsure"] },
         { "id": "general.scope", "type": "single_select", "label": "Who or what is affected?", "required": true, "options": ["self", "team", "organization", "site", "multiple_sites", "unknown"] },
         { "id": "general.next_step", "type": "single_select", "label": "What would help next?", "required": true, "options": ["recommendation", "assessment", "quote", "support", "conversation", "unknown"] }
       ],
