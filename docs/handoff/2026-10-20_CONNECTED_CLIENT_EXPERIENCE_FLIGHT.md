@@ -2,7 +2,7 @@
 
 Updated: 2026-10-20
 
-This ledger tracks the recovered flight in the current repository checkout and distinguishes its pushed branch from the public production site. The current feature branch is `codex/intake-lead-visibility` at `ff08b828a1eda075b84f48e38c645ec60dcb281c`. No production deployment, service activation, payment, or release was performed.
+This ledger tracks the recovered flight in the current repository checkout and distinguishes its pushed branch from the public production site. The implementation snapshot described here was pushed as `72c3cbace2133e2c73d44d07d5f5b3421b2acfac` on `codex/intake-lead-visibility`; subsequent commits on that branch update these handoff documents. No production deployment, service activation, payment, or release was performed.
 
 ## Public site observed on 2026-10-20
 
